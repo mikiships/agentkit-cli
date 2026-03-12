@@ -266,3 +266,47 @@ def test_run_summary_table_title(tmp_path):
     with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
         result = runner.invoke(app, ["run", "--path", str(tmp_path)])
     assert "Pipeline Summary" in result.output
+
+
+def test_lint_diff_step_uses_check_command(tmp_path):
+    """lint-diff step must call agentlint check, not pass path as command."""
+    calls = []
+    def mock_run(tool, args, cwd=None):
+        calls.append((tool, args))
+        result = MagicMock()
+        result.returncode = 0
+        result.stdout = "clean"
+        result.stderr = ""
+        return result
+
+    (tmp_path / "CLAUDE.md").write_text("# Test")
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=True), \
+         patch("agentkit_cli.commands.run_cmd.run_tool", side_effect=mock_run):
+        runner.invoke(app, ["run", "--path", str(tmp_path), "--skip", "benchmark"])
+
+    lint_diff_calls = [(t, a) for t, a in calls if a and a[0] == "check"]
+    assert len(lint_diff_calls) >= 1, f"Expected agentlint check call, got: {calls}"
+    assert lint_diff_calls[0][0] == "agentlint"
+    assert lint_diff_calls[0][1][0] == "check"
+
+
+def test_reflect_step_uses_from_notes_flag(tmp_path):
+    """reflect step must use --from-notes, not --notes."""
+    calls = []
+    def mock_run(tool, args, cwd=None):
+        calls.append((tool, args))
+        result = MagicMock()
+        result.returncode = 0
+        result.stdout = "ok"
+        result.stderr = ""
+        return result
+
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=True), \
+         patch("agentkit_cli.commands.run_cmd.run_tool", side_effect=mock_run):
+        runner.invoke(app, ["run", "--path", str(tmp_path), "--skip", "benchmark"])
+
+    reflect_calls = [(t, a) for t, a in calls if t == "agentreflect"]
+    assert len(reflect_calls) >= 1, f"Expected agentreflect call, got: {calls}"
+    args = reflect_calls[0][1]
+    assert "--from-notes" in args, f"Expected --from-notes in args, got: {args}"
+    assert "--notes" not in args or "--from-notes" in args, "Should use --from-notes, not --notes"

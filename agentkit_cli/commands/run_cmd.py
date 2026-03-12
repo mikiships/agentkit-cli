@@ -97,7 +97,7 @@ def run_command(
 
         # Step 3: lint diffs
         console.print("[dim]→ agentlint (diff) ...[/dim]")
-        r2 = _run_step("lint-diff", "agentlint", [cwd_str], cwd_str)
+        r2 = _run_step("lint-diff", "agentlint", ["check", "HEAD~1"], cwd_str)
         results.append(r2)
     else:
         results.append({"step": "lint-context", "tool": "agentlint", "status": "skipped", "reason": "user skipped", "duration": 0.0})
@@ -113,7 +113,7 @@ def run_command(
 
     # Step 5: reflect
     if "reflect" not in skip_set:
-        reflect_args = ["generate", "--notes", notes or "agentkit run completed", cwd_str]
+        reflect_args = ["generate", "--from-notes", notes or "agentkit run completed"]
         console.print("[dim]→ agentreflect generate ...[/dim]")
         r = _run_step("reflect", "agentreflect", reflect_args, cwd_str)
         results.append(r)

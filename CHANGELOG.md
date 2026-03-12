@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.1 (2026-03-12)
+
+### Fixed
+- `agentkit run` lint-diff step: was passing project path as command to agentlint (causing "No such command" error). Now correctly calls `agentlint check HEAD~1`.
+- `agentkit run` reflect step: was using `--notes` flag (doesn't exist in agentreflect). Now correctly uses `--from-notes`.
+- Added `pyyaml` dev dependency for GitHub Action tests.
+
+### Tests
+- 82 tests (up from 47). Added regression tests for both bug fixes.
+
 ## v0.2.0 (2026-03-12)
 
 ### Added
