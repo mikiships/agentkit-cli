@@ -1,0 +1,60 @@
+name: agentkit pipeline
+description: Run the full Agent Quality pipeline (agentmd, agentlint, coderace, agentreflect) on your repo.
+author: mikiships
+
+inputs:
+  skip:
+    description: Comma-separated pipeline steps to skip (generate, lint, benchmark, reflect)
+    required: false
+    default: ''
+  benchmark:
+    description: Enable benchmark step (coderace). Set to 'true' to enable.
+    required: false
+    default: 'false'
+  python-version:
+    description: Python version to use
+    required: false
+    default: '3.12'
+  fail-on-lint:
+    description: Exit 1 if agentlint reports failures
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install agentkit-cli and quartet tools
+      shell: bash
+      run: |
+        pip install --upgrade pip
+        pip install agentkit-cli agentmd agentlint coderace agentreflect
+
+    - name: Run agentkit doctor
+      shell: bash
+      run: agentkit doctor
+
+    - name: Run agentkit pipeline
+      shell: bash
+      run: |
+        SKIP_ARGS=""
+        if [ -n "${{ inputs.skip }}" ]; then
+          for step in $(echo "${{ inputs.skip }}" | tr ',' ' '); do
+            SKIP_ARGS="$SKIP_ARGS --skip $step"
+          done
+        fi
+        BENCH_FLAG=""
+        if [ "${{ inputs.benchmark }}" = "true" ]; then
+          BENCH_FLAG="--benchmark"
+        fi
+        agentkit run $SKIP_ARGS $BENCH_FLAG --json
+
+    - name: Check lint result
+      if: inputs.fail-on-lint == 'true'
+      shell: bash
+      run: |
+        echo "Lint check enforced (fail-on-lint=true). Pipeline exit code already propagated above."

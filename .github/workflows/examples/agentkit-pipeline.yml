@@ -1,0 +1,23 @@
+name: Agent Quality Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  agentkit:
+    runs-on: ubuntu-latest
+    name: Run agentkit pipeline
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run agentkit pipeline
+        uses: mikiships/agentkit-cli@v0.2.0
+        with:
+          python-version: '3.12'
+          skip: ''
+          benchmark: 'false'
+          fail-on-lint: 'true'
