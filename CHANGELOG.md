@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.3.0 (2026-03-12)
+
+### Added
+- `agentkit ci` — generate a ready-to-use `.github/workflows/agentkit.yml` in one command
+  - `--python-version`, `--benchmark`, `--min-score`, `--output-dir`, `--dry-run` flags
+  - Generated YAML is validated via `yaml.safe_load` before writing
+  - Installs all quartet tools and runs `agentkit run --ci` on every PR
+- `agentkit watch` — watch the project for file changes and re-run the pipeline automatically
+  - Powered by `watchdog` library
+  - `--extensions`, `--debounce`, `--ci` flags
+  - 2-second debounce by default; graceful Ctrl+C handling
+- `agentkit run --ci` flag — CI-friendly non-interactive mode
+  - Plain text output (no Rich markup/spinners for clean CI logs)
+  - Exits 1 on any step failure
+  - `--json` output now includes `success: bool` and `steps[{name, status, duration_ms, output_file}]` per contract spec
+
+### Changed
+- `agentkit run --json` output: added `success` top-level key; `steps` now uses contract format `{name, status, duration_ms, output_file}`; legacy `summary.steps` fields preserved for backwards compat
+- `pyproject.toml`: added `watchdog>=3.0.0` and `pyyaml>=6.0.0` as runtime dependencies
+
+### Tests
+- 142 tests (up from 82). Added 30+ tests across `test_ci.py`, `test_watch.py`, `test_run_ci.py`.
+
 ## v0.2.1 (2026-03-12)
 
 ### Fixed
