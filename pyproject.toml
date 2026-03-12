@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentkit-cli"
-version = "0.2.1"
+version = "0.3.0"
 description = "Unified CLI for the Agent Quality Toolkit (agentmd, coderace, agentlint, agentreflect)"
 readme = "README.md"
 license = {text = "MIT"}
@@ -15,6 +15,8 @@ requires-python = ">=3.11"
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
+    "watchdog>=3.0.0",
+    "pyyaml>=6.0.0",
 ]
 keywords = ["ai", "agents", "llm", "cli", "toolkit", "quality", "benchmark"]
 classifiers = [

@@ -65,6 +65,7 @@ def run_command(
     benchmark: bool = typer.Option(False, "--benchmark", help="Include benchmark step (skipped by default)"),
     json_output: bool = typer.Option(False, "--json", help="Output summary JSON"),
     notes: Optional[str] = typer.Option(None, "--notes", help="Notes passed to agentreflect"),
+    ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on any failure"),
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -75,14 +76,27 @@ def run_command(
     if not benchmark:
         skip_set.add("benchmark")
 
-    console.print(f"\n[bold]agentkit run[/bold] — project: {root}\n")
+    # In CI mode, use a plain console (no Rich markup/spinners)
+    ci_console = Console(highlight=False, markup=False) if ci else None
+    active_console = ci_console if ci else console
+
+    active_console.print(f"\nagentkit run — project: {root}\n" if ci else f"\n[bold]agentkit run[/bold] — project: {root}\n")
 
     context_file = root / "CLAUDE.md"
     results = []
 
+    def _print(msg: str) -> None:
+        if ci:
+            # Strip Rich markup for CI plain output
+            import re
+            plain = re.sub(r'\[/?[^\]]+\]', '', msg)
+            active_console.print(plain)
+        else:
+            active_console.print(msg)
+
     # Step 1: generate
     if "generate" not in skip_set:
-        console.print("[dim]→ agentmd generate ...[/dim]")
+        _print("[dim]→ agentmd generate ...[/dim]")
         r = _run_step("generate", "agentmd", ["generate", cwd_str], cwd_str)
         results.append(r)
     else:
@@ -91,12 +105,12 @@ def run_command(
     # Step 2: lint context file
     if "lint" not in skip_set:
         lint_args = ["check-context", str(context_file)] if context_file.exists() else ["check-context", cwd_str]
-        console.print("[dim]→ agentlint check-context ...[/dim]")
+        _print("[dim]→ agentlint check-context ...[/dim]")
         r = _run_step("lint-context", "agentlint", lint_args, cwd_str)
         results.append(r)
 
         # Step 3: lint diffs
-        console.print("[dim]→ agentlint (diff) ...[/dim]")
+        _print("[dim]→ agentlint (diff) ...[/dim]")
         r2 = _run_step("lint-diff", "agentlint", ["check", "HEAD~1"], cwd_str)
         results.append(r2)
     else:
@@ -105,7 +119,7 @@ def run_command(
 
     # Step 4: benchmark (opt-in)
     if "benchmark" not in skip_set:
-        console.print("[dim]→ coderace benchmark ...[/dim]")
+        _print("[dim]→ coderace benchmark ...[/dim]")
         r = _run_step("benchmark", "coderace", ["benchmark", cwd_str], cwd_str)
         results.append(r)
     else:
@@ -114,7 +128,7 @@ def run_command(
     # Step 5: reflect
     if "reflect" not in skip_set:
         reflect_args = ["generate", "--from-notes", notes or "agentkit run completed"]
-        console.print("[dim]→ agentreflect generate ...[/dim]")
+        _print("[dim]→ agentreflect generate ...[/dim]")
         r = _run_step("reflect", "agentreflect", reflect_args, cwd_str)
         results.append(r)
     else:
@@ -134,31 +148,53 @@ def run_command(
         "error": ("✗ ERROR", "red"),
     }
 
-    table = Table(title="Pipeline Summary", show_header=True)
-    table.add_column("Step", style="bold")
-    table.add_column("Status")
-    table.add_column("Duration")
-    table.add_column("Notes", max_width=60)
+    if ci:
+        # Plain text summary for CI logs
+        active_console.print("\nPipeline Summary:")
+        for r in results:
+            status = r.get("status", "unknown")
+            symbol = STATUS_SYMBOLS.get(status, (status, "white"))[0]
+            duration_s = r.get("duration", 0.0) or 0.0
+            duration = f" ({duration_s:.2f}s)" if duration_s else ""
+            active_console.print(f"  {r['step']:20s}  {symbol}{duration}")
+    else:
+        table = Table(title="Pipeline Summary", show_header=True)
+        table.add_column("Step", style="bold")
+        table.add_column("Status")
+        table.add_column("Duration")
+        table.add_column("Notes", max_width=60)
 
-    for r in results:
-        status = r.get("status", "unknown")
-        symbol, color = STATUS_SYMBOLS.get(status, (status, "white"))
-        duration_s = r.get("duration", 0.0) or 0.0
-        duration = f"{duration_s:.2f}s" if duration_s else ""
-        note = r.get("reason", "") or (r.get("output", "")[:60] if r.get("output") else "")
-        table.add_row(
-            r["step"],
-            f"[{color}]{symbol}[/{color}]",
-            duration,
-            note,
-        )
+        for r in results:
+            status = r.get("status", "unknown")
+            symbol, color = STATUS_SYMBOLS.get(status, (status, "white"))
+            duration_s = r.get("duration", 0.0) or 0.0
+            duration = f"{duration_s:.2f}s" if duration_s else ""
+            note = r.get("reason", "") or (r.get("output", "")[:60] if r.get("output") else "")
+            table.add_row(
+                r["step"],
+                f"[{color}]{symbol}[/{color}]",
+                duration,
+                note,
+            )
 
-    console.print()
-    console.print(table)
-    console.print(f"\n[bold]{passed_count}/{total_count} steps passed[/bold]")
+        console.print()
+        console.print(table)
 
-    # Save last run
-    step_summary = [
+    active_console.print(f"\n{passed_count}/{total_count} steps passed" if ci else f"\n[bold]{passed_count}/{total_count} steps passed[/bold]")
+
+    # Build structured step summaries
+    # New contract format: {name, status, duration_ms, output_file}
+    steps_new = [
+        {
+            "name": r["step"],
+            "status": r.get("status", "unknown"),
+            "duration_ms": int((r.get("duration", 0.0) or 0.0) * 1000),
+            "output_file": None,
+        }
+        for r in results
+    ]
+    # Legacy format preserved for backwards compat
+    steps_legacy = [
         {
             "step": r["step"],
             "status": r.get("status", "unknown"),
@@ -168,11 +204,13 @@ def run_command(
         for r in results
     ]
     summary = {
+        "success": failed_count == 0,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "project": cwd_str,
-        "steps": results,
+        # `steps` satisfies both old tests (list) and new contract format
+        "steps": steps_new,
         "summary": {
-            "steps": step_summary,
+            "steps": steps_legacy,
             "total": total_count,
             "passed": passed_count,
             "failed": failed_count,
@@ -194,7 +232,13 @@ def run_command(
 
     # Final status
     if failed_count > 0:
-        console.print(f"\n[red]Pipeline completed with {failed_count} failure(s).[/red]")
+        if ci:
+            active_console.print(f"\nPipeline completed with {failed_count} failure(s).")
+        else:
+            console.print(f"\n[red]Pipeline completed with {failed_count} failure(s).[/red]")
         raise typer.Exit(code=1)
     else:
-        console.print(f"\n[green]Pipeline complete.[/green] {passed_count} passed, {skipped_count} skipped.\n")
+        if ci:
+            active_console.print(f"\nPipeline complete. {passed_count} passed, {skipped_count} skipped.\n")
+        else:
+            console.print(f"\n[green]Pipeline complete.[/green] {passed_count} passed, {skipped_count} skipped.\n")

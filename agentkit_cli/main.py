@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 import typer
-from typing import Optional
+from typing import List, Optional
 from pathlib import Path
 
 from agentkit_cli.commands.init_cmd import init_command
 from agentkit_cli.commands.run_cmd import run_command
 from agentkit_cli.commands.status_cmd import status_command
 from agentkit_cli.commands.doctor_cmd import doctor_command
+from agentkit_cli.commands.ci import ci_command
+from agentkit_cli.commands.watch import watch_command
 
 app = typer.Typer(
     name="agentkit",
@@ -28,13 +30,14 @@ def init(
 @app.command("run")
 def run(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
-    skip: Optional[list[str]] = typer.Option(None, "--skip", help="Steps to skip: generate, lint, benchmark, reflect"),
+    skip: Optional[List[str]] = typer.Option(None, "--skip", help="Steps to skip: generate, lint, benchmark, reflect"),
     benchmark: bool = typer.Option(False, "--benchmark", help="Include benchmark step (off by default)"),
     json_output: bool = typer.Option(False, "--json", help="Emit summary as JSON"),
     notes: Optional[str] = typer.Option(None, "--notes", help="Notes for agentreflect"),
+    ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on failure"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci)
 
 
 @app.command("doctor")
@@ -52,6 +55,35 @@ def status(
 ) -> None:
     """Show health status of toolkit and current project."""
     status_command(path=path, json_output=json_output)
+
+
+@app.command("ci")
+def ci(
+    python_version: str = typer.Option("3.12", "--python-version", help="Python version for the workflow"),
+    benchmark: bool = typer.Option(False, "--benchmark", help="Include coderace benchmark step"),
+    min_score: Optional[int] = typer.Option(None, "--min-score", help="Gate on maintainer rubric score"),
+    output_dir: Path = typer.Option(Path(".github/workflows"), "--output-dir", help="Where to write the workflow file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print to stdout instead of writing file"),
+) -> None:
+    """Generate a GitHub Actions workflow that runs the agentkit pipeline on every PR."""
+    ci_command(
+        python_version=python_version,
+        benchmark=benchmark,
+        min_score=min_score,
+        output_dir=output_dir,
+        dry_run=dry_run,
+    )
+
+
+@app.command("watch")
+def watch(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory to watch"),
+    extensions: Optional[List[str]] = typer.Option(None, "--extensions", help="File extensions to watch (e.g. .py,.md)"),
+    debounce: float = typer.Option(2.0, "--debounce", help="Debounce delay in seconds"),
+    ci: bool = typer.Option(False, "--ci", help="Run pipeline in CI mode on changes"),
+) -> None:
+    """Watch the project for changes and re-run the pipeline automatically."""
+    watch_command(path=path, extensions=extensions, debounce=debounce, ci=ci)
 
 
 @app.callback(invoke_without_command=True)
