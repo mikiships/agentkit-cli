@@ -1,91 +1,64 @@
-# BUILD-REPORT.md — agentkit-cli v0.1.0
+# BUILD-REPORT.md — agentkit-cli v0.2.0
 
-**Built:** 2026-03-12
-**Builder:** Mordecai (subagent)
-
----
+**Date:** 2026-03-12  
+**Status:** COMPLETE ✓
 
 ## What Was Built
 
-All 5 deliverables completed per contract.
+### D1: `agentkit doctor` command
+- `agentkit_cli/commands/doctor_cmd.py` — checks all 4 quartet tools via `is_installed`/`get_version`
+- Rich table output with ✓/✗ per tool, version, install hint
+- `--json` flag outputs `{"tool": "version-or-NOT FOUND"}`
+- Exit code 1 if any tool missing
+- Registered in `main.py`
+- `tests/test_doctor.py` — 13 tests (unit + CLI integration)
 
-### D1: Project Scaffold
-- `~/repos/agentkit-cli/` created with `pyproject.toml` (hatchling build backend)
-- Package: `agentkit-cli`, importable as `agentkit_cli`
-- CLI entrypoint: `agentkit`
-- Dependencies: `typer>=0.9.0`, `rich>=13.0.0` only
-- MIT license, README.md, CHANGELOG.md
+### D2: GitHub Action
+- `action.yml` — composite action with 4 inputs: `skip`, `benchmark`, `python-version`, `fail-on-lint`
+- `.github/workflows/examples/agentkit-pipeline.yml` — example workflow
+- README updated with CI Integration section
+- `tests/test_action.py` — 10 tests verifying YAML structure and required fields
 
-### D2: `agentkit init`
-- Detects git root or falls back to cwd
-- Checks all 4 quartet tools via `shutil.which()`
-- Creates `.agentkit.yaml` with default config (skips if already exists)
-- Shows install hints for missing tools
-- Prints "Next Steps" panel
+### D3: Improved `agentkit run` summary
+- Summary table now uses ✓ PASS / ✗ FAIL / ⊘ SKIPPED symbols
+- `X/Y steps passed` line after table
+- `--json` output now includes `summary` key with `{steps, total, passed, failed, skipped, result}`
+- 10 new tests in `tests/test_run.py` covering all new behavior
 
-### D3: `agentkit run`
-- Sequential 5-step pipeline: generate → lint-context → lint-diff → benchmark → reflect
-- `--skip <step>` flag to skip individual steps
-- `--benchmark` flag to opt-in to coderace step (skipped by default)
-- `--json` flag for machine-readable summary output
-- `--notes` flag passed to agentreflect
-- Saves `.agentkit-last-run.json` after each run
-- Rich table output; non-zero exit on failures
+### D4: Version bump, docs, publish
+- `pyproject.toml`: `version = "0.2.0"`
+- `agentkit_cli/__init__.py`: `__version__ = "0.2.0"`
+- `CHANGELOG.md`: v0.2.0 entry with all three features
+- `README.md`: `agentkit doctor` section + CI Integration section
+- Built and published to PyPI
+- Git tag `v0.2.0` pushed to GitHub
 
-### D4: `agentkit status`
-- Shows all quartet tools with install status, version, and path
-- Shows `.agentkit.yaml`, `CLAUDE.md`, `.agentkit-last-run.json` presence
-- Shows last run summary if available
-- `--json` flag for machine-readable output
+## Test Counts
 
-### D5: Tests, Docs, Publish
-- 47 tests across 5 files — all passing
-- README.md with framing, pipeline diagram, usage examples, quartet links
-- CHANGELOG.md with v0.1.0 entry
-- Published to PyPI
+| Suite | Tests |
+|-------|-------|
+| test_main.py | 7 |
+| test_init.py | 10 |
+| test_run.py | 22 |
+| test_status.py | 7 |
+| test_tools.py | 11 |
+| test_doctor.py | 13 |
+| test_action.py | 10 |
+| **Total** | **80** |
 
----
+All 80 tests pass (47 existing + 33 new).
 
-## Test Count
+## PyPI URL
 
-- **Total tests:** 47
-- **Passed:** 47
-- **Failed:** 0
+https://pypi.org/project/agentkit-cli/0.2.0/
 
-Test files:
-- `tests/test_init.py` — 9 tests
-- `tests/test_run.py` — 13 tests
-- `tests/test_status.py` — 13 tests
-- `tests/test_tools.py` — 8 tests
-- `tests/test_main.py` — 6 tests
+## GitHub
 
----
-
-## PyPI
-
-**URL:** https://pypi.org/project/agentkit-cli/0.1.0/
-
-```bash
-pip install agentkit-cli==0.1.0
-```
-
----
-
-## Deviations from Contract
-
-None. All contract requirements met:
-- subprocess only (no quartet Python imports)
-- 25+ tests (47 delivered)
-- typer + rich only as hard deps
-- All 3 commands (init, run, status) implemented
-- `.agentkit.yaml` created by init
-- `--json` flags on run and status
-- Missing tools handled gracefully with install hints
-
----
+https://github.com/mikiships/agentkit-cli
 
 ## Issues Encountered
 
-1. **Rich console wrapping long paths in JSON output** — rich wraps lines at terminal width, which inserted newlines into JSON strings causing `json.JSONDecodeError`. Fixed by using `print(json.dumps(...))` (stdlib) for JSON output instead of `console.print()`.
-
-2. **Externally-managed Python environment** — system pip3 refused `pip install`. Used `python3 -m venv .venv` pattern. Build and twine upload ran via `.venv/bin/`.
+- The existing `test_main.py::test_version_flag` hardcoded `"0.1.0"` — updated to `"0.2.0"` as part of the version bump.
+- `json.loads(output[json_start:])` failed for JSON summary tests because trailing Rich console output followed the JSON block. Fixed with a balanced-brace JSON extractor helper `_extract_json()`.
+- `test_example_workflow_valid_yaml` initially checked `"on" in data` — PyYAML parses YAML 1.1 `on:` key as boolean `True`, not the string `"on"`. Updated assertion.
+- No remote was configured for the repo; created the GitHub repo via `gh repo create` before pushing tag.
