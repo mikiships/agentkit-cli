@@ -146,3 +146,123 @@ def test_run_passing_steps_exit_zero(tmp_path):
          patch("agentkit_cli.commands.run_cmd.run_tool", return_value=mock_result):
         result = runner.invoke(app, ["run", "--path", str(tmp_path)])
     assert result.exit_code == 0
+
+
+# --- D3: Summary table tests ---
+
+def test_run_summary_shows_pass_count(tmp_path):
+    """Summary line shows X/Y steps passed."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "steps passed" in result.output
+
+
+def test_run_summary_table_has_columns(tmp_path):
+    """Summary table has Step/Status/Duration/Notes columns."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "Step" in result.output
+    assert "Status" in result.output
+    assert "Duration" in result.output
+    assert "Notes" in result.output
+
+
+def test_run_summary_skipped_symbol(tmp_path):
+    """Skipped steps show ⊘ SKIPPED symbol."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "SKIPPED" in result.output
+
+
+def test_run_summary_pass_symbol(tmp_path):
+    """Passed steps show ✓ PASS symbol."""
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stdout = "ok"
+    mock_result.stderr = ""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=True), \
+         patch("agentkit_cli.commands.run_cmd.run_tool", return_value=mock_result):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "PASS" in result.output
+
+
+def test_run_summary_fail_symbol(tmp_path):
+    """Failed steps show ✗ FAIL symbol."""
+    mock_result = MagicMock()
+    mock_result.returncode = 1
+    mock_result.stdout = "error"
+    mock_result.stderr = ""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=True), \
+         patch("agentkit_cli.commands.run_cmd.run_tool", return_value=mock_result):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "FAIL" in result.output
+
+
+def _extract_json(output: str) -> dict:
+    """Extract outermost JSON object from mixed output."""
+    start = output.find("{")
+    assert start != -1, "No JSON found"
+    depth = 0
+    for i, ch in enumerate(output[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return json.loads(output[start:i + 1])
+    raise ValueError("Unterminated JSON")
+
+
+def test_run_json_has_summary_key(tmp_path):
+    """JSON output includes 'summary' key with structured data."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path), "--json"])
+    data = _extract_json(result.output)
+    assert "summary" in data
+    assert "passed" in data["summary"]
+    assert "failed" in data["summary"]
+    assert "skipped" in data["summary"]
+    assert "total" in data["summary"]
+    assert "result" in data["summary"]
+
+
+def test_run_json_summary_result_pass(tmp_path):
+    """JSON summary result=pass when no failures."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path), "--json"])
+    data = _extract_json(result.output)
+    assert data["summary"]["result"] == "pass"
+
+
+def test_run_json_summary_result_fail(tmp_path):
+    """JSON summary result=fail when a step fails."""
+    mock_result = MagicMock()
+    mock_result.returncode = 1
+    mock_result.stdout = "error"
+    mock_result.stderr = ""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=True), \
+         patch("agentkit_cli.commands.run_cmd.run_tool", return_value=mock_result):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path), "--json"])
+    data = _extract_json(result.output)
+    assert data["summary"]["result"] == "fail"
+
+
+def test_run_json_summary_steps_list(tmp_path):
+    """JSON summary.steps is a list with step/status/duration/notes."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path), "--json"])
+    data = _extract_json(result.output)
+    steps = data["summary"]["steps"]
+    assert isinstance(steps, list)
+    assert len(steps) > 0
+    first = steps[0]
+    assert "step" in first
+    assert "status" in first
+    assert "duration" in first
+
+
+def test_run_summary_table_title(tmp_path):
+    """Summary table has 'Pipeline Summary' title."""
+    with patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False):
+        result = runner.invoke(app, ["run", "--path", str(tmp_path)])
+    assert "Pipeline Summary" in result.output

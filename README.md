@@ -109,6 +109,46 @@ agentkit status --json
 
 ---
 
+### `agentkit doctor`
+
+Diagnose whether all quartet tools are installed and functional.
+
+```bash
+agentkit doctor
+agentkit doctor --json
+```
+
+Outputs a Rich table with ✓/✗ per tool, version, and install command. Exits 1 if any tool is missing.
+
+---
+
+## CI Integration
+
+Use the agentkit GitHub Action to run the full pipeline in CI:
+
+```yaml
+- name: Run agentkit pipeline
+  uses: mikiships/agentkit-cli@v0.2.0
+  with:
+    python-version: '3.12'
+    skip: ''
+    benchmark: 'false'
+    fail-on-lint: 'true'
+```
+
+**Inputs:**
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `skip` | `''` | Comma-separated steps to skip (`generate`, `lint`, `benchmark`, `reflect`) |
+| `benchmark` | `false` | Enable coderace benchmark step |
+| `python-version` | `3.12` | Python version to use |
+| `fail-on-lint` | `true` | Exit 1 on agentlint failures |
+
+See [`.github/workflows/examples/agentkit-pipeline.yml`](.github/workflows/examples/agentkit-pipeline.yml) for a full example.
+
+---
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

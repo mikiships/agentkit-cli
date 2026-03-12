@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.0 (2026-03-12)
+
+### Added
+- `agentkit doctor` — diagnose quartet tool installation with Rich table output, `--json` flag, exits 1 on missing tools
+- GitHub Action (`action.yml`) — composite action to run agentkit pipeline in CI with configurable inputs
+- Example workflow (`.github/workflows/examples/agentkit-pipeline.yml`)
+- Improved `agentkit run` summary table with ✓/✗/⊘ status symbols and `X/Y steps passed` line
+- `summary` key in `agentkit run --json` output with structured step results
+
 ## v0.1.0 (2026-03-12)
 
 Initial release.

@@ -120,41 +120,69 @@ def run_command(
     else:
         results.append({"step": "reflect", "tool": "agentreflect", "status": "skipped", "reason": "user skipped", "duration": 0.0})
 
-    # Display table
-    table = Table(title="Pipeline Results", show_header=True)
+    # Build summary counts
+    passed_count = sum(1 for r in results if r.get("status") == "pass")
+    failed_count = sum(1 for r in results if r.get("status") == "fail")
+    skipped_count = sum(1 for r in results if r.get("status") in ("skipped", "error"))
+    total_count = len(results)
+
+    # Display summary table
+    STATUS_SYMBOLS = {
+        "pass": ("✓ PASS", "green"),
+        "fail": ("✗ FAIL", "red"),
+        "skipped": ("⊘ SKIPPED", "yellow"),
+        "error": ("✗ ERROR", "red"),
+    }
+
+    table = Table(title="Pipeline Summary", show_header=True)
     table.add_column("Step", style="bold")
-    table.add_column("Tool")
     table.add_column("Status")
     table.add_column("Duration")
-    table.add_column("Notes", max_width=50)
-
-    status_colors = {"pass": "green", "fail": "red", "skipped": "yellow", "error": "red"}
+    table.add_column("Notes", max_width=60)
 
     for r in results:
         status = r.get("status", "unknown")
-        color = status_colors.get(status, "white")
-        duration = f"{r.get('duration', 0):.2f}s" if r.get("duration") else ""
+        symbol, color = STATUS_SYMBOLS.get(status, (status, "white"))
+        duration_s = r.get("duration", 0.0) or 0.0
+        duration = f"{duration_s:.2f}s" if duration_s else ""
         note = r.get("reason", "") or (r.get("output", "")[:60] if r.get("output") else "")
         table.add_row(
             r["step"],
-            r.get("tool", ""),
-            f"[{color}]{status}[/{color}]",
+            f"[{color}]{symbol}[/{color}]",
             duration,
             note,
         )
 
     console.print()
     console.print(table)
+    console.print(f"\n[bold]{passed_count}/{total_count} steps passed[/bold]")
 
     # Save last run
+    step_summary = [
+        {
+            "step": r["step"],
+            "status": r.get("status", "unknown"),
+            "duration": r.get("duration", 0.0),
+            "notes": r.get("reason", "") or (r.get("output", "")[:60] if r.get("output") else ""),
+        }
+        for r in results
+    ]
     summary = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "project": cwd_str,
         "steps": results,
-        "total": len(results),
-        "passed": sum(1 for r in results if r.get("status") == "pass"),
-        "failed": sum(1 for r in results if r.get("status") == "fail"),
-        "skipped": sum(1 for r in results if r.get("status") == "skipped"),
+        "summary": {
+            "steps": step_summary,
+            "total": total_count,
+            "passed": passed_count,
+            "failed": failed_count,
+            "skipped": skipped_count,
+            "result": "pass" if failed_count == 0 else "fail",
+        },
+        "total": total_count,
+        "passed": passed_count,
+        "failed": failed_count,
+        "skipped": skipped_count,
     }
     try:
         save_last_run(summary, root)
@@ -162,12 +190,11 @@ def run_command(
         pass
 
     if json_output:
-        console.print("\n[bold]JSON Output:[/bold]")
         print(json.dumps(summary, indent=2))
 
     # Final status
-    if summary["failed"] > 0:
-        console.print(f"\n[red]Pipeline completed with {summary['failed']} failure(s).[/red]")
+    if failed_count > 0:
+        console.print(f"\n[red]Pipeline completed with {failed_count} failure(s).[/red]")
         raise typer.Exit(code=1)
     else:
-        console.print(f"\n[green]Pipeline complete.[/green] {summary['passed']} passed, {summary['skipped']} skipped.\n")
+        console.print(f"\n[green]Pipeline complete.[/green] {passed_count} passed, {skipped_count} skipped.\n")
