@@ -53,6 +53,47 @@ pip install agentmd agentlint coderace agentreflect
 
 ## Usage
 
+### `agentkit report`
+
+Generate a shareable HTML quality report for the current project in one command.
+
+```bash
+agentkit report                          # saves agentkit-report.html in current dir
+agentkit report --output myreport.html   # custom output path
+agentkit report --open                   # save and auto-open in browser
+agentkit report --json                   # emit structured JSON to stdout
+agentkit report --path /my/project       # specify project directory
+```
+
+Runs all installed toolkit tools (agentlint, agentmd, coderace, agentreflect) with 60-second timeouts, collects results, and assembles a **self-contained HTML report** — no CDN, no external fonts, suitable for sharing as a screenshot or file. Tools that aren't installed are shown as skipped; the command never crashes regardless of toolkit state.
+
+**Report sections:**
+- Toolkit coverage score (% of tools ran successfully)
+- Context quality score from agentlint (freshness, top issues)
+- Context docs score from agentmd (file sizes, tier structure)
+- Agent benchmark results from coderace (scores per agent, winner highlighted)
+- Reflection summary from agentreflect
+- Pipeline status table (installed / success / failed / not installed)
+
+**JSON output format:**
+```json
+{
+  "project": "my-project",
+  "version": "0.5.0",
+  "coverage": 75,
+  "tools": [
+    {"tool": "agentlint", "installed": true, "status": "success"},
+    {"tool": "agentmd", "installed": true, "status": "success"},
+    {"tool": "coderace", "installed": false, "status": "not_installed"},
+    {"tool": "agentreflect", "installed": true, "status": "success"}
+  ],
+  "agentlint": { ... },
+  "agentmd": { ... },
+  "coderace": null,
+  "agentreflect": { ... }
+}
+```
+
 ### `agentkit demo`
 
 Zero-config first-run experience. Works in any directory — no `.agentkit.yaml` needed.

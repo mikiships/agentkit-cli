@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.5.0 (2026-03-13)
+
+### Added
+- `agentkit report` — run all toolkit checks and generate a shareable HTML quality report
+  - Detects which quartet tools are installed; runs available checks with 60s timeouts
+  - `--json` emits structured JSON with coverage score, per-tool status, and tool output
+  - `--output PATH` saves HTML report to specified path (default: `./agentkit-report.html`)
+  - `--open` auto-opens the report in the default browser after saving
+  - `--path PATH` override project directory
+  - Self-contained HTML: no CDN, no external fonts, no JS libraries — inline CSS only
+  - Dark theme with color-coded scores (green ≥80, yellow 50-79, red <50)
+  - Sections: toolkit coverage, context quality (agentlint), context docs (agentmd), agent benchmark (coderace), reflection (agentreflect), pipeline status table
+  - Gracefully handles any mix of installed/missing/failing tools (never crashes)
+- `agentkit_cli/report_runner.py` — internal module with per-tool runner functions
+  - `run_agentlint_check(path)`, `run_agentmd_score(path)`, `run_coderace_bench(path)`, `run_agentreflect_analyze(path)`
+  - Each returns parsed JSON dict or `None` (tool missing / non-zero exit / unparseable output)
+  - Robust JSON extraction: handles tools that prefix output with non-JSON lines
+
+### Tests
+- 201 tests (up from 170). Added 31 tests in `tests/test_report.py`.
+
 ## v0.4.0 (2026-03-13)
 
 ### Added
