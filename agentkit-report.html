@@ -38,17 +38,17 @@ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;o
 <body>
 <div class="container">
   <h1>agentkit report</h1>
-  <div class="meta">Project: <strong>agentkit-cli</strong> &nbsp;·&nbsp; Generated: 2026-03-13 07:04 UTC &nbsp;·&nbsp; agentkit-cli v0.5.0</div>
+  <div class="meta">Project: <strong>agentkit-cli</strong> &nbsp;·&nbsp; Generated: 2026-03-13 09:01 UTC &nbsp;·&nbsp; agentkit-cli v0.5.0</div>
 
   <!-- Summary row -->
   <div class="grid">
     <div class="card">
       <h2>Toolkit Coverage</h2>
-      <div class="score-big" style="color:#ffb300">75%</div>
-      <div class="score-label">3 of 4 tools ran successfully</div>
+      <div class="score-big" style="color:#4caf50">100%</div>
+      <div class="score-label">4 of 4 tools ran successfully</div>
     </div>
-    <div class="card"><h2>Context Quality</h2><div style="color:#8b949e">agentlint not available</div></div>
-    <div class="card"><h2>Context Docs</h2><div style="color:#8b949e">—</div><div class="score-label">0 files analyzed</div></div>
+    <div class="card"><h2>Context Quality</h2><div class="score-big" style="color:#ffb300">70</div><div class="score-label">agentlint score</div></div>
+    <div class="card"><h2>Context Docs</h2><div class="score-big" style="color:#f44336">0</div><div class="score-label">4 files analyzed</div></div>
   </div>
 
   <!-- Pipeline status -->
@@ -57,7 +57,7 @@ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;o
       <h2>Pipeline Status</h2>
       <table>
         <thead><tr><th>Tool</th><th>Installed</th><th>Status</th></tr></thead>
-        <tbody><tr><td>agentlint</td><td class="status-ok">✓</td><td><span class="badge badge-red">failed</span></td></tr>
+        <tbody><tr><td>agentlint</td><td class="status-ok">✓</td><td><span class="badge badge-green">success</span></td></tr>
 <tr><td>agentmd</td><td class="status-ok">✓</td><td><span class="badge badge-green">success</span></td></tr>
 <tr><td>coderace</td><td class="status-ok">✓</td><td><span class="badge badge-green">success</span></td></tr>
 <tr><td>agentreflect</td><td class="status-ok">✓</td><td><span class="badge badge-green">success</span></td></tr></tbody>
@@ -66,11 +66,17 @@ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;o
   </div>
 
   
+<div class="section">
+  <div class="card">
+    <h2>Context Quality (agentlint)</h2>
+    <table><thead><tr><th>Severity</th><th>Issue</th></tr></thead><tbody><tr><td colspan="2" style="color:#56d364">No issues found</td></tr></tbody></table>
+  </div>
+</div>
   
 <div class="section">
   <div class="card">
     <h2>Context Generation (agentmd)</h2>
-    <table><thead><tr><th>File</th><th>Size</th><th>Tier</th></tr></thead><tbody><tr><td colspan="3" style="color:#8b949e">No file details available</td></tr></tbody></table>
+    <table><thead><tr><th>File</th><th>Size</th><th>Tier</th></tr></thead><tbody><tr><td>?</td><td>?</td><td>?</td></tr><tr><td>?</td><td>?</td><td>?</td></tr><tr><td>?</td><td>?</td><td>?</td></tr><tr><td>?</td><td>?</td><td>?</td></tr></tbody></table>
   </div>
 </div>
   
@@ -90,7 +96,7 @@ pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;o
 
 - [ ] When fixing a bug, add a regression test to prevent recurrence
 
-_Source: 1 failure analyzed, 1 suggestion generated_</pre>
+_Source: 2 failures analyzed, 1 suggestion generated_</pre>
   </div>
 </div>
 

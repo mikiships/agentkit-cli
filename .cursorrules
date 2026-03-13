@@ -1,0 +1,61 @@
+# .cursorrules
+
+Cursor IDE rules. These rules are applied to every AI interaction in this project.
+
+## Always
+- Read the relevant source files before making changes.
+- Make minimal, targeted edits — avoid reformatting unrelated code.
+- Respect the existing code style (indentation, naming, import order).
+- Run `python3 -m pytest tests/ -x` after every non-trivial change.
+- Add type annotations to all new public functions.
+- Use `pathlib.Path` instead of `os.path` for file operations.
+
+## Never
+- Never commit API keys, tokens, or credentials.
+- Never delete tests to make the suite pass.
+- Never use `TODO` comments without a linked issue or explanation.
+- Never make changes outside the scope of the current task without flagging them.
+- Never use `except:` without specifying the exception type.
+- Never use `eval()` or `exec()` on untrusted input.
+
+## Project Overview
+**Primary languages:** Python
+**Package managers:** pip, uv
+**CI:** GitHub Actions
+
+## Build, Test, and Lint Commands
+**Install dependencies:**
+```
+pip install -e '.[dev]'
+```
+```
+uv sync
+```
+**Run tests:**
+```
+python3 -m pytest tests/ -x
+```
+
+## Directory Structure
+**Top-level directories:** `.github`, `agentkit_cli`, `memory`, `tests`
+**Test roots:** `tests`
+**Most-changed directories:** `agentkit_cli`, `tests`, `CHANGELOG.md`, `pyproject.toml`, `BUILD-REPORT.md`
+
+## File Patterns
+**Test files:** `tests/**`
+**Python source:** `**/*.py`
+**Python tests:** `**/test_*.py`, `**/*_test.py`
+
+## Conventions Inferred from Codebase
+**Commit prefix style:** `feat`, `fix`, `d5`, `add`, `build-report.md` (follow this pattern)
+**Common file extensions:** `.py`, `.pyc`, `.md`, `.toml`, `.gz`
+- Python: use type hints on all public functions
+- Python: snake_case for functions/variables, PascalCase for classes
+- Tests: files named `test_*.py`, functions named `test_*`
+
+## Context Preferences
+When writing or reviewing code, prefer to include in context:
+- `tests/` (primary code locations)
+- The file being edited and its direct imports.
+- Relevant test files alongside source files.
+- Configuration files when modifying build or tooling behavior.
