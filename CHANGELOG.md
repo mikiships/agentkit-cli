@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.7.0 (2026-03-13)
+
+### Added
+
+- **GitHub Actions composite action** (`action.yml`) — Run the full Agent Quality Toolkit pipeline on every PR. Checks agentlint context score, agentmd drift, and coderace review, then posts an aggregated quality comment to the PR.
+  - Inputs: `github-token` (required), `min-lint-score` (default: 70), `post-comment` (default: true), `python-version` (default: 3.11)
+  - Outputs: `lint-score`, `drift-status`, `review-summary`
+  - Fails the action if lint score < `min-lint-score`
+- **`scripts/run-agentkit-action.py`** — orchestrates agentlint, agentmd, and coderace; aggregates results to JSON; sets GitHub Actions outputs.
+- **`scripts/post-pr-comment.py`** — posts/updates a formatted markdown quality report comment on the PR via GitHub API (idempotent).
+- **`examples/agentkit-quality.yml`** — ready-to-use workflow file for adopters.
+- **README GitHub Action section** — explains what the action checks, how to add it in 3 lines, PR comment format, and input/output reference.
+
 ## v0.6.0 (2026-03-13)
 
 ### Added
