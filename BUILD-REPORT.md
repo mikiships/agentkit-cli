@@ -1,65 +1,60 @@
-# agentkit-cli v0.10.0 Build Report
+# Build Report — agentkit-cli v0.11.0
 
-Date: 2026-03-13
-Status: COMPLETE
-Tests: 357 passing
-Deliverables: D1 ✓ D2 ✓ D3 ✓ D4 ✓ D5 ✓
+**Date:** 2026-03-13
+**Contract:** memory/contracts/agentkit-cli-v0.11.0-suggest.md
+**Status:** COMPLETE
 
-## Summary
+## What Was Built
 
-Implemented `agentkit compare` — a command that compares agent quality scores between two git refs.
+### `agentkit suggest` command
 
-## Deliverables
+A new CLI command that turns agentlint findings into a prioritized action list answering "What should I fix to improve my agent quality score?"
 
-### D1: Core `agentkit compare` command ✓
-- `agentkit_cli/commands/compare_cmd.py` — full command implementation
-- `agentkit_cli/utils/git_utils.py` — git checkout helpers using `git worktree`
-- `agentkit_cli/utils/__init__.py` — package init
-- Per-tool score deltas in colored Rich table
-- `--json` flag: structured JSON output
-- `--quiet` flag: only emits IMPROVED/NEUTRAL/DEGRADED
-- Graceful N/A handling when tools fail
-- 42 new tests covering all paths
+**New files:**
+- `agentkit_cli/suggest_engine.py` — prioritization engine
+  - `Finding` dataclass (tool, severity, category, description, fix_hint, auto_fixable, file, line)
+  - `parse_agentlint_check_context(json)` — extracts findings from check-context JSON
+  - `parse_agentlint_diff(json)` — extracts findings from diff analysis JSON
+  - `prioritize(findings, top_n)` — deduplicates (same category+file = one finding), sorts critical→high→medium→low
+  - `prioritize_findings(output)` — high-level entry point
+  - Severity mapping: year-rot/path-rot/mcp-security=critical, script-rot/stale-todo=high, bloat/multi-file-conflict=medium, cosmetic/whitespace=low
 
-### D2: Per-file breakdown (`--files` flag) ✓
-- `--files` flag shows changed files between refs
-- Uses `git diff --name-only` via `git_utils.changed_files()`
-- Falls back gracefully if git fails
-- JSON output includes `changed_files` key when `--files` used
+- `agentkit_cli/commands/suggest_cmd.py` — command implementation
+  - `suggest_command(path, show_all, fix, dry_run, json_output)`
+  - Auto-fixes: year-rot (updates years >2 years old), trailing-whitespace, duplicate-blank-lines
+  - Only modifies context files: CLAUDE.md, AGENTS.md, .agents/*.md
+  - `--dry-run` shows unified diff without writing
+  - Rich table output with severity color-coding
+  - Score summary line: "Current score: 72/100 — 3 critical issues found"
 
-### D3: CI mode integration ✓
-- `--ci` flag: exits 1 if verdict is DEGRADED
-- `--min-delta N` flag: exits 1 if net delta is below N
-- Both flags can be combined
-
-### D4: GitHub Actions integration ✓
-- `action.yml` updated with `mode`, `compare-base`, `compare-head`, `min-delta` inputs
-- Example workflow: `.github/workflows/examples/agentkit-compare.yml`
-- YAML validated (no parse errors)
-
-### D5: Docs, CHANGELOG, version bump ✓
-- `CHANGELOG.md` — v0.10.0 entry with full feature list
-- `README.md` — `agentkit compare` section with usage examples and verdicts table
-- `pyproject.toml` — version bumped to 0.10.0
-- `agentkit_cli/__init__.py` — `__version__` bumped to 0.10.0
+**Modified files:**
+- `agentkit_cli/main.py` — wired `suggest` command with all flags
+- `tests/test_suggest.py` — 59 new tests
+- `tests/test_main.py` — updated version assertion
+- `CHANGELOG.md` — v0.11.0 entry
+- `README.md` — `agentkit suggest` section added
+- `pyproject.toml` — version bumped to 0.11.0
+- `agentkit_cli/__init__.py` — version bumped to 0.11.0
 
 ## Test Count
 
-- Baseline: 315 passing
-- Final: 357 passing (+42 new tests)
-- Target was 340+: ✓
+| Phase | Count |
+|-------|-------|
+| Baseline (v0.10.0) | 357 |
+| New tests added | 59 |
+| **Final (v0.11.0)** | **416** |
 
-## Validation Gates
+Contract required 392+ (35+ new). Delivered 416 (59 new). ✓
 
-- [x] `python3 -m pytest --tb=short -q` passes with 0 failures (357 passed)
-- [x] `agentkit compare --help` renders clean usage
-- [x] `--json` flag produces valid JSON (validated in tests)
-- [x] `--quiet` flag outputs only IMPROVED/NEUTRAL/DEGRADED (validated in tests)
-- [x] `--ci` exits 1 on DEGRADED, 0 on IMPROVED/NEUTRAL (validated in tests)
-- [x] N/A tool handling tested (no crash)
+## Deviations from Contract
 
-## Notes
+**None.** All D1–D5 deliverables implemented as specified.
 
-- Fixed a pre-existing timing flake in `tests/test_watch.py::test_on_modified_fires_after_debounce` (sleep 0.15s → 0.30s; debounce=0.05s was too tight on loaded CI machines)
-- `agentkit compare HEAD~1 HEAD` works against this repo's own history; actual tool scoring depends on quartet tools being installed (gracefully N/A if not)
-- The installed `agentkit` binary at `~/.local/bin/agentkit` is v0.5.0 (old); new version runs via `python3 -m agentkit_cli.main`
+Minor implementation notes:
+- Fix helpers (`_fix_year_rot`, etc.) live in `suggest_cmd.py` rather than `suggest_engine.py` since they are command-level concerns and the engine stays importable without side effects.
+- `run_fixes` is also exported from `suggest_cmd.py` (importable for tests).
+- The `suggest_command` function runs auto-fixes even when no agentlint findings exist (a user may want to run `--fix` on a clean project for whitespace/year cleanup).
+
+## Ready to Publish
+
+**Yes.** All 416 tests pass, version bumped to 0.11.0, docs updated, CHANGELOG written.
