@@ -1,55 +1,69 @@
-# BUILD-REPORT: agentkit-cli v0.5.1
+# BUILD-REPORT: agentkit-cli v0.6.0
 
-**Date:** 2026-03-13  
-**Build type:** Bug-fix release — `agentkit report` CLI invocation fixes
+## What Was Built
 
-## Test Results
+### `agentkit publish` (D1)
+New subcommand at `agentkit_cli/publish.py`. Implements the here.now 3-step publish flow:
+1. POST `/v1/publish` to get upload URLs + finalize URL
+2. PUT HTML file content to upload URL
+3. POST finalize URL to get public URL
+
+Features:
+- `HERENOW_API_KEY` env var for authenticated (persistent) publishes
+- Anonymous fallback with 24h expiry notice
+- `--json` flag: outputs `{"url": "...", "expires_in": "24h"}`
+- `--quiet` flag: only prints the URL
+- Clear error messages (file not found → hint to run `agentkit report`)
+- Registered as `agentkit publish [HTML_PATH]` in `main.py`
+
+### `--publish` flags (D2)
+- `agentkit run --publish`: publishes HTML report after pipeline finishes; failure is non-fatal
+- `agentkit report --publish`: publishes HTML report after generation; failure is non-fatal
+
+### Tests (D3)
+10 new tests in `tests/test_publish.py`, all passing, all using mocks (no real HTTP calls):
+- Anonymous and authenticated success paths
+- FileNotFoundError with helpful message
+- Step 1/2/3 HTTP failures (503, 403, 500)
+- `--json` output validation
+- `--quiet` output validation
+- `run --publish` flag integration (publish called, non-fatal)
+- `report --publish` flag integration (publish called, non-fatal on failure)
+
+### Docs + version bump (D4)
+- `README.md`: "Sharing Results" section added after `agentkit report` section
+- `CHANGELOG.md`: `## v0.6.0` entry added
+- `pyproject.toml`: version `0.5.1` → `0.6.0`
+- `agentkit_cli/__init__.py`: version `0.5.0` → `0.6.0`
+
+## Test Count
+
+**220 tests passing** (210 existing + 10 new). No regressions.
+
+## Git Log
 
 ```
-210 passed in 2.65s
+55161d5 D4: add Sharing Results docs, CHANGELOG v0.6.0, bump version to 0.6.0
+17676fa D3: add 10 tests for publish command (220 total passing)
+fb1fb2d D2: add --publish flag to run and report commands
+494102b D1: add agentkit publish command (here.now 3-step API)
 ```
 
-All 210 tests pass (pytest tests/ -x). Includes new tests added in this release:
-- `test_runner_agentlint_uses_format_json_flag` — verifies `--format json` not `--json`
-- `test_runner_coderace_no_history` — graceful no_results dict when history is unparseable
-- `test_runner_coderace_run_fails` — graceful no_results dict when command fails
-- `test_runner_agentreflect_success` — returns `suggestions_md` dict
-- `test_runner_agentreflect_uses_correct_flags` — verifies `--from-git --format markdown`
-- `test_agentmd_summary_card_handles_list` — averages scores across list
-- `test_agentmd_summary_card_handles_empty_list` — no crash on empty list
-- `test_agentmd_summary_card_handles_dict` — existing dict behavior preserved
-- `test_report_html_with_agentmd_list` — full HTML generation with agentmd list
-- `test_agentreflect_section_renders_suggestions_md` — renders suggestions_md key
+## Deviations from Contract
 
-## End-to-End Result
-
-```
-agentkit report --path ~/repos/agentkit-cli
-```
-
-**Result: SUCCESS — HTML produced at agentkit-report.html (4367 bytes)**
-
-Tool outcomes:
-| Tool | Status | Notes |
-|------|--------|-------|
-| agentlint | failed | agentlint itself crashed (unrelated to our fix; non-zero exit) |
-| agentmd | success | returned data, rendered in HTML |
-| coderace | success | no cached history → returned no_results dict gracefully |
-| agentreflect | success | returned suggestions_md markdown |
-
-agentlint's own crash is a pre-existing issue in the agentlint tool itself (Python traceback from inside agentlint's code). Our runner handles it correctly — logs a warning and returns None instead of crashing the report.
-
-## Bugs Fixed
-
-1. **D1 agentlint**: `--json` → `--format json`
-2. **D2 coderace**: `benchmark --json` → `benchmark history` + graceful `no_results` fallback
-3. **D3 agentreflect**: `--format json` → `--from-git --format markdown`, returns `{"suggestions_md": text, "count": N}`
-4. **D4 agentmd crash**: `_agentmd_summary_card` and `_agentmd_section` now handle list input by averaging scores
-
-## Files Changed
-
-- `agentkit_cli/report_runner.py` — D1, D2, D3 fixes
-- `agentkit_cli/commands/report_cmd.py` — D4 fix + agentreflect section rendering
-- `tests/test_report.py` — updated fixtures + 10 new tests
-- `pyproject.toml` — bumped to 0.5.1
-- `CHANGELOG.md` — documented all fixes
+None. All checklist items satisfied:
+- `publish.py` with 3-step here.now API ✓
+- Auth via `HERENOW_API_KEY` ✓
+- Anonymous fallback with 24h notice ✓
+- File-not-found error with hint ✓
+- Registered in `cli.py` (main.py) ✓
+- `agentkit run --publish` ✓
+- `agentkit report --publish` ✓
+- Publish failure non-fatal in both ✓
+- 10 new tests, all mocked ✓
+- README "Sharing Results" section ✓
+- CHANGELOG v0.6.0 entry ✓
+- Version bumped to 0.6.0 ✓
+- `agentkit --version` returns 0.6.0 ✓
+- No PyPI publish ✓
+- No real HTTP calls in tests ✓
