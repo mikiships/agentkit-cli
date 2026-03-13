@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.9.0 (2026-03-13)
+
+### Added
+
+- **`agentkit readme`** — new command to inject or update the agent quality badge in README.md.
+  - Finds README.md in the current directory (or `--readme path/to/README.md`)
+  - Idempotent: if the badge section already exists, updates the score; otherwise appends to end of file
+  - `--dry-run`: show what would change without modifying the file
+  - `--remove`: remove the injected section cleanly
+  - `--section-header`: customize the injected section header (default: `## Agent Quality`)
+  - `--score N`: override computed score
+  - Prints summary: `Updated README.md — agent quality: 87/100 (green)`
+- **`agentkit run --readme`** — runs the full pipeline then injects/updates the README badge
+- **`agentkit report --readme`** — generates the HTML report then injects the badge
+
+### Changed
+
+- Version bumped to 0.9.0
+
 ## v0.8.0 (2026-03-13)
 
 ### Added
