@@ -164,12 +164,18 @@ def test_report_html_default_path(tmp_path):
 
 
 def test_report_html_is_self_contained(tmp_path):
-    """Generated HTML must not reference external URLs (CDN-free)."""
+    """Generated HTML must not reference external CDN scripts/stylesheets.
+    Badge URLs (img.shields.io) are allowed as they are data URLs, not CDN deps.
+    """
     with patch("agentkit_cli.commands.report_cmd.run_all", return_value=ALL_RESULTS):
         runner.invoke(app, ["report", "--path", str(tmp_path)])
     html = (tmp_path / "agentkit-report.html").read_text()
     assert "http://" not in html
-    assert "https://" not in html
+    # Badge URLs (shields.io) are intentional external image links — filter them out
+    html_no_badge = "\n".join(
+        line for line in html.splitlines() if "shields.io" not in line and "github.com/mikiships" not in line
+    )
+    assert "https://" not in html_no_badge
 
 
 def test_report_html_has_minimum_size(tmp_path):

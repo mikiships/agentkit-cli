@@ -391,6 +391,37 @@ Or use `agentkit ci` to generate the workflow automatically (recommended for v0.
 
 ---
 
+## Add a Badge
+
+Show your project's agent quality score in your README:
+
+```bash
+agentkit badge
+```
+
+This outputs a [shields.io](https://shields.io) badge URL plus ready-to-paste Markdown and HTML snippets. Add it to your README:
+
+```markdown
+[![agent quality](https://img.shields.io/badge/agent%20quality-87%2F100-green)](https://github.com/mikiships/agentkit-cli)
+```
+
+For CI or scripting, use `--json`:
+
+```bash
+agentkit badge --json
+# {"score": 87, "color": "green", "badge_url": "...", "markdown": "...", "html": "..."}
+```
+
+To use a fixed score (e.g. from a gating check):
+
+```bash
+agentkit badge --score 87
+```
+
+**Color thresholds:** green ≥80 · yellow 60-79 · orange 40-59 · red <40
+
+---
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

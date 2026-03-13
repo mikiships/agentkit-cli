@@ -14,6 +14,7 @@ from agentkit_cli.commands.watch import watch_command
 from agentkit_cli.commands.demo_cmd import demo_command
 from agentkit_cli.commands.report_cmd import report_command
 from agentkit_cli.publish import publish_command
+from agentkit_cli.commands.badge_cmd import badge_command
 
 app = typer.Typer(
     name="agentkit",
@@ -110,6 +111,16 @@ def publish(
 ) -> None:
     """Publish an HTML report to here.now and return a shareable URL."""
     publish_command(html_path=html_path, json_output=json_output, quiet=quiet)
+
+
+@app.command("badge")
+def badge(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
+    json_output: bool = typer.Option(False, "--json", help="Emit badge info as JSON"),
+    score_override: Optional[int] = typer.Option(None, "--score", help="Use this score instead of computing it"),
+) -> None:
+    """Generate a shields.io-compatible badge showing the project's agent quality score."""
+    badge_command(path=path, json_output=json_output, score_override=score_override)
 
 
 @app.command("watch")

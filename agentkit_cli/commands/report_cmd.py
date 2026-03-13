@@ -14,6 +14,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from agentkit_cli import __version__
+from agentkit_cli.commands.badge_cmd import build_badge_url, build_markdown, score_to_color
 from agentkit_cli.report_runner import (
     run_agentlint_check,
     run_agentmd_score,
@@ -128,6 +129,7 @@ pre{{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;
 <div class="container">
   <h1>agentkit report</h1>
   <div class="meta">Project: <strong>{project_name}</strong> &nbsp;·&nbsp; Generated: {date} &nbsp;·&nbsp; agentkit-cli v{version}</div>
+  {badge_snippet}
 
   <!-- Summary row -->
   <div class="grid">
@@ -332,12 +334,48 @@ def _agentreflect_section(data: Optional[dict]) -> str:
 </div>'''
 
 
+def _compute_overall_score(results: dict) -> int:
+    """Compute overall badge score from results dict."""
+    scores = []
+    lint = results.get("agentlint")
+    if lint:
+        for key in ("score", "freshness_score", "total_score"):
+            v = lint.get(key)
+            if v is not None:
+                try:
+                    scores.append(min(100.0, max(0.0, float(v))))
+                    break
+                except (TypeError, ValueError):
+                    pass
+    md = results.get("agentmd")
+    if md is not None:
+        if isinstance(md, list):
+            vals = [d.get("score") or d.get("total_score") or 0 for d in md if isinstance(d, dict)]
+            if vals:
+                scores.append(min(100.0, max(0.0, sum(vals) / len(vals))))
+        else:
+            for key in ("score", "total_score"):
+                v = md.get(key)
+                if v is not None:
+                    try:
+                        scores.append(min(100.0, max(0.0, float(v))))
+                        break
+                    except (TypeError, ValueError):
+                        pass
+    return int(round(sum(scores) / len(scores))) if scores else 0
+
+
 def build_html(project_name: str, results: dict, statuses: list[dict]) -> str:
     tools_total = len(TOOLS)
     tools_run = sum(1 for k in TOOLS if results.get(k) is not None)
     coverage = round(tools_run / tools_total * 100)
     coverage_color = _score_color_css(coverage)
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    overall_score = _compute_overall_score(results)
+    badge_url = build_badge_url(overall_score)
+    badge_md = build_markdown(badge_url)
+    badge_snippet_html = f'<div style="margin-bottom:16px"><a href="{badge_url}"><img src="{badge_url}" alt="agent quality"></a> <code style="background:#161b22;padding:2px 6px;border-radius:4px;font-size:12px">{badge_md}</code></div>'
 
     return _HTML_TEMPLATE.format(
         project_name=project_name,
@@ -350,6 +388,7 @@ def build_html(project_name: str, results: dict, statuses: list[dict]) -> str:
         agentlint_summary_card=_agentlint_summary_card(results.get("agentlint")),
         agentmd_summary_card=_agentmd_summary_card(results.get("agentmd")),
         pipeline_rows=_pipeline_rows(statuses),
+        badge_snippet=badge_snippet_html,
         agentlint_section=_agentlint_section(results.get("agentlint")),
         agentmd_section=_agentmd_section(results.get("agentmd")),
         coderace_section=_coderace_section(results.get("coderace")),
@@ -441,3 +480,9 @@ def report_command(
                 console.print("[dim]Note: anonymous publish — link expires in 24h.[/dim]")
         except (PublishError, Exception) as e:
             console.print(f"[yellow]Warning: publish failed — {e}[/yellow]")
+        # Always output badge markdown on --publish
+        overall_score = _compute_overall_score(results)
+        badge_url_pub = build_badge_url(overall_score)
+        badge_md_pub = build_markdown(badge_url_pub)
+        console.print(f"\n[bold]Add this badge to your README:[/bold]")
+        console.print(f"  {badge_md_pub}")

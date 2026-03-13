@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.8.0 (2026-03-13)
+
+### Added
+
+- **`agentkit badge`** — new command to generate a shields.io-compatible README badge showing the project's agent quality score. No server required; just a static badge URL.
+  - Computes score from agentlint, agentmd, and coderace results (average of available components)
+  - Color-coded: green ≥80, yellow 60-79, orange 40-59, red <40
+  - Outputs badge URL, Markdown snippet, and HTML snippet
+  - `--json` mode for CI integration: `{"score":87,"color":"green","badge_url":"...","markdown":"...","html":"..."}`
+  - `--score N` to override computed score (useful for testing or CI gates)
+- **Badge in HTML report** — `agentkit report` now embeds the badge at the top of the generated HTML report
+- **Badge on publish** — `agentkit report --publish` now also prints the badge Markdown snippet
+
+### Changed
+
+- Version bumped to 0.8.0
+
 ## v0.7.0 (2026-03-13)
 
 ### Added

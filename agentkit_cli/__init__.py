@@ -1,3 +1,3 @@
 """agentkit-cli: Unified CLI for the Agent Quality Toolkit."""
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
