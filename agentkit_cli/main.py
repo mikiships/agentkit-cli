@@ -16,6 +16,7 @@ from agentkit_cli.commands.report_cmd import report_command
 from agentkit_cli.publish import publish_command
 from agentkit_cli.commands.badge_cmd import badge_command
 from agentkit_cli.commands.readme_cmd import readme_command
+from agentkit_cli.commands.compare_cmd import compare_command
 
 app = typer.Typer(
     name="agentkit",
@@ -143,6 +144,32 @@ def readme(
         section_header=section_header,
         path=path,
         score_override=score_override,
+    )
+
+
+@app.command("compare")
+def compare(
+    ref1: str = typer.Argument("HEAD~1", help="Base ref (older)"),
+    ref2: str = typer.Argument("HEAD", help="Head ref (newer)"),
+    tools: Optional[List[str]] = typer.Option(None, "--tools", help="Tools to compare (default: all quartet)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit structured JSON"),
+    quiet: bool = typer.Option(False, "--quiet", help="Only print IMPROVED/NEUTRAL/DEGRADED verdict"),
+    ci_mode: bool = typer.Option(False, "--ci", help="Exit 1 if verdict is DEGRADED"),
+    min_delta: Optional[float] = typer.Option(None, "--min-delta", help="Fail if net delta is below this value"),
+    files: bool = typer.Option(False, "--files", help="Show per-file score breakdown"),
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
+) -> None:
+    """Compare agent quality scores between two git refs."""
+    compare_command(
+        ref1=ref1,
+        ref2=ref2,
+        tools=tools,
+        json_output=json_output,
+        quiet=quiet,
+        ci_mode=ci_mode,
+        min_delta=min_delta,
+        files=files,
+        path=path,
     )
 
 
