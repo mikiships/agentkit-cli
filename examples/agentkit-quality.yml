@@ -1,0 +1,17 @@
+name: Agent Quality
+
+on: [pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mikiships/agentkit-cli@v0.7.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          min-lint-score: '70'
+          post-comment: 'true'

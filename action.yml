@@ -1,24 +1,36 @@
-name: agentkit pipeline
-description: Run the full Agent Quality pipeline (agentmd, agentlint, coderace, agentreflect) on your repo.
+name: Agent Quality Toolkit
+description: >
+  Run agentlint, agentmd drift, and coderace review on every PR,
+  then post an aggregated quality comment. Part of the agentkit-cli suite.
 author: mikiships
 
 inputs:
-  skip:
-    description: Comma-separated pipeline steps to skip (generate, lint, benchmark, reflect)
-    required: false
-    default: ''
-  benchmark:
-    description: Enable benchmark step (coderace). Set to 'true' to enable.
-    required: false
-    default: 'false'
   python-version:
     description: Python version to use
     required: false
-    default: '3.12'
-  fail-on-lint:
-    description: Exit 1 if agentlint reports failures
+    default: '3.11'
+  min-lint-score:
+    description: Minimum agentlint score (0-100). Action fails if score is below this.
+    required: false
+    default: '70'
+  post-comment:
+    description: Post a PR comment with the quality report
     required: false
     default: 'true'
+  github-token:
+    description: GitHub token for posting PR comments
+    required: true
+
+outputs:
+  lint-score:
+    description: agentlint context score (0-100)
+    value: ${{ steps.run-toolkit.outputs.lint-score }}
+  drift-status:
+    description: agentmd drift status (fresh / drifted / skipped)
+    value: ${{ steps.run-toolkit.outputs.drift-status }}
+  review-summary:
+    description: coderace review summary string
+    value: ${{ steps.run-toolkit.outputs.review-summary }}
 
 runs:
   using: composite
@@ -28,33 +40,31 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
 
-    - name: Install agentkit-cli and quartet tools
+    - name: Install agentkit-cli and dependencies
       shell: bash
       run: |
         pip install --upgrade pip
         pip install agentkit-cli agentmd agentlint coderace agentreflect
 
-    - name: Run agentkit doctor
+    - name: Run Agent Quality Toolkit
+      id: run-toolkit
       shell: bash
-      run: agentkit doctor
-
-    - name: Run agentkit pipeline
-      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        MIN_LINT_SCORE: ${{ inputs.min-lint-score }}
+        POST_COMMENT: ${{ inputs.post-comment }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
       run: |
-        SKIP_ARGS=""
-        if [ -n "${{ inputs.skip }}" ]; then
-          for step in $(echo "${{ inputs.skip }}" | tr ',' ' '); do
-            SKIP_ARGS="$SKIP_ARGS --skip $step"
-          done
-        fi
-        BENCH_FLAG=""
-        if [ "${{ inputs.benchmark }}" = "true" ]; then
-          BENCH_FLAG="--benchmark"
-        fi
-        agentkit run $SKIP_ARGS $BENCH_FLAG --json
+        python "${{ github.action_path }}/scripts/run-agentkit-action.py"
 
-    - name: Check lint result
-      if: inputs.fail-on-lint == 'true'
+    - name: Post PR comment
+      if: inputs.post-comment == 'true' && github.event_name == 'pull_request'
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+        QUALITY_SUMMARY_FILE: /tmp/agentkit-quality-summary.json
       run: |
-        echo "Lint check enforced (fail-on-lint=true). Pipeline exit code already propagated above."
+        python "${{ github.action_path }}/scripts/post-pr-comment.py"

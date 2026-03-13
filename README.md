@@ -125,6 +125,63 @@ export HERENOW_API_KEY=your-key-here
 agentkit publish   # link never expires
 ```
 
+### GitHub Action
+
+Add automated agent quality checks to every pull request with the `mikiships/agentkit-cli` GitHub Action.
+
+[![Agent Quality](https://github.com/mikiships/agentkit-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mikiships/agentkit-cli/actions/workflows/ci.yml)
+
+**What it checks:**
+- **Context Lint Score** — runs `agentlint check-context` and scores your `AGENTS.md` / `CLAUDE.md` (0–100). Fails the action if the score falls below `min-lint-score`.
+- **Context Drift** — runs `agentmd drift` to detect whether your context file has drifted from the codebase.
+- **Code Review** — runs `coderace review` on the PR diff with parallel review lanes.
+
+**Add it in 3 lines:**
+
+```yaml
+# .github/workflows/agent-quality.yml
+name: Agent Quality
+on: [pull_request]
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mikiships/agentkit-cli@v0.7.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          min-lint-score: '70'
+```
+
+**PR comment format:**
+
+```
+## 🔬 Agent Quality Report
+
+| Check | Result |
+|-------|--------|
+| Context Lint Score | 85/100 |
+| Context Drift | ✅ Fresh |
+| Code Review | Review complete |
+
+[Details in workflow logs]
+```
+
+**Inputs:**
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `github-token` | — | Required. Token for posting PR comments. |
+| `min-lint-score` | `70` | Minimum lint score. Action fails if below this. |
+| `post-comment` | `true` | Whether to post a PR comment. |
+| `python-version` | `3.11` | Python version to use. |
+
+**Outputs:** `lint-score`, `drift-status`, `review-summary`
+
+See [`examples/agentkit-quality.yml`](examples/agentkit-quality.yml) for a complete ready-to-use workflow.
+
 ### `agentkit demo`
 
 Zero-config first-run experience. Works in any directory — no `.agentkit.yaml` needed.
