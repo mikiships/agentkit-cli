@@ -12,6 +12,7 @@ from agentkit_cli.commands.doctor_cmd import doctor_command
 from agentkit_cli.commands.ci import ci_command
 from agentkit_cli.commands.watch import watch_command
 from agentkit_cli.commands.demo_cmd import demo_command
+from agentkit_cli.commands.report_cmd import report_command
 
 app = typer.Typer(
     name="agentkit",
@@ -85,6 +86,17 @@ def demo(
 ) -> None:
     """Zero-config demo: shows the toolkit in action without any setup."""
     demo_command(task=task, agents=agents, skip_benchmark=skip_benchmark, json_output=json_output)
+
+
+@app.command("report")
+def report(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory to analyse"),
+    json_output: bool = typer.Option(False, "--json", help="Emit results as JSON to stdout"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Path to write HTML report (default: ./agentkit-report.html)"),
+    open_browser: bool = typer.Option(False, "--open", help="Auto-open the HTML report in the default browser"),
+) -> None:
+    """Run all toolkit checks and generate a self-contained HTML quality report."""
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser)
 
 
 @app.command("watch")
