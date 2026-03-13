@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.11.0 (2026-03-13)
+
+### Added
+- `agentkit suggest` command: prioritized action list from agentlint findings
+- `suggest_engine.py`: `Finding` dataclass, `parse_agentlint_check_context`, `parse_agentlint_diff`, `prioritize`, `prioritize_findings`
+- `--fix` flag: auto-applies safe fixes (year-rot, trailing-whitespace, duplicate-blank-lines) to context files only
+- `--dry-run` flag: shows unified diff without writing changes
+- `--all` flag: shows all findings instead of top 5
+- `--json` flag: structured JSON output with score + findings array
+- 59 new tests (357 → 416 total)
+
 ## v0.10.0 (2026-03-13)
 
 ### Added

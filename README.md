@@ -365,6 +365,49 @@ agentkit compare --files HEAD~1 HEAD
 - `NEUTRAL` — net delta between -5 and +5
 - `DEGRADED` — net delta < -5
 
+### `agentkit suggest`
+
+Get a prioritized action list from agentlint findings. Answers: "What should I fix to improve my agent quality score?"
+
+```bash
+# Show top 5 prioritized findings
+agentkit suggest
+
+# Show all findings
+agentkit suggest --all
+
+# Output as JSON
+agentkit suggest --json
+
+# Auto-apply safe fixes (year-rot, trailing whitespace, duplicate blank lines)
+agentkit suggest --fix
+
+# Preview fixes without applying
+agentkit suggest --fix --dry-run
+
+# Run against a specific project directory
+agentkit suggest --path /my/project
+```
+
+Shows:
+```
+Current score: 72/100 — 3 critical issues found
+
+ agentkit suggest — top findings
+ #  Severity   Category              Description       Fix Hint        Auto-fix?
+ 1  critical   year-rot              Stale year 2021   Update year     yes
+ 2  critical   path-rot              Broken file ref   Fix or remove   no
+ 3  high       stale-todo            Unresolved TODO   Resolve TODO    no
+```
+
+**Safe auto-fixes** (`--fix`): Only modifies CLAUDE.md, AGENTS.md, and `.agents/*.md`. Never touches source code files.
+
+- **year-rot**: Updates stale year references (>2 years old) to current year
+- **trailing-whitespace**: Strips trailing whitespace
+- **duplicate-blank-lines**: Collapses 3+ consecutive blank lines to 2
+
+---
+
 ### `agentkit watch`
 
 Watch the project for file changes and automatically re-run the pipeline.
