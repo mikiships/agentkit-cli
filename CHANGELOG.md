@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0 (2026-03-13)
+
+### Added
+
+- **`agentkit publish`** — new command to upload an HTML report to [here.now](https://here.now) and return a shareable URL. Supports anonymous (24h expiry) and authenticated (persistent) publishes via `HERENOW_API_KEY` env var. Options: `--json`, `--quiet`.
+- **`agentkit report --publish`** — generate a report and publish it in one command. Publish failure is non-fatal (prints a warning, does not exit 1).
+- **`agentkit run --publish`** — run the full pipeline and publish the resulting report. Publish failure is also non-fatal.
+
 ## v0.5.1 (2026-03-13)
 
 ### Fixed

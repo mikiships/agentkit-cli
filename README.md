@@ -94,6 +94,37 @@ Runs all installed toolkit tools (agentlint, agentmd, coderace, agentreflect) wi
 }
 ```
 
+### Sharing Results
+
+Publish a report to [here.now](https://here.now) and get a shareable link in seconds.
+
+```bash
+# Publish the most recently generated report
+agentkit publish
+
+# Publish a specific report file
+agentkit publish path/to/report.html
+
+# Generate and publish in one command
+agentkit report --publish
+
+# Run the full pipeline and publish at the end
+agentkit run --publish
+
+# Get just the URL (useful in scripts)
+agentkit publish --quiet
+
+# Get JSON output with URL and expiry info
+agentkit publish --json
+```
+
+**Authentication:** Anonymous publishes expire after 24 hours. For persistent links, set the `HERENOW_API_KEY` environment variable:
+
+```bash
+export HERENOW_API_KEY=your-key-here
+agentkit publish   # link never expires
+```
+
 ### `agentkit demo`
 
 Zero-config first-run experience. Works in any directory — no `.agentkit.yaml` needed.
