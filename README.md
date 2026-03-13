@@ -330,6 +330,41 @@ jobs:
 
 ---
 
+### `agentkit compare`
+
+Compare agent quality scores between two git refs. Useful for "did my PR improve or degrade agent quality?"
+
+```bash
+# Quick check: compare last commit to HEAD
+agentkit compare
+
+# Explicit refs
+agentkit compare HEAD~1 HEAD
+
+# Only show verdict (for shell scripts)
+agentkit compare --quiet HEAD~1 HEAD
+
+# Structured JSON output
+agentkit compare --json HEAD~1 HEAD
+
+# CI mode: exit 1 if verdict is DEGRADED
+agentkit compare --ci HEAD~1 HEAD
+
+# Require at least +5 net delta improvement
+agentkit compare --ci --min-delta 5 HEAD~1 HEAD
+
+# Limit to specific tools
+agentkit compare --tools agentlint,agentreflect HEAD~1 HEAD
+
+# Show which files changed between refs
+agentkit compare --files HEAD~1 HEAD
+```
+
+**Verdicts:**
+- `IMPROVED` — net delta > +5
+- `NEUTRAL` — net delta between -5 and +5
+- `DEGRADED` — net delta < -5
+
 ### `agentkit watch`
 
 Watch the project for file changes and automatically re-run the pipeline.

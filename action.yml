@@ -20,6 +20,22 @@ inputs:
   github-token:
     description: GitHub token for posting PR comments
     required: true
+  mode:
+    description: 'Action mode: run (default) or compare'
+    required: false
+    default: 'run'
+  compare-base:
+    description: Base ref for compare mode (leave empty to use PR base SHA)
+    required: false
+    default: ''
+  compare-head:
+    description: Head ref for compare mode (leave empty to use current SHA)
+    required: false
+    default: ''
+  min-delta:
+    description: Minimum net delta for compare mode. Fails if net delta is below this.
+    required: false
+    default: '0'
 
 outputs:
   lint-score:
@@ -55,8 +71,20 @@ runs:
         POST_COMMENT: ${{ inputs.post-comment }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO: ${{ github.repository }}
+        AGENTKIT_MODE: ${{ inputs.mode }}
+        COMPARE_BASE: ${{ inputs.compare-base }}
+        COMPARE_HEAD: ${{ inputs.compare-head }}
+        MIN_DELTA: ${{ inputs.min-delta }}
       run: |
-        python "${{ github.action_path }}/scripts/run-agentkit-action.py"
+        if [ "${{ inputs.mode }}" = "compare" ]; then
+          BASE="${{ inputs.compare-base }}"
+          HEAD_REF="${{ inputs.compare-head }}"
+          if [ -z "$BASE" ]; then BASE="${{ github.event.pull_request.base.sha }}"; fi
+          if [ -z "$HEAD_REF" ]; then HEAD_REF="${{ github.sha }}"; fi
+          agentkit compare --ci --min-delta "${{ inputs.min-delta }}" "$BASE" "$HEAD_REF"
+        else
+          python "${{ github.action_path }}/scripts/run-agentkit-action.py"
+        fi
 
     - name: Post PR comment
       if: inputs.post-comment == 'true' && github.event_name == 'pull_request'

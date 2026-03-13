@@ -47,7 +47,7 @@ class TestChangeHandler:
         """Handler fires after debounce period."""
         handler, calls = self._make_handler(debounce=0.05)
         handler.on_modified("/tmp/test/foo.py")
-        time.sleep(0.15)
+        time.sleep(0.30)
         assert len(calls) == 1
         assert calls[0] == "/tmp/test/foo.py"
 

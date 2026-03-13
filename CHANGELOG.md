@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.10.0 (2026-03-13)
+
+### Added
+
+- **`agentkit compare`** — new command to compare agent quality scores between two git refs.
+  - `agentkit compare <ref1> <ref2>` (defaults: `HEAD~1`, `HEAD`)
+  - Per-tool score deltas shown in a colored Rich table (green = improved, red = degraded)
+  - Net delta + verdict: `IMPROVED` (>+5), `NEUTRAL` (-5..+5), `DEGRADED` (<-5)
+  - `--json` flag: structured JSON output with all deltas
+  - `--quiet` flag: only prints the verdict (IMPROVED/NEUTRAL/DEGRADED) — ideal for shell scripts
+  - `--ci` flag: exits with code 1 if verdict is DEGRADED
+  - `--min-delta N` flag: exits 1 if net delta is below N (for stricter CI gates)
+  - `--tools` flag: limit which quartet tools are compared
+  - `--files` flag: show which files changed between refs
+  - Graceful handling of tool failures (marks as N/A, does not crash)
+  - Uses `git worktree` for safe, isolated checkout of each ref
+- **`agentkit_cli/utils/git_utils.py`** — new git helpers (resolve_ref, changed_files, Worktree context manager)
+- **GitHub Action `mode: compare`** — new compare mode for action.yml with `compare-base`, `compare-head`, and `min-delta` inputs
+- **Example workflow** — `.github/workflows/examples/agentkit-compare.yml`
+
+### Changed
+
+- Version bumped to 0.10.0
+
 ## v0.9.0 (2026-03-13)
 
 ### Added

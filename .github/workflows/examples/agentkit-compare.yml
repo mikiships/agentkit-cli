@@ -1,0 +1,42 @@
+name: Agent Quality Compare
+
+on:
+  pull_request:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install agentkit-cli
+        run: |
+          pip install --upgrade pip
+          pip install agentkit-cli agentmd-gen ai-agentlint coderace ai-agentreflect
+
+      - name: Compare agent quality scores
+        uses: ./
+        with:
+          mode: compare
+          compare-base: ${{ github.event.pull_request.base.sha }}
+          compare-head: ${{ github.sha }}
+          min-delta: 0
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Alternative: run compare directly via CLI
+      # - name: Compare scores (CLI)
+      #   run: |
+      #     agentkit compare --ci --min-delta 0 \
+      #       ${{ github.event.pull_request.base.sha }} \
+      #       ${{ github.sha }}
