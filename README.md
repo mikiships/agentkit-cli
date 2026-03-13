@@ -53,6 +53,22 @@ pip install agentmd agentlint coderace agentreflect
 
 ## Usage
 
+### `agentkit demo`
+
+Zero-config first-run experience. Works in any directory — no `.agentkit.yaml` needed.
+
+```bash
+agentkit demo                        # auto-detect project type and agents
+agentkit demo --skip-benchmark       # just run generate + lint + reflect
+agentkit demo --task refactor        # pick a specific coderace task
+agentkit demo --agents claude,codex  # specify agents manually
+agentkit demo --json                 # emit results as JSON
+```
+
+Detects your project type (python/typescript/javascript/generic), picks the best benchmark task, finds installed agents (claude, codex), and runs the full pipeline without any setup. Footer shows how to continue with `agentkit init && agentkit run`.
+
+---
+
 ### `agentkit init`
 
 Initialize agentkit in a project. Checks which tools are installed and creates `.agentkit.yaml`.

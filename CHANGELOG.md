@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.4.0 (2026-03-13)
+
+### Added
+- `agentkit demo` — zero-config first-run experience
+  - Detects project type (python/typescript/javascript/generic) from directory contents
+  - Auto-selects best coderace task for detected project type
+  - Auto-detects available AI agents (claude, codex) via PATH
+  - Runs generate → lint → reflect pipeline steps without any config file
+  - Optional benchmark step when agents are available
+  - `--task TEXT` override, `--agents TEXT` override, `--skip-benchmark`, `--json` flags
+  - Rich output with step table, benchmark results table, and footer hint
+  - Highlights best-scoring agent in green
+
+### Tests
+- 157+ tests (up from 142). Added 20 tests in `test_demo.py`.
+
 ## v0.3.0 (2026-03-12)
 
 ### Added

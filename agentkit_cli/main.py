@@ -11,6 +11,7 @@ from agentkit_cli.commands.status_cmd import status_command
 from agentkit_cli.commands.doctor_cmd import doctor_command
 from agentkit_cli.commands.ci import ci_command
 from agentkit_cli.commands.watch import watch_command
+from agentkit_cli.commands.demo_cmd import demo_command
 
 app = typer.Typer(
     name="agentkit",
@@ -73,6 +74,17 @@ def ci(
         output_dir=output_dir,
         dry_run=dry_run,
     )
+
+
+@app.command("demo")
+def demo(
+    task: Optional[str] = typer.Option(None, "--task", help="Coderace task to benchmark (default: auto-pick)"),
+    agents: Optional[str] = typer.Option(None, "--agents", help="Comma-separated agents, e.g. claude,codex"),
+    skip_benchmark: bool = typer.Option(False, "--skip-benchmark", help="Skip coderace benchmark step"),
+    json_output: bool = typer.Option(False, "--json", help="Emit results as JSON"),
+) -> None:
+    """Zero-config demo: shows the toolkit in action without any setup."""
+    demo_command(task=task, agents=agents, skip_benchmark=skip_benchmark, json_output=json_output)
 
 
 @app.command("watch")
