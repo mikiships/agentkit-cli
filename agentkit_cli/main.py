@@ -17,6 +17,7 @@ from agentkit_cli.publish import publish_command
 from agentkit_cli.commands.badge_cmd import badge_command
 from agentkit_cli.commands.readme_cmd import readme_command
 from agentkit_cli.commands.compare_cmd import compare_command
+from agentkit_cli.commands.suggest_cmd import suggest_command
 
 app = typer.Typer(
     name="agentkit",
@@ -171,6 +172,18 @@ def compare(
         files=files,
         path=path,
     )
+
+
+@app.command("suggest")
+def suggest(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project root (default: cwd)"),
+    show_all: bool = typer.Option(False, "--all", help="Show all findings, not just top 5"),
+    fix: bool = typer.Option(False, "--fix", help="Auto-apply safe fixes (year-rot, trailing-whitespace, duplicate-blank-lines)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="With --fix, show diff without applying"),
+    json_output: bool = typer.Option(False, "--json", help="Emit findings as JSON to stdout"),
+) -> None:
+    """Show prioritized action list from agentlint findings. Optionally auto-fix safe issues."""
+    suggest_command(path=path, show_all=show_all, fix=fix, dry_run=dry_run, json_output=json_output)
 
 
 @app.command("watch")
