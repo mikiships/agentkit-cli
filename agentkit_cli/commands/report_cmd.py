@@ -366,6 +366,7 @@ def report_command(
     json_output: bool,
     output: Optional[Path],
     open_browser: bool,
+    publish: bool = False,
 ) -> None:
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -427,3 +428,16 @@ def report_command(
     if open_browser:
         webbrowser.open(out_path.as_uri())
         console.print("[dim]Opening in browser...[/dim]")
+
+    if publish:
+        from agentkit_cli.publish import publish_html, PublishError
+        import os
+        try:
+            api_key = os.environ.get("HERENOW_API_KEY") or None
+            result = publish_html(out_path, api_key=api_key)
+            url = result["url"]
+            console.print(f"[bold]Report published:[/bold] {url}")
+            if result.get("anonymous"):
+                console.print("[dim]Note: anonymous publish — link expires in 24h.[/dim]")
+        except (PublishError, Exception) as e:
+            console.print(f"[yellow]Warning: publish failed — {e}[/yellow]")

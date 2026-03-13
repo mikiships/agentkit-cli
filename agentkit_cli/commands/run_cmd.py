@@ -66,6 +66,7 @@ def run_command(
     json_output: bool = typer.Option(False, "--json", help="Output summary JSON"),
     notes: Optional[str] = typer.Option(None, "--notes", help="Notes passed to agentreflect"),
     ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on any failure"),
+    publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -229,6 +230,32 @@ def run_command(
 
     if json_output:
         print(json.dumps(summary, indent=2))
+
+    # Optional publish step
+    if publish:
+        from agentkit_cli.publish import publish_html, resolve_html_path, PublishError
+        import os
+        try:
+            html_path = resolve_html_path(None)
+            api_key = os.environ.get("HERENOW_API_KEY") or None
+            result = publish_html(html_path, api_key=api_key)
+            url = result["url"]
+            if ci:
+                active_console.print(f"\nReport published: {url}")
+            else:
+                console.print(f"\n[bold]Report published:[/bold] {url}")
+            if result.get("anonymous"):
+                msg = "Note: anonymous publish — link expires in 24h."
+                if ci:
+                    active_console.print(msg)
+                else:
+                    console.print(f"[dim]{msg}[/dim]")
+        except (FileNotFoundError, PublishError, Exception) as e:
+            warn = f"Warning: publish failed — {e}"
+            if ci:
+                active_console.print(warn)
+            else:
+                console.print(f"[yellow]{warn}[/yellow]")
 
     # Final status
     if failed_count > 0:
