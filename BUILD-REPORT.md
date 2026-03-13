@@ -1,63 +1,55 @@
-# BUILD-REPORT.md — agentkit-cli v0.5.0
+# BUILD-REPORT: agentkit-cli v0.5.1
 
-Build date: 2026-03-13
-Contract: `memory/contracts/agentkit-cli-v0.5.0-report.md`
+**Date:** 2026-03-13  
+**Build type:** Bug-fix release — `agentkit report` CLI invocation fixes
 
-## Final Test Count
+## Test Results
 
-**201 tests passing** (baseline: 170, new: 31)
-
-All tests pass clean: `python3 -m pytest tests/ -q` → `201 passed`
-
-## Deliverables
-
-| # | Deliverable | Status | Notes |
-|---|-------------|--------|-------|
-| D1 | `agentkit report` subcommand | ✅ Complete | `--help`, `--json`, `--output`, `--open`, `--path` all working |
-| D2 | Self-contained HTML report | ✅ Complete | Dark theme, inline CSS, no CDN, color-coded scores, all sections |
-| D3 | `report_runner.py` module | ✅ Complete | 4 runner functions, graceful None on failure/missing |
-| D4 | 20+ new tests in `test_report.py` | ✅ Complete | 31 tests added |
-| D5 | v0.5.0 bump + README + CHANGELOG | ✅ Complete | pyproject.toml, `__init__.py`, README, CHANGELOG all updated |
-
-## Commits
-
-1. `725bcf6` — `feat: D1/D2/D3 agentkit report command + HTML report + report_runner module`
-2. `7335291` — `feat: D4 add 31 tests in test_report.py (201 total)`
-3. `7979c00` — `feat: D5 bump to v0.5.0, update README and CHANGELOG`
-
-## Skipped / Notes
-
-- **agentlint `--json` flag**: agentlint is installed but doesn't support `--json` on `check-context`. Runner gracefully returns `None`. Documented in runner via warning log.
-- **coderace `--json` on benchmark**: same — tool doesn't accept `--json` at that invocation. Returns `None` gracefully.
-- **agentreflect `--format json`**: tool only supports `markdown` and `diff` formats. Returns `None` gracefully.
-- Coverage in live test run is 25% (only agentmd returned parseable output). This is expected — the quartet tools have different JSON interfaces than assumed. The HTML report and JSON output handle this gracefully.
-
-## Sample `agentkit report --json` output
-
-```json
-{
-  "project": "agentkit-cli",
-  "version": "0.5.0",
-  "coverage": 25,
-  "tools": [
-    {"tool": "agentlint", "installed": true, "status": "failed"},
-    {"tool": "agentmd", "installed": true, "status": "success"},
-    {"tool": "coderace", "installed": true, "status": "failed"},
-    {"tool": "agentreflect", "installed": true, "status": "failed"}
-  ],
-  "agentlint": null,
-  "agentmd": [],
-  "coderace": null,
-  "agentreflect": null
-}
+```
+210 passed in 2.65s
 ```
 
-## Validation Gates
+All 210 tests pass (pytest tests/ -x). Includes new tests added in this release:
+- `test_runner_agentlint_uses_format_json_flag` — verifies `--format json` not `--json`
+- `test_runner_coderace_no_history` — graceful no_results dict when history is unparseable
+- `test_runner_coderace_run_fails` — graceful no_results dict when command fails
+- `test_runner_agentreflect_success` — returns `suggestions_md` dict
+- `test_runner_agentreflect_uses_correct_flags` — verifies `--from-git --format markdown`
+- `test_agentmd_summary_card_handles_list` — averages scores across list
+- `test_agentmd_summary_card_handles_empty_list` — no crash on empty list
+- `test_agentmd_summary_card_handles_dict` — existing dict behavior preserved
+- `test_report_html_with_agentmd_list` — full HTML generation with agentmd list
+- `test_agentreflect_section_renders_suggestions_md` — renders suggestions_md key
 
-- [x] `python3 -m pytest tests/ -q` → 201 passed
-- [x] `agentkit report --help` → shows correct usage with all flags
-- [x] `agentkit report --json` → runs without crashing, returns valid JSON
-- [x] HTML output exists and is > 4KB
-- [x] HTML contains no `http://` or `https://` references (self-contained)
-- [x] `pyproject.toml` version is `0.5.0`
-- [x] git commits clean after each deliverable
+## End-to-End Result
+
+```
+agentkit report --path ~/repos/agentkit-cli
+```
+
+**Result: SUCCESS — HTML produced at agentkit-report.html (4367 bytes)**
+
+Tool outcomes:
+| Tool | Status | Notes |
+|------|--------|-------|
+| agentlint | failed | agentlint itself crashed (unrelated to our fix; non-zero exit) |
+| agentmd | success | returned data, rendered in HTML |
+| coderace | success | no cached history → returned no_results dict gracefully |
+| agentreflect | success | returned suggestions_md markdown |
+
+agentlint's own crash is a pre-existing issue in the agentlint tool itself (Python traceback from inside agentlint's code). Our runner handles it correctly — logs a warning and returns None instead of crashing the report.
+
+## Bugs Fixed
+
+1. **D1 agentlint**: `--json` → `--format json`
+2. **D2 coderace**: `benchmark --json` → `benchmark history` + graceful `no_results` fallback
+3. **D3 agentreflect**: `--format json` → `--from-git --format markdown`, returns `{"suggestions_md": text, "count": N}`
+4. **D4 agentmd crash**: `_agentmd_summary_card` and `_agentmd_section` now handle list input by averaging scores
+
+## Files Changed
+
+- `agentkit_cli/report_runner.py` — D1, D2, D3 fixes
+- `agentkit_cli/commands/report_cmd.py` — D4 fix + agentreflect section rendering
+- `tests/test_report.py` — updated fixtures + 10 new tests
+- `pyproject.toml` — bumped to 0.5.1
+- `CHANGELOG.md` — documented all fixes

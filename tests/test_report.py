@@ -51,7 +51,8 @@ SAMPLE_CODERACE = {
 }
 
 SAMPLE_AGENTREFLECT = {
-    "summary": "Agent performed well on context quality tasks.",
+    "suggestions_md": "### Suggestion 1\nConsider adding more context files.\n### Suggestion 2\nUpdate AGENTS.md.",
+    "count": 2,
 }
 
 ALL_RESULTS = {
@@ -301,12 +302,32 @@ def test_runner_coderace_not_installed():
 
 
 def test_runner_coderace_success():
+    """coderace benchmark history returns parseable JSON → pass it through."""
     data = {"results": [{"agent": "claude", "score": 90}]}
     proc = _make_proc(stdout=json.dumps(data))
     with patch("agentkit_cli.report_runner._is_installed", return_value=True):
         with patch("agentkit_cli.report_runner._run", return_value=proc):
             result = report_runner.run_coderace_bench("/tmp")
     assert result == data
+
+
+def test_runner_coderace_no_history():
+    """coderace benchmark history returns no JSON → graceful no_results dict."""
+    proc = _make_proc(stdout="No benchmark history found.")
+    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
+        with patch("agentkit_cli.report_runner._run", return_value=proc):
+            result = report_runner.run_coderace_bench("/tmp")
+    assert result is not None
+    assert result.get("status") == "no_results"
+
+
+def test_runner_coderace_run_fails():
+    """coderace benchmark history command fails → graceful no_results dict."""
+    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
+        with patch("agentkit_cli.report_runner._run", return_value=None):
+            result = report_runner.run_coderace_bench("/tmp")
+    assert result is not None
+    assert result.get("status") == "no_results"
 
 
 def test_runner_agentreflect_not_installed():
@@ -316,12 +337,35 @@ def test_runner_agentreflect_not_installed():
 
 
 def test_runner_agentreflect_success():
-    data = {"summary": "Great reflection."}
-    proc = _make_proc(stdout=json.dumps(data))
+    """agentreflect returns markdown text; runner wraps in suggestions_md dict."""
+    md_text = "### Suggestion 1\nAdd more context.\n### Suggestion 2\nFix AGENTS.md."
+    proc = _make_proc(stdout=md_text)
     with patch("agentkit_cli.report_runner._is_installed", return_value=True):
         with patch("agentkit_cli.report_runner._run", return_value=proc):
             result = report_runner.run_agentreflect_analyze("/tmp")
-    assert result == data
+    assert result is not None
+    assert "suggestions_md" in result
+    assert result["suggestions_md"] == md_text
+    assert result["count"] == 2
+
+
+def test_runner_agentreflect_uses_correct_flags():
+    """agentreflect runner must use --from-git --format markdown (not --format json)."""
+    calls = []
+
+    def capture_run(cmd, cwd, timeout):
+        calls.append(cmd)
+        return _make_proc(stdout="### Note\nsome suggestion")
+
+    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
+        with patch("agentkit_cli.report_runner._run", side_effect=capture_run):
+            report_runner.run_agentreflect_analyze("/tmp")
+    assert calls, "expected _run to be called"
+    cmd = calls[0]
+    assert "--from-git" in cmd
+    assert "--format" in cmd
+    assert "markdown" in cmd
+    assert "json" not in cmd
 
 
 def test_runner_invalid_json_returns_none():
@@ -341,3 +385,83 @@ def test_runner_json_with_prefix():
         with patch("agentkit_cli.report_runner._run", return_value=proc):
             result = report_runner.run_agentlint_check("/tmp")
     assert result == data
+
+
+def test_runner_agentlint_uses_format_json_flag():
+    """agentlint runner must use --format json, not --json."""
+    calls = []
+
+    def capture_run(cmd, cwd, timeout):
+        calls.append(cmd)
+        return _make_proc(stdout=json.dumps({"score": 80}))
+
+    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
+        with patch("agentkit_cli.report_runner._run", side_effect=capture_run):
+            report_runner.run_agentlint_check("/tmp")
+    assert calls, "expected _run to be called"
+    cmd = calls[0]
+    assert "--format" in cmd
+    assert "json" in cmd
+    # The old wrong flag must NOT be present as a standalone --json
+    assert "--json" not in cmd
+
+
+# ---------------------------------------------------------------------------
+# T-agentmd-list: agentmd list handling in summary card
+# ---------------------------------------------------------------------------
+
+def test_agentmd_summary_card_handles_list():
+    """_agentmd_summary_card must handle a list of per-file dicts (D4 fix)."""
+    from agentkit_cli.commands.report_cmd import _agentmd_summary_card
+    data_list = [
+        {"file": "CLAUDE.md", "score": 80},
+        {"file": "AGENTS.md", "score": 60},
+        {"file": "README.md", "score": 70},
+    ]
+    html = _agentmd_summary_card(data_list)
+    assert "files analyzed" in html
+    # Average score = 70
+    assert "70" in html
+
+
+def test_agentmd_summary_card_handles_empty_list():
+    """_agentmd_summary_card must not crash on empty list."""
+    from agentkit_cli.commands.report_cmd import _agentmd_summary_card
+    html = _agentmd_summary_card([])
+    assert "0 files analyzed" in html
+
+
+def test_agentmd_summary_card_handles_dict():
+    """_agentmd_summary_card still works with a plain dict (existing behavior)."""
+    from agentkit_cli.commands.report_cmd import _agentmd_summary_card
+    html = _agentmd_summary_card({"score": 85, "files": []})
+    assert "85" in html
+    assert "agentmd score" in html
+
+
+def test_report_html_with_agentmd_list(tmp_path):
+    """HTML generation doesn't crash when agentmd returns a list."""
+    results_with_list = {
+        **EMPTY_RESULTS,
+        "agentmd": [
+            {"file": "CLAUDE.md", "score": 75},
+            {"file": "AGENTS.md", "score": 65},
+        ],
+    }
+    with patch("agentkit_cli.commands.report_cmd.run_all", return_value=results_with_list):
+        result = runner.invoke(app, ["report", "--path", str(tmp_path)])
+    assert result.exit_code == 0
+    html = (tmp_path / "agentkit-report.html").read_text()
+    assert "files analyzed" in html
+
+
+def test_agentreflect_section_renders_suggestions_md():
+    """_agentreflect_section renders suggestions_md key (D3 fix)."""
+    from agentkit_cli.commands.report_cmd import _agentreflect_section
+    data = {
+        "suggestions_md": "### Tip 1\nDo something.\n### Tip 2\nDo another.",
+        "count": 2,
+    }
+    html = _agentreflect_section(data)
+    assert "Tip 1" in html
+    assert "Tip 2" in html

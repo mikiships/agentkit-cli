@@ -208,13 +208,22 @@ def _agentlint_summary_card(data: Optional[dict]) -> str:
     return f'<div class="card"><h2>Context Quality</h2>{score_html}<div class="score-label">agentlint score</div></div>'
 
 
-def _agentmd_summary_card(data: Optional[dict]) -> str:
+def _agentmd_summary_card(data) -> str:
+    # Fix D4: agentmd can return a list of per-file scored dicts instead of a single dict
     if data is None:
         return '<div class="card"><h2>Context Docs</h2><div style="color:#8b949e">agentmd not available</div></div>'
-    score = data.get("score") or data.get("total_score")
+    if isinstance(data, list):
+        if not data:
+            return '<div class="card"><h2>Context Docs</h2><div style="color:#8b949e">—</div><div class="score-label">0 files analyzed</div></div>'
+        scores = [d.get("score") or d.get("total_score") or 0 for d in data if isinstance(d, dict)]
+        score = round(sum(scores) / len(scores), 1) if scores else None
+        subtitle = f"{len(data)} files analyzed"
+    else:
+        score = data.get("score") or data.get("total_score")
+        subtitle = "agentmd score"
     color = _score_color_css(score)
     score_html = f'<div class="score-big" style="color:{color}">{_score_label(score)}</div>' if score is not None else '<div style="color:#8b949e">—</div>'
-    return f'<div class="card"><h2>Context Docs</h2>{score_html}<div class="score-label">agentmd score</div></div>'
+    return f'<div class="card"><h2>Context Docs</h2>{score_html}<div class="score-label">{subtitle}</div></div>'
 
 
 def _agentlint_section(data: Optional[dict]) -> str:
@@ -241,10 +250,14 @@ def _agentlint_section(data: Optional[dict]) -> str:
 </div>'''
 
 
-def _agentmd_section(data: Optional[dict]) -> str:
+def _agentmd_section(data) -> str:
     if data is None:
         return ""
-    files = data.get("files") or data.get("generated") or []
+    # Handle list of per-file scored dicts (D4 fix)
+    if isinstance(data, list):
+        files = data
+    else:
+        files = data.get("files") or data.get("generated") or []
     rows = ""
     for f in files[:20]:
         if isinstance(f, dict):
@@ -299,7 +312,14 @@ def _coderace_section(data: Optional[dict]) -> str:
 def _agentreflect_section(data: Optional[dict]) -> str:
     if data is None:
         return ""
-    summary = data.get("summary") or data.get("reflection") or data.get("output") or ""
+    # Fix D3: new format uses suggestions_md (markdown text); legacy keys kept as fallback
+    summary = (
+        data.get("suggestions_md")
+        or data.get("summary")
+        or data.get("reflection")
+        or data.get("output")
+        or ""
+    )
     if not summary and isinstance(data, dict):
         summary = json.dumps(data, indent=2)
     summary_html = f'<pre>{summary[:2000]}</pre>' if summary else '<div style="color:#8b949e">No output</div>'

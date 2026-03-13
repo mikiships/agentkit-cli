@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.5.1 (2026-03-13)
+
+### Fixed
+- **agentlint runner**: corrected CLI flag from `--json` (nonexistent) to `--format json`
+- **coderace runner**: removed `benchmark --json` (no such flag); now uses `benchmark history`
+  to check for cached results. Returns `{"status": "no_results", ...}` gracefully if no
+  history found — no crash, no live agent run required
+- **agentreflect runner**: `--format json` not supported; now uses `--from-git --format markdown`
+  and returns `{"suggestions_md": text, "count": N}` instead of trying to parse JSON
+- **agentmd summary card**: `_agentmd_summary_card` crashed when agentmd returned a list of
+  per-file scored dicts instead of a single dict; now averages scores across the list and
+  shows "N files analyzed" subtitle
+- Updated `_agentreflect_section` to render `suggestions_md` key (markdown text in `<pre>`)
+  with fallback to legacy `summary`/`reflection`/`output` keys
+
 ## v0.5.0 (2026-03-13)
 
 ### Added

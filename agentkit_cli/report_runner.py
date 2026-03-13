@@ -64,7 +64,8 @@ def run_agentlint_check(path: str) -> Optional[dict]:
     """Run agentlint check-context on path, return parsed JSON or None."""
     if not _is_installed("agentlint"):
         return None
-    result = _run(["agentlint", "check-context", ".", "--json"], cwd=path, timeout=TOOL_TIMEOUT)
+    # Fix D1: correct flag is --format json, not --json
+    result = _run(["agentlint", "check-context", ".", "--format", "json"], cwd=path, timeout=TOOL_TIMEOUT)
     if result is None:
         return None
     data = _parse_json_output(result.stdout)
@@ -92,28 +93,44 @@ def run_agentmd_score(path: str) -> Optional[dict]:
 
 
 def run_coderace_bench(path: str) -> Optional[dict]:
-    """Run coderace benchmark on path with 60s timeout, return parsed JSON or None."""
+    """Check coderace benchmark history for cached results.
+
+    Fix D2: coderace has no --json flag on benchmark. Instead check history
+    for cached results. Returns a graceful no_results dict if none found.
+    """
     if not _is_installed("coderace"):
         return None
-    result = _run(["coderace", "benchmark", "--json"], cwd=path, timeout=TOOL_TIMEOUT)
+    # Try to fetch cached benchmark history (no live agents required)
+    result = _run(["coderace", "benchmark", "history"], cwd=path, timeout=TOOL_TIMEOUT)
     if result is None:
-        return None
+        # coderace is installed but history command failed or no results
+        return {"status": "no_results", "message": "Run coderace benchmark to populate data"}
+    # Try to parse JSON from history output
     data = _parse_json_output(result.stdout)
     if data is None:
-        logger.warning("coderace: could not parse JSON output")
-        return None
+        # History output exists but isn't parseable JSON — treat as no cached data
+        logger.warning("coderace: benchmark history output not parseable as JSON")
+        return {"status": "no_results", "message": "Run coderace benchmark to populate data"}
     return data
 
 
 def run_agentreflect_analyze(path: str) -> Optional[dict]:
-    """Run agentreflect generate on path, return parsed JSON or None."""
+    """Run agentreflect generate on path, return dict with markdown suggestions.
+
+    Fix D3: --format json is not supported. Use --from-git --format markdown
+    and return the text as {"suggestions_md": text, "count": N}.
+    """
     if not _is_installed("agentreflect"):
         return None
-    result = _run(["agentreflect", "generate", "--format", "json"], cwd=path, timeout=REFLECT_TIMEOUT)
+    result = _run(
+        ["agentreflect", "generate", "--from-git", "--format", "markdown"],
+        cwd=path,
+        timeout=REFLECT_TIMEOUT,
+    )
     if result is None:
         return None
-    data = _parse_json_output(result.stdout)
-    if data is None:
-        logger.warning("agentreflect: could not parse JSON output")
-        return None
-    return data
+    text = result.stdout.strip()
+    return {
+        "suggestions_md": text,
+        "count": text.count("###"),
+    }
