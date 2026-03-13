@@ -15,6 +15,7 @@ from agentkit_cli.commands.demo_cmd import demo_command
 from agentkit_cli.commands.report_cmd import report_command
 from agentkit_cli.publish import publish_command
 from agentkit_cli.commands.badge_cmd import badge_command
+from agentkit_cli.commands.readme_cmd import readme_command
 
 app = typer.Typer(
     name="agentkit",
@@ -40,9 +41,10 @@ def run(
     notes: Optional[str] = typer.Option(None, "--notes", help="Notes for agentreflect"),
     ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on failure"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
+    inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme)
 
 
 @app.command("doctor")
@@ -98,9 +100,10 @@ def report(
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Path to write HTML report (default: ./agentkit-report.html)"),
     open_browser: bool = typer.Option(False, "--open", help="Auto-open the HTML report in the default browser"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after generation"),
+    inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after report"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme)
 
 
 @app.command("publish")
@@ -121,6 +124,26 @@ def badge(
 ) -> None:
     """Generate a shields.io-compatible badge showing the project's agent quality score."""
     badge_command(path=path, json_output=json_output, score_override=score_override)
+
+
+@app.command("readme")
+def readme(
+    readme_path: Optional[Path] = typer.Option(None, "--readme", help="Path to README.md (default: ./README.md)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would change without modifying the file"),
+    remove: bool = typer.Option(False, "--remove", help="Remove the injected badge section"),
+    section_header: str = typer.Option("## Agent Quality", "--section-header", help="Section header to use"),
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
+    score_override: Optional[int] = typer.Option(None, "--score", help="Use this score instead of computing it"),
+) -> None:
+    """Inject or update the agent quality badge in README.md."""
+    readme_command(
+        readme=readme_path,
+        dry_run=dry_run,
+        remove=remove,
+        section_header=section_header,
+        path=path,
+        score_override=score_override,
+    )
 
 
 @app.command("watch")

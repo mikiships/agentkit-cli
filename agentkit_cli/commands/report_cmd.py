@@ -406,7 +406,8 @@ def report_command(
     output: Optional[Path],
     open_browser: bool,
     publish: bool = False,
-) -> None:
+    inject_readme: bool = False,
+) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
     cwd = cwd.resolve()
@@ -486,3 +487,14 @@ def report_command(
         badge_md_pub = build_markdown(badge_url_pub)
         console.print(f"\n[bold]Add this badge to your README:[/bold]")
         console.print(f"  {badge_md_pub}")
+
+    if inject_readme:
+        from agentkit_cli.commands.readme_cmd import readme_command
+        readme_command(
+            readme=None,
+            dry_run=False,
+            remove=False,
+            section_header="## Agent Quality",
+            path=cwd,
+            score_override=None,
+        )

@@ -67,6 +67,7 @@ def run_command(
     notes: Optional[str] = typer.Option(None, "--notes", help="Notes passed to agentreflect"),
     ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on any failure"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
+    inject_readme: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -256,6 +257,18 @@ def run_command(
                 active_console.print(warn)
             else:
                 console.print(f"[yellow]{warn}[/yellow]")
+
+    # Optional README badge injection
+    if inject_readme:
+        from agentkit_cli.commands.readme_cmd import readme_command
+        readme_command(
+            readme=None,
+            dry_run=False,
+            remove=False,
+            section_header="## Agent Quality",
+            path=root,
+            score_override=None,
+        )
 
     # Final status
     if failed_count > 0:
