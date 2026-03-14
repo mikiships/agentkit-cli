@@ -19,6 +19,7 @@ from agentkit_cli.commands.readme_cmd import readme_command
 from agentkit_cli.commands.compare_cmd import compare_command
 from agentkit_cli.commands.suggest_cmd import suggest_command
 from agentkit_cli.commands.summary_cmd import summary_command
+from agentkit_cli.commands.history_cmd import history_command
 
 app = typer.Typer(
     name="agentkit",
@@ -45,9 +46,10 @@ def run(
     ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on failure"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after run"),
+    no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history)
 
 
 @app.command("doctor")
@@ -197,6 +199,32 @@ def summary(
 ) -> None:
     """Generate a maintainer-facing markdown summary."""
     summary_command(path=path, json_input=json_input)
+
+
+@app.command("history")
+def history(
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of runs to show"),
+    tool: Optional[str] = typer.Option(None, "--tool", "-t", help="Filter to one tool"),
+    project: Optional[str] = typer.Option(None, "--project", help="Override project name"),
+    graph: bool = typer.Option(False, "--graph", help="Show ASCII sparkline trend"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    clear: bool = typer.Option(False, "--clear", help="Delete history for this project"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation for --clear"),
+    all_projects: bool = typer.Option(False, "--all-projects", help="Show history for all projects"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+) -> None:
+    """Show agent quality score history and trends."""
+    history_command(
+        limit=limit,
+        tool=tool,
+        project=project,
+        graph=graph,
+        json_output=json_output,
+        clear=clear,
+        yes=yes,
+        all_projects=all_projects,
+        db_path=db_path,
+    )
 
 
 @app.command("watch")

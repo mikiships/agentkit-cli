@@ -13,6 +13,7 @@ from rich.table import Table
 
 from agentkit_cli.tools import is_installed, run_tool, INSTALL_HINTS
 from agentkit_cli.config import find_project_root, save_last_run
+from agentkit_cli.history import record_run
 
 console = Console()
 
@@ -68,6 +69,7 @@ def run_command(
     ci: bool = typer.Option(False, "--ci", help="CI mode: plain output, exit 1 on any failure"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
     inject_readme: bool = False,
+    no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -228,6 +230,42 @@ def run_command(
         save_last_run(summary, root)
     except Exception:
         pass
+
+    # Record scores to history DB (silently, never aborts the run)
+    if not no_history:
+        try:
+            project_name = root.name
+            # Map step results to per-tool scores (pass=100, fail=0, skipped=None)
+            tool_scores: list[float] = []
+            step_to_tool = {
+                "generate": "agentmd",
+                "lint-context": "agentlint",
+                "lint-diff": "agentlint",
+                "benchmark": "coderace",
+                "reflect": "agentreflect",
+            }
+            recorded_tools: set[str] = set()
+            for r in results:
+                tool_name = step_to_tool.get(r["step"])
+                if not tool_name:
+                    continue
+                status = r.get("status", "unknown")
+                if status == "pass":
+                    score = 100.0
+                elif status == "fail":
+                    score = 0.0
+                else:
+                    continue  # skipped/error → don't record
+                tool_scores.append(score)
+                if tool_name not in recorded_tools:
+                    record_run(project_name, tool_name, score)
+                    recorded_tools.add(tool_name)
+            if tool_scores:
+                overall = round(sum(tool_scores) / len(tool_scores), 1)
+                record_run(project_name, "overall", overall)
+        except Exception as exc:
+            import sys
+            print(f"[agentkit history] DEBUG: history recording failed: {exc}", file=sys.stderr)
 
     if json_output:
         print(json.dumps(summary, indent=2))
