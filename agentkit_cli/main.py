@@ -18,6 +18,7 @@ from agentkit_cli.commands.badge_cmd import badge_command
 from agentkit_cli.commands.readme_cmd import readme_command
 from agentkit_cli.commands.compare_cmd import compare_command
 from agentkit_cli.commands.suggest_cmd import suggest_command
+from agentkit_cli.commands.summary_cmd import summary_command
 
 app = typer.Typer(
     name="agentkit",
@@ -187,6 +188,15 @@ def suggest(
 ) -> None:
     """Show prioritized action list from agentlint findings. Optionally auto-fix safe issues."""
     suggest_command(path=path, show_all=show_all, fix=fix, dry_run=dry_run, json_output=json_output)
+
+
+@app.command("summary")
+def summary(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory to analyse"),
+    json_input: Optional[Path] = typer.Option(None, "--json-input", help="Path to existing agentkit JSON results"),
+) -> None:
+    """Generate a maintainer-facing markdown summary."""
+    summary_command(path=path, json_input=json_input)
 
 
 @app.command("watch")

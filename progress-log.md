@@ -39,3 +39,14 @@
 - D1 baseline: 21 doctor tests, 403 total
 - This pass: +45 doctor tests = 66 total
 - Full suite: **469 passing**
+
+## v0.13.0 — `agentkit summary` build pass
+
+### D1: Core summary command — DONE
+- Added `agentkit summary` wiring in `agentkit_cli/main.py`
+- Added `agentkit_cli/commands/summary_cmd.py` with deterministic markdown rendering
+- Supports `--path` local analysis mode and `--json-input` file mode
+- Added baseline tests for command help, markdown rendering, JSON input, and path mode
+- Tests passing: `python3 -m pytest tests/test_summary.py tests/test_main.py -q` -> `10 passed`
+- Next: maintainer-focused sections for verdicts, prioritized fixes, and compare data
+- Blockers: none
