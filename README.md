@@ -72,6 +72,58 @@ Agent Quality Score: 82/100 (B)  repo: fastapi
 
 ---
 
+## Sweep: Batch Analysis
+
+Compare multiple repos side-by-side in a single command:
+
+```bash
+# Positional targets
+agentkit sweep github:psf/requests github:pallets/flask ./my-project
+
+# Targets from a file (one per line)
+agentkit sweep --targets-file repos.txt
+
+# Mix positional + file targets (duplicates removed)
+agentkit sweep github:psf/requests --targets-file repos.txt
+```
+
+Example output:
+
+```
+agentkit sweep — analyzed 3 target(s)
+
+ target                  score  grade  status        error
+ github:pallets/flask       88  B      ✓ succeeded
+ github:psf/requests        82  B      ✓ succeeded
+ ./my-project               64  D      ✓ succeeded
+
+Total: 3 | Succeeded: 3 | Failed: 0
+```
+
+**Options:**
+- `--sort-by score|name|grade` — sort order (default: score descending)
+- `--limit N` — show only top N results in table output
+- `--json` — machine-readable JSON output with ranked results and summary counts
+- `--keep` — keep temp clone dirs
+- `--publish` — publish HTML report after each analysis
+- `--timeout N` — per-target timeout in seconds (default: 120)
+- `--no-generate` — skip `agentmd generate`; score only what's there
+- `--targets-file PATH` — file with one target per line (blank lines and `#` comments ignored)
+
+**JSON schema** (`--json`):
+```json
+{
+  "targets": ["github:psf/requests", "github:pallets/flask"],
+  "results": [
+    {"rank": 1, "target": "github:pallets/flask", "score": 88.0, "grade": "B", "status": "succeeded"},
+    {"rank": 2, "target": "github:psf/requests", "score": 82.0, "grade": "B", "status": "succeeded"}
+  ],
+  "summary_counts": {"total": 2, "succeeded": 2, "failed": 0, "analyzed_with_scores": 2}
+}
+```
+
+---
+
 ## Agent Quality Score
 
 Get a single **0-100 composite score** for your AI agent project in one command:

@@ -96,6 +96,37 @@ class SweepRunResult:
         }
 
 
+def sort_results(
+    results: list[SweepTargetResult],
+    sort_by: str = "score",
+) -> list[SweepTargetResult]:
+    """Sort sweep results by the given key (score, name, grade).
+
+    Score sorts descending (highest first); name and grade sort ascending.
+    Failed targets (no score) sort to the bottom for score/grade sorts.
+    """
+    if sort_by == "name":
+        return sorted(results, key=lambda r: r.target.lower())
+    elif sort_by == "grade":
+        grade_order = {"A": 0, "B": 1, "C": 2, "D": 3, "F": 4}
+        return sorted(
+            results,
+            key=lambda r: (
+                grade_order.get(r.grade, 99) if r.grade else 99,
+                r.target.lower(),
+            ),
+        )
+    else:  # score (default)
+        return sorted(
+            results,
+            key=lambda r: (
+                0 if r.composite_score is not None else 1,
+                -(r.composite_score or 0),
+                r.target.lower(),
+            ),
+        )
+
+
 def _count_successful_tools(tools: dict[str, dict]) -> int:
     return sum(1 for key in CORE_TOOL_KEYS if tools.get(key, {}).get("status") == "pass")
 

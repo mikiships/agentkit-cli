@@ -286,6 +286,9 @@ def sweep(
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after each analysis"),
     timeout: int = typer.Option(120, "--timeout", help="Clone + analysis timeout in seconds"),
     no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
+    sort_by: str = typer.Option("score", "--sort-by", help="Sort results by: score, name, or grade"),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Show only top N results in table output"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
 ) -> None:
     """Analyze multiple GitHub repos or local paths in one batch."""
     sweep_command(
@@ -295,6 +298,9 @@ def sweep(
         publish=publish,
         timeout=timeout,
         no_generate=no_generate,
+        sort_by=sort_by,
+        limit=limit,
+        json_output=json_output,
     )
 
 

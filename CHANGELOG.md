@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.18.0 (2026-03-14)
+
+### Added
+- `agentkit sweep` command: multi-target batch analysis with ranked output
+  - **D1 Core engine**: `agentkit sweep github:psf/requests github:pallets/flask .` — batch runner reusing existing `analyze` pipeline; `--targets-file` for file-based target lists; deduplication; failure isolation (one bad target doesn't crash the batch)
+  - **D2 Ranked output**: Rich table with columns (target | score | grade | status | error); `--sort-by` flag (score, name, grade); `--limit N` for top-N display
+  - **D3 JSON output**: `--json` flag with stable schema `{ targets, results: [{rank, target, score, grade, status, error}], summary_counts }`; deterministic, console-noise-free; ranking order preserved in JSON
+  - **D4 Docs**: README sweep section with usage examples; CHANGELOG entry; version bump to 0.18.0
+- `sort_results()` in `agentkit_cli/sweep.py`: sort sweep results by score (descending), name, or grade
+- 20 new tests covering sort, limit, Rich table, JSON schema, and determinism
+
 ## v0.17.0 (2026-03-14)
 
 ### Added

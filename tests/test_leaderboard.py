@@ -387,4 +387,4 @@ class TestLeaderboardCLI:
 
     def test_version_is_015(self):
         result = runner.invoke(app, ["--version"])
-        assert "0.17" in result.output
+        assert "0.18" in result.output
