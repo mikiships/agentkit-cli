@@ -40,3 +40,20 @@
 
 ## Final Status
 All deliverables complete. 220 tests passing. No blockers.
+
+---
+
+# agentkit-cli v0.12.0 Progress Log
+
+## D1: Core `agentkit doctor` command + result model — DONE
+- Replaced the legacy tool-only `doctor` command with a structured report model in `agentkit_cli/doctor.py`
+- Added fixed repo/context checks: git repo, initial commit, working tree state, `README.md`, `pyproject.toml`, and context-file presence
+- Wired `agentkit doctor` through `agentkit_cli/commands/doctor_cmd.py` to use shared result objects for human and JSON output
+- Added 21 focused tests covering the D1 check functions, report counts, CLI summary output, and exit-code behavior
+- Verification: `python3 -m pytest tests/test_doctor.py tests/test_main.py -q`
+- Commit: blocked by sandbox `.git` write restriction
+
+## Blocker
+- Attempted `git add` / `git commit` for the D1 deliverable, but the sandbox rejects writes under `.git` with `Operation not permitted`
+- Per contract stop condition, execution stopped after the third attempt on the same issue
+- See `BUILD-REPORT.md` for the exact failing commands and current repository state
