@@ -15,6 +15,7 @@ from agentkit_cli.report_runner import (
     run_agentreflect_analyze,
     run_coderace_bench,
 )
+from agentkit_cli.composite import CompositeScoreEngine
 
 console = Console()
 
@@ -105,8 +106,11 @@ def _extract_coderace_score(data: Optional[dict]) -> Optional[float]:
     return max(scores) if scores else None
 
 
-def compute_badge_score(path: str) -> dict:
-    """Compute badge score from agentlint (fast) + optional cached results.
+def compute_badge_score(path: str, tool: Optional[str] = None) -> dict:
+    """Compute badge score.
+
+    If tool is specified, returns that tool's score only.
+    Otherwise computes composite score using CompositeScoreEngine.
 
     Returns dict with keys: score (int), sources (list), raw_scores (dict).
     """
@@ -131,17 +135,56 @@ def compute_badge_score(path: str) -> dict:
     if cr_score is not None:
         component_scores["coderace"] = min(100.0, max(0.0, cr_score))
 
+    ar_data = raw.get("agentreflect")
+    if ar_data is not None:
+        ar_score = None
+        if isinstance(ar_data, dict):
+            for key in ("score", "total_score"):
+                v = ar_data.get(key)
+                if v is not None:
+                    try:
+                        ar_score = float(v)
+                        break
+                    except (TypeError, ValueError):
+                        pass
+        if ar_score is not None:
+            component_scores["agentreflect"] = min(100.0, max(0.0, ar_score))
+
+    if tool is not None:
+        # Single-tool mode
+        if tool in component_scores:
+            final_score = int(round(component_scores[tool]))
+        else:
+            final_score = 0
+        return {
+            "score": final_score,
+            "sources": [tool] if tool in component_scores else [],
+            "raw_scores": component_scores,
+            "mode": "single",
+            "tool": tool,
+        }
+
+    # Composite score (default)
     if component_scores:
-        avg = sum(component_scores.values()) / len(component_scores)
-        final_score = int(round(avg))
+        tool_scores_input = {t: component_scores.get(t) for t in ("coderace", "agentlint", "agentmd", "agentreflect")}
+        engine = CompositeScoreEngine()
+        try:
+            comp = engine.compute(tool_scores_input)
+            final_score = int(round(comp.score))
+            sources = list(comp.components.keys())
+        except ValueError:
+            avg = sum(component_scores.values()) / len(component_scores)
+            final_score = int(round(avg))
+            sources = list(component_scores.keys())
     else:
-        # No tools available — default to agentlint-only placeholder (0)
         final_score = 0
+        sources = []
 
     return {
         "score": final_score,
-        "sources": list(component_scores.keys()),
+        "sources": sources,
         "raw_scores": component_scores,
+        "mode": "composite",
     }
 
 
@@ -153,6 +196,7 @@ def badge_command(
     path: Optional[Path],
     json_output: bool,
     score_override: Optional[int],
+    tool: Optional[str] = None,
 ) -> None:
     """Generate a shields.io badge showing the project's agent quality score."""
     cwd = (path or Path.cwd()).resolve()
@@ -162,8 +206,9 @@ def badge_command(
         sources: list[str] = ["override"]
     else:
         if not json_output:
-            console.print("\n[dim]Computing agent quality score...[/dim]")
-        result = compute_badge_score(str(cwd))
+            mode_str = f"single-tool ({tool})" if tool else "composite"
+            console.print(f"\n[dim]Computing agent quality score ({mode_str})...[/dim]")
+        result = compute_badge_score(str(cwd), tool=tool)
         score = result["score"]
         sources = result["sources"]
 

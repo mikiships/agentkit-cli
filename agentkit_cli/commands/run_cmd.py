@@ -14,6 +14,7 @@ from rich.table import Table
 from agentkit_cli.tools import is_installed, run_tool, INSTALL_HINTS
 from agentkit_cli.config import find_project_root, save_last_run
 from agentkit_cli.history import record_run
+from agentkit_cli.composite import CompositeScoreEngine
 
 console = Console()
 
@@ -308,6 +309,76 @@ def run_command(
             path=root,
             score_override=None,
         )
+
+    # Composite score display
+    _composite_score: float | None = None
+    try:
+        tool_score_map: dict[str, float | None] = {}
+        step_tool_score: dict[str, float | None] = {
+            "generate": None,
+            "lint-context": None,
+            "benchmark": None,
+            "reflect": None,
+        }
+        _tool_key = {
+            "generate": "agentmd",
+            "lint-context": "agentlint",
+            "benchmark": "coderace",
+            "reflect": "agentreflect",
+        }
+        for r in results:
+            sname = r["step"]
+            if sname in _tool_key:
+                status = r.get("status", "unknown")
+                if status == "pass":
+                    step_tool_score[sname] = 100.0
+                elif status == "fail":
+                    step_tool_score[sname] = 0.0
+                # skipped/error → None
+        for step, tname in _tool_key.items():
+            score_val = step_tool_score.get(step)
+            # Only record if not already set by a previous step for same tool
+            if tname not in tool_score_map:
+                tool_score_map[tname] = score_val
+            elif score_val is not None:
+                # Average if both present (e.g., lint has lint-context and lint-diff)
+                existing = tool_score_map[tname]
+                if existing is not None:
+                    tool_score_map[tname] = (existing + score_val) / 2
+                else:
+                    tool_score_map[tname] = score_val
+
+        engine = CompositeScoreEngine()
+        comp_result = engine.compute(tool_score_map)
+        _composite_score = comp_result.score
+        grade = comp_result.grade
+        comp_parts = ", ".join(
+            f"{t} {d['raw_score']:.0f}" for t, d in sorted(comp_result.components.items())
+        )
+        score_color = "green" if _composite_score >= 80 else ("yellow" if _composite_score >= 60 else "red")
+        sep = "─" * 60
+        if ci:
+            active_console.print(f"\n{sep}")
+            active_console.print(
+                f"Agent Quality Score: {_composite_score:.0f}/100 ({grade})  [components: {comp_parts}]"
+            )
+            active_console.print(sep)
+        else:
+            console.print(f"\n[dim]{sep}[/dim]")
+            console.print(
+                f"[bold]Agent Quality Score:[/bold] [{score_color}]{_composite_score:.0f}/100 ({grade})[/{score_color}]"
+                f"  [dim][components: {comp_parts}][/dim]"
+            )
+            console.print(f"[dim]{sep}[/dim]")
+
+        # Record composite score to history
+        if not no_history:
+            try:
+                record_run(root.name, "composite", _composite_score, label=label)
+            except Exception:
+                pass
+    except Exception:
+        pass  # Never let composite scoring abort the run
 
     # Final status
     if failed_count > 0:

@@ -21,6 +21,7 @@ from agentkit_cli.commands.suggest_cmd import suggest_command
 from agentkit_cli.commands.summary_cmd import summary_command
 from agentkit_cli.commands.history_cmd import history_command
 from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
+from agentkit_cli.commands.score_cmd import score_command
 
 app = typer.Typer(
     name="agentkit",
@@ -131,9 +132,22 @@ def badge(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
     json_output: bool = typer.Option(False, "--json", help="Emit badge info as JSON"),
     score_override: Optional[int] = typer.Option(None, "--score", help="Use this score instead of computing it"),
+    tool: Optional[str] = typer.Option(None, "--tool", help="Show single-tool score instead of composite (e.g. coderace, agentlint, agentmd, agentreflect)"),
 ) -> None:
     """Generate a shields.io-compatible badge showing the project's agent quality score."""
-    badge_command(path=path, json_output=json_output, score_override=score_override)
+    badge_command(path=path, json_output=json_output, score_override=score_override, tool=tool)
+
+
+@app.command("score")
+def score(
+    path: Optional[Path] = typer.Argument(None, help="Project directory (default: cwd)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit JSON output"),
+    breakdown: bool = typer.Option(False, "--breakdown", help="Show per-component score table"),
+    ci: bool = typer.Option(False, "--ci", help="Exit 1 if score < min-score"),
+    min_score: int = typer.Option(70, "--min-score", help="CI gate threshold (default: 70)"),
+) -> None:
+    """Compute composite agent quality score (0-100) from all toolkit tools."""
+    score_command(path=path, json_output=json_output, breakdown=breakdown, ci=ci, min_score=min_score)
 
 
 @app.command("readme")

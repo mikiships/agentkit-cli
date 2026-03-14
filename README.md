@@ -10,6 +10,35 @@ Get the full Agent Quality Toolkit pipeline in a single command — no more jugg
 
 ---
 
+## Agent Quality Score
+
+Get a single **0-100 composite score** for your AI agent project in one command:
+
+```bash
+agentkit score
+# → Agent Quality Score: 87/100 (B)
+
+agentkit score --breakdown
+# Shows per-component table: coderace, agentlint, agentmd, agentreflect
+
+agentkit score --json
+# {"score": 87, "grade": "B", "components": {...}, "missing_tools": [...]}
+
+agentkit score --ci --min-score 70
+# Exits 1 if score < 70 (great for PR gates)
+```
+
+The composite score synthesizes all four toolkit tools into one headline metric using weighted averaging (coderace 30%, agentlint 25%, agentmd 25%, agentreflect 20%). Missing tools are automatically excluded and weights renormalized.
+
+Use it in your README badge too:
+
+```bash
+agentkit badge           # composite score badge (default)
+agentkit badge --tool coderace  # single-tool badge
+```
+
+---
+
 ## What is it?
 
 `agentkit-cli` is a unified meta-CLI that wraps the **Agent Quality Toolkit quartet**:

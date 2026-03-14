@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.16.0 (2026-03-14)
+
+### Added
+- `agentkit score` command: composite 0-100 agent quality score synthesizing all four toolkit tools
+- `CompositeScoreEngine` in `agentkit/composite.py`: weighted scoring with automatic weight renormalization for missing tools
+- Grade assignments (A/B/C/D/F) based on composite score thresholds
+- `--breakdown` flag for per-component Rich table output
+- `--json` output for machine-readable composite score
+- `--ci` / `--min-score` flags for CI gate integration
+- `agentkit run` now displays composite score line at pipeline completion
+- Composite score recorded to history DB as `composite` tool
+- `agentkit badge` now defaults to composite score; use `--tool <name>` for single-tool badge
+- 50 new tests covering all composite score functionality
+
 ## v0.15.0 (2026-03-14)
 
 ### Added
