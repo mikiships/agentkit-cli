@@ -527,6 +527,20 @@ def test_check_context_freshness_warn_when_non_json(tmp_path: Path) -> None:
     assert "non-JSON" in result.summary
 
 
+def test_check_context_freshness_uses_format_json_flag(tmp_path: Path) -> None:
+    """Regression: doctor must call 'agentlint check-context --format json', not '--json'."""
+    payload = json.dumps({"fresh": True, "age_days": 1})
+    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
+         patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
+        check_context_freshness(tmp_path)
+
+    call_args = mock_run.call_args[0][0]  # first positional arg = command list
+    assert "--format" in call_args, "Must use --format flag"
+    assert "json" in call_args, "Must pass json as format value"
+    assert "--json" not in call_args, "Must not use deprecated --json flag"
+
+
 def test_check_context_freshness_pass_when_fresh(tmp_path: Path) -> None:
     payload = json.dumps({"fresh": True, "age_days": 2})
     with patch("shutil.which", return_value="/usr/bin/agentlint"), \

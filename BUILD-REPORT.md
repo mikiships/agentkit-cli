@@ -1,79 +1,40 @@
-# BUILD-REPORT.md — agentkit-cli v0.15.0
+# agentkit-cli v0.16.0 Build Report
 
-**Date:** 2026-03-14  
-**Feature:** `agentkit leaderboard` command  
-**PyPI:** https://pypi.org/project/agentkit-cli/0.15.0/
+## Status: COMPLETE
+## Tests: 625 passing
+## PyPI: https://pypi.org/project/agentkit-cli/0.16.0/
+## GitHub tag: v0.16.0
 
----
+## Deliverables
+- [x] D1: CompositeScoreEngine (`agentkit_cli/composite.py`)
+  - Weighted scoring: coderace 30%, agentlint 25%, agentmd 25%, agentreflect 20%
+  - Automatic weight renormalization for missing tools
+  - Grade thresholds: A≥90, B≥80, C≥70, D≥60, F<60
+  - Raises ValueError if no tools present
+  - Scores clamped to [0, 100]
+- [x] D2: `agentkit score` command (`agentkit_cli/commands/score_cmd.py`)
+  - `--json`, `--breakdown`, `--ci`, `--min-score` flags all working
+  - Lives agentlint run + history DB for other tools
+  - Color-coded output: green ≥80, yellow ≥60, red <60
+- [x] D3: `agentkit run` composite score integration
+  - Displays composite score line after pipeline summary
+  - Records `composite` tool to history DB
+  - Respects `--no-history` flag
+  - Works in both normal and CI modes
+- [x] D4: `agentkit badge` defaults to composite score
+  - `--tool <name>` flag for single-tool badge
+  - Uses `CompositeScoreEngine` internally
+  - `--score` override still works
+- [x] D5: Tests, docs, version bump, PyPI publish
+  - 50 new tests in `tests/test_composite.py`
+  - README: "Agent Quality Score" section added near top
+  - CHANGELOG: v0.16.0 entry
+  - version bumped 0.15.0 → 0.16.0 in `__init__.py` and `pyproject.toml`
+  - PyPI published: https://pypi.org/project/agentkit-cli/0.16.0/
 
-## Test Results
-
-- **Total tests:** 575
-- **Passing:** 575
-- **Failing:** 0
-- **New tests added:** 47 (in `tests/test_leaderboard.py`)
-
-```
-575 passed in 6.86s
-```
-
----
-
-## What Was Built
-
-### D1: Run Labeling
-- Added `--label <str>` flag to `agentkit run`
-- Label stored in history DB via backward-compatible `ALTER TABLE` migration
-- Old rows without label column are readable (migrate to NULL → shown as "default")
-- Module-level `record_run()` and `HistoryDB.record_run()` both accept `label=` kwarg
-
-### D2: Leaderboard Engine
-- `agentkit_cli/commands/leaderboard_cmd.py` — `leaderboard_command()` function
-- `HistoryDB.get_leaderboard_data()` — groups by label, computes avg/best/worst/trend
-- `_compute_trend()` — avg(last 3) - avg(first 3), handles short arrays cleanly
-- Supports `tool`, `project`, `since` (ISO timestamp), `last_n` filters
-
-### D3: CLI Command
-- `agentkit leaderboard` registered in `main.py`
-- Rich ranked table: Rank, Label, Runs, Avg Score, Trend (↑/↓/→), Best, Worst
-- Color-coded scores (green ≥80, yellow ≥50, red <50)
-- Flags: `--by`, `--project`, `--last`, `--since`, `--json`, `--db` (hidden, for testing)
-
-### D4: GitHub Actions
-- `action.yml` updated with `leaderboard-json` output
-- Emitted alongside `history-json` when `save-history: true`
-
-### D5: Docs, Tests, Version
-- README: "Agent Leaderboard" section added with example output and GitHub Actions snippet
-- CHANGELOG: v0.15.0 entry
-- Version: 0.14.0 → 0.15.0 in `pyproject.toml` and `__init__.py`
-
----
-
-## Demo Commands
-
-```bash
-# Install
-pip install agentkit-cli==0.15.0
-
-# Tag runs with labels
-agentkit run --label gpt-4 --no-history  # (tools not installed, use --no-history for demo)
-agentkit run --label claude-sonnet
-
-# View leaderboard
-agentkit leaderboard
-agentkit leaderboard --json
-agentkit leaderboard --by agentlint
-agentkit leaderboard --last 5
-agentkit leaderboard --since 7d
-
-# Verify version
-agentkit --version  # → agentkit-cli v0.15.0
-```
-
----
-
-## Known Issues
-
-- `test_watch.py::TestChangeHandler::test_debounce_resets_on_rapid_changes` is a pre-existing flaky timing test; it passes on most runs but occasionally fails under load. Not related to this feature.
-- The `--label` flag on `agentkit run` does not appear in the run summary JSON output (it's stored in the DB only). This could be a future enhancement.
+## Notes
+- Baseline: 575 tests (v0.15.0). Final: 625 tests. +50 new, 0 broken.
+- One pre-existing test (`test_version_is_015`) updated to expect 0.16.0.
+- `agentkit badge` now uses `CompositeScoreEngine` for weighted composite; old simple-average code replaced. `agentreflect` score extraction added to badge (was previously missing).
+- `agentkit run` composite scoring never aborts the pipeline (wrapped in try/except).
+- History DB migration not needed — `composite` is stored as a new tool name in existing schema.

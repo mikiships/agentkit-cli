@@ -462,7 +462,7 @@ def check_context_freshness(root: Path) -> DoctorCheckResult:
 
     try:
         result = subprocess.run(
-            [binary, "check-context", "--json"],
+            [binary, "check-context", "--format", "json"],
             cwd=root,
             capture_output=True,
             text=True,

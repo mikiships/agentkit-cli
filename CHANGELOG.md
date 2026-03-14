@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.16.1 (2026-03-14)
+
+### Fixed
+- `agentkit doctor` context freshness check: was passing `--json` to `agentlint check-context` (invalid flag). Corrected to `--format json`. Regression test added.
+
 ## v0.16.0 (2026-03-14)
 
 ### Added
