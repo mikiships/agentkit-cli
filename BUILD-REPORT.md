@@ -1,60 +1,70 @@
-# Build Report — agentkit-cli v0.11.0
+# BUILD-REPORT.md — agentkit-cli v0.12.0
 
-**Date:** 2026-03-13
-**Contract:** memory/contracts/agentkit-cli-v0.11.0-suggest.md
-**Status:** COMPLETE
+**Status:** SHIPPED  
+**Date:** 2026-03-13  
+**Contract:** all-day-build-contract-agentkit-cli-v0.12.0-doctor-continuation.md
 
-## What Was Built
+---
 
-### `agentkit suggest` command
+## Deliverables Completed
 
-A new CLI command that turns agentlint findings into a prioritized action list answering "What should I fix to improve my agent quality score?"
+| Deliverable | Status | Commit |
+|-------------|--------|--------|
+| D1: Core doctor result model + repo checks | ✅ Done (prior pass) | `db30c34` |
+| D2: Toolchain probes (agentmd/agentlint/coderace/agentreflect/git/python3) | ✅ Done | `0156f2c` |
+| D3: Actionability checks (source files, context freshness, output dir, API key) | ✅ Done | `0156f2c` |
+| D4: `--json`, `--category`, `--fail-on`, `--no-fail-exit` flags | ✅ Done | `0156f2c` |
+| D5: README, CHANGELOG, version bump | ✅ Done | (this commit) |
 
-**New files:**
-- `agentkit_cli/suggest_engine.py` — prioritization engine
-  - `Finding` dataclass (tool, severity, category, description, fix_hint, auto_fixable, file, line)
-  - `parse_agentlint_check_context(json)` — extracts findings from check-context JSON
-  - `parse_agentlint_diff(json)` — extracts findings from diff analysis JSON
-  - `prioritize(findings, top_n)` — deduplicates (same category+file = one finding), sorts critical→high→medium→low
-  - `prioritize_findings(output)` — high-level entry point
-  - Severity mapping: year-rot/path-rot/mcp-security=critical, script-rot/stale-todo=high, bloat/multi-file-conflict=medium, cosmetic/whitespace=low
+---
 
-- `agentkit_cli/commands/suggest_cmd.py` — command implementation
-  - `suggest_command(path, show_all, fix, dry_run, json_output)`
-  - Auto-fixes: year-rot (updates years >2 years old), trailing-whitespace, duplicate-blank-lines
-  - Only modifies context files: CLAUDE.md, AGENTS.md, .agents/*.md
-  - `--dry-run` shows unified diff without writing
-  - Rich table output with severity color-coding
-  - Score summary line: "Current score: 72/100 — 3 critical issues found"
+## Test Command
 
-**Modified files:**
-- `agentkit_cli/main.py` — wired `suggest` command with all flags
-- `tests/test_suggest.py` — 59 new tests
-- `tests/test_main.py` — updated version assertion
-- `CHANGELOG.md` — v0.11.0 entry
-- `README.md` — `agentkit suggest` section added
-- `pyproject.toml` — version bumped to 0.11.0
-- `agentkit_cli/__init__.py` — version bumped to 0.11.0
+```bash
+python3 -m pytest -q
+```
 
-## Test Count
+## Final Test Counts
 
-| Phase | Count |
-|-------|-------|
-| Baseline (v0.10.0) | 357 |
-| New tests added | 59 |
-| **Final (v0.11.0)** | **416** |
+- **469 total tests passing, 0 failing**
+- Doctor-specific tests: **66** (21 from D1 + 45 new)
+- Breakdown of new tests:
+  - D2 toolchain: 10 tests
+  - D3 actionability: 21 tests
+  - D4 CLI flags: 14 tests
 
-Contract required 392+ (35+ new). Delivered 416 (59 new). ✓
+## New Features Shipped
 
-## Deviations from Contract
+### `agentkit doctor` (v0.12.0)
 
-**None.** All D1–D5 deliverables implemented as specified.
+Full preflight command with 16 structured checks across 4 categories:
 
-Minor implementation notes:
-- Fix helpers (`_fix_year_rot`, etc.) live in `suggest_cmd.py` rather than `suggest_engine.py` since they are command-level concerns and the engine stays importable without side effects.
-- `run_fixes` is also exported from `suggest_cmd.py` (importable for tests).
-- The `suggest_command` function runs auto-fixes even when no agentlint findings exist (a user may want to run `--fix` on a clean project for whitespace/year cleanup).
+**repo**: git repo, initial commit, working tree clean, README.md, pyproject.toml, context files  
+**toolchain**: agentmd, agentlint, coderace, agentreflect (fail if missing), git + python3 (warn if missing) — all with version capture  
+**context**: source file presence, agentlint context freshness (graceful fallback), output dir write access  
+**publish**: HERENOW_API_KEY readiness
 
-## Ready to Publish
+CLI flags added:
+- `--json` — structured JSON output (same model as human output)
+- `--category repo|toolchain|context|publish` — filter to one category
+- `--fail-on warn|fail` — exit threshold (default: `fail`)
+- `--no-fail-exit` — always exit 0
 
-**Yes.** All 416 tests pass, version bumped to 0.11.0, docs updated, CHANGELOG written.
+### Key design decisions
+- Missing core toolkit binary = `fail`; missing optional binary = `warn`
+- Context freshness check degrades gracefully when agentlint unavailable, errors, or returns non-JSON
+- Human and JSON output use the same `DoctorReport` model
+- `--category` filters both displayed checks and summary counts
+
+## Known Limitations
+
+- Context freshness check relies on `agentlint check-context --json` — if agentlint doesn't support this subcommand in a given version, it degrades to `warn`
+- Output-dir not-writable test skipped under environments where `chmod` doesn't affect root; test correctly guards behavior for non-root users
+- `check_context_freshness` in tests is patched to avoid requiring agentlint installed in the test environment
+
+## Repo State
+
+- Branch: `main`
+- Working tree: clean after final commit
+- No PyPI publish performed (out of scope)
+- All prior tests passing: ✅

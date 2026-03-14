@@ -256,14 +256,54 @@ agentkit status --json
 
 ### `agentkit doctor`
 
-Diagnose whether all quartet tools are installed and functional.
+Full preflight check: repo health, toolchain availability, context freshness, and publish readiness — all in one command.
 
 ```bash
-agentkit doctor
-agentkit doctor --json
+agentkit doctor                          # human-readable Rich table
+agentkit doctor --json                   # structured JSON output
+agentkit doctor --category repo          # filter: repo | toolchain | context | publish
+agentkit doctor --fail-on warn           # exit 1 on any warn or fail (default: fail only)
+agentkit doctor --no-fail-exit           # always exit 0 (useful in informational hooks)
 ```
 
-Outputs a Rich table with ✓/✗ per tool, version, and install command. Exits 1 if any tool is missing.
+**What it checks:**
+
+| Category | Check | Severity |
+|----------|-------|----------|
+| `repo` | Git repository present | fail |
+| `repo` | At least one commit | warn |
+| `repo` | Working tree clean | warn |
+| `repo` | README.md present | warn |
+| `repo` | pyproject.toml present | warn |
+| `repo` | Context files (CLAUDE.md / AGENTS.md / .agents/) | warn |
+| `toolchain` | agentmd on PATH + version | fail |
+| `toolchain` | agentlint on PATH + version | fail |
+| `toolchain` | coderace on PATH + version | fail |
+| `toolchain` | agentreflect on PATH + version | fail |
+| `toolchain` | git on PATH (optional) | warn |
+| `toolchain` | python3 on PATH (optional) | warn |
+| `context` | Source files present (.py/.ts/.js/.tsx/.jsx) | warn |
+| `context` | Context freshness via `agentlint check-context` | warn |
+| `context` | agentkit-report/ output dir writable | fail |
+| `publish` | HERENOW_API_KEY set | warn |
+
+Exit codes: `0` = all checks passed (or only warns at default threshold); `1` = one or more checks at the fail level. Use `--fail-on warn` to treat warns as failures (good for CI preflight).
+
+**Troubleshooting / preflight checklist:**
+
+1. **Missing quartet tools** — `pip install agentmd agentlint coderace agentreflect`
+2. **No git repo** — `git init && git add . && git commit -m "Initial commit"`
+3. **No context files** — `agentmd generate .`
+4. **Stale context** — `agentmd generate .` to refresh CLAUDE.md / AGENTS.md
+5. **No HERENOW_API_KEY** — set `export HERENOW_API_KEY=your-key` in your shell profile for persistent publish URLs
+6. **Unwritable output dir** — `chmod u+w agentkit-report/` or use `--output` flag on `agentkit report`
+
+**Use in CI:**
+
+```yaml
+- name: Preflight check
+  run: agentkit doctor --fail-on warn --category toolchain
+```
 
 ---
 

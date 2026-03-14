@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.12.0 (2026-03-13)
+
+### Added
+- `agentkit doctor` expanded to a full preflight command (D2–D4):
+  - **D2 Toolchain probes**: checks agentmd, agentlint, coderace, agentreflect (missing = fail); git, python3 (missing = warn); captures version text with noisy-output tolerance
+  - **D3 Actionability checks**: source-file presence, context freshness via `agentlint check-context --json` (graceful degradation when unavailable), output-dir write access, HERENOW_API_KEY readiness
+  - **D4 CLI ergonomics**: `--category repo|toolchain|context|publish` filter; `--fail-on warn|fail` threshold; `--no-fail-exit` for hooks
+- README `agentkit doctor` section rewritten with full check table, troubleshooting checklist, and CI usage example
+- 45 new doctor tests (21 → 66); full suite 469 tests passing
+
 ## v0.11.0 (2026-03-13)
 
 ### Added

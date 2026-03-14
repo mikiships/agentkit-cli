@@ -1,59 +1,41 @@
-# agentkit-cli v0.6.0 Progress Log
+# agentkit-cli Progress Log
 
-## D1: Core `agentkit publish` command — DONE
-- Created `agentkit_cli/publish.py` with 3-step here.now API (POST /publish → PUT files → POST finalize)
-- Auth via `HERENOW_API_KEY` env var; anonymous fallback with 24h notice
-- File-not-found: clear error with hint to run `agentkit report` first
-- Registered as `agentkit publish` subcommand in `main.py`
-- Commit: `494102b`
+## v0.12.0 — `agentkit doctor` continuation pass
 
-## D2: `--publish` flag on `run` and `report` — DONE
-- `agentkit run --publish`: publishes after pipeline completes; failure is non-fatal (warning only)
-- `agentkit report --publish`: publishes after HTML written; failure is non-fatal
-- Both delegate to same `publish_html()` function from D1
-- Commit: `fb1fb2d`
+### D1: Core doctor result model and repo checks — DONE (prior pass)
+- `DoctorCheckResult`, `DoctorReport` dataclasses with `as_dict()` / `exit_code()`
+- Checks: git repo, initial commit, working tree, README.md, pyproject.toml, context files
+- 21 tests
+- Commit: `db30c34`
 
-## D3: Tests — DONE
-- `tests/test_publish.py`: 10 new tests, all passing
-  - test_anonymous_publish_success
-  - test_authenticated_publish_success
-  - test_file_not_found
-  - test_api_step1_failure
-  - test_api_step2_failure
-  - test_api_step3_failure
-  - test_json_output
-  - test_quiet_output
-  - test_run_publish_flag
-  - test_report_publish_flag
-- All use `unittest.mock.patch`; no real HTTP calls
-- Updated test_main.py version assertion to 0.6.0
-- Full suite: **220 passed**
-- Commit: `17676fa`
+### D2: Toolchain probes — DONE
+- `check_tool_binary(binary, is_core)`: PATH probe + `--version` capture
+- Version parsing handles noisy multi-line output (first line, 80-char cap)
+- Subprocess failures degrade gracefully (binary still counts as found)
+- Core tools (agentmd, agentlint, coderace, agentreflect): missing = `fail`
+- Optional tools (git, python3): missing = `warn`
+- `check_toolchain()` runs all 6 probes
 
-## D4: README + CHANGELOG + version bump — DONE
-- README: added "Sharing Results" section after `agentkit report` section
-- CHANGELOG: added `## v0.6.0` entry
-- pyproject.toml: `0.5.1` → `0.6.0`
-- `__init__.py`: `0.5.0` → `0.6.0`
-- `agentkit --version` returns `agentkit-cli v0.6.0`
-- Commit: `55161d5`
+### D3: Actionability checks — DONE
+- `check_source_files()`: recursive scan for .py/.ts/.js/.tsx/.jsx
+- `check_context_freshness()`: `agentlint check-context --json` with full graceful fallback (not found, non-zero exit, non-JSON output, subprocess error, timeout)
+- `check_output_dir()`: agentkit-report/ existence + write permission; parent-dir fallback
+- `check_herenow_api_key()`: warn (not fail) when unset
 
-## Final Status
-All deliverables complete. 220 tests passing. No blockers.
+### D4: CLI ergonomics — DONE
+- `--category repo|toolchain|context|publish`: filter checks and summary
+- `--fail-on warn|fail`: threshold for exit 1
+- `--no-fail-exit`: always exit 0
+- Invalid values exit 2 with clear error
+- Commit: `0156f2c` (D2+D3+D4 combined)
 
----
+### D5: Docs, changelog, version — DONE
+- README `agentkit doctor` section: full check table, troubleshooting checklist, CI usage
+- CHANGELOG: v0.12.0 entry
+- Version bumped: 0.11.0 → 0.12.0 in `__init__.py` and `pyproject.toml`
+- Final commit: see BUILD-REPORT.md
 
-# agentkit-cli v0.12.0 Progress Log
-
-## D1: Core `agentkit doctor` command + result model — DONE
-- Replaced the legacy tool-only `doctor` command with a structured report model in `agentkit_cli/doctor.py`
-- Added fixed repo/context checks: git repo, initial commit, working tree state, `README.md`, `pyproject.toml`, and context-file presence
-- Wired `agentkit doctor` through `agentkit_cli/commands/doctor_cmd.py` to use shared result objects for human and JSON output
-- Added 21 focused tests covering the D1 check functions, report counts, CLI summary output, and exit-code behavior
-- Verification: `python3 -m pytest tests/test_doctor.py tests/test_main.py -q`
-- Commit: blocked by sandbox `.git` write restriction
-
-## Blocker
-- Attempted `git add` / `git commit` for the D1 deliverable, but the sandbox rejects writes under `.git` with `Operation not permitted`
-- Per contract stop condition, execution stopped after the third attempt on the same issue
-- See `BUILD-REPORT.md` for the exact failing commands and current repository state
+### Test counts
+- D1 baseline: 21 doctor tests, 403 total
+- This pass: +45 doctor tests = 66 total
+- Full suite: **469 passing**
