@@ -36,6 +36,10 @@ inputs:
     description: Minimum net delta for compare mode. Fails if net delta is below this.
     required: false
     default: '0'
+  save-history:
+    description: Save run scores to history.json artifact (true/false)
+    required: false
+    default: 'false'
 
 outputs:
   lint-score:
@@ -47,6 +51,9 @@ outputs:
   review-summary:
     description: coderace review summary string
     value: ${{ steps.run-toolkit.outputs.review-summary }}
+  history-json:
+    description: JSON string of latest run history (when save-history=true)
+    value: ${{ steps.save-history.outputs.history-json }}
 
 runs:
   using: composite
@@ -85,6 +92,15 @@ runs:
         else
           python "${{ github.action_path }}/scripts/run-agentkit-action.py"
         fi
+
+    - name: Save history artifact
+      id: save-history
+      if: inputs.save-history == 'true'
+      shell: bash
+      run: |
+        HISTORY_JSON=$(agentkit history --json --project "$(basename $GITHUB_WORKSPACE)" 2>/dev/null || echo '{"runs":[],"sparkline":""}')
+        echo "$HISTORY_JSON" > history.json
+        echo "history-json=$HISTORY_JSON" >> "$GITHUB_OUTPUT"
 
     - name: Post PR comment
       if: inputs.post-comment == 'true' && github.event_name == 'pull_request'

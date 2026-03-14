@@ -455,3 +455,49 @@ def test_readme_has_github_action_section():
     readme = (REPO_ROOT / "README.md").read_text()
     assert "GitHub Action" in readme
     assert "mikiships/agentkit-cli@v0.7.0" in readme
+
+
+# ---------------------------------------------------------------------------
+# D4 — History integration tests
+# ---------------------------------------------------------------------------
+
+class TestActionHistoryIntegration(unittest.TestCase):
+    """Tests for save-history input and history-json output in action.yml."""
+
+    def test_action_has_save_history_input(self):
+        data = _load_action()
+        assert "save-history" in data["inputs"]
+
+    def test_save_history_default_is_false(self):
+        data = _load_action()
+        assert data["inputs"]["save-history"]["default"] == "false"
+
+    def test_save_history_is_not_required(self):
+        data = _load_action()
+        save_history_input = data["inputs"]["save-history"]
+        assert save_history_input.get("required") is not True
+
+    def test_action_has_history_json_output(self):
+        data = _load_action()
+        assert "history-json" in data["outputs"]
+
+    def test_history_json_output_has_description(self):
+        data = _load_action()
+        assert data["outputs"]["history-json"].get("description")
+
+    def test_example_ci_workflow_exists(self):
+        assert EXAMPLES_DIR.exists()
+        ci_file = EXAMPLES_DIR / "agentkit-ci.yml"
+        assert ci_file.exists(), "examples/agentkit-ci.yml should exist"
+
+    def test_example_ci_workflow_has_save_history(self):
+        ci_file = EXAMPLES_DIR / "agentkit-ci.yml"
+        content = ci_file.read_text()
+        assert "save-history" in content
+
+    def test_example_ci_workflow_is_valid_yaml(self):
+        ci_file = EXAMPLES_DIR / "agentkit-ci.yml"
+        import yaml
+        data = yaml.safe_load(ci_file.read_text())
+        assert isinstance(data, dict)
+        assert "jobs" in data

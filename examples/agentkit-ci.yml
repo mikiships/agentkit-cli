@@ -1,0 +1,28 @@
+name: Agent Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mikiships/agentkit-cli@main
+        id: agentkit
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          min-lint-score: '70'
+          save-history: 'true'   # optional: emit history.json artifact
+
+      # Optional: upload the history JSON as a build artifact
+      - name: Upload history artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentkit-history
+          path: history.json
+          if-no-files-found: ignore
