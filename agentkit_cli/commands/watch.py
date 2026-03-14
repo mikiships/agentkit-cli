@@ -37,6 +37,7 @@ class _ChangeHandler:
         self._timer: Optional[threading.Timer] = None
         self._lock = threading.Lock()
         self._last_file: Optional[str] = None
+        self._generation: int = 0
 
     def on_modified(self, path: str) -> None:
         ext = Path(path).suffix.lstrip(".")
@@ -46,7 +47,17 @@ class _ChangeHandler:
             self._last_file = path
             if self._timer is not None:
                 self._timer.cancel()
-            self._timer = threading.Timer(self.debounce, self._fire)
+            self._generation += 1
+            gen = self._generation
+
+            def _guarded_fire(expected_gen: int = gen) -> None:
+                with self._lock:
+                    if expected_gen != self._generation:
+                        # Stale timer — a newer event superseded this one.
+                        return
+                self._fire()
+
+            self._timer = threading.Timer(self.debounce, _guarded_fire)
             self._timer.daemon = True
             self._timer.start()
 

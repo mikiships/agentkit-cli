@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.17.0 (2026-03-14)
+
+### Added
+- `agentkit analyze <target>` command: zero-friction agent quality analysis for any GitHub repo or local path
+  - **Target formats**: `github:owner/repo`, `https://github.com/owner/repo`, `owner/repo` (bare shorthand), `./local-path`
+  - **Pipeline**: clones repo into temp dir (depth=1), runs `agentmd generate` (if no context), `agentmd score`, `agentlint check-context --format json`, `agentreflect generate`, computes composite score
+  - **Output**: Rich table showing Tool / Status / Score / Key Finding + headline `Agent Quality Score: X/100 (Grade)  repo: owner/repo`
+  - **Flags**: `--json` (machine-readable output), `--keep` (keep temp clone dir), `--publish` (publish HTML report to here.now), `--timeout N` (default 120s), `--no-generate` (skip agentmd generate)
+  - **Error handling**: git not installed → clear error; clone failure → helpful message + temp dir cleanup; individual tool failure isolation; timeout → partial results; 1 retry with 5s backoff on clone
+  - **JSON schema**: `target`, `repo_name`, `composite_score`, `grade`, `tools`, `generated_context`, `temp_dir` (if --keep), `report_url` (if --publish succeeded)
+- 25 new tests covering URL parsing, mock clone, pipeline execution, JSON schema, and all error paths
+
 ## v0.16.2 (2026-03-14)
 
 ### Fixed

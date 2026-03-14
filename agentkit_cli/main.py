@@ -22,6 +22,8 @@ from agentkit_cli.commands.summary_cmd import summary_command
 from agentkit_cli.commands.history_cmd import history_command
 from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
 from agentkit_cli.commands.score_cmd import score_command
+from agentkit_cli.commands.analyze_cmd import analyze_command
+from agentkit_cli.commands.sweep_cmd import sweep_command
 
 app = typer.Typer(
     name="agentkit",
@@ -254,6 +256,46 @@ def leaderboard(
 ) -> None:
     """Show a ranked leaderboard of agent runs grouped by --label tags."""
     leaderboard_command(by=by, project=project, last=last, since=since, json_output=json_output, db_path=db_path)
+
+
+@app.command("analyze")
+def analyze(
+    target: str = typer.Argument(..., help="Target: github:owner/repo, https://github.com/..., owner/repo, or ./local-path"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    keep: bool = typer.Option(False, "--keep", help="Keep temp clone dir after analysis (prints path)"),
+    publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after analysis"),
+    timeout: int = typer.Option(120, "--timeout", help="Clone + analysis timeout in seconds"),
+    no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
+) -> None:
+    """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
+    analyze_command(
+        target=target,
+        json_output=json_output,
+        keep=keep,
+        publish=publish,
+        timeout=timeout,
+        no_generate=no_generate,
+    )
+
+
+@app.command("sweep")
+def sweep(
+    targets: Optional[List[str]] = typer.Argument(None, help="Targets to analyze in order"),
+    targets_file: Optional[Path] = typer.Option(None, "--targets-file", help="File containing one target per line"),
+    keep: bool = typer.Option(False, "--keep", help="Keep temp clone dirs after analysis"),
+    publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after each analysis"),
+    timeout: int = typer.Option(120, "--timeout", help="Clone + analysis timeout in seconds"),
+    no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
+) -> None:
+    """Analyze multiple GitHub repos or local paths in one batch."""
+    sweep_command(
+        targets=targets or [],
+        targets_file=targets_file,
+        keep=keep,
+        publish=publish,
+        timeout=timeout,
+        no_generate=no_generate,
+    )
 
 
 @app.command("watch")

@@ -1,40 +1,124 @@
-# agentkit-cli v0.16.0 Build Report
+# BUILD-REPORT.md — agentkit-cli v0.17.0
 
-## Status: COMPLETE
-## Tests: 625 passing
-## PyPI: https://pypi.org/project/agentkit-cli/0.16.0/
-## GitHub tag: v0.16.0
+**Date:** 2026-03-14  
+**Builder:** Claude (subagent)  
+**Version bump:** 0.16.2 → 0.17.0  
+**All tests passing:** 651 (626 original + 25 new)
 
-## Deliverables
-- [x] D1: CompositeScoreEngine (`agentkit_cli/composite.py`)
-  - Weighted scoring: coderace 30%, agentlint 25%, agentmd 25%, agentreflect 20%
-  - Automatic weight renormalization for missing tools
-  - Grade thresholds: A≥90, B≥80, C≥70, D≥60, F<60
-  - Raises ValueError if no tools present
-  - Scores clamped to [0, 100]
-- [x] D2: `agentkit score` command (`agentkit_cli/commands/score_cmd.py`)
-  - `--json`, `--breakdown`, `--ci`, `--min-score` flags all working
-  - Lives agentlint run + history DB for other tools
-  - Color-coded output: green ≥80, yellow ≥60, red <60
-- [x] D3: `agentkit run` composite score integration
-  - Displays composite score line after pipeline summary
-  - Records `composite` tool to history DB
-  - Respects `--no-history` flag
-  - Works in both normal and CI modes
-- [x] D4: `agentkit badge` defaults to composite score
-  - `--tool <name>` flag for single-tool badge
-  - Uses `CompositeScoreEngine` internally
-  - `--score` override still works
-- [x] D5: Tests, docs, version bump, PyPI publish
-  - 50 new tests in `tests/test_composite.py`
-  - README: "Agent Quality Score" section added near top
-  - CHANGELOG: v0.16.0 entry
-  - version bumped 0.15.0 → 0.16.0 in `__init__.py` and `pyproject.toml`
-  - PyPI published: https://pypi.org/project/agentkit-cli/0.16.0/
+---
 
-## Notes
-- Baseline: 575 tests (v0.15.0). Final: 625 tests. +50 new, 0 broken.
-- One pre-existing test (`test_version_is_015`) updated to expect 0.16.0.
-- `agentkit badge` now uses `CompositeScoreEngine` for weighted composite; old simple-average code replaced. `agentreflect` score extraction added to badge (was previously missing).
-- `agentkit run` composite scoring never aborts the pipeline (wrapped in try/except).
-- History DB migration not needed — `composite` is stored as a new tool name in existing schema.
+## What Was Built
+
+### D1 — Core `agentkit analyze` command
+
+**New files:**
+- `agentkit_cli/analyze.py` — `AnalyzeResult` dataclass + `analyze_target()` function + `parse_target()` helper
+- `agentkit_cli/commands/analyze_cmd.py` — CLI wiring with Rich table output
+- `agentkit_cli/main.py` — registered `@app.command("analyze")`
+
+**Target parsing supported:**
+- `github:owner/repo` → `https://github.com/owner/repo.git`
+- `https://github.com/owner/repo[.git]` → normalized URL
+- `owner/repo` (bare shorthand, exactly one slash, no spaces) → GitHub shorthand
+- `./local`, `/abs`, `~/home` → local path, no clone
+
+**Pipeline:**
+1. `agentmd generate .` (unless `--no-generate` or context already exists)
+2. `agentmd score .`
+3. `agentlint check-context --format json`
+4. `agentreflect generate .`
+5. Composite score via `CompositeScoreEngine` (graceful fallback to 0.0/F when all tools skipped)
+
+**Options implemented:**
+- `--json` — machine-readable JSON (suppresses Rich console prefix)
+- `--keep` — keep temp clone dir, include path in output/JSON
+- `--publish` — publish HTML report to here.now (best-effort, doesn't abort on failure)
+- `--timeout N` — clone + analysis timeout (default: 120s)
+- `--no-generate` — skip agentmd generate
+
+### D2 — Output formatting + JSON schema
+
+Rich table: Tool | Status | Score | Key Finding  
+Headline: `Agent Quality Score: X/100 (Grade)  repo: owner/repo`  
+Color-coded grades (A/B=green, C=yellow, D/F=red)  
+JSON schema matches spec exactly; `temp_dir`/`report_url` omitted when None.
+
+### D3 — Error handling + graceful degradation
+
+- Git not installed → `RuntimeError: git is not installed` with install hint
+- Clone failure → `RuntimeError` with stderr, temp dir cleaned
+- 1 retry with 5s backoff on clone
+- Individual tool failure isolation (each tool wrapped in try/except, status="error", analysis continues)
+- Timeout on tool → status="error", analysis continues with partial results
+- `CompositeScoreEngine` ValueError (all tools skipped) → caught, returns 0.0/F
+- All error paths use try/finally for temp dir cleanup
+
+### D4 — README + docs update
+
+- `README.md`: new `## Analyze Any Repo (Zero Setup)` section with examples, option list, and JSON schema
+- `CHANGELOG.md`: v0.17.0 entry with full feature list
+- `pyproject.toml`: version → 0.17.0
+- `agentkit_cli/__init__.py`: `__version__` → 0.17.0
+- `tests/test_main.py` + `tests/test_leaderboard.py`: version assertion updated from "0.16" to "0.17"
+
+### D5 — Tests
+
+**New test file:** `tests/test_analyze.py` — 25 tests
+
+| Category | Tests |
+|----------|-------|
+| Target URL parsing (github:, https://, bare owner/repo, local paths, invalid) | 9 |
+| Mock clone (remote target invokes git clone, local path skips mkdtemp) | 2 |
+| Mock pipeline (all tools skipped, all pass, no_generate) | 3 |
+| JSON output schema (required fields, temp_dir inclusion) | 2 |
+| Rich table output | 1 |
+| Error handling (git missing, clone failure exit code, tool timeout, temp dir cleanup) | 5 |
+| AnalyzeResult.to_dict() schema | 3 |
+
+---
+
+## Deviations from Plan
+
+1. **CompositeScoreEngine ValueError handling** — the engine raises `ValueError` when all tool scores are None. Not called out in the build contract. Added try/except to return score=0.0, grade="F" rather than crash. Correct behavior per D3 (graceful degradation).
+
+2. **Version bump of existing test assertions** — `test_main.py` and `test_leaderboard.py` both had `assert "0.16" in result.output` which broke after version bump. Updated to "0.17" as required.
+
+3. **JSON output console prefix** — the `--json` flag suppresses the "cloning…" console line to ensure stdout is pure JSON. Ensures `json.loads(result.output)` works in tests and pipelines.
+
+---
+
+## Follow-up Items
+
+- `--publish` is best-effort and silently skips if `here.now` is unavailable or no report HTML exists. A future pass could generate a fresh HTML report from the analysis result before publishing.
+- `agentreflect generate <path>` may need `--from-notes` or similar flags depending on tool version; the current implementation passes the work_dir as positional arg (matches `run_cmd.py` pattern).
+- The composite score with all tools skipped returns 0.0/F which is technically correct but could be improved to show "N/A" when no tools are installed at all.
+
+---
+
+## Test Counts
+
+| Suite | Count |
+|-------|-------|
+| Pre-build (existing) | 626 |
+| New (test_analyze.py) | 25 |
+| **Total passing** | **651** |
+
+All 651 tests pass. No previously passing tests broken.
+
+---
+
+## Release Unblock Addendum — Watch Debounce Race (2026-03-14)
+
+**Blocking failure:** `tests/test_watch.py::TestChangeHandler::test_debounce_resets_on_rapid_changes` (2 fires observed, 1 expected)
+
+**Root cause:** `threading.Timer.cancel()` is not race-free. A timer thread that has already begun executing ignores subsequent `cancel()` calls, allowing stale timers to fire after a newer timer was started.
+
+**Fix:** Generation counter in `_ChangeHandler`. Each `on_modified` call increments `_generation` and wraps the callback in a `_guarded_fire` closure that checks the captured generation before dispatching to `_fire()`. Stale timer callbacks silently no-op.
+
+**Files changed:** `agentkit_cli/commands/watch.py` only.
+
+**Post-fix verification:**
+- `python3 -m pytest -q tests/test_watch.py` → 17 passed
+- `python3 -m pytest -q` → **651 passed, 0 failed**
+
+v0.17.0 is release-ready. ✅

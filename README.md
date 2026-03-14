@@ -10,6 +10,68 @@ Get the full Agent Quality Toolkit pipeline in a single command — no more jugg
 
 ---
 
+## Analyze Any Repo (Zero Setup)
+
+The viral mechanic: analyze any public GitHub repo for agent quality without touching it first.
+
+```bash
+# GitHub shorthand
+agentkit analyze tiangolo/fastapi
+
+# github: prefix
+agentkit analyze github:tiangolo/fastapi
+
+# Full URL
+agentkit analyze https://github.com/tiangolo/fastapi
+
+# Local path
+agentkit analyze ./my-project
+```
+
+Example output:
+
+```
+agentkit analyze — cloning https://github.com/tiangolo/fastapi.git …
+
+             Analysis: fastapi
+┌──────────────┬──────────┬───────┬───────────────────────────┐
+│ Tool         │ Status   │ Score │ Key Finding               │
+├──────────────┼──────────┼───────┼───────────────────────────┤
+│ agentmd      │ ✓ pass   │ 82    │ context file found        │
+│ agentlint    │ ✓ pass   │ 78    │ 2 suggestions             │
+│ agentreflect │ ✓ pass   │ 85    │ reflection generated      │
+└──────────────┴──────────┴───────┴───────────────────────────┘
+
+────────────────────────────────────────────────────────────
+Agent Quality Score: 82/100 (B)  repo: fastapi
+────────────────────────────────────────────────────────────
+```
+
+**Options:**
+- `--json` — machine-readable JSON output with full schema
+- `--keep` — don't delete the temp clone (prints path for follow-up)
+- `--publish` — publish HTML report to here.now after analysis
+- `--timeout N` — clone + analysis timeout in seconds (default: 120)
+- `--no-generate` — skip `agentmd generate`; score only what's already there
+
+**JSON schema** (`--json`):
+```json
+{
+  "target": "github:tiangolo/fastapi",
+  "repo_name": "fastapi",
+  "composite_score": 82.0,
+  "grade": "B",
+  "tools": {
+    "agentmd": {"tool": "agentmd", "status": "pass", "score": 82.0, "finding": "context file found"},
+    "agentlint": {"tool": "agentlint", "status": "pass", "score": 78.0, "finding": "2 suggestions"},
+    "agentreflect": {"tool": "agentreflect", "status": "pass", "score": 85.0, "finding": "reflection generated"}
+  },
+  "generated_context": false
+}
+```
+
+---
+
 ## Agent Quality Score
 
 Get a single **0-100 composite score** for your AI agent project in one command:
