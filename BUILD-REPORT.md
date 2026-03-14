@@ -1,66 +1,79 @@
-# BUILD-REPORT: agentkit-cli v0.14.0
+# BUILD-REPORT.md — agentkit-cli v0.15.0
 
 **Date:** 2026-03-14  
-**Contract:** agentkit-cli-v0.14.0-history.md  
-**Status:** COMPLETE ✅
+**Feature:** `agentkit leaderboard` command  
+**PyPI:** https://pypi.org/project/agentkit-cli/0.15.0/
 
-## What was built
+---
 
-### D1 — `agentkit_cli/history.py`
-SQLite-backed `HistoryDB` class at `~/.config/agentkit/history.db`.
-- `record_run(project, tool, score, details=None)` — insert a run record
-- `get_history(project, tool, limit)` — rows newest-first
-- `clear_history(project)` — delete by project or all
-- `get_all_projects()` / `get_project_summary()` — cross-project stats
-- Module-level helpers: `record_run()`, `get_history()`, `clear_history()` (error-safe wrappers)
-- Schema idempotent via `CREATE TABLE/INDEX IF NOT EXISTS`
+## Test Results
 
-### D2 — Auto-record in `run_cmd.py`
-After each `agentkit run`, per-tool scores (pass=100, fail=0) and a mean `overall` score are silently recorded. DB failures are caught and printed to stderr at DEBUG level — never abort the run. `--no-history` flag skips recording.
+- **Total tests:** 575
+- **Passing:** 575
+- **Failing:** 0
+- **New tests added:** 47 (in `tests/test_leaderboard.py`)
 
-### D3 — `agentkit history` command
-- Rich table with date, tool, score, block-bar, trend arrows (↑↓—) and delta vs previous
-- `--limit N` — number of runs (default 10)
-- `--tool TOOL` — filter to one tool
-- `--project NAME` — override project name
-- `--graph` — ASCII sparkline using `▁▂▃▄▅▆▇█` chars
-- `--json` — `{runs: [...], sparkline: "..."}` 
-- `--clear` — confirm-prompt delete (`--yes` to skip)
-- `--all-projects` — cross-project summary table
-- Wired into `main.py` as `agentkit history`
+```
+575 passed in 6.86s
+```
 
-### D4 — GitHub Actions integration
-- `action.yml`: new `save-history` optional input (default: `false`)
-- `history-json` output set when save-history=true
-- `examples/agentkit-ci.yml`: example workflow with optional history artifact upload
+---
 
-### D5 — Docs, CHANGELOG, version bump
-- `pyproject.toml` + `__init__.py`: bumped to `0.14.0`
-- `CHANGELOG.md`: v0.14.0 entry
-- `README.md`: "Quality Trend Tracking" section with usage examples and GitHub Actions integration
+## What Was Built
 
-## Test counts
+### D1: Run Labeling
+- Added `--label <str>` flag to `agentkit run`
+- Label stored in history DB via backward-compatible `ALTER TABLE` migration
+- Old rows without label column are readable (migrate to NULL → shown as "default")
+- Module-level `record_run()` and `HistoryDB.record_run()` both accept `label=` kwarg
 
-| Suite | Tests |
-|---|---|
-| Pre-existing (476 baseline) | 476 |
-| test_history.py (D1 unit) | 25 |
-| test_history_cmd.py (D3 cmd) | 27 |
-| test_run_history.py (D2 auto-record) | 5 |
-| test_action.py additions (D4) | 8 |
-| **Total** | **528** (511 excl. flaky watch tests) |
+### D2: Leaderboard Engine
+- `agentkit_cli/commands/leaderboard_cmd.py` — `leaderboard_command()` function
+- `HistoryDB.get_leaderboard_data()` — groups by label, computes avg/best/worst/trend
+- `_compute_trend()` — avg(last 3) - avg(first 3), handles short arrays cleanly
+- Supports `tool`, `project`, `since` (ISO timestamp), `last_n` filters
 
-`pytest -q --ignore=tests/test_watch.py` → **511 passed**  
-Full suite: 526+ (watch tests pass in isolation, flaky under parallel load — pre-existing issue)
+### D3: CLI Command
+- `agentkit leaderboard` registered in `main.py`
+- Rich ranked table: Rank, Label, Runs, Avg Score, Trend (↑/↓/→), Best, Worst
+- Color-coded scores (green ≥80, yellow ≥50, red <50)
+- Flags: `--by`, `--project`, `--last`, `--since`, `--json`, `--db` (hidden, for testing)
 
-## PyPI
+### D4: GitHub Actions
+- `action.yml` updated with `leaderboard-json` output
+- Emitted alongside `history-json` when `save-history: true`
 
-**URL:** https://pypi.org/project/agentkit-cli/0.14.0/  
-**Status:** ✅ Published successfully  
-**Wheel:** `agentkit_cli-0.14.0-py3-none-any.whl` (87.8 kB)
+### D5: Docs, Tests, Version
+- README: "Agent Leaderboard" section added with example output and GitHub Actions snippet
+- CHANGELOG: v0.15.0 entry
+- Version: 0.14.0 → 0.15.0 in `pyproject.toml` and `__init__.py`
 
-## Deviations from contract
+---
 
-- **Test count 528 vs 520+ target**: exceeded target by 8 tests.
-- **Watch test flakiness**: 2 timing-based tests in `test_watch.py` are flaky under parallel pytest load (pre-existing, pass in isolation). Not caused by this change.
-- **`--db` hidden flag**: added hidden `--db` option to `agentkit history` CLI for test isolation (no user-visible impact).
+## Demo Commands
+
+```bash
+# Install
+pip install agentkit-cli==0.15.0
+
+# Tag runs with labels
+agentkit run --label gpt-4 --no-history  # (tools not installed, use --no-history for demo)
+agentkit run --label claude-sonnet
+
+# View leaderboard
+agentkit leaderboard
+agentkit leaderboard --json
+agentkit leaderboard --by agentlint
+agentkit leaderboard --last 5
+agentkit leaderboard --since 7d
+
+# Verify version
+agentkit --version  # → agentkit-cli v0.15.0
+```
+
+---
+
+## Known Issues
+
+- `test_watch.py::TestChangeHandler::test_debounce_resets_on_rapid_changes` is a pre-existing flaky timing test; it passes on most runs but occasionally fails under load. Not related to this feature.
+- The `--label` flag on `agentkit run` does not appear in the run summary JSON output (it's stored in the DB only). This could be a future enhancement.
