@@ -627,6 +627,47 @@ agentkit badge --score 87
 
 ---
 
+## Quality Trend Tracking
+
+Every `agentkit run` automatically records scores to a local SQLite database (`~/.config/agentkit/history.db`). Use `agentkit history` to view your quality trend over time.
+
+```bash
+# Show last 10 runs for current project (Rich table with trend arrows)
+agentkit history
+
+# Filter to one tool
+agentkit history --tool agentlint
+
+# Show ASCII sparkline of last 10 overall scores
+agentkit history --graph
+
+# Machine-readable output
+agentkit history --json
+
+# Cross-project summary
+agentkit history --all-projects
+
+# Clear history for current project
+agentkit history --clear
+
+# Skip recording during a run
+agentkit run --no-history
+```
+
+**GitHub Actions**: set `save-history: true` in the action to emit a `history.json` artifact:
+
+```yaml
+- uses: mikiships/agentkit-cli@main
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    save-history: 'true'
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: agentkit-history
+    path: history.json
+```
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

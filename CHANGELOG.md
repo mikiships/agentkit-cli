@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.14.0 (2026-03-14)
+
+### Added
+- `agentkit history` command: persistent quality score tracking with SQLite backend
+  - **D1 HistoryDB**: SQLite store at `~/.config/agentkit/history.db`; `record_run()`, `get_history()`, `clear_history()` with idempotent schema
+  - **D2 Auto-record**: `agentkit run` automatically records per-tool and overall scores after each run; `--no-history` flag to skip; DB failures never abort the run
+  - **D3 history command**: Rich table with trend arrows and block bars; `--limit`, `--tool`, `--project`, `--graph` (sparkline), `--json`, `--clear` (with confirmation), `--all-projects` flags
+  - **D4 GitHub Actions**: `save-history` optional input; `history-json` output; `examples/agentkit-ci.yml` example workflow
+- 52 new tests; full suite 528 tests passing
+
 ## v0.13.0 (2026-03-14)
 
 ### Added
