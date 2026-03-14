@@ -52,9 +52,12 @@ def run(
 @app.command("doctor")
 def doctor(
     json_output: bool = typer.Option(False, "--json", help="Emit results as JSON"),
+    category: Optional[str] = typer.Option(None, "--category", help="Filter to one category: repo, toolchain, context, publish"),
+    fail_on: str = typer.Option("fail", "--fail-on", help="Exit non-zero when any check at this level or above fails: warn|fail"),
+    no_fail_exit: bool = typer.Option(False, "--no-fail-exit", help="Always exit 0, regardless of check results"),
 ) -> None:
-    """Diagnose whether all quartet tools are installed and functional."""
-    doctor_command(json_output=json_output)
+    """Preflight check: verify repo health, toolchain, context, and publish readiness."""
+    doctor_command(json_output=json_output, category=category, fail_on=fail_on, no_fail_exit=no_fail_exit)
 
 
 @app.command("status")

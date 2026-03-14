@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -327,17 +329,301 @@ def check_context_files(root: Path) -> DoctorCheckResult:
     )
 
 
+# ---------------------------------------------------------------------------
+# D2: Toolchain probes
+# ---------------------------------------------------------------------------
+
+_CORE_TOOLS = ("agentmd", "agentlint", "coderace", "agentreflect")
+_OPTIONAL_TOOLS = ("git", "python3")
+
+
+def _probe_binary_version(binary: str) -> tuple[bool, str]:
+    """Return (found, version_text).  version_text is '' when unavailable."""
+    if shutil.which(binary) is None:
+        return False, ""
+    try:
+        result = subprocess.run(
+            [binary, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        raw = (result.stdout or result.stderr).strip()
+        # Take the first non-empty line and cap to 80 chars for readability.
+        version_line = next((line for line in raw.splitlines() if line.strip()), "")
+        return True, version_line[:80]
+    except (OSError, subprocess.SubprocessError):
+        return True, ""  # binary exists but --version probe failed; still found
+
+
+def check_tool_binary(binary: str, *, is_core: bool) -> DoctorCheckResult:
+    """Check whether a toolkit binary is available on PATH."""
+    found, version = _probe_binary_version(binary)
+    category = "toolchain"
+    tool_id = f"toolchain.{binary.replace('-', '_')}"
+
+    if found:
+        summary = f"{binary} is available."
+        details = version if version else f"{binary} found on PATH; version probe returned no output."
+        return DoctorCheckResult(
+            id=tool_id,
+            name=binary,
+            status="pass",
+            summary=summary,
+            details=details,
+            fix_hint="",
+            category=category,
+        )
+
+    if is_core:
+        return DoctorCheckResult(
+            id=tool_id,
+            name=binary,
+            status="fail",
+            summary=f"{binary} is not installed.",
+            details=f"Required core tool '{binary}' was not found on PATH.",
+            fix_hint=f"Install {binary} and make sure it is on your PATH.",
+            category=category,
+        )
+
+    return DoctorCheckResult(
+        id=tool_id,
+        name=binary,
+        status="warn",
+        summary=f"{binary} is not installed (optional).",
+        details=f"Optional tool '{binary}' was not found on PATH.",
+        fix_hint=f"Install {binary} for the full toolkit experience.",
+        category=category,
+    )
+
+
+def check_toolchain() -> list[DoctorCheckResult]:
+    """Return a check result for each core and optional tool."""
+    results: list[DoctorCheckResult] = []
+    for binary in _CORE_TOOLS:
+        results.append(check_tool_binary(binary, is_core=True))
+    for binary in _OPTIONAL_TOOLS:
+        results.append(check_tool_binary(binary, is_core=False))
+    return results
+
+
+# ---------------------------------------------------------------------------
+# D3: Actionability checks with fix hints
+# ---------------------------------------------------------------------------
+
+_SOURCE_EXTENSIONS = {".py", ".ts", ".js", ".tsx", ".jsx"}
+
+
+def check_source_files(root: Path) -> DoctorCheckResult:
+    """Check whether *root* contains at least one recognised source file."""
+    found = next(
+        (
+            f
+            for f in root.rglob("*")
+            if f.suffix in _SOURCE_EXTENSIONS and f.is_file()
+        ),
+        None,
+    )
+    if found:
+        return DoctorCheckResult(
+            id="context.source_files",
+            name="Source files",
+            status="pass",
+            summary="Source files found in project.",
+            details=f"e.g. {found.relative_to(root)}",
+            fix_hint="",
+            category="context",
+        )
+
+    return DoctorCheckResult(
+        id="context.source_files",
+        name="Source files",
+        status="warn",
+        summary="No source files found.",
+        details=f"Looked for {', '.join(sorted(_SOURCE_EXTENSIONS))} files recursively.",
+        fix_hint="Add at least one source file (.py, .ts, .js, .tsx, or .jsx) to the project.",
+        category="context",
+    )
+
+
+def check_context_freshness(root: Path) -> DoctorCheckResult:
+    """Run agentlint check-context --json if available; degrade gracefully."""
+    binary = shutil.which("agentlint")
+    if binary is None:
+        return DoctorCheckResult(
+            id="context.freshness",
+            name="Context freshness",
+            status="warn",
+            summary="agentlint not found; context freshness check skipped.",
+            details="Install agentlint to enable context freshness diagnostics.",
+            fix_hint="Install agentlint and re-run 'agentkit doctor'.",
+            category="context",
+        )
+
+    try:
+        result = subprocess.run(
+            [binary, "check-context", "--json"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return DoctorCheckResult(
+            id="context.freshness",
+            name="Context freshness",
+            status="warn",
+            summary="agentlint check-context failed unexpectedly.",
+            details=str(exc),
+            fix_hint="Run 'agentlint check-context' manually to diagnose.",
+            category="context",
+        )
+
+    if result.returncode != 0:
+        stderr_hint = (result.stderr or "").strip()[:200]
+        return DoctorCheckResult(
+            id="context.freshness",
+            name="Context freshness",
+            status="warn",
+            summary="agentlint check-context returned a non-zero exit code.",
+            details=stderr_hint or "No error detail available.",
+            fix_hint="Run 'agentlint check-context' to see full output.",
+            category="context",
+        )
+
+    try:
+        payload = json.loads(result.stdout)
+        fresh = payload.get("fresh", True)
+        age_days = payload.get("age_days")
+        detail = result.stdout.strip()[:200]
+        if fresh:
+            return DoctorCheckResult(
+                id="context.freshness",
+                name="Context freshness",
+                status="pass",
+                summary="Context files are up to date.",
+                details=detail,
+                fix_hint="",
+                category="context",
+            )
+        age_label = f" ({age_days}d old)" if age_days is not None else ""
+        return DoctorCheckResult(
+            id="context.freshness",
+            name="Context freshness",
+            status="warn",
+            summary=f"Context files may be stale{age_label}.",
+            details=detail,
+            fix_hint="Run 'agentmd generate .' to refresh context files.",
+            category="context",
+        )
+    except (json.JSONDecodeError, ValueError):
+        # agentlint ran but returned non-JSON; treat as graceful degradation
+        return DoctorCheckResult(
+            id="context.freshness",
+            name="Context freshness",
+            status="warn",
+            summary="agentlint check-context returned non-JSON output.",
+            details=(result.stdout or result.stderr or "").strip()[:200],
+            fix_hint="Run 'agentlint check-context' manually to inspect output.",
+            category="context",
+        )
+
+
+def check_output_dir(root: Path) -> DoctorCheckResult:
+    """Check whether the default report output directory is accessible."""
+    report_dir = root / "agentkit-report"
+    if report_dir.exists():
+        if os.access(report_dir, os.W_OK):
+            return DoctorCheckResult(
+                id="context.output_dir",
+                name="Report output dir",
+                status="pass",
+                summary="agentkit-report/ is present and writable.",
+                details=str(report_dir),
+                fix_hint="",
+                category="context",
+            )
+        return DoctorCheckResult(
+            id="context.output_dir",
+            name="Report output dir",
+            status="fail",
+            summary="agentkit-report/ exists but is not writable.",
+            details=str(report_dir),
+            fix_hint="Fix permissions: 'chmod u+w agentkit-report/'.",
+            category="context",
+        )
+
+    # Dir doesn't exist yet — check parent is writable.
+    if os.access(root, os.W_OK):
+        return DoctorCheckResult(
+            id="context.output_dir",
+            name="Report output dir",
+            status="pass",
+            summary="agentkit-report/ does not exist yet; parent dir is writable.",
+            details=f"Will be created at {report_dir} when needed.",
+            fix_hint="",
+            category="context",
+        )
+
+    return DoctorCheckResult(
+        id="context.output_dir",
+        name="Report output dir",
+        status="fail",
+        summary="Cannot create agentkit-report/ — parent directory is not writable.",
+        details=str(root),
+        fix_hint=f"Fix permissions on '{root}' or use --output to specify a writable path.",
+        category="context",
+    )
+
+
+def check_herenow_api_key() -> DoctorCheckResult:
+    """Warn if HERENOW_API_KEY is unset (publish will fail without it)."""
+    key = os.environ.get("HERENOW_API_KEY", "").strip()
+    if key:
+        return DoctorCheckResult(
+            id="publish.herenow_key",
+            name="HERENOW_API_KEY",
+            status="pass",
+            summary="HERENOW_API_KEY is set.",
+            details="Publish via 'agentkit publish' will be authenticated.",
+            fix_hint="",
+            category="publish",
+        )
+
+    return DoctorCheckResult(
+        id="publish.herenow_key",
+        name="HERENOW_API_KEY",
+        status="warn",
+        summary="HERENOW_API_KEY is not set.",
+        details="Publishing reports via 'agentkit publish' will use anonymous mode (24h expiry).",
+        fix_hint="Set HERENOW_API_KEY in your shell profile for persistent publish URLs.",
+        category="publish",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Core runner
+# ---------------------------------------------------------------------------
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
     repo_state = detect_git_repo(project_root)
-    checks = [
+    checks: list[DoctorCheckResult] = [
+        # D1: repo checks
         check_git_repo(project_root),
         check_git_has_commit(project_root, repo_state=repo_state),
         check_working_tree_clean(project_root, repo_state=repo_state),
         check_readme_present(project_root),
         check_pyproject_present(project_root),
         check_context_files(project_root),
+        # D2: toolchain probes
+        *check_toolchain(),
+        # D3: actionability checks
+        check_source_files(project_root),
+        check_context_freshness(project_root),
+        check_output_dir(project_root),
+        check_herenow_api_key(),
     ]
     return DoctorReport(root=str(project_root), checks=checks)
 
