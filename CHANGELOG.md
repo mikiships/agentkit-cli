@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.15.0 (2026-03-14)
+
+### Added
+- `agentkit leaderboard` command: ranked comparison of agent runs grouped by label
+  - **D1 Run labeling**: `--label <str>` flag on `agentkit run`; label stored in history DB via backward-compatible `ALTER TABLE` migration
+  - **D2 Leaderboard engine**: `agentkit/leaderboard_cmd.py` with `get_leaderboard_data()` — groups runs by label, computes avg/best/worst/trend (last-3 minus first-3 avg); handles NULL labels as "default"
+  - **D3 CLI command**: Rich ranked table with Rank, Label, Runs, Avg Score, Trend (↑/↓/→), Best, Worst; `--json`, `--by`, `--since`, `--project`, `--last` flags
+  - **D4 GitHub Actions**: `leaderboard-json` output when `save-history: true`; README example snippet
+- 47 new tests; full suite 575 tests passing
+
 ## v0.14.0 (2026-03-14)
 
 ### Added

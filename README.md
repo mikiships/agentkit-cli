@@ -668,6 +668,59 @@ agentkit run --no-history
     path: history.json
 ```
 
+## Agent Leaderboard
+
+Tag runs with `--label` to compare models, configs, or agents head-to-head over time. The leaderboard groups all runs by label and ranks them by average score.
+
+```bash
+# Tag runs with a label
+agentkit run --label gpt-4
+agentkit run --label claude-sonnet
+agentkit run --label codex
+
+# Show ranked leaderboard (Rich table)
+agentkit leaderboard
+
+# Rank by a specific tool dimension
+agentkit leaderboard --by agentlint
+
+# Filter to a specific project
+agentkit leaderboard --project myproject
+
+# Only use last N runs per label (recency bias)
+agentkit leaderboard --last 5
+
+# Filter by recency
+agentkit leaderboard --since 7d
+agentkit leaderboard --since 2026-01-01
+
+# Machine-readable output
+agentkit leaderboard --json
+```
+
+Example output:
+```
+Agent Quality Leaderboard ─────────────────────────────────
+ Rank  Label          Runs  Avg Score  Trend   Best   Worst
+  1    gpt-4          12    87.3       ↑+3.1   92.0   79.0
+  2    claude-sonnet  8     83.1       →       89.0   75.0
+  3    codex          5     71.4       ↓-2.0   78.0   61.0
+─────────────────────────────────────────────────────────────
+```
+
+**GitHub Actions**: set `save-history: true` to also emit a `leaderboard-json` output:
+
+```yaml
+- uses: mikiships/agentkit-cli@main
+  id: agentkit
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    save-history: 'true'
+
+- name: Print leaderboard
+  run: echo '${{ steps.agentkit.outputs.leaderboard-json }}'
+```
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

@@ -70,6 +70,7 @@ def run_command(
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
     inject_readme: bool = False,
     no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
+    label: Optional[str] = typer.Option(None, "--label", help="Tag this run with a label for leaderboard"),
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -258,11 +259,11 @@ def run_command(
                     continue  # skipped/error → don't record
                 tool_scores.append(score)
                 if tool_name not in recorded_tools:
-                    record_run(project_name, tool_name, score)
+                    record_run(project_name, tool_name, score, label=label)
                     recorded_tools.add(tool_name)
             if tool_scores:
                 overall = round(sum(tool_scores) / len(tool_scores), 1)
-                record_run(project_name, "overall", overall)
+                record_run(project_name, "overall", overall, label=label)
         except Exception as exc:
             import sys
             print(f"[agentkit history] DEBUG: history recording failed: {exc}", file=sys.stderr)

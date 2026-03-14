@@ -54,6 +54,9 @@ outputs:
   history-json:
     description: JSON string of latest run history (when save-history=true)
     value: ${{ steps.save-history.outputs.history-json }}
+  leaderboard-json:
+    description: JSON string of leaderboard data grouped by label (when save-history=true)
+    value: ${{ steps.save-history.outputs.leaderboard-json }}
 
 runs:
   using: composite
@@ -98,9 +101,12 @@ runs:
       if: inputs.save-history == 'true'
       shell: bash
       run: |
-        HISTORY_JSON=$(agentkit history --json --project "$(basename $GITHUB_WORKSPACE)" 2>/dev/null || echo '{"runs":[],"sparkline":""}')
+        PROJECT="$(basename $GITHUB_WORKSPACE)"
+        HISTORY_JSON=$(agentkit history --json --project "$PROJECT" 2>/dev/null || echo '{"runs":[],"sparkline":""}')
         echo "$HISTORY_JSON" > history.json
         echo "history-json=$HISTORY_JSON" >> "$GITHUB_OUTPUT"
+        LEADERBOARD_JSON=$(agentkit leaderboard --json --project "$PROJECT" 2>/dev/null || echo '{"tool":"overall","project":"'$PROJECT'","leaderboard":[]}')
+        echo "leaderboard-json=$LEADERBOARD_JSON" >> "$GITHUB_OUTPUT"
 
     - name: Post PR comment
       if: inputs.post-comment == 'true' && github.event_name == 'pull_request'

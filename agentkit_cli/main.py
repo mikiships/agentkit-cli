@@ -20,6 +20,7 @@ from agentkit_cli.commands.compare_cmd import compare_command
 from agentkit_cli.commands.suggest_cmd import suggest_command
 from agentkit_cli.commands.summary_cmd import summary_command
 from agentkit_cli.commands.history_cmd import history_command
+from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
 
 app = typer.Typer(
     name="agentkit",
@@ -47,9 +48,10 @@ def run(
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after run"),
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after run"),
     no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
+    label: Optional[str] = typer.Option(None, "--label", help="Tag this run with a label (e.g. model name) for leaderboard comparison"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label)
 
 
 @app.command("doctor")
@@ -225,6 +227,19 @@ def history(
         all_projects=all_projects,
         db_path=db_path,
     )
+
+
+@app.command("leaderboard")
+def leaderboard(
+    by: str = typer.Option("overall", "--by", help="Score dimension: overall, agentmd, agentlint, coderace, agentreflect"),
+    project: Optional[str] = typer.Option(None, "--project", help="Filter by project name (default: cwd basename)"),
+    last: Optional[int] = typer.Option(None, "--last", help="Only use the most recent N runs per label"),
+    since: Optional[str] = typer.Option(None, "--since", help="Filter by recency: '7d' or 'YYYY-MM-DD'"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+) -> None:
+    """Show a ranked leaderboard of agent runs grouped by --label tags."""
+    leaderboard_command(by=by, project=project, last=last, since=since, json_output=json_output, db_path=db_path)
 
 
 @app.command("watch")

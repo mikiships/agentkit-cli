@@ -10,6 +10,23 @@ from typing import Optional
 
 
 _DB_DIR = Path.home() / ".config" / "agentkit"
+
+
+def _compute_trend(scores: list[float]) -> float:
+    """Compute trend delta: avg(last 3) - avg(first 3). Returns float delta.
+
+    For short arrays (< 4 scores), uses first half vs second half to avoid overlap.
+    """
+    if len(scores) < 2:
+        return 0.0
+    if len(scores) < 4:
+        mid = len(scores) // 2
+        first = scores[:mid] if mid > 0 else scores[:1]
+        last = scores[mid:] if mid < len(scores) else scores[-1:]
+    else:
+        first = scores[:3]
+        last = scores[-3:]
+    return round(sum(last) / len(last) - sum(first) / len(first), 1)
 _DB_PATH = _DB_DIR / "history.db"
 
 _DDL = """
@@ -24,6 +41,11 @@ CREATE TABLE IF NOT EXISTS runs (
 CREATE INDEX IF NOT EXISTS idx_runs_project ON runs(project);
 CREATE INDEX IF NOT EXISTS idx_runs_ts      ON runs(ts DESC);
 """
+
+_MIGRATIONS = [
+    "ALTER TABLE runs ADD COLUMN label TEXT",
+    "CREATE INDEX IF NOT EXISTS idx_runs_label ON runs(label)",
+]
 
 
 class HistoryDB:
@@ -42,6 +64,16 @@ class HistoryDB:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             conn.executescript(_DDL)
+        self._run_migrations()
+
+    def _run_migrations(self) -> None:
+        """Apply forward-only DDL migrations (idempotent)."""
+        with self._connect() as conn:
+            for sql in _MIGRATIONS:
+                try:
+                    conn.execute(sql)
+                except sqlite3.OperationalError:
+                    pass  # column already exists
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(str(self._path))
@@ -58,14 +90,15 @@ class HistoryDB:
         tool: str,
         score: float,
         details: Optional[dict] = None,
+        label: Optional[str] = None,
     ) -> None:
         """Insert one run record."""
         ts = datetime.now(timezone.utc).isoformat()
         details_json = json.dumps(details) if details is not None else None
         with self._connect() as conn:
             conn.execute(
-                "INSERT INTO runs (ts, project, tool, score, details) VALUES (?, ?, ?, ?, ?)",
-                (ts, project, tool, float(score), details_json),
+                "INSERT INTO runs (ts, project, tool, score, details, label) VALUES (?, ?, ?, ?, ?, ?)",
+                (ts, project, tool, float(score), details_json, label),
             )
 
     def get_history(
@@ -94,7 +127,7 @@ class HistoryDB:
         where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
         params.append(limit)
 
-        sql = f"SELECT id, ts, project, tool, score, details FROM runs {where} ORDER BY ts DESC LIMIT ?"
+        sql = f"SELECT id, ts, project, tool, score, details, label FROM runs {where} ORDER BY ts DESC LIMIT ?"
         with self._connect() as conn:
             rows = conn.execute(sql, params).fetchall()
 
@@ -110,6 +143,7 @@ class HistoryDB:
                     "tool": row["tool"],
                     "score": row["score"],
                     "details": details,
+                    "label": row["label"],
                 }
             )
         return result
@@ -137,6 +171,63 @@ class HistoryDB:
         with self._connect() as conn:
             rows = conn.execute(sql).fetchall()
         return [dict(row) for row in rows]
+
+    def get_leaderboard_data(
+        self,
+        tool: str = "overall",
+        project: Optional[str] = None,
+        since: Optional[str] = None,
+        last_n: Optional[int] = None,
+    ) -> list[dict]:
+        """Return per-label leaderboard rows.
+
+        Each row: {label, runs, avg_score, best, worst, trend, scores_asc}
+        Rows with NULL label are grouped as 'default'.
+        """
+        clauses: list[str] = ["tool = ?"]
+        params: list = [tool]
+
+        if project is not None:
+            clauses.append("project = ?")
+            params.append(project)
+        if since is not None:
+            clauses.append("ts >= ?")
+            params.append(since)
+
+        where = "WHERE " + " AND ".join(clauses)
+        sql = f"SELECT COALESCE(label, 'default') AS lbl, score, ts FROM runs {where} ORDER BY ts ASC"
+
+        with self._connect() as conn:
+            rows = conn.execute(sql, params).fetchall()
+
+        # Group by label
+        from collections import defaultdict
+        groups: dict[str, list[float]] = defaultdict(list)
+        for row in rows:
+            groups[row["lbl"]].append(row["score"])
+
+        results = []
+        for lbl, scores in groups.items():
+            if last_n is not None and last_n > 0:
+                scores = scores[-last_n:]
+            if not scores:
+                continue
+            avg = round(sum(scores) / len(scores), 1)
+            best = round(max(scores), 1)
+            worst = round(min(scores), 1)
+            trend = _compute_trend(scores)
+            results.append({
+                "label": lbl,
+                "runs": len(scores),
+                "avg_score": avg,
+                "best": best,
+                "worst": worst,
+                "trend": trend,
+            })
+
+        # Sort by avg descending
+        results.sort(key=lambda r: r["avg_score"], reverse=True)
+        return results
 
     def clear_history(self, project: Optional[str] = None) -> int:
         """Delete history rows. Returns count deleted."""
@@ -170,10 +261,11 @@ def record_run(
     score: float,
     details: Optional[dict] = None,
     db: Optional[HistoryDB] = None,
+    label: Optional[str] = None,
 ) -> None:
     """Record one run (silently ignores errors)."""
     try:
-        (db or _get_db()).record_run(project, tool, score, details)
+        (db or _get_db()).record_run(project, tool, score, details, label=label)
     except Exception as exc:  # pragma: no cover
         print(f"[agentkit history] DEBUG: failed to record run: {exc}", file=sys.stderr)
 
