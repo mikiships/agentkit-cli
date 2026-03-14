@@ -448,6 +448,45 @@ Current score: 72/100 — 3 critical issues found
 
 ---
 
+### `agentkit summary`
+
+Generate a maintainer-facing summary from agentkit analysis results. Designed for CI job summaries, PR comments, and release notes.
+
+```bash
+# Summarise the current project (runs the full toolkit)
+agentkit summary
+
+# Write markdown to a file
+agentkit summary --output summary.md
+
+# Append to GitHub Actions job summary
+agentkit summary --job-summary
+
+# Read from a JSON report (e.g. output of agentkit report --json)
+agentkit summary --json-input report.json
+
+# Emit structured JSON instead of markdown
+agentkit summary --json
+```
+
+Output includes:
+
+- **Overview**: project name, verdict (`Passing`, `Warnings Present`, `Action Required`, `Regression Detected`), overall score, tools passing
+- **Tool status table**: per-tool status, score, and concise notes
+- **Top fixes**: up to 5 prioritized findings derived from agentlint and agentreflect
+- **Compare section** (when compare data is present): base/head refs, net delta, per-tool deltas
+
+**GitHub Actions integration:**
+
+```yaml
+- name: Generate agent quality summary
+  run: agentkit summary --job-summary
+  env:
+    GITHUB_STEP_SUMMARY: ${{ runner.temp }}/summary.md
+```
+
+---
+
 ### `agentkit watch`
 
 Watch the project for file changes and automatically re-run the pipeline.

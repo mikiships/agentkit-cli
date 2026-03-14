@@ -50,3 +50,12 @@
 - Tests passing: `python3 -m pytest tests/test_summary.py tests/test_main.py -q` -> `10 passed`
 - Next: maintainer-focused sections for verdicts, prioritized fixes, and compare data
 - Blockers: none
+
+### D2: Maintainer-focused markdown sections — DONE
+- Expanded `agentkit summary` markdown into overview, per-tool status, top fixes, and optional compare sections
+- Added deterministic verdict logic: `PASSING`, `WARNINGS_PRESENT`, `ACTION_REQUIRED`, `REGRESSION_DETECTED`
+- Derived top fixes from prioritized findings first, then reflection suggestions when findings are absent
+- Improved agentlint tool notes to summarize issue severity mix instead of a generic issue count
+- Tests passing: `python3 -m pytest tests/test_summary.py tests/test_main.py -q` -> `13 passed`
+- Next: GitHub-friendly output targets (`--output`, `--job-summary`)
+- Blockers: cannot commit D2 in this sandbox because `.git` writes are denied; see `blocker-report-v0.13.0-summary.md`

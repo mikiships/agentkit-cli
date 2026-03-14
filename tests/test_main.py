@@ -11,7 +11,7 @@ def test_version_flag():
     """--version prints version."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "0.12.0" in result.output
+    assert "0.13.0" in result.output
 
 
 def test_no_args_shows_help():

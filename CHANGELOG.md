@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.13.0 (2026-03-14)
+
+### Added
+- `agentkit summary` command: maintainer-facing summary for CI, PR, and release workflows
+  - **D1 Core command**: `--path` (local analysis) and `--json-input` (file mode); deterministic markdown rendering
+  - **D2 Maintainer sections**: verdict logic (`PASSING`, `WARNINGS_PRESENT`, `ACTION_REQUIRED`, `REGRESSION_DETECTED`); per-tool status with concise notes; top-fixes section (up to 5 prioritized findings from agentlint/agentreflect); optional compare/regression section
+  - **D3 GitHub-friendly outputs**: `--output <path>` writes markdown to file; `--job-summary` appends to `GITHUB_STEP_SUMMARY`; clear error when job-summary env var is absent
+  - **D4 JSON mode**: `--json` emits structured payload (project, verdict, score, tool_status, top_fixes, compare, markdown)
+- README `agentkit summary` section with full usage examples and GitHub Actions integration
+- 7 new summary tests; full suite 476 tests passing
+
 ## v0.12.0 (2026-03-13)
 
 ### Added
