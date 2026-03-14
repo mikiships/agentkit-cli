@@ -38,7 +38,7 @@ def _run_agentlint_check_context(path: Path) -> Optional[dict]:
     """Run agentlint check-context --json and return parsed JSON, or None on failure."""
     try:
         result = subprocess.run(
-            ["agentlint", "check-context", str(path), "--json"],
+            ["agentlint", "check-context", str(path), "--format", "json"],
             capture_output=True,
             text=True,
             timeout=30,
@@ -63,7 +63,7 @@ def _run_agentlint_diff(path: Path) -> Optional[dict]:
         if not diff_text:
             return None
         result = subprocess.run(
-            ["agentlint", "--json"],
+            ["agentlint", "check", "--format", "json"],
             input=diff_text,
             capture_output=True,
             text=True,

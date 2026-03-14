@@ -101,7 +101,7 @@ def run_coderace_bench(path: str) -> Optional[dict]:
     if not _is_installed("coderace"):
         return None
     # Try to fetch cached benchmark history (no live agents required)
-    result = _run(["coderace", "benchmark", "history"], cwd=path, timeout=TOOL_TIMEOUT)
+    result = _run(["coderace", "benchmark", "history", "--format", "json"], cwd=path, timeout=TOOL_TIMEOUT)
     if result is None:
         # coderace is installed but history command failed or no results
         return {"status": "no_results", "message": "Run coderace benchmark to populate data"}

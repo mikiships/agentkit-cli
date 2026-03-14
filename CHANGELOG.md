@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.16.2 (2026-03-14)
+
+### Fixed
+- `agentkit score`: was passing `--json` to `agentlint check-context` (invalid flag). Corrected to `--format json`.
+- `agentkit suggest`: same flag issue in two places (`check-context --json` → `--format json`; bare `agentlint --json` → `agentlint check --format json`).
+- `agentkit report`: `coderace benchmark history` now called with `--format json` instead of no format flag.
+- Version check test made forward-compatible (checks `"0.16"` prefix, not exact string).
+
 ## v0.16.1 (2026-03-14)
 
 ### Fixed

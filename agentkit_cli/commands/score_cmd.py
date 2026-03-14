@@ -44,7 +44,7 @@ def _run_agentlint_fast(cwd: str) -> Optional[float]:
     try:
         context_file = Path(cwd) / "CLAUDE.md"
         args = ["check-context", str(context_file)] if context_file.exists() else ["check-context", cwd]
-        result = run_tool("agentlint", args + ["--json"], cwd=cwd)
+        result = run_tool("agentlint", args + ["--format", "json"], cwd=cwd)
         if result.returncode == 0:
             try:
                 data = json.loads(result.stdout)
