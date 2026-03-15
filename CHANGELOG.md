@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.26.1] - 2026-03-15
+
+### Fixed
+- Version assertions in tests now forward-compatible (no hardcoded minor version numbers)
+
 ## [0.25.0] - 2026-03-15
 
 ### Added
