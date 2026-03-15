@@ -407,6 +407,7 @@ def report_command(
     open_browser: bool,
     publish: bool = False,
     inject_readme: bool = False,
+    share: bool = False,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -498,3 +499,25 @@ def report_command(
             path=cwd,
             score_override=None,
         )
+
+    if share:
+        from agentkit_cli.share import generate_scorecard_html, upload_scorecard
+        import os as _os
+        try:
+            _share_score_result = {
+                "agentlint": results.get("agentlint"),
+                "agentmd": results.get("agentmd"),
+                "coderace": results.get("coderace"),
+                "agentreflect": results.get("agentreflect"),
+            }
+            _share_html = generate_scorecard_html(
+                score_result=_share_score_result,
+                project_name=project_name,
+                ref="unknown",
+            )
+            _share_api_key = _os.environ.get("HERENOW_API_KEY") or None
+            _share_url = upload_scorecard(_share_html, api_key=_share_api_key)
+            if _share_url:
+                console.print(f"\n[bold]Score card:[/bold] {_share_url}")
+        except Exception as _e:
+            console.print(f"[yellow]Warning: share failed — {_e}[/yellow]")

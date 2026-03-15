@@ -78,6 +78,7 @@ def run_command(
     notify_webhook: Optional[str] = None,
     notify_on: str = "fail",
     profile: Optional[str] = None,
+    share: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -337,6 +338,39 @@ def run_command(
             path=root,
             score_override=None,
         )
+
+    # Optional share step
+    if share:
+        from agentkit_cli.share import generate_scorecard_html, upload_scorecard
+        import os as _os
+        try:
+            _share_score_result: dict = {}
+            # Composite score comes later, so do a quick inline score
+            try:
+                import agentkit_cli.composite as _composite_mod
+                _cse = _composite_mod.CompositeScoreEngine()
+                _csr = _cse.compute({})
+                _share_score_result = {"composite": _csr.composite, "breakdown": _csr.breakdown}
+            except Exception:
+                pass
+            _share_html = generate_scorecard_html(
+                score_result=_share_score_result,
+                project_name=(root.resolve().name if root else Path.cwd().name),
+                ref="unknown",
+            )
+            _share_api_key = _os.environ.get("HERENOW_API_KEY") or None
+            _share_url = upload_scorecard(_share_html, api_key=_share_api_key)
+            if _share_url:
+                if ci:
+                    active_console.print(f"\nScore card: {_share_url}")
+                else:
+                    console.print(f"\n[bold]Score card:[/bold] {_share_url}")
+        except Exception as _e:
+            _warn = f"Warning: share failed — {_e}"
+            if ci:
+                active_console.print(_warn)
+            else:
+                console.print(f"[yellow]{_warn}[/yellow]")
 
     # Composite score display
     _composite_score: float | None = None
