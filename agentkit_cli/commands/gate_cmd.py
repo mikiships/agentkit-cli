@@ -10,6 +10,7 @@ import typer
 from rich.console import Console
 
 from agentkit_cli.gate import GateError, GateResult, run_gate
+from agentkit_cli.notifier import fire_notifications, resolve_notify_configs
 
 console = Console()
 
@@ -74,6 +75,10 @@ def gate_command(
     json_output: bool = False,
     output: Optional[Path] = None,
     job_summary: bool = False,
+    notify_slack: Optional[str] = None,
+    notify_discord: Optional[str] = None,
+    notify_webhook: Optional[str] = None,
+    notify_on: str = "fail",
 ) -> None:
     """Evaluate the current project against gate thresholds."""
     try:
@@ -89,6 +94,25 @@ def gate_command(
             _write_payload(payload, output)
         if job_summary:
             _write_job_summary(result)
+
+        # Fire notifications (never affect exit code)
+        try:
+            notify_configs = resolve_notify_configs(
+                notify_slack=notify_slack,
+                notify_discord=notify_discord,
+                notify_webhook=notify_webhook,
+                notify_on=notify_on,
+                project_name=str((path or Path.cwd()).resolve().name),
+            )
+            fire_notifications(
+                notify_configs,
+                verdict=result.verdict,
+                score=result.score,
+                top_findings=list(result.failure_reasons),
+                delta=result.baseline_delta,
+            )
+        except Exception:
+            pass
 
         if json_output:
             print(json.dumps(payload, indent=2))

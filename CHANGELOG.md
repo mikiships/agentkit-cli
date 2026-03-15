@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.21.0] - 2026-03-15
+
+### Added
+- **Webhook notifications** for `agentkit gate` and `agentkit run`:
+  - `--notify-slack <url>` — post a color-coded Slack attachment on gate result
+  - `--notify-discord <url>` — post a color-coded Discord embed on gate result
+  - `--notify-webhook <url>` — post a generic JSON payload to any HTTP endpoint
+  - `--notify-on fail|always` — control when notifications fire (default: `fail`)
+  - Env vars `AGENTKIT_NOTIFY_SLACK`, `AGENTKIT_NOTIFY_DISCORD`, `AGENTKIT_NOTIFY_WEBHOOK` accepted as fallbacks; CLI flags take precedence
+  - Notification failures **never** affect gate exit code — errors are logged and swallowed
+  - Single retry with 5 s timeout per attempt
+- **`agentkit notify` command group**:
+  - `agentkit notify test --slack|--discord|--webhook <url>` — fire a test notification and print ✓/✗ result
+  - `agentkit notify config` — show current notification env var configuration
+- **`agentkit_cli/notifier.py`** — standalone notification module with `NotifyConfig`, `build_payload`, `notify_result`, `fire_notifications`, `resolve_notify_configs`
+- `action.yml` gains `notify-slack`, `notify-discord`, `notify-webhook`, `notify-on` inputs
+
 ## [0.20.0] - 2026-03-14
 
 ### Added

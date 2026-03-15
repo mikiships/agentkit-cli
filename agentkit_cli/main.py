@@ -26,12 +26,14 @@ from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
+from agentkit_cli.commands.notify_cmd import notify_app
 
 app = typer.Typer(
     name="agentkit",
     help="Unified CLI for the Agent Quality Toolkit (agentmd, coderace, agentlint, agentreflect).",
     add_completion=False,
 )
+app.add_typer(notify_app, name="notify")
 
 
 @app.command("init")
@@ -54,9 +56,13 @@ def run(
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after run"),
     no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
     label: Optional[str] = typer.Option(None, "--label", help="Tag this run with a label (e.g. model name) for leaderboard comparison"),
+    notify_slack: Optional[str] = typer.Option(None, "--notify-slack", help="Slack webhook URL (or set AGENTKIT_NOTIFY_SLACK)"),
+    notify_discord: Optional[str] = typer.Option(None, "--notify-discord", help="Discord webhook URL (or set AGENTKIT_NOTIFY_DISCORD)"),
+    notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
+    notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on)
 
 
 @app.command("doctor")
@@ -315,6 +321,10 @@ def gate(
     json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Path to write the JSON payload"),
     job_summary: bool = typer.Option(False, "--job-summary", help="Write a markdown verdict block to GITHUB_STEP_SUMMARY"),
+    notify_slack: Optional[str] = typer.Option(None, "--notify-slack", help="Slack webhook URL (or set AGENTKIT_NOTIFY_SLACK)"),
+    notify_discord: Optional[str] = typer.Option(None, "--notify-discord", help="Discord webhook URL (or set AGENTKIT_NOTIFY_DISCORD)"),
+    notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
+    notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
 ) -> None:
     """Fail the build when agent quality falls below your policy thresholds."""
     gate_command(
@@ -325,6 +335,10 @@ def gate(
         json_output=json_output,
         output=output,
         job_summary=job_summary,
+        notify_slack=notify_slack,
+        notify_discord=notify_discord,
+        notify_webhook=notify_webhook,
+        notify_on=notify_on,
     )
 
 

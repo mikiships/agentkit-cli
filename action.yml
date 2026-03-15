@@ -40,6 +40,22 @@ inputs:
     description: Save run scores to history.json artifact (true/false)
     required: false
     default: 'false'
+  notify-slack:
+    description: Slack webhook URL for gate result notifications
+    required: false
+    default: ''
+  notify-discord:
+    description: Discord webhook URL for gate result notifications
+    required: false
+    default: ''
+  notify-webhook:
+    description: Generic JSON webhook URL for gate result notifications
+    required: false
+    default: ''
+  notify-on:
+    description: When to notify — fail (default) or always
+    required: false
+    default: 'fail'
 
 outputs:
   lint-score:

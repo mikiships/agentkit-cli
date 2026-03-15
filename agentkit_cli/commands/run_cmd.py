@@ -15,6 +15,7 @@ from agentkit_cli.tools import is_installed, run_tool, INSTALL_HINTS
 from agentkit_cli.config import find_project_root, save_last_run
 from agentkit_cli.history import record_run
 from agentkit_cli.composite import CompositeScoreEngine
+from agentkit_cli.notifier import fire_notifications, resolve_notify_configs
 
 console = Console()
 
@@ -72,6 +73,10 @@ def run_command(
     inject_readme: bool = False,
     no_history: bool = typer.Option(False, "--no-history", help="Skip recording scores to history DB"),
     label: Optional[str] = typer.Option(None, "--label", help="Tag this run with a label for leaderboard"),
+    notify_slack: Optional[str] = None,
+    notify_discord: Optional[str] = None,
+    notify_webhook: Optional[str] = None,
+    notify_on: str = "fail",
 ) -> None:
     """Run the full Agent Quality pipeline."""
     root = path or find_project_root()
@@ -379,6 +384,22 @@ def run_command(
                 pass
     except Exception:
         pass  # Never let composite scoring abort the run
+
+    # Fire notifications (never affect exit code)
+    try:
+        _notify_verdict = "FAIL" if failed_count > 0 else "PASS"
+        _notify_score = _composite_score if "_composite_score" in dir() else 0.0
+        _notify_findings = [r["step"] for r in results if r.get("status") in ("fail", "error")]
+        _notify_configs = resolve_notify_configs(
+            notify_slack=notify_slack,
+            notify_discord=notify_discord,
+            notify_webhook=notify_webhook,
+            notify_on=notify_on,
+            project_name=str(root.name),
+        )
+        fire_notifications(_notify_configs, verdict=_notify_verdict, score=_notify_score, top_findings=_notify_findings)
+    except Exception:
+        pass
 
     # Final status
     if failed_count > 0:

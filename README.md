@@ -975,6 +975,84 @@ Agent Quality Leaderboard ──────────────────
   run: echo '${{ steps.agentkit.outputs.leaderboard-json }}'
 ```
 
+## Notifications
+
+Send gate results to Slack, Discord, or any webhook — no extra dependencies required.
+
+### Slack
+
+```bash
+agentkit gate --min-score 80 --notify-slack https://hooks.slack.com/services/T.../B.../...
+```
+
+Posts a color-coded Slack attachment (green on pass, red on fail) with score, verdict, and top findings.
+
+### Discord
+
+```bash
+agentkit gate --min-score 80 --notify-discord https://discord.com/api/webhooks/.../.../
+```
+
+Posts a color-coded Discord embed.
+
+### Generic Webhook
+
+```bash
+agentkit gate --notify-webhook https://your-service.com/hook
+```
+
+Posts a JSON payload: `{project, score, verdict, top_findings, timestamp, delta}`.
+
+### Control When Notifications Fire
+
+```bash
+# Only notify on failure (default)
+agentkit gate --notify-slack $SLACK_URL --notify-on fail
+
+# Notify on every run
+agentkit gate --notify-slack $SLACK_URL --notify-on always
+```
+
+### Environment Variables
+
+```bash
+export AGENTKIT_NOTIFY_SLACK=https://hooks.slack.com/services/...
+export AGENTKIT_NOTIFY_DISCORD=https://discord.com/api/webhooks/...
+export AGENTKIT_NOTIFY_WEBHOOK=https://your-service.com/hook
+export AGENTKIT_NOTIFY_ON=fail  # or always
+
+agentkit gate --min-score 80  # picks up env vars automatically
+```
+
+### Test Connectivity
+
+```bash
+agentkit notify test --slack https://hooks.slack.com/services/...
+# ✓ Notification delivered
+
+agentkit notify test --discord https://discord.com/api/webhooks/...
+agentkit notify test --webhook https://your-service.com/hook
+```
+
+### Show Current Config
+
+```bash
+agentkit notify config
+```
+
+### GitHub Actions
+
+```yaml
+- uses: mikiships/agentkit-cli@v0.21.0
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    min-lint-score: 80
+    notify-slack: ${{ secrets.SLACK_WEBHOOK }}
+    notify-on: fail
+```
+
+> **Note:** Notification failures never affect the gate exit code. If the webhook is unreachable, agentkit logs a warning and continues normally.
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

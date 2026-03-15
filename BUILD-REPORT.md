@@ -1,71 +1,32 @@
-# BUILD-REPORT: agentkit-cli v0.20.0
+# BUILD-REPORT: agentkit-cli v0.21.0
 
-**Contract:** agentkit-cli-v0.20.0-setup-ci  
-**Date:** 2026-03-14  
-**Status:** COMPLETE
+**Date:** 2026-03-15
+**Builder:** build-loop subagent
 
-## Summary
+## What Was Built
 
-Added `agentkit setup-ci` command — one-command CI onboarding for any Python repo.
+Added full Slack/Discord/generic webhook notification support to agentkit-cli as specified in contract `agentkit-cli-v0.21.0-notify.md`.
 
-## Deliverables
+### Deliverables
 
-### D1: Core `agentkit setup-ci` command + GitHub Actions workflow writer ✅
-- `agentkit_cli/commands/setup_ci_cmd.py` — full command implementation
-- Wired into `agentkit_cli/main.py` as `agentkit setup-ci`
-- Generates `.github/workflows/agentkit-quality.yml` with correct v0.19.0 gate flags
-- Supports `--dry-run`, `--force`, `--workflow-path`, `--min-score`, `--path`
-- Non-destructive by default: skips existing file unless `--force` is set
-- Detects GitHub remote via `.git/config`
+- [x] **D1: `agentkit_cli/notifier.py`** — `NotifyConfig` dataclass, `build_payload` (Slack attachment / Discord embed / generic JSON), `notify_result`, `fire_notifications`, `resolve_notify_configs`. HTTP POST via stdlib `urllib` (no new dependencies), single retry with 5s timeout. Notification errors never propagate to caller exit code.
 
-### D2: Baseline generation integration ✅
-- Runs `agentkit report --json --output .agentkit-baseline.json` after workflow write
-- Warns (doesn't abort) if baseline generation fails
-- `--skip-baseline` bypasses report run
-- Generated workflow uses `if [ -f ".agentkit-baseline.json" ]` guard before passing `--baseline-report`
+- [x] **D2: CLI flags** — `--notify-slack`, `--notify-discord`, `--notify-webhook`, `--notify-on` added to `agentkit gate` and `agentkit run`. Env vars `AGENTKIT_NOTIFY_SLACK` / `AGENTKIT_NOTIFY_DISCORD` / `AGENTKIT_NOTIFY_WEBHOOK` / `AGENTKIT_NOTIFY_ON` accepted as fallbacks; CLI flags take precedence. `action.yml` updated with matching inputs.
 
-### D3: README badge injection ✅
-- Reuses existing `readme_cmd.readme_command()` — no duplication
-- `--no-badge` skips injection
-- Reports "Badge injected" or "skipped" clearly
+- [x] **D3: `agentkit notify` command group** — `agentkit notify test --slack|--discord|--webhook <url>` fires a test notification and prints ✓/✗ result. `agentkit notify config` shows current env var config.
 
-### D4: Docs, CHANGELOG, version bump ✅
-- `README.md`: full `## agentkit setup-ci` section with flags table, example flow, and usage
-- `CHANGELOG.md`: v0.20.0 entry with all new flags documented
-- `pyproject.toml`: version bumped `0.19.0` → `0.20.0`
-- `agentkit_cli/__init__.py`: `__version__` bumped to `"0.20.0"`
+- [x] **D4: Tests + docs + version bump** — 57 new tests across `test_notifier.py`, `test_notify_command.py`, `test_gate_notify_integration.py`. All HTTP mocked via `unittest.mock`. README Notifications section written. CHANGELOG v0.21.0 entry added. Version bumped `0.20.0 → 0.21.0` in `pyproject.toml` and `agentkit_cli/__init__.py`.
 
-## Tests
+## Test Count
 
-- `tests/test_setup_ci.py`: 16 new tests covering all contract requirements
-- Full suite: **702 tests passing** (686 original + 16 new)
-- `pytest -q` exits 0
-
-### Test coverage:
-- Workflow written to correct default path
-- `--dry-run` prints to stdout without writing
-- `--force` overwrites existing file
-- Without `--force`, skips existing file
-- `--min-score` value embedded in YAML
-- `--skip-baseline` bypasses `_run_baseline`
-- Baseline written on success; warning on failure (no abort)
-- `--no-badge` skips `_inject_badge`
-- Badge injected when README exists
-- Custom `--workflow-path` respected
-- `_is_github_repo` helper: true/false/no-git-dir cases
-
-## No Regressions
-
-All 686 pre-existing tests continue to pass unchanged.
-
-## Files Modified
-
-| File | Change |
+| | Count |
 |---|---|
-| `agentkit_cli/commands/setup_ci_cmd.py` | Created (new command) |
-| `agentkit_cli/main.py` | Wired setup-ci command |
-| `tests/test_setup_ci.py` | Created (16 tests) |
-| `pyproject.toml` | Version 0.19.0 → 0.20.0 |
-| `agentkit_cli/__init__.py` | __version__ 0.19.0 → 0.20.0 |
-| `CHANGELOG.md` | Added v0.20.0 entry |
-| `README.md` | Added agentkit setup-ci section |
+| Before | 702 |
+| After | 759 |
+| New tests added | 57 |
+
+## Deviations from Contract
+
+None. All deliverables match spec. The `fire_notifications` wrapper catches per-config exceptions to ensure one failing notification never blocks the others (slightly more defensive than the contract required, which only specified gate exit code safety).
+
+## READY TO SHIP
