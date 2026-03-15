@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.20.0] - 2026-03-14
+
+### Added
+- `agentkit setup-ci`: one-command CI onboarding. Writes a complete GitHub Actions workflow
+  (`.github/workflows/agentkit-quality.yml`), generates an initial baseline report
+  (`.agentkit-baseline.json`), and injects the agent quality badge into README.md.
+  - `--min-score N` (default: 70): threshold embedded in generated gate command
+  - `--workflow-path PATH`: override workflow output path
+  - `--force`: overwrite existing workflow file
+  - `--dry-run`: print workflow to stdout without writing
+  - `--skip-baseline`: skip baseline report generation
+  - `--no-badge`: skip README badge injection
+
 ## [0.19.0] - 2026-03-14
 
 ### Added

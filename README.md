@@ -664,6 +664,71 @@ On any matching file change, clears the screen and re-runs `agentkit run`. Press
 
 ---
 
+## agentkit setup-ci
+
+One command to wire agentkit into GitHub Actions. Run it once in your repo and you're done.
+
+```bash
+# Default: write workflow, generate baseline, inject README badge
+agentkit setup-ci
+
+# Custom min-score threshold
+agentkit setup-ci --min-score 80
+
+# Preview without writing anything
+agentkit setup-ci --dry-run
+
+# Overwrite an existing workflow
+agentkit setup-ci --force
+
+# Skip baseline generation (useful if tools aren't installed locally)
+agentkit setup-ci --skip-baseline
+
+# Skip README badge injection
+agentkit setup-ci --no-badge
+
+# Custom workflow output path
+agentkit setup-ci --workflow-path .github/workflows/quality.yml
+```
+
+**What it does:**
+
+1. Writes `.github/workflows/agentkit-quality.yml` — a complete, working GitHub Actions
+   workflow that runs `agentkit gate` on every push and PR, posts a verdict as a PR comment,
+   and conditionally uses `--baseline-report` if `.agentkit-baseline.json` is present.
+2. Runs `agentkit report --json --output .agentkit-baseline.json` to generate the initial
+   baseline so CI can detect regressions immediately.
+3. Injects the agent quality badge into `README.md` (if it exists).
+
+**Full example flow:**
+
+```bash
+# In your Python project root:
+agentkit setup-ci --min-score 75
+
+# Commit everything in one go:
+git add .github/workflows/agentkit-quality.yml .agentkit-baseline.json README.md
+git commit -m "ci: add agentkit quality workflow"
+git push
+
+# CI now runs on every push and PR. You'll see:
+# ✓ agentkit gate PASS — 82.0/100 (B)
+```
+
+**Flags:**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--min-score N` | 70 | Score threshold embedded in generated gate command |
+| `--workflow-path PATH` | `.github/workflows/agentkit-quality.yml` | Override workflow output path |
+| `--force` | false | Overwrite existing workflow file |
+| `--dry-run` | false | Print workflow to stdout without writing |
+| `--skip-baseline` | false | Skip baseline generation |
+| `--no-badge` | false | Skip README badge injection |
+| `--path PATH` | git root | Project root |
+
+---
+
 ## agentkit gate
 
 Block merges when agent quality drops. Gate on an absolute score, a regression threshold, or both.
