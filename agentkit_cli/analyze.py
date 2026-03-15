@@ -237,7 +237,7 @@ def analyze_target(
 
         # agentreflect generate
         status, output = _run_pipeline_step(
-            "agentreflect", ["generate", work_dir], work_dir, timeout
+            "agentreflect", ["generate", "--from-git", "--format", "markdown"], work_dir, timeout
         )
         reflect_score = _status_to_score(status, output)
         reflect_finding = output.splitlines()[0][:100] if output else ""

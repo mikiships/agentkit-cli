@@ -9,7 +9,7 @@ from typing import Optional
 from urllib import request, error as urllib_error
 from urllib.request import Request
 
-HERENOW_API_BASE = "https://api.here.now/v1"
+HERENOW_API_BASE = "https://here.now/api/v1"
 DEFAULT_REPORT_NAMES = ["agentkit-report.html"]
 LAST_REPORT_PATH = Path.home() / ".agentkit" / "last-report.html"
 
