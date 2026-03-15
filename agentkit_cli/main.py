@@ -22,6 +22,7 @@ from agentkit_cli.commands.summary_cmd import summary_command
 from agentkit_cli.commands.history_cmd import history_command
 from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
 from agentkit_cli.commands.score_cmd import score_command
+from agentkit_cli.commands.share_cmd import share_command
 from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
@@ -65,9 +66,10 @@ def run(
     notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
     notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
+    share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after run and print the URL"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share)
 
 
 @app.command("doctor")
@@ -127,9 +129,23 @@ def report(
     open_browser: bool = typer.Option(False, "--open", help="Auto-open the HTML report in the default browser"),
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after generation"),
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after report"),
+    share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after report and print the URL"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share)
+
+
+@app.command("share")
+def share(
+    report: Optional[Path] = typer.Option(None, "--report", help="Path to a saved JSON report file"),
+    project: Optional[str] = typer.Option(None, "--project", help="Override project name"),
+    no_scores: bool = typer.Option(False, "--no-scores", help="Hide raw numbers; show pass/fail only"),
+    json_output: bool = typer.Option(False, "--json", help='Output {"url": "...", "score": N} instead of plain text'),
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory (default: cwd)"),
+    api_key: Optional[str] = typer.Option(None, "--api-key", help="here.now API key (overrides HERENOW_API_KEY env var)", envvar="HERENOW_API_KEY"),
+) -> None:
+    """Generate a shareable score card and upload it to here.now."""
+    share_command(report=report, project=project, no_scores=no_scores, json_output=json_output, path=path, api_key=api_key)
 
 
 @app.command("publish")
