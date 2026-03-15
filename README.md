@@ -118,6 +118,12 @@ agentkit run --share
 
 # Auto-share after generating a report
 agentkit report --share
+
+# Analyze a GitHub repo and share the score card in one command
+agentkit analyze github:owner/repo --share
+
+# Batch analyze repos and share a combined scorecard
+agentkit sweep github:owner/repo1 github:owner/repo2 --share
 ```
 
 Score cards are standalone HTML pages (dark theme) showing: composite score, per-tool breakdown, project name, git ref, and timestamp. Anonymous cards expire in 24h; set `HERENOW_API_KEY` for persistent links.

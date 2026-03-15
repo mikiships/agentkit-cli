@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.25.0] - 2026-03-15
+
+### Added
+- **`--share` flag on `agentkit analyze`**: generate and upload a public score card after analyzing any GitHub repo or local path; URL printed to stdout; `--json` output includes `"share_url"`; upload failure is non-fatal
+- **`--share` flag on `agentkit sweep`**: generate a combined scorecard for all analyzed targets, upload once, print URL; `--json` output includes `"share_url"` in summary; upload failure is non-fatal
+- **`generate_sweep_scorecard_html()`** in `agentkit_cli/share.py`: combined dark-theme HTML scorecard for multi-target sweep results with ranked table
+- **`generate_scorecard_html()` improvements** (D3): optional `repo_url` and `repo_name` parameters; repo name rendered as clickable link in card header; analysis timestamp shown in footer; fully backward-compatible (optional params)
+- 25 new tests covering D1–D3 (mock upload, URL in output, JSON schema, failure cases)
+
 ## [0.24.0] - 2026-03-15
 
 ### Added
