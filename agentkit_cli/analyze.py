@@ -206,12 +206,19 @@ def analyze_target(
             )
 
         # agentmd score
-        status, output = _run_pipeline_step(
-            "agentmd", ["score", work_dir], work_dir, timeout
-        )
-        score = _status_to_score(status, output)
-        finding = output.splitlines()[0][:100] if output else ""
-        tool_results["agentmd"] = ToolResult(tool="agentmd", status=status, score=score, finding=finding)
+        # If --no-generate and no context file exists, score 0 (repo is not agent-ready)
+        if no_generate and not context_exists:
+            tool_results["agentmd"] = ToolResult(
+                tool="agentmd", status="fail", score=0.0,
+                finding="No CLAUDE.md / AGENTS.md found. Run `agentmd generate` to create one."
+            )
+        else:
+            status, output = _run_pipeline_step(
+                "agentmd", ["score", work_dir], work_dir, timeout
+            )
+            score = _status_to_score(status, output)
+            finding = output.splitlines()[0][:100] if output else ""
+            tool_results["agentmd"] = ToolResult(tool="agentmd", status=status, score=score, finding=finding)
 
         # agentlint check-context --format json
         status, output = _run_pipeline_step(
