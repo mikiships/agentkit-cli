@@ -35,6 +35,7 @@ def analyze_command(
     publish: bool = False,
     timeout: int = 120,
     no_generate: bool = False,
+    profile: Optional[str] = None,
 ) -> None:
     """Analyze a GitHub repo or local path for agent quality."""
     # Validate target early

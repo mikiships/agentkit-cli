@@ -67,11 +67,20 @@ def score_command(
     breakdown: bool,
     ci: bool,
     min_score: int,
+    profile: Optional[str] = None,
 ) -> None:
     """Compute and display the composite agent quality score."""
     # Apply config defaults
     from agentkit_cli.config import load_config
+    from agentkit_cli.profiles import apply_profile
     cfg = load_config(path)
+    if profile is not None:
+        try:
+            apply_profile(profile, cfg, cli_min_score=None if min_score == 70 else float(min_score))
+        except ValueError as exc:
+            from rich.console import Console as _Console
+            _Console().print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(code=2)
     if min_score == 70 and cfg.gate.min_score is not None:
         min_score = int(cfg.gate.min_score)
 

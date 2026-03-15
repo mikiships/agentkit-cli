@@ -77,11 +77,20 @@ def run_command(
     notify_discord: Optional[str] = None,
     notify_webhook: Optional[str] = None,
     notify_on: str = "fail",
+    profile: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
     from agentkit_cli.config import load_config
+    from agentkit_cli.profiles import apply_profile
     cfg = load_config(path)
+    if profile is not None:
+        try:
+            apply_profile(profile, cfg)
+        except ValueError as exc:
+            from rich.console import Console as _Console
+            _Console().print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(code=2)
     if not notify_slack and cfg.notify.slack_url:
         notify_slack = cfg.notify.slack_url
     if not notify_discord and cfg.notify.discord_url:

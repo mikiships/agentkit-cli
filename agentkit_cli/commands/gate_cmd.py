@@ -79,11 +79,27 @@ def gate_command(
     notify_discord: Optional[str] = None,
     notify_webhook: Optional[str] = None,
     notify_on: str = "fail",
+    profile: Optional[str] = None,
 ) -> None:
     """Evaluate the current project against gate thresholds."""
     # Apply config defaults when CLI flags were not provided
     from agentkit_cli.config import load_config
+    from agentkit_cli.profiles import ProfileRegistry, apply_profile
     cfg = load_config(path)
+
+    # Apply profile (fills gaps not covered by explicit CLI flags)
+    if profile is not None:
+        try:
+            apply_profile(
+                profile,
+                cfg,
+                cli_min_score=min_score,
+                cli_max_drop=max_drop,
+            )
+        except ValueError as exc:
+            console.print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(code=2)
+
     if min_score is None and cfg.gate.min_score is not None:
         min_score = cfg.gate.min_score
     if max_drop is None and cfg.gate.max_drop is not None:
@@ -138,6 +154,8 @@ def gate_command(
         score_color = _score_color(result.score)
         console.print()
         console.print(f"[bold]agentkit gate[/bold] — project: {(path or Path.cwd()).resolve()}")
+        if profile is not None:
+            console.print(f"[bold]Profile:[/bold] {profile}")
         console.print(f"[bold]Verdict:[/bold] [{color}]{result.verdict}[/{color}]")
         console.print(
             f"[bold]Score:[/bold] [{score_color}]{result.score:.1f}/100 ({result.grade})[/{score_color}]"

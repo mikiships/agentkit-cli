@@ -24,11 +24,20 @@ def sweep_command(
     sort_by: str = "score",
     limit: Optional[int] = None,
     json_output: bool = False,
+    profile: Optional[str] = None,
 ) -> None:
     """Run `agentkit analyze` across multiple targets."""
     # Apply config defaults
     from agentkit_cli.config import load_config
+    from agentkit_cli.profiles import apply_profile
     cfg = load_config()
+    if profile is not None:
+        try:
+            apply_profile(profile, cfg)
+        except ValueError as exc:
+            from rich.console import Console as _Console
+            _Console().print(f"[red]Error:[/red] {exc}")
+            raise typer.Exit(code=2)
     if not targets and cfg.sweep.targets:
         targets = cfg.sweep.targets
     if sort_by == "score" and cfg.sweep.sort_by != "score":
