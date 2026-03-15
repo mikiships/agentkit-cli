@@ -664,6 +664,52 @@ On any matching file change, clears the screen and re-runs `agentkit run`. Press
 
 ---
 
+## agentkit gate
+
+Block merges when agent quality drops. Gate on an absolute score, a regression threshold, or both.
+
+```bash
+# Fail if composite score < 75
+agentkit gate --min-score 75
+
+# Fail if score dropped more than 5 points from last release
+agentkit gate --baseline-report baseline.json --max-drop 5
+
+# Both rules together
+agentkit gate --min-score 70 --baseline-report baseline.json --max-drop 5
+
+# Machine-readable JSON (CI-safe, no Rich color codes)
+agentkit gate --min-score 75 --json
+
+# Write JSON to disk
+agentkit gate --min-score 75 --output gate-result.json
+
+# Write markdown verdict to GitHub Actions step summary
+agentkit gate --min-score 75 --job-summary
+```
+
+**GitHub Actions example:**
+
+```yaml
+- name: Save baseline
+  run: agentkit report --json > baseline.json
+
+# ... your code changes ...
+
+- name: Quality gate
+  run: |
+    agentkit gate \
+      --min-score 70 \
+      --baseline-report baseline.json \
+      --max-drop 5 \
+      --job-summary \
+      --output gate-result.json
+```
+
+Exit code 0 = PASS, 1 = FAIL, 2 = configuration error.
+
+---
+
 ## CI Integration
 
 Use the agentkit GitHub Action to run the full pipeline in CI:

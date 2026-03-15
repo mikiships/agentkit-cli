@@ -130,3 +130,15 @@ Failed attempts:
 Action taken:
 - Wrote `blocker-report-v0.19.0-gate.md`
 - Stopped before D2 per contract rule 8
+
+---
+
+## 2026-03-14 — v0.19.0 D4 completion
+
+D2, D3, D4 complete.
+
+- D2: evaluate_gate_rules extended; --baseline-report + --max-drop wired end-to-end; 4 new unit tests + 2 CLI tests
+- D3: to_json_payload() on GateResult; --json suppresses Rich output; --output writes JSON to disk; --job-summary prints markdown (to GITHUB_STEP_SUMMARY env file or stdout if not set); 3 new CLI tests
+- D4: README agentkit gate section added; CHANGELOG [0.19.0] entry; version bumped to 0.19.0; BUILD-REPORT updated; progress-log updated
+
+Final test count: 686 passing, 0 failed.

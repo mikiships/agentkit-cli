@@ -122,3 +122,33 @@ All 651 tests pass. No previously passing tests broken.
 - `python3 -m pytest -q` → **651 passed, 0 failed**
 
 v0.17.0 is release-ready. ✅
+
+---
+
+# BUILD-REPORT.md — agentkit-cli v0.19.0
+
+**Date:** 2026-03-14
+**Builder:** Claude (subagent)
+**Version bump:** 0.18.0 → 0.19.0
+
+## What gate does
+
+`agentkit gate` is a quality enforcement command for CI pipelines. It runs the full agentkit report pipeline on the current project, computes a composite score, evaluates it against configurable thresholds, and exits with code 0 (PASS) or 1 (FAIL).
+
+## Deliverables
+
+| Deliverable | Status |
+|---|---|
+| D1: Core gate engine + CLI wiring | ✅ Done (prior commit) |
+| D2: Baseline regression gating (--baseline-report, --max-drop) | ✅ Done |
+| D3: JSON output, --output, --job-summary, to_json_payload() | ✅ Done |
+| D4: README section, CHANGELOG, version bump, BUILD-REPORT | ✅ Done |
+
+## Test count
+
+- Gate tests: 15 (5 D1 + 4 D2 unit + 2 D2 CLI + 3 D3 CLI + 1 help)
+- Full suite: 686 tests passing, 0 failed
+
+## Release state
+
+All commits made. Version bumped to 0.19.0 in pyproject.toml and __init__.py. Ready for `git push` + PyPI publish (not done per task contract).

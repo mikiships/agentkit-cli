@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.19.0] - 2026-03-14
+
+### Added
+- `agentkit gate` command: quality gate that fails the build when agent quality drops
+  - **D1 Core engine**: `agentkit gate --min-score 75` — runs full report pipeline and evaluates composite score against threshold; GateResult dataclass with verdict, score, grade, failure_reasons; clean GateError for config problems
+  - **D2 Baseline regression gating**: `--baseline-report PATH` loads a prior `agentkit report --json` artifact; `--max-drop N` fails if score dropped more than N points from baseline; both rules checked together with all failure reasons reported
+  - **D3 Machine-readable outputs**: `--json` prints stable JSON payload (verdict, score, grade, thresholds, failure_reasons, passed); `--output PATH` writes JSON to disk; `--job-summary` writes markdown verdict block to GITHUB_STEP_SUMMARY (or stdout if not set); `to_json_payload()` method on GateResult
+  - **D4 Docs**: README `agentkit gate` section with local usage and GitHub Actions example; CHANGELOG entry; version bump to 0.19.0
+- 10 new tests covering min-score, baseline regression pass/fail, invalid baseline file, both rules together, JSON schema, --output file write, --job-summary stdout
+
 ## v0.18.0 (2026-03-14)
 
 ### Added
