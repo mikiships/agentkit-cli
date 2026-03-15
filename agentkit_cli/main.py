@@ -25,6 +25,7 @@ from agentkit_cli.commands.score_cmd import score_command
 from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
+from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
 
 app = typer.Typer(
     name="agentkit",
@@ -324,6 +325,28 @@ def gate(
         json_output=json_output,
         output=output,
         job_summary=job_summary,
+    )
+
+
+@app.command("setup-ci")
+def setup_ci(
+    min_score: int = typer.Option(70, "--min-score", help="Minimum score threshold to embed in generated gate command"),
+    workflow_path: Optional[Path] = typer.Option(None, "--workflow-path", help="Path to write the workflow file (default: .github/workflows/agentkit-quality.yml)"),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing workflow file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print workflow to stdout without writing"),
+    skip_baseline: bool = typer.Option(False, "--skip-baseline", help="Skip baseline report generation"),
+    no_badge: bool = typer.Option(False, "--no-badge", help="Skip badge injection into README.md"),
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project root (default: git root or cwd)"),
+) -> None:
+    """One-command CI setup: write GitHub Actions workflow, generate baseline, inject README badge."""
+    setup_ci_command(
+        min_score=min_score,
+        workflow_path=workflow_path,
+        force=force,
+        dry_run=dry_run,
+        skip_baseline=skip_baseline,
+        no_badge=no_badge,
+        path=path,
     )
 
 
