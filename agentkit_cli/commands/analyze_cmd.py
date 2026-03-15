@@ -38,6 +38,7 @@ def analyze_command(
     no_generate: bool = False,
     profile: Optional[str] = None,
     share: bool = False,
+    record_findings: bool = False,
 ) -> None:
     """Analyze a GitHub repo or local path for agent quality."""
     # Validate target early

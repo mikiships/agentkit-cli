@@ -45,6 +45,7 @@ CREATE INDEX IF NOT EXISTS idx_runs_ts      ON runs(ts DESC);
 _MIGRATIONS = [
     "ALTER TABLE runs ADD COLUMN label TEXT",
     "CREATE INDEX IF NOT EXISTS idx_runs_label ON runs(label)",
+    "ALTER TABLE runs ADD COLUMN findings TEXT",
 ]
 
 
@@ -91,14 +92,16 @@ class HistoryDB:
         score: float,
         details: Optional[dict] = None,
         label: Optional[str] = None,
+        findings: Optional[list] = None,
     ) -> None:
         """Insert one run record."""
         ts = datetime.now(timezone.utc).isoformat()
         details_json = json.dumps(details) if details is not None else None
+        findings_json = json.dumps(findings) if findings is not None else None
         with self._connect() as conn:
             conn.execute(
-                "INSERT INTO runs (ts, project, tool, score, details, label) VALUES (?, ?, ?, ?, ?, ?)",
-                (ts, project, tool, float(score), details_json, label),
+                "INSERT INTO runs (ts, project, tool, score, details, label, findings) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (ts, project, tool, float(score), details_json, label, findings_json),
             )
 
     def get_history(
@@ -262,10 +265,11 @@ def record_run(
     details: Optional[dict] = None,
     db: Optional[HistoryDB] = None,
     label: Optional[str] = None,
+    findings: Optional[list] = None,
 ) -> None:
     """Record one run (silently ignores errors)."""
     try:
-        (db or _get_db()).record_run(project, tool, score, details, label=label)
+        (db or _get_db()).record_run(project, tool, score, details, label=label, findings=findings)
     except Exception as exc:  # pragma: no cover
         print(f"[agentkit history] DEBUG: failed to record run: {exc}", file=sys.stderr)
 

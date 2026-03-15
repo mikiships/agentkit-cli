@@ -79,6 +79,7 @@ def run_command(
     notify_on: str = "fail",
     profile: Optional[str] = None,
     share: bool = False,
+    record_findings: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -293,7 +294,18 @@ def run_command(
                     recorded_tools.add(tool_name)
             if tool_scores:
                 overall = round(sum(tool_scores) / len(tool_scores), 1)
-                record_run(project_name, "overall", overall, label=label)
+                # Collect findings from agentlint results when --record-findings is set
+                findings_to_store: Optional[list] = None
+                if record_findings:
+                    findings_to_store = []
+                    for r in results:
+                        if r.get("step") in ("lint-context", "lint-diff"):
+                            raw = r.get("output", "") or ""
+                            for line in raw.splitlines():
+                                line = line.strip()
+                                if line and not line.startswith("#"):
+                                    findings_to_store.append(line)
+                record_run(project_name, "overall", overall, label=label, findings=findings_to_store)
         except Exception as exc:
             import sys
             print(f"[agentkit history] DEBUG: history recording failed: {exc}", file=sys.stderr)

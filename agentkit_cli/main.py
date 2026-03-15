@@ -70,9 +70,10 @@ def run(
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after run and print the URL"),
     release_check: bool = typer.Option(False, "--release-check", help="Verify release surfaces after pipeline completes"),
+    record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings)
     if release_check:
         from agentkit_cli.release_check import run_release_check
         from agentkit_cli.commands.release_check_cmd import _render_table
@@ -306,6 +307,7 @@ def analyze(
     no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after analysis and print the URL"),
+    record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
 ) -> None:
     """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
     analyze_command(
@@ -317,6 +319,7 @@ def analyze(
         no_generate=no_generate,
         profile=profile,
         share=share,
+        record_findings=record_findings,
     )
 
 
