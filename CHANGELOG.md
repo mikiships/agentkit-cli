@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.28.0] - 2026-03-15
+
+### Added
+- `agentkit insights` command: cross-repo pattern synthesis across all historical runs
+  - Portfolio health summary (avg score, total runs, unique repos, best/worst repo, top issue)
+  - `--common-findings`: most common agentlint findings across 2+ repos
+  - `--outliers`: repos in the bottom quartile of historical scores
+  - `--trending`: repos with score change >10 between last two runs
+  - `--all`: all sections in one output
+  - `--json`: structured JSON output with full schema
+  - `--db`: override history DB path
+- `InsightsEngine` class in `agentkit_cli/insights.py` with four methods: `get_common_findings`, `get_outliers`, `get_trending`, `get_portfolio_summary`
+- `--record-findings` flag on `agentkit run` and `agentkit analyze`: stores agentlint findings in history DB alongside scores for richer cross-repo analysis
+- Schema migration: `findings TEXT` column added to `runs` table (migration-safe, idempotent)
+- 45 new tests (total suite: 1057 tests)
+
 ## [0.27.0] - 2026-03-15
 
 ### Added

@@ -95,6 +95,66 @@ agentkit gate --profile strict --min-score 99
 - `agentkit config <sub>` — manage configuration
 - `agentkit history` — show score history
 - `agentkit leaderboard` — compare runs by label
+- `agentkit insights` — cross-repo pattern synthesis
+
+## Portfolio Insights
+
+Once you've analyzed multiple repos with `agentkit analyze` or `agentkit run`, the
+`agentkit insights` command synthesizes patterns across all historical runs:
+
+```bash
+# Portfolio health summary (avg score, best/worst repo, top issue)
+agentkit insights
+
+# Most common agentlint findings across all repos
+agentkit insights --common-findings
+
+# Repos scoring in the bottom quartile
+agentkit insights --outliers
+
+# Repos with significant score movement between runs
+agentkit insights --trending
+
+# All sections in one view
+agentkit insights --all
+
+# Machine-readable JSON (useful for scripts/dashboards)
+agentkit insights --json
+
+# Use a specific history DB
+agentkit insights --db /path/to/history.db
+```
+
+Store agentlint findings alongside scores for richer cross-repo analysis:
+
+```bash
+agentkit run --record-findings
+agentkit analyze github:owner/repo --record-findings
+```
+
+**JSON output schema:**
+
+```json
+{
+  "portfolio_summary": {
+    "avg_score": 74.5,
+    "total_runs": 12,
+    "unique_repos": 4,
+    "top_issue": "missing-tools-section",
+    "best_repo": "owner/repo-a",
+    "worst_repo": "owner/repo-d"
+  },
+  "common_findings": [
+    {"finding": "missing-tools-section", "repo_count": 3, "total_occurrences": 5}
+  ],
+  "outliers": [
+    {"project": "owner/repo-d", "latest_score": 42.0, "avg_score": 48.5, "run_count": 2}
+  ],
+  "trending": [
+    {"project": "owner/repo-b", "previous_score": 55.0, "latest_score": 80.0, "delta": 25.0, "direction": "up"}
+  ]
+}
+```
 
 ## Sharing Results
 
