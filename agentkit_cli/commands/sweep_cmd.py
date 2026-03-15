@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli.sweep import resolve_targets, run_sweep, sort_results
+from agentkit_cli.share import generate_sweep_scorecard_html, upload_scorecard
 
 console = Console()
 
@@ -25,6 +26,7 @@ def sweep_command(
     limit: Optional[int] = None,
     json_output: bool = False,
     profile: Optional[str] = None,
+    share: bool = False,
 ) -> None:
     """Run `agentkit analyze` across multiple targets."""
     # Apply config defaults
@@ -72,6 +74,24 @@ def sweep_command(
     # Sort results
     sorted_results = sort_results(sweep_result.results, sort_by=sort_by)
 
+    # --share: generate combined scorecard and upload once
+    share_url: Optional[str] = None
+    if share:
+        share_results_data = [
+            {
+                "target": r.target,
+                "score": r.composite_score,
+                "grade": r.grade,
+                "status": r.status,
+                "error": r.error,
+            }
+            for r in sorted_results
+        ]
+        html = generate_sweep_scorecard_html(share_results_data)
+        share_url = upload_scorecard(html)
+        if share_url and not json_output:
+            console.print(f"\n[bold green]Score card published:[/bold green] {share_url}")
+
     if json_output:
         # Stable JSON output (D3)
         ranked_results = []
@@ -87,11 +107,13 @@ def sweep_command(
                 entry["error"] = result.error
             ranked_results.append(entry)
 
-        output = {
+        output: dict = {
             "targets": list(sweep_result.targets),
             "results": ranked_results,
             "summary_counts": sweep_result.summary_counts(),
         }
+        if share_url:
+            output["share_url"] = share_url
         console.print(json.dumps(output, indent=2))
         return
 

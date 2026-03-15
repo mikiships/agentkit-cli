@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli.analyze import analyze_target, parse_target, AnalyzeResult
+from agentkit_cli.share import generate_scorecard_html, upload_scorecard
 
 console = Console()
 
@@ -36,6 +37,7 @@ def analyze_command(
     timeout: int = 120,
     no_generate: bool = False,
     profile: Optional[str] = None,
+    share: bool = False,
 ) -> None:
     """Analyze a GitHub repo or local path for agent quality."""
     # Validate target early
@@ -64,8 +66,29 @@ def analyze_command(
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(code=1)
 
+    # --share: generate and upload scorecard
+    share_url: Optional[str] = None
+    if share:
+        score_result = {"composite": result.composite_score}
+        for key, tr in result.tools.items():
+            if tr.get("score") is not None:
+                score_result[key] = tr["score"]
+        html = generate_scorecard_html(
+            score_result,
+            project_name=result.repo_name,
+            ref=target,
+            repo_url=target if not target.startswith((".", "/", "~")) else None,
+            repo_name=result.repo_name,
+        )
+        share_url = upload_scorecard(html)
+        if share_url and not json_output:
+            console.print(f"\n[bold green]Score card published:[/bold green] {share_url}")
+
     if json_output:
-        print(json.dumps(result.to_dict(), indent=2))
+        d = result.to_dict()
+        if share_url:
+            d["share_url"] = share_url
+        print(json.dumps(d, indent=2))
         return
 
     # Rich table output

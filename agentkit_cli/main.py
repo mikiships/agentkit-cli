@@ -297,6 +297,7 @@ def analyze(
     timeout: int = typer.Option(120, "--timeout", help="Clone + analysis timeout in seconds"),
     no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
+    share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after analysis and print the URL"),
 ) -> None:
     """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
     analyze_command(
@@ -307,6 +308,7 @@ def analyze(
         timeout=timeout,
         no_generate=no_generate,
         profile=profile,
+        share=share,
     )
 
 
@@ -322,6 +324,7 @@ def sweep(
     limit: Optional[int] = typer.Option(None, "--limit", help="Show only top N results in table output"),
     json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
+    share: bool = typer.Option(False, "--share", help="Upload a combined score card to here.now after sweep and print the URL"),
 ) -> None:
     """Analyze multiple GitHub repos or local paths in one batch."""
     sweep_command(
@@ -335,6 +338,7 @@ def sweep(
         limit=limit,
         json_output=json_output,
         profile=profile,
+        share=share,
     )
 
 
