@@ -336,11 +336,15 @@ def upload_scorecard(html: str, api_key: Optional[str] = None) -> Optional[str]:
         headers["Authorization"] = f"Bearer {api_key}"
 
     try:
-        step1_body = {"files": [{"path": "index.html", "contentType": "text/html"}]}
+        step1_body = {"files": [{"path": "index.html", "contentType": "text/html; charset=utf-8", "size": len(content)}]}
         step1_resp = _json_post(f"{HERENOW_API_BASE}/publish", step1_body, headers)
 
-        upload_urls = step1_resp.get("uploadUrls") or []
-        finalize_url = step1_resp.get("finalizeUrl")
+        # Response shape: {"siteUrl": "...", "upload": {"versionId": "...", "uploads": [...], "finalizeUrl": "..."}}
+        upload_info = step1_resp.get("upload") or {}
+        upload_urls = upload_info.get("uploads") or step1_resp.get("uploadUrls") or []
+        finalize_url = upload_info.get("finalizeUrl") or step1_resp.get("finalizeUrl")
+        version_id = upload_info.get("versionId")
+        public_url = step1_resp.get("siteUrl") or step1_resp.get("url")
         if not upload_urls or not finalize_url:
             raise PublishError(f"Unexpected response from publish API: {step1_resp}")
 
@@ -348,10 +352,11 @@ def upload_scorecard(html: str, api_key: Optional[str] = None) -> Optional[str]:
             upload_url = entry.get("url")
             if not upload_url:
                 raise PublishError(f"Missing upload URL in response: {entry}")
-            _put_file(upload_url, content, "text/html")
+            _put_file(upload_url, content, "text/html; charset=utf-8")
 
-        finalize_resp = _finalize(finalize_url)
-        public_url = finalize_resp.get("url")
+        finalize_resp = _finalize(finalize_url, version_id=version_id)
+        if not public_url:
+            public_url = finalize_resp.get("url") or finalize_resp.get("siteUrl")
         if not public_url:
             raise PublishError(f"No URL in finalize response: {finalize_resp}")
 

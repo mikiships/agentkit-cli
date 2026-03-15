@@ -47,8 +47,13 @@ def _put_file(url: str, content: bytes, content_type: str = "text/html") -> None
         raise PublishError(f"Network error uploading file: {e.reason}") from e
 
 
-def _finalize(url: str) -> dict:
-    req = Request(url, data=b"", method="POST")
+def _finalize(url: str, version_id: Optional[str] = None) -> dict:
+    body: dict = {}
+    if version_id:
+        body["versionId"] = version_id
+    data = json.dumps(body).encode("utf-8") if body else b"{}"
+    req = Request(url, data=data, method="POST")
+    req.add_header("Content-Type", "application/json")
     try:
         with request.urlopen(req) as resp:
             return json.loads(resp.read().decode("utf-8"))
@@ -94,11 +99,15 @@ def publish_html(html_path: Path, api_key: Optional[str] = None) -> dict:
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
 
-    step1_body = {"files": [{"path": "index.html", "contentType": "text/html"}]}
+    step1_body = {"files": [{"path": "index.html", "contentType": "text/html; charset=utf-8", "size": len(content)}]}
     step1_resp = _json_post(f"{HERENOW_API_BASE}/publish", step1_body, headers)
 
-    upload_urls = step1_resp.get("uploadUrls") or []
-    finalize_url = step1_resp.get("finalizeUrl")
+    # Response shape: {"siteUrl": "...", "upload": {"versionId": "...", "uploads": [...], "finalizeUrl": "..."}}
+    upload_info = step1_resp.get("upload") or {}
+    upload_urls = upload_info.get("uploads") or step1_resp.get("uploadUrls") or []
+    finalize_url = upload_info.get("finalizeUrl") or step1_resp.get("finalizeUrl")
+    version_id = upload_info.get("versionId")
+    public_url = step1_resp.get("siteUrl") or step1_resp.get("url")
     if not upload_urls or not finalize_url:
         raise PublishError(f"Unexpected response from publish API: {step1_resp}")
 
@@ -107,11 +116,12 @@ def publish_html(html_path: Path, api_key: Optional[str] = None) -> dict:
         upload_url = entry.get("url")
         if not upload_url:
             raise PublishError(f"Missing upload URL in response: {entry}")
-        _put_file(upload_url, content, "text/html")
+        _put_file(upload_url, content, "text/html; charset=utf-8")
 
     # Step 3: finalize
-    finalize_resp = _finalize(finalize_url)
-    public_url = finalize_resp.get("url")
+    finalize_resp = _finalize(finalize_url, version_id=version_id)
+    if not public_url:
+        public_url = finalize_resp.get("url") or finalize_resp.get("siteUrl")
     if not public_url:
         raise PublishError(f"No URL in finalize response: {finalize_resp}")
 
