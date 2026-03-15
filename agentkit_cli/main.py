@@ -31,6 +31,7 @@ from agentkit_cli.commands.release_check_cmd import release_check_command
 from agentkit_cli.commands.notify_cmd import notify_app
 from agentkit_cli.commands.config_cmd import config_app
 from agentkit_cli.commands.profile_cmd import profile_app
+from agentkit_cli.commands.insights_cmd import insights_command
 
 app = typer.Typer(
     name="agentkit",
@@ -425,6 +426,26 @@ def release_check(
         package=package,
         registry=registry,
         skip_tests=skip_tests,
+        json_output=json_output,
+    )
+
+
+@app.command("insights")
+def insights(
+    db_path: Optional[Path] = typer.Option(None, "--db", help="Override history DB path"),
+    common_findings: bool = typer.Option(False, "--common-findings", help="Show most common findings across repos"),
+    outliers: bool = typer.Option(False, "--outliers", help="Show repos in the bottom quartile"),
+    trending: bool = typer.Option(False, "--trending", help="Show repos with recent score movement"),
+    all_sections: bool = typer.Option(False, "--all", help="Show all sections in one output"),
+    json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
+) -> None:
+    """Synthesize patterns across agentkit analyze runs. What do your repos have in common?"""
+    insights_command(
+        db_path=db_path,
+        common_findings=common_findings,
+        outliers=outliers,
+        trending=trending,
+        all_sections=all_sections,
         json_output=json_output,
     )
 
