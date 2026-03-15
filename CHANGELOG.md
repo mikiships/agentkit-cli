@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.27.0] - 2026-03-15
+
+### Added
+- `agentkit release-check` command: verifies the 4-part release surface (tests green, git push confirmed, tag pushed, registry live) for Python (PyPI) and npm packages
+- `--release-check` flag on `agentkit run` and `agentkit gate` to append release surface verification after pipeline completes
+- `agentkit_cli/release_check.py` engine with structured `ReleaseCheckResult` output, JSON mode, and actionable next-step hints
+- 52 new tests covering all check functions, CLI flags, error handling, and dataclass contracts (total suite: 1012 tests)
+
 ## [0.26.1] - 2026-03-15
 
 ### Fixed

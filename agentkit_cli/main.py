@@ -27,6 +27,7 @@ from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
+from agentkit_cli.commands.release_check_cmd import release_check_command
 from agentkit_cli.commands.notify_cmd import notify_app
 from agentkit_cli.commands.config_cmd import config_app
 from agentkit_cli.commands.profile_cmd import profile_app
@@ -67,9 +68,15 @@ def run(
     notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after run and print the URL"),
+    release_check: bool = typer.Option(False, "--release-check", help="Verify release surfaces after pipeline completes"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
     run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share)
+    if release_check:
+        from agentkit_cli.release_check import run_release_check
+        from agentkit_cli.commands.release_check_cmd import _render_table
+        result = run_release_check(path=path or None)
+        _render_table(result)
 
 
 @app.command("doctor")
@@ -356,8 +363,14 @@ def gate(
     notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
     notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
+    release_check: bool = typer.Option(False, "--release-check", help="Add release surface verification to gate checks"),
 ) -> None:
     """Fail the build when agent quality falls below your policy thresholds."""
+    if release_check:
+        from agentkit_cli.release_check import run_release_check
+        from agentkit_cli.commands.release_check_cmd import _render_table
+        rc_result = run_release_check(path=path or None)
+        _render_table(rc_result)
     gate_command(
         path=path,
         min_score=min_score,
@@ -393,6 +406,26 @@ def setup_ci(
         skip_baseline=skip_baseline,
         no_badge=no_badge,
         path=path,
+    )
+
+
+@app.command("release-check")
+def release_check(
+    path: Optional[Path] = typer.Argument(None, help="Project directory (default: cwd)"),
+    version: Optional[str] = typer.Option(None, "--version", help="Version to check (default: from pyproject.toml/package.json)"),
+    package: Optional[str] = typer.Option(None, "--package", help="Package name (default: from pyproject.toml/package.json)"),
+    registry: str = typer.Option("auto", "--registry", help="Registry to check: pypi|npm|auto"),
+    skip_tests: bool = typer.Option(False, "--skip-tests", help="Skip the pytest/npm test step"),
+    json_output: bool = typer.Option(False, "--json", help="Output structured JSON for CI integration"),
+) -> None:
+    """Verify the 4-part release surface: tests, git push, tag, and registry."""
+    release_check_command(
+        path=path,
+        version=version,
+        package=package,
+        registry=registry,
+        skip_tests=skip_tests,
+        json_output=json_output,
     )
 
 

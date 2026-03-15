@@ -149,6 +149,46 @@ Or install and run directly:
 
 See `agentkit setup-ci` for automated workflow generation.
 
+## Release Check
+
+`agentkit release-check` verifies the 4-part release surface to confirm a package is truly shipped, not just locally complete:
+
+```
+agentkit release-check [PATH] [OPTIONS]
+
+Options:
+  --version VERSION   Version to verify (default: from pyproject.toml/package.json)
+  --package NAME      Package name (default: from pyproject.toml/package.json)
+  --registry          pypi|npm|auto (default: auto-detected)
+  --skip-tests        Skip the pytest/npm test step for quick checks
+  --json              Output structured JSON for CI integration
+```
+
+Example output:
+
+```
+agentkit release-check — /your/project
+
+┌────────────┬────────┬─────────────────────────────────┐
+│ Check      │ Status │ Detail                          │
+├────────────┼────────┼─────────────────────────────────┤
+│ tests      │ ✓ PASS │ 42 passed in 1.23s              │
+│ git_push   │ ✓ PASS │ Local HEAD abc12345 matches rem │
+│ git_tag    │ ✓ PASS │ Tag v1.0.0 found on remote.     │
+│ registry   │ ✓ PASS │ PyPI: mypkg==1.0.0 is live.    │
+└────────────┴────────┴─────────────────────────────────┘
+
+Verdict: SHIPPED
+```
+
+Verdict levels:
+- **SHIPPED** — all 4 surfaces confirmed (exit 0)
+- **RELEASE-READY** — tests + git confirmed, registry not yet live (exit 1)
+- **BUILT** — tests pass locally, not yet pushed (exit 1)
+- **UNKNOWN** — tests failing (exit 1)
+
+Integrate with `agentkit gate --release-check` or `agentkit run --release-check` to add release verification to your pipeline.
+
 ## License
 
 MIT
