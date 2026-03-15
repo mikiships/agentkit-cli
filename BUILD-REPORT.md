@@ -1,3 +1,34 @@
+# BUILD-REPORT: agentkit-cli v0.23.0 — Profiles System
+
+**Built:** 2026-03-15
+**Branch:** main
+**Contract:** all-day-build-contract-agentkit-cli-v0.23.0-profiles.md
+
+---
+
+## v0.23.0 Deliverable Status
+
+| # | Deliverable | Status |
+|---|---|---|
+| D1 | `agentkit_cli/profiles.py` — ProfileDefinition, ProfileRegistry, built-in presets, apply_profile | ✅ Complete |
+| D1 | Three built-in presets: strict, balanced, minimal | ✅ Complete |
+| D1 | User-defined profiles from `~/.agentkit/profiles/*.toml` | ✅ Complete |
+| D1 | Case-insensitive profile lookup | ✅ Complete |
+| D1 | apply_profile() with CLI flag precedence | ✅ Complete |
+| D1 | `tests/test_profiles.py` — 40 tests | ✅ Complete |
+| D2 | `agentkit profile list/show/create/use/export` | ✅ Complete |
+| D2 | Wire into main.py as `agentkit profile` | ✅ Complete |
+| D2 | `tests/test_profile_command.py` — 19 tests | ✅ Complete |
+| D3 | `--profile` flag added to gate, run, sweep, score, analyze | ✅ Complete |
+| D3 | Profile name shown in gate output | ✅ Complete |
+| D3 | `tests/test_profile_integration.py` — 16 tests | ✅ Complete |
+| D4 | README Profiles section | ✅ Complete |
+| D4 | CHANGELOG v0.23.0 entry | ✅ Complete |
+| D4 | Version bumped to 0.23.0 | ✅ Complete |
+| D4 | All tests pass (891 passing) | ✅ Complete |
+
+---
+
 # BUILD-REPORT: agentkit-cli v0.22.0 — Config System
 
 **Built:** 2026-03-15  

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.23.0] - 2026-03-15
+
+### Added
+- **Quality profiles system** (`agentkit_cli/profiles.py`):
+  - `ProfileDefinition` dataclass: name, description, gate thresholds, notify config, sweep targets
+  - `ProfileRegistry`: stores built-in presets + user-defined profiles from `~/.agentkit/profiles/*.toml`
+  - Three built-in presets: `strict` (min-score 85, max-drop 3), `balanced` (min-score 70, max-drop 10), `minimal` (min-score 50, max-drop 20, gate disabled)
+  - `apply_profile(name, config)` — merges profile values into AgentKitConfig (CLI flags > profile > config > defaults)
+  - Case-insensitive profile lookup
+  - User-defined profile loading from `~/.agentkit/profiles/*.toml`
+- **`agentkit profile` command group**:
+  - `agentkit profile list` — list all profiles (built-in + user) in Rich table
+  - `agentkit profile show <name>` — show profile config details in key-value table
+  - `agentkit profile create <name> [--from <base>]` — create user profile (optionally inheriting from base)
+  - `agentkit profile use <name>` — set active profile in `.agentkit.toml`
+  - `agentkit profile export <name> [--format toml|json]` — print profile as TOML or JSON
+- **`--profile` flag** added to `gate`, `run`, `sweep`, `score`, `analyze` commands
+  - Profile name shown in `gate` Rich output (e.g. "Profile: strict")
+  - Explicit CLI flags (e.g. `--min-score 90`) always override profile values
+
 ## [0.22.0] - 2026-03-15
 
 ### Added
