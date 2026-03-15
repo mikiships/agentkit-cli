@@ -109,6 +109,22 @@ class GateResult:
     tool_status: list[dict[str, Any]]
     baseline_delta: Optional[float] = None
 
+    def to_json_payload(self) -> dict[str, Any]:
+        """Return a stable dict suitable for JSON serialization and machine consumption."""
+        return {
+            "verdict": self.verdict,
+            "passed": self.passed,
+            "score": self.score,
+            "grade": self.grade,
+            "thresholds": {
+                "min_score": self.thresholds.get("min_score"),
+                "max_drop": self.thresholds.get("max_drop"),
+                "baseline_score": self.thresholds.get("baseline_score"),
+                "baseline_delta": self.baseline_delta,
+            },
+            "failure_reasons": self.failure_reasons,
+        }
+
     def to_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "verdict": self.verdict,

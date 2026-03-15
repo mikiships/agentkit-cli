@@ -58,7 +58,8 @@ def _build_job_summary(result: GateResult) -> str:
 def _write_job_summary(result: GateResult) -> None:
     summary_target = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_target:
-        raise GateError("--job-summary requires the GITHUB_STEP_SUMMARY environment variable.")
+        print(_build_job_summary(result))
+        return
 
     summary_path = Path(summary_target)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
@@ -82,7 +83,7 @@ def gate_command(
             baseline_report=baseline_report,
             max_drop=max_drop,
         )
-        payload = result.to_dict()
+        payload = result.to_json_payload()
 
         if output is not None:
             _write_payload(payload, output)
