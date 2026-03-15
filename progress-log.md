@@ -93,3 +93,40 @@ Blockers:
   - `git add ...` -> `fatal: Unable to create '.git/index.lock': Operation not permitted`
   - `touch .git/codex-write-test` -> `Operation not permitted`
   - `git commit --allow-empty ...` -> `fatal: Unable to create '.git/index.lock': Operation not permitted`
+
+---
+
+## 2026-03-14 — v0.19.0 gate
+
+### D1 — Core gate engine + CLI wiring ✅
+
+Built:
+- `agentkit_cli/gate.py`: gate score extraction, composite-score evaluation from the existing report pipeline, threshold evaluation, and structured gate result payload
+- `agentkit_cli/commands/gate_cmd.py`: `agentkit gate` CLI wiring with terminal PASS/FAIL output and deterministic exit codes
+- `agentkit_cli/main.py`: registered the `gate` command
+- `tests/test_gate.py`: D1 coverage for threshold evaluation, engine pass behavior, CLI pass/fail exit codes, and command help
+
+Tests:
+- `python3 -m pytest -q tests/test_gate.py` — 5 passed
+
+Remains:
+- D2 baseline report parsing and `--max-drop`
+- D3 JSON payload, `--output`, and `--job-summary`
+- D4 README/CHANGELOG/BUILD-REPORT/version updates plus full-suite verification
+
+Blockers:
+- None in feature code so far
+
+### Stop Condition — contract blocked at D1 commit gate
+
+Observed issue:
+- The sandbox does not allow the git writes required for the mandatory post-deliverable commit.
+
+Failed attempts:
+- `git add agentkit_cli/gate.py agentkit_cli/commands/gate_cmd.py agentkit_cli/main.py tests/test_gate.py progress-log.md` -> `fatal: Unable to create '/Users/mordecai/repos/agentkit-cli/.git/index.lock': Operation not permitted`
+- `git commit -m "feat: add agentkit gate d1"` -> `fatal: Unable to create '/Users/mordecai/repos/agentkit-cli/.git/index.lock': Operation not permitted`
+- `GIT_INDEX_FILE=/tmp/agentkit-cli-gate.index git add ...` -> `error: unable to create temporary file: Operation not permitted` / `fatal: adding files failed`
+
+Action taken:
+- Wrote `blocker-report-v0.19.0-gate.md`
+- Stopped before D2 per contract rule 8

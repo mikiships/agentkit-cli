@@ -1,0 +1,133 @@
+"""agentkit gate command."""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+from typing import Optional
+
+import typer
+from rich.console import Console
+
+from agentkit_cli.gate import GateError, GateResult, run_gate
+
+console = Console()
+
+
+def _score_color(score: float) -> str:
+    if score >= 80:
+        return "green"
+    if score >= 60:
+        return "yellow"
+    return "red"
+
+
+def _write_payload(payload: dict, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def _build_job_summary(result: GateResult) -> str:
+    lines = [
+        "## agentkit gate",
+        "",
+        f"- Verdict: **{result.verdict}**",
+        f"- Score: **{result.score:.1f}/100 ({result.grade})**",
+    ]
+
+    min_score = result.thresholds.get("min_score")
+    if min_score is not None:
+        lines.append(f"- Min score: {min_score:.1f}")
+
+    baseline_score = result.thresholds.get("baseline_score")
+    max_drop = result.thresholds.get("max_drop")
+    if baseline_score is not None:
+        lines.append(f"- Baseline score: {baseline_score:.1f}")
+    if result.baseline_delta is not None:
+        lines.append(f"- Baseline delta: {result.baseline_delta:+.1f}")
+    if max_drop is not None:
+        lines.append(f"- Max drop: {max_drop:.1f}")
+
+    if result.failure_reasons:
+        lines.extend(["", "### Failure reasons"])
+        lines.extend(f"- {reason}" for reason in result.failure_reasons)
+
+    return "\n".join(lines) + "\n"
+
+
+def _write_job_summary(result: GateResult) -> None:
+    summary_target = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not summary_target:
+        raise GateError("--job-summary requires the GITHUB_STEP_SUMMARY environment variable.")
+
+    summary_path = Path(summary_target)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.write_text(_build_job_summary(result), encoding="utf-8")
+
+
+def gate_command(
+    path: Optional[Path] = None,
+    min_score: Optional[float] = None,
+    baseline_report: Optional[Path] = None,
+    max_drop: Optional[float] = None,
+    json_output: bool = False,
+    output: Optional[Path] = None,
+    job_summary: bool = False,
+) -> None:
+    """Evaluate the current project against gate thresholds."""
+    try:
+        result = run_gate(
+            path=path,
+            min_score=min_score,
+            baseline_report=baseline_report,
+            max_drop=max_drop,
+        )
+        payload = result.to_dict()
+
+        if output is not None:
+            _write_payload(payload, output)
+        if job_summary:
+            _write_job_summary(result)
+
+        if json_output:
+            print(json.dumps(payload, indent=2))
+            raise typer.Exit(code=0 if result.passed else 1)
+
+        color = "green" if result.passed else "red"
+        score_color = _score_color(result.score)
+        console.print()
+        console.print(f"[bold]agentkit gate[/bold] — project: {(path or Path.cwd()).resolve()}")
+        console.print(f"[bold]Verdict:[/bold] [{color}]{result.verdict}[/{color}]")
+        console.print(
+            f"[bold]Score:[/bold] [{score_color}]{result.score:.1f}/100 ({result.grade})[/{score_color}]"
+        )
+
+        min_score_value = result.thresholds.get("min_score")
+        if min_score_value is not None:
+            console.print(f"[bold]Min score:[/bold] {min_score_value:.1f}")
+
+        baseline_score = result.thresholds.get("baseline_score")
+        if baseline_score is not None:
+            console.print(f"[bold]Baseline score:[/bold] {baseline_score:.1f}")
+        if result.baseline_delta is not None:
+            console.print(f"[bold]Baseline delta:[/bold] {result.baseline_delta:+.1f}")
+        max_drop_value = result.thresholds.get("max_drop")
+        if max_drop_value is not None:
+            console.print(f"[bold]Max drop:[/bold] {max_drop_value:.1f}")
+
+        if result.failure_reasons:
+            console.print("[bold]Failure reasons:[/bold]")
+            for reason in result.failure_reasons:
+                console.print(f"- {reason}")
+        else:
+            console.print("[bold]Failure reasons:[/bold] none")
+
+        if output is not None:
+            console.print(f"[dim]JSON payload saved to {output}[/dim]")
+        if job_summary:
+            console.print("[dim]Job summary written to GITHUB_STEP_SUMMARY[/dim]")
+
+        raise typer.Exit(code=0 if result.passed else 1)
+    except GateError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(code=2) from exc

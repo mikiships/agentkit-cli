@@ -24,6 +24,7 @@ from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
 from agentkit_cli.commands.score_cmd import score_command
 from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
+from agentkit_cli.commands.gate_cmd import gate_command
 
 app = typer.Typer(
     name="agentkit",
@@ -301,6 +302,28 @@ def sweep(
         sort_by=sort_by,
         limit=limit,
         json_output=json_output,
+    )
+
+
+@app.command("gate")
+def gate(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory"),
+    min_score: Optional[float] = typer.Option(None, "--min-score", help="Fail if the composite score is below this threshold"),
+    baseline_report: Optional[Path] = typer.Option(None, "--baseline-report", help="Path to a prior agentkit report --json artifact"),
+    max_drop: Optional[float] = typer.Option(None, "--max-drop", help="Fail if the score drops by more than this many points from baseline"),
+    json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Path to write the JSON payload"),
+    job_summary: bool = typer.Option(False, "--job-summary", help="Write a markdown verdict block to GITHUB_STEP_SUMMARY"),
+) -> None:
+    """Fail the build when agent quality falls below your policy thresholds."""
+    gate_command(
+        path=path,
+        min_score=min_score,
+        baseline_report=baseline_report,
+        max_drop=max_drop,
+        json_output=json_output,
+        output=output,
+        job_summary=job_summary,
     )
 
 
