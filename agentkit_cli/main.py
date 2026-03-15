@@ -27,6 +27,7 @@ from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
 from agentkit_cli.commands.notify_cmd import notify_app
+from agentkit_cli.commands.config_cmd import config_app
 
 app = typer.Typer(
     name="agentkit",
@@ -34,6 +35,7 @@ app = typer.Typer(
     add_completion=False,
 )
 app.add_typer(notify_app, name="notify")
+app.add_typer(config_app, name="config")
 
 
 @app.command("init")

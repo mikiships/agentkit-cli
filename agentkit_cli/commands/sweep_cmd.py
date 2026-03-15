@@ -26,6 +26,16 @@ def sweep_command(
     json_output: bool = False,
 ) -> None:
     """Run `agentkit analyze` across multiple targets."""
+    # Apply config defaults
+    from agentkit_cli.config import load_config
+    cfg = load_config()
+    if not targets and cfg.sweep.targets:
+        targets = cfg.sweep.targets
+    if sort_by == "score" and cfg.sweep.sort_by != "score":
+        sort_by = cfg.sweep.sort_by
+    if limit is None and cfg.sweep.limit != 20:
+        limit = cfg.sweep.limit
+
     try:
         resolved_targets = resolve_targets(targets, targets_file=targets_file)
     except OSError as exc:

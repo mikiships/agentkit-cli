@@ -69,6 +69,12 @@ def score_command(
     min_score: int,
 ) -> None:
     """Compute and display the composite agent quality score."""
+    # Apply config defaults
+    from agentkit_cli.config import load_config
+    cfg = load_config(path)
+    if min_score == 70 and cfg.gate.min_score is not None:
+        min_score = int(cfg.gate.min_score)
+
     root = (path or find_project_root()).resolve()
     project = root.name
 

@@ -81,6 +81,22 @@ def gate_command(
     notify_on: str = "fail",
 ) -> None:
     """Evaluate the current project against gate thresholds."""
+    # Apply config defaults when CLI flags were not provided
+    from agentkit_cli.config import load_config
+    cfg = load_config(path)
+    if min_score is None and cfg.gate.min_score is not None:
+        min_score = cfg.gate.min_score
+    if max_drop is None and cfg.gate.max_drop is not None:
+        max_drop = cfg.gate.max_drop
+    if not notify_slack and cfg.notify.slack_url:
+        notify_slack = cfg.notify.slack_url
+    if not notify_discord and cfg.notify.discord_url:
+        notify_discord = cfg.notify.discord_url
+    if not notify_webhook and cfg.notify.webhook_url:
+        notify_webhook = cfg.notify.webhook_url
+    if notify_on == "fail" and cfg.notify.on != "fail":
+        notify_on = cfg.notify.on
+
     try:
         result = run_gate(
             path=path,

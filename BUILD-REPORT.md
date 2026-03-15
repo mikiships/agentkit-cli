@@ -1,32 +1,59 @@
-# BUILD-REPORT: agentkit-cli v0.21.0
+# BUILD-REPORT: agentkit-cli v0.22.0 — Config System
 
-**Date:** 2026-03-15
-**Builder:** build-loop subagent
+**Built:** 2026-03-15  
+**Branch:** main  
+**Contract:** memory/contracts/agentkit-cli-v0.22.0-config.md
 
-## What Was Built
+---
 
-Added full Slack/Discord/generic webhook notification support to agentkit-cli as specified in contract `agentkit-cli-v0.21.0-notify.md`.
+## Deliverable Status
 
-### Deliverables
+| # | Deliverable | Status |
+|---|---|---|
+| D1 | `agentkit_cli/config.py` — TOML config loading with git-style traversal, user config, env vars, `AgentKitConfig` dataclass | ✅ Complete |
+| D1 | `.agentkit.toml` traversal from cwd upward | ✅ Complete |
+| D1 | `~/.config/agentkit/config.toml` user-level defaults | ✅ Complete |
+| D1 | Environment variable overrides (12 vars) | ✅ Complete |
+| D1 | Config precedence: CLI > env > project > user > defaults | ✅ Complete |
+| D1 | `tomllib` (Python 3.11+) with `tomli` fallback | ✅ Complete |
+| D1 | Graceful error on invalid TOML | ✅ Complete |
+| D2 | Wire config into `agentkit gate` | ✅ Complete |
+| D2 | Wire config into `agentkit run` | ✅ Complete |
+| D2 | Wire config into `agentkit sweep` | ✅ Complete |
+| D2 | Wire config into `agentkit score` | ✅ Complete |
+| D2 | Wire config into `agentkit notify` (via gate/run) | ✅ Complete |
+| D2 | Wire config into `agentkit analyze` | ✅ Complete (via gate/run) |
+| D3 | `agentkit config init` | ✅ Complete |
+| D3 | `agentkit config init --global` | ✅ Complete |
+| D3 | `agentkit config show` (with source annotations) | ✅ Complete |
+| D3 | `agentkit config show --json` | ✅ Complete |
+| D3 | `agentkit config get <key>` | ✅ Complete |
+| D3 | `agentkit config set <key> <value>` | ✅ Complete |
+| D3 | `--global` flag on init/set/get | ✅ Complete |
+| D4 | 58 new tests in `tests/test_config.py` (target: 30+) | ✅ Complete (58 tests) |
+| D4 | Tests: loading, precedence, env var overrides | ✅ Complete |
+| D4 | Tests: init/show/set/get CLI | ✅ Complete |
+| D4 | README "Project Configuration" section | ✅ Complete |
+| D4 | CHANGELOG entry for v0.22.0 | ✅ Complete |
+| D4 | Version bump to 0.22.0 in pyproject.toml | ✅ Complete |
+| D4 | Version bump to 0.22.0 in `agentkit_cli/__init__.py` | ✅ Complete |
 
-- [x] **D1: `agentkit_cli/notifier.py`** — `NotifyConfig` dataclass, `build_payload` (Slack attachment / Discord embed / generic JSON), `notify_result`, `fire_notifications`, `resolve_notify_configs`. HTTP POST via stdlib `urllib` (no new dependencies), single retry with 5s timeout. Notification errors never propagate to caller exit code.
+---
 
-- [x] **D2: CLI flags** — `--notify-slack`, `--notify-discord`, `--notify-webhook`, `--notify-on` added to `agentkit gate` and `agentkit run`. Env vars `AGENTKIT_NOTIFY_SLACK` / `AGENTKIT_NOTIFY_DISCORD` / `AGENTKIT_NOTIFY_WEBHOOK` / `AGENTKIT_NOTIFY_ON` accepted as fallbacks; CLI flags take precedence. `action.yml` updated with matching inputs.
+## Test Results
 
-- [x] **D3: `agentkit notify` command group** — `agentkit notify test --slack|--discord|--webhook <url>` fires a test notification and prints ✓/✗ result. `agentkit notify config` shows current env var config.
+```
+817 passed, 1 pre-existing failure (test_watch.py::TestChangeHandler::test_last_file_recorded — IndexError, pre-existing, not introduced by this build)
+```
 
-- [x] **D4: Tests + docs + version bump** — 57 new tests across `test_notifier.py`, `test_notify_command.py`, `test_gate_notify_integration.py`. All HTTP mocked via `unittest.mock`. README Notifications section written. CHANGELOG v0.21.0 entry added. Version bumped `0.20.0 → 0.21.0` in `pyproject.toml` and `agentkit_cli/__init__.py`.
+New tests in `tests/test_config.py`: **58 passing**
 
-## Test Count
+---
 
-| | Count |
-|---|---|
-| Before | 702 |
-| After | 759 |
-| New tests added | 57 |
+## Key Design Decisions
 
-## Deviations from Contract
-
-None. All deliverables match spec. The `fire_notifications` wrapper catches per-config exceptions to ensure one failing notification never blocks the others (slightly more defensive than the contract required, which only specified gate exit code safety).
-
-## READY TO SHIP
+- Used `tomllib` (stdlib) with no new hard dependencies. `tomli` fallback for older Pythons.
+- Minimal TOML writer (`_dict_to_toml`) avoids adding `tomli-w` dependency.
+- Source tracking via `_sources` dict on `AgentKitConfig` enables `config show` source annotations.
+- Legacy `.agentkit.yaml` system preserved fully for backward compat.
+- Config wired via "apply defaults when flag is None" pattern — no breaking changes to CLI interface.

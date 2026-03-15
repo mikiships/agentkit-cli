@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.22.0] - 2026-03-15
+
+### Added
+- **Project configuration system** (`.agentkit.toml`):
+  - Git-style upward traversal to find `.agentkit.toml` from current directory
+  - User-level defaults at `~/.config/agentkit/config.toml`
+  - `AgentKitConfig` dataclass with typed sections: `gate`, `notify`, `run`, `sweep`, `score`
+  - Environment variable overrides for all config keys (e.g. `AGENTKIT_GATE_MIN_SCORE`)
+  - Config precedence: CLI flags > env vars > project config > user config > built-in defaults
+  - `tomllib` (stdlib, Python 3.11+) with `tomli` fallback for TOML parsing
+  - Graceful error handling: invalid or missing TOML never crashes
+- **`agentkit config` command group**:
+  - `agentkit config init` — write `.agentkit.toml` with all defaults and inline comments
+  - `agentkit config init --global` — write to `~/.config/agentkit/config.toml`
+  - `agentkit config show` — display effective merged config with source annotations (`[project]`, `[env]`, `[default]`)
+  - `agentkit config show --json` — machine-readable JSON output
+  - `agentkit config get <key>` — print a single value by dotted key
+  - `agentkit config set <key> <value>` — set a value in project (or `--global` user) config
+- **Config wired into commands**:
+  - `agentkit gate` uses config `gate.min_score`, `gate.max_drop`, and `notify.*` as defaults when flags are not provided
+  - `agentkit run` uses config `notify.*` and `run.label` as defaults
+  - `agentkit sweep` uses config `sweep.targets`, `sweep.sort_by`, and `sweep.limit` as defaults
+  - `agentkit score` uses config `gate.min_score` as default CI threshold
+- README: new "Project Configuration" section with annotated `.agentkit.toml` example and environment variable table
+
 ## [0.21.0] - 2026-03-15
 
 ### Added

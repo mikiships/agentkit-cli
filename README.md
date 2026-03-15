@@ -1053,6 +1053,63 @@ agentkit notify config
 
 > **Note:** Notification failures never affect the gate exit code. If the webhook is unreachable, agentkit logs a warning and continues normally.
 
+## Project Configuration
+
+agentkit supports project-level configuration via `.agentkit.toml`. Drop one in your repo root (or any parent directory) and stop repeating flags on every command.
+
+### Quick Start
+
+```bash
+agentkit config init       # create .agentkit.toml with all defaults + comments
+agentkit config show       # display effective config with source annotations
+agentkit config set gate.min_score 80   # update a value
+agentkit config get gate.min_score      # read a value
+```
+
+Use `--global` to write to `~/.config/agentkit/config.toml` (user-level defaults):
+
+```bash
+agentkit config init --global
+agentkit config set notify.slack_url "https://hooks.slack.com/..." --global
+```
+
+### `.agentkit.toml` Format
+
+```toml
+[gate]
+min_score = 75
+max_drop = 10.0
+fail_on_regression = false
+
+[notify]
+slack_url = ""
+discord_url = ""
+webhook_url = ""
+on = "fail"
+
+[run]
+output_dir = ".agentkit"
+label = ""
+record_history = true
+
+[sweep]
+targets = []
+sort_by = "score"
+limit = 20
+
+[score.weights]
+coderace = 0.3
+agentlint = 0.3
+agentmd = 0.2
+agentreflect = 0.2
+```
+
+### Config Precedence
+
+```
+CLI flags > env vars > project .agentkit.toml > ~/.config/agentkit/config.toml > built-in defaults
+```
+
 ## Links
 
 - [agentmd](https://pypi.org/project/agentmd/)

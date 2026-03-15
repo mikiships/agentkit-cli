@@ -79,6 +79,20 @@ def run_command(
     notify_on: str = "fail",
 ) -> None:
     """Run the full Agent Quality pipeline."""
+    # Apply config defaults
+    from agentkit_cli.config import load_config
+    cfg = load_config(path)
+    if not notify_slack and cfg.notify.slack_url:
+        notify_slack = cfg.notify.slack_url
+    if not notify_discord and cfg.notify.discord_url:
+        notify_discord = cfg.notify.discord_url
+    if not notify_webhook and cfg.notify.webhook_url:
+        notify_webhook = cfg.notify.webhook_url
+    if notify_on == "fail" and cfg.notify.on != "fail":
+        notify_on = cfg.notify.on
+    if label is None and cfg.run.label:
+        label = cfg.run.label
+
     root = path or find_project_root()
     cwd_str = str(root)
     skip_set = set(s.lower() for s in (skip or []))
