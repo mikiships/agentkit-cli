@@ -96,6 +96,32 @@ agentkit gate --profile strict --min-score 99
 - `agentkit history` — show score history
 - `agentkit leaderboard` — compare runs by label
 
+## Sharing Results
+
+Share your agent quality score card with a single command:
+
+```bash
+# Generate and upload a score card to here.now
+agentkit share
+
+# Share from a saved JSON report
+agentkit share --report agentkit-report.json
+
+# Hide raw numbers (show pass/fail only)
+agentkit share --no-scores
+
+# Output JSON with URL and score
+agentkit share --json
+
+# Auto-share after a run
+agentkit run --share
+
+# Auto-share after generating a report
+agentkit report --share
+```
+
+Score cards are standalone HTML pages (dark theme) showing: composite score, per-tool breakdown, project name, git ref, and timestamp. Anonymous cards expire in 24h; set `HERENOW_API_KEY` for persistent links.
+
 ## GitHub Actions
 
 Use the agentkit GitHub Action to run quality checks on every PR:

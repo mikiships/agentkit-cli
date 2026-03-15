@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.24.0] - 2026-03-15
+
+### Added
+- **`agentkit share` command** (`agentkit_cli/commands/share_cmd.py`):
+  - Generates a shareable score card HTML page (dark theme, standalone)
+  - Uploads to here.now and returns a public URL
+  - `--report PATH`: load from a saved JSON report file instead of running fresh
+  - `--project NAME`: override project name (default: git remote origin or cwd basename)
+  - `--no-scores`: hide raw numbers; show pass/fail indicators only
+  - `--json`: output `{"url": "...", "score": N}` instead of plain text
+  - `--api-key`: override `HERENOW_API_KEY` env var
+  - Anonymous publish (no API key) expires in 24h; authenticated is persistent
+- **Score card HTML generator** (`agentkit_cli/share.py`):
+  - `generate_scorecard_html()`: dark-theme (#0d1117), monospace, no CDN dependencies
+  - Hero number with color coding: green ≥80, yellow 60–79, red <60
+  - Per-tool breakdown table with pass/fail indicators
+  - Footer with agentkit-cli version and PyPI link
+  - `upload_scorecard()`: reuses here.now 3-step publish flow from `agentkit_cli/publish.py`
+  - Graceful fallback on network failure (prints warning, returns None)
+- **`--share` flag on `agentkit run`**: uploads score card after run, prints URL
+- **`--share` flag on `agentkit report`**: uploads score card after report, prints URL
+- 43 new tests covering D1–D4 (HTML generation, upload, CLI command, flags)
+
 ## [0.23.0] - 2026-03-15
 
 ### Added
