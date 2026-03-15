@@ -98,6 +98,17 @@ agentkit gate --profile strict --min-score 99
 
 ## GitHub Actions
 
+Use the agentkit GitHub Action to run quality checks on every PR:
+
+```yaml
+- uses: mikiships/agentkit-cli@v0.7.0
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    min-score: 70
+```
+
+Or install and run directly:
+
 ```yaml
 - uses: actions/checkout@v4
 - run: pip install agentkit-cli
