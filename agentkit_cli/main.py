@@ -28,6 +28,7 @@ from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
 from agentkit_cli.commands.notify_cmd import notify_app
 from agentkit_cli.commands.config_cmd import config_app
+from agentkit_cli.commands.profile_cmd import profile_app
 
 app = typer.Typer(
     name="agentkit",
@@ -36,6 +37,7 @@ app = typer.Typer(
 )
 app.add_typer(notify_app, name="notify")
 app.add_typer(config_app, name="config")
+app.add_typer(profile_app, name="profile")
 
 
 @app.command("init")
@@ -62,9 +64,10 @@ def run(
     notify_discord: Optional[str] = typer.Option(None, "--notify-discord", help="Discord webhook URL (or set AGENTKIT_NOTIFY_DISCORD)"),
     notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
     notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
+    profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile)
 
 
 @app.command("doctor")
@@ -157,9 +160,10 @@ def score(
     breakdown: bool = typer.Option(False, "--breakdown", help="Show per-component score table"),
     ci: bool = typer.Option(False, "--ci", help="Exit 1 if score < min-score"),
     min_score: int = typer.Option(70, "--min-score", help="CI gate threshold (default: 70)"),
+    profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
 ) -> None:
     """Compute composite agent quality score (0-100) from all toolkit tools."""
-    score_command(path=path, json_output=json_output, breakdown=breakdown, ci=ci, min_score=min_score)
+    score_command(path=path, json_output=json_output, breakdown=breakdown, ci=ci, min_score=min_score, profile=profile)
 
 
 @app.command("readme")
@@ -276,6 +280,7 @@ def analyze(
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after analysis"),
     timeout: int = typer.Option(120, "--timeout", help="Clone + analysis timeout in seconds"),
     no_generate: bool = typer.Option(False, "--no-generate", help="Skip agentmd generate; only score what's there"),
+    profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
 ) -> None:
     """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
     analyze_command(
@@ -285,6 +290,7 @@ def analyze(
         publish=publish,
         timeout=timeout,
         no_generate=no_generate,
+        profile=profile,
     )
 
 
@@ -299,6 +305,7 @@ def sweep(
     sort_by: str = typer.Option("score", "--sort-by", help="Sort results by: score, name, or grade"),
     limit: Optional[int] = typer.Option(None, "--limit", help="Show only top N results in table output"),
     json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
 ) -> None:
     """Analyze multiple GitHub repos or local paths in one batch."""
     sweep_command(
@@ -311,6 +318,7 @@ def sweep(
         sort_by=sort_by,
         limit=limit,
         json_output=json_output,
+        profile=profile,
     )
 
 
@@ -327,6 +335,7 @@ def gate(
     notify_discord: Optional[str] = typer.Option(None, "--notify-discord", help="Discord webhook URL (or set AGENTKIT_NOTIFY_DISCORD)"),
     notify_webhook: Optional[str] = typer.Option(None, "--notify-webhook", help="Generic JSON webhook URL (or set AGENTKIT_NOTIFY_WEBHOOK)"),
     notify_on: str = typer.Option("fail", "--notify-on", help="When to notify: fail|always"),
+    profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
 ) -> None:
     """Fail the build when agent quality falls below your policy thresholds."""
     gate_command(
@@ -341,6 +350,7 @@ def gate(
         notify_discord=notify_discord,
         notify_webhook=notify_webhook,
         notify_on=notify_on,
+        profile=profile,
     )
 
 
