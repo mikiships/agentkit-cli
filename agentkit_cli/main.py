@@ -38,6 +38,7 @@ from agentkit_cli.commands.duel_cmd import duel_command
 from agentkit_cli.commands.tournament_cmd import tournament_command
 from agentkit_cli.commands.org_cmd import org_command
 from agentkit_cli.commands.serve_cmd import serve_command
+from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -591,6 +592,28 @@ def serve(
 ) -> None:
     """Start a local web dashboard showing all toolkit runs."""
     serve_command(port=port, open_browser=open_browser, json_output=json_output, once=once, db_path=db_path, live=live)
+
+
+@app.command("pr")
+def pr(
+    target: str = typer.Argument(..., help="Target repo in format github:owner/repo"),
+    file: str = typer.Option("CLAUDE.md", "--file", "-f", help="Context file to generate (CLAUDE.md or AGENTS.md)"),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing context file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be done without making any git or API calls"),
+    pr_title: str = typer.Option("feat: add CLAUDE.md for AI coding agents", "--pr-title", help="Custom PR title"),
+    pr_body_file: Optional[Path] = typer.Option(None, "--pr-body-file", help="Path to custom PR body markdown file"),
+    json_output: bool = typer.Option(False, "--json", help="Output result as JSON"),
+) -> None:
+    """Submit a CLAUDE.md (or AGENTS.md) PR to a public GitHub repository."""
+    pr_command(
+        target=target,
+        file=file,
+        force=force,
+        dry_run=dry_run,
+        pr_title=pr_title,
+        pr_body_file=pr_body_file,
+        json_output=json_output,
+    )
 
 
 @app.command("watch")
