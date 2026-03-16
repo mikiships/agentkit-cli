@@ -11,6 +11,13 @@ pip install agentkit-cli
 ## Quick Start
 
 ```bash
+pip install agentkit-cli
+agentkit quickstart    # 🚀 fastest path to a score — start here
+```
+
+`agentkit quickstart` checks your toolchain, runs a fast composite score (agentlint + agentmd), prints a beautiful Rich summary, and optionally publishes a shareable score card — all in under 60 seconds.
+
+```bash
 agentkit run           # run the full pipeline
 agentkit score         # compute composite score
 agentkit gate          # fail if score < threshold
@@ -86,6 +93,7 @@ agentkit gate --profile strict --min-score 99
 
 ## Commands
 
+- `agentkit quickstart` — 🚀 fastest path to a score (start here)
 - `agentkit run` — run the full pipeline
 - `agentkit score` — compute composite score
 - `agentkit gate` — fail if score < threshold
@@ -226,7 +234,10 @@ agentkit run --share
 # Auto-share after generating a report
 agentkit report --share
 
-# Analyze a GitHub repo and share the score card in one command
+# Quickest way to get a score + share URL for any repo
+agentkit quickstart github:owner/repo
+
+# Full analyze with share (more detail, slower)
 agentkit analyze github:owner/repo --share
 
 # Batch analyze repos and share a combined scorecard
