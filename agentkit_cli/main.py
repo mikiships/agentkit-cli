@@ -32,6 +32,7 @@ from agentkit_cli.commands.notify_cmd import notify_app
 from agentkit_cli.commands.config_cmd import config_app
 from agentkit_cli.commands.profile_cmd import profile_app
 from agentkit_cli.commands.insights_cmd import insights_command
+from agentkit_cli.commands.trending_cmd import trending_command
 
 app = typer.Typer(
     name="agentkit",
@@ -430,6 +431,32 @@ def release_check(
         registry=registry,
         skip_tests=skip_tests,
         json_output=json_output,
+    )
+
+
+@app.command("trending")
+def trending(
+    period: str = typer.Option("week", "--period", help="Trending window: day|week|month"),
+    topic: Optional[str] = typer.Option(None, "--topic", help="Filter by GitHub topic (e.g. ai-agent)"),
+    limit: int = typer.Option(10, "--limit", help="Max repos to fetch (max 25)"),
+    category: str = typer.Option("ai", "--category", help="Pre-defined category: ai|python|all"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now and print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of table"),
+    no_analyze: bool = typer.Option(False, "--no-analyze", help="Skip agentkit analysis (fast mode)"),
+    min_stars: int = typer.Option(100, "--min-stars", help="Filter repos below this star count"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or GITHUB_TOKEN env var)", envvar="GITHUB_TOKEN"),
+) -> None:
+    """Fetch trending GitHub repos and rank them by agent quality score."""
+    trending_command(
+        period=period,
+        topic=topic,
+        limit=limit,
+        category=category,
+        share=share,
+        json_output=json_output,
+        no_analyze=no_analyze,
+        min_stars=min_stars,
+        token=token,
     )
 
 
