@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.34.0] - 2026-03-16
+
+### Added
+- **ToolAdapter** class in `agentkit_cli/tools.py`: single source of truth for all quartet tool invocations (agentmd, agentlint, coderace, agentreflect) with canonical correct flags, timeouts, and error handling
+- **Golden smoke test suite** (`tests/test_smoke_integration.py`): 9 integration tests exercising every orchestration command against a fixture project. Run `pytest -m smoke` before any release.
+- **SmokeTestCheck** in `release_check.py`: `agentkit release-check` now includes smoke suite pass as a blocking check
+- `pytest.mark.smoke` marker registered in `pyproject.toml`
+- Fixture project at `tests/fixtures/smoke_project/` for smoke testing
+
+### Changed
+- All hand-rolled quartet subprocess calls migrated to ToolAdapter (suggest, compare, doctor, analyze, report_runner)
+- `report_runner.py` now delegates to ToolAdapter (backward-compatible signatures preserved)
+- `check_context_freshness` in doctor.py uses ToolAdapter instead of direct subprocess calls
+
+### Fixed
+- Eliminates the M34 architectural debt: flag-wiring bugs can no longer recur across subcommands since all quartet invocations go through a single module
+
 ## [0.33.0] - 2026-03-16
 
 ### Added

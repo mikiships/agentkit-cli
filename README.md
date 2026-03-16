@@ -335,6 +335,12 @@ Verdict levels:
 
 Integrate with `agentkit gate --release-check` or `agentkit run --release-check` to add release verification to your pipeline.
 
+## Architecture
+
+All quartet tool invocations (agentmd, agentlint, coderace, agentreflect) go through `ToolAdapter` in `agentkit_cli/tools.py`. This ensures canonical correct flags are used everywhere and flag-wiring bugs cannot recur across subcommands.
+
+Run `pytest -m smoke` before any release to catch integration regressions.
+
 ## License
 
 MIT

@@ -1,58 +1,43 @@
-# BUILD REPORT — agentkit-cli v0.32.0 (agentkit serve)
+# BUILD-REPORT: agentkit-cli v0.34.0
 
-Date: 2026-03-16
-Status: COMPLETE
+## Summary
 
-## Deliverable Status
+Resolved M34 architectural debt: centralized all quartet tool invocations into a single ToolAdapter class, added a golden smoke test suite, and integrated smoke tests into the release-check pipeline.
+
+## Deliverables
 
 | # | Deliverable | Status |
 |---|-------------|--------|
-| D1 | `agentkit_cli/serve.py` — core server module | ✅ DONE |
-| D2 | CLI command `agentkit serve` | ✅ DONE |
-| D3 | Dashboard HTML quality | ✅ DONE |
-| D4 | `--watch` variant + doctor integration | ✅ DONE |
-| D5 | Docs + version bump to v0.32.0 | ✅ DONE |
+| D1 | ToolAdapter class in tools.py | ✅ Complete |
+| D2 | Migrate all hand-rolled quartet calls | ✅ Complete |
+| D3 | Golden smoke test suite (9 tests) | ✅ Complete |
+| D4 | SmokeTestCheck in release_check.py | ✅ Complete |
+| D5 | Docs, CHANGELOG, version bump, reports | ✅ Complete |
 
 ## Test Results
 
-- **Existing tests:** 1212 (all passing)
-- **New tests:** 56 (in `tests/test_serve.py`)
-- **Total:** 1268 passed, 0 failed
+- **Total tests:** 1330 passed
+- **New tests:** 49 (34 ToolAdapter + 9 smoke + 6 SmokeTestCheck)
+- **Existing tests:** 1281 (all passing, no regressions)
+- **Requirement:** >= 1325 ✅
 
-## New Files
+## Files Changed
 
-- `agentkit_cli/serve.py` — HTTP server, HTML generator, grade/color logic
-- `agentkit_cli/commands/serve_cmd.py` — CLI wrapper
-- `tests/test_serve.py` — 56 tests
+- `agentkit_cli/tools.py` — added ToolAdapter class (7 methods + helpers)
+- `agentkit_cli/report_runner.py` — delegates to ToolAdapter
+- `agentkit_cli/commands/suggest_cmd.py` — migrated to ToolAdapter
+- `agentkit_cli/commands/compare_cmd.py` — migrated to ToolAdapter
+- `agentkit_cli/doctor.py` — migrated check_context_freshness
+- `agentkit_cli/analyze.py` — migrated pipeline steps
+- `agentkit_cli/release_check.py` — added check_smoke_tests
+- `tests/test_tool_adapter.py` — 34 new tests
+- `tests/test_smoke_integration.py` — 9 smoke tests
+- `tests/test_release_check.py` — 6 new SmokeTestCheck tests
+- `tests/test_report.py` — updated mock paths
+- `tests/test_doctor.py` — updated mock paths
+- `tests/fixtures/smoke_project/` — fixture project
+- `CHANGELOG.md` — v0.34.0 entry
+- `README.md` — Architecture section
+- `pyproject.toml` — version bump + pytest markers
 
-## Modified Files
-
-- `agentkit_cli/main.py` — registered `agentkit serve` command, added `--serve` to `run`
-- `agentkit_cli/commands/run_cmd.py` — `--serve` flag, prints dashboard URL after pipeline
-- `agentkit_cli/doctor.py` — `check_serve_available()`, appended to `run_doctor()`
-- `agentkit_cli/__init__.py` — version → 0.32.0
-- `pyproject.toml` — version → 0.32.0
-- `CHANGELOG.md` — v0.32.0 entry
-- `README.md` — Local Dashboard section
-
-## Key Decisions
-
-- Used `category="publish"` for the doctor serve check to avoid breaking existing tests that hardcode toolchain check counts (6 items)
-- `check_serve_available()` appended directly in `run_doctor()` rather than inside `check_toolchain()` for same reason
-- Dashboard HTML fully self-contained in `serve.py` (no external template files)
-- Auto-refresh via both `<meta http-equiv="refresh" content="30">` and JS `setTimeout` for belt-and-suspenders
-
-## Commits
-
-- `393399c` D1-D3: agentkit serve core module, dashboard HTML, 56 tests
-- `515e228` D4: wire serve into CLI, run --serve flag, doctor check
-- `74f571a` D5: bump to v0.32.0, changelog, README Local Dashboard section
-
-BUILD COMPLETE: 1268 passed
-
-## v0.33.0 — Live Dashboard (2026-03-16)
-- D1: SSE broker + /events + /api/runs
-- D2: Dashboard JS EventSource live table updates (● Live / ○ Offline indicator)
-- D3: agentkit watch --serve combined mode
-- D4: agentkit serve --live flag for external-write polling
-- D5: Tests (1281 passing), docs, version bump to 0.33.0
+ALL DELIVERABLES COMPLETE. Tests: 1330 passed.
