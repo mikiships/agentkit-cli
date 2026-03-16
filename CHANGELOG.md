@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.38.0] - 2026-03-16
+
+### Added
+- **`agentkit pr github:<owner>/<repo>`** command: viral distribution mechanic — generates a CLAUDE.md and opens a PR against any public GitHub repo
+  - Clones repo (shallow, depth 1), runs `agentmd generate .`, forks under authenticated user, creates branch `agentkit/add-claude-md`, commits and pushes, opens PR
+  - `--dry-run`: show all planned steps without any git or API calls
+  - `--file`: generate AGENTS.md instead of CLAUDE.md (default: CLAUDE.md)
+  - `--force`: overwrite existing context file (default: skip if already present)
+  - `--pr-title`: custom PR title override
+  - `--pr-body-file`: path to custom PR body markdown file
+  - `--json`: structured output `{"pr_url": "...", "repo": "...", "file": "...", "score_before": N, "score_after": N}`
+  - Requires `GITHUB_TOKEN` environment variable; gives clear error if missing
+  - PR body template at `agentkit_cli/templates/pr_body.md`
+  - 30 new tests in `tests/test_pr_cmd.py`
+
 ## [0.37.0] - 2026-03-16
 
 ### Added

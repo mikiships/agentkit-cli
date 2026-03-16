@@ -1,3 +1,52 @@
+# BUILD-REPORT: agentkit-cli v0.38.0
+
+**Status:** BUILT
+
+**Date:** 2026-03-16
+
+---
+
+## v0.38.0 — `agentkit pr`
+
+### Deliverables
+
+- [x] **D1 — Core `pr` command** (`agentkit_cli/commands/pr_cmd.py`)
+  - `agentkit pr github:<owner>/<repo>` clones repo (depth 1), runs `agentmd generate .`, checks for existing file
+  - `--dry-run`, `--force`, `--file`, `--pr-title`, `--pr-body-file`, `--json` flags
+  - Skips if context file already exists (unless `--force`)
+
+- [x] **D2 — GitHub fork + branch + PR flow**
+  - Checks/creates fork via GitHub API (`POST /repos/{owner}/{repo}/forks`)
+  - Creates branch `agentkit/add-claude-md` on fork
+  - Commits generated file, pushes to fork
+  - Opens PR via `POST /repos/{owner}/{repo}/pulls`
+  - Requires `GITHUB_TOKEN` (clear error if missing)
+  - PR body from `agentkit_cli/templates/pr_body.md`
+
+- [x] **D3 — Output + UX**
+  - Rich progress steps: Clone → Generate → Fork → Branch → Commit → Push → PR
+  - Success: prints PR URL
+  - `--json`: `{"pr_url": ..., "repo": ..., "file": ..., "score_before": ..., "score_after": ...}`
+  - Clear error messages for missing token, fork failure, network errors
+
+- [x] **D4 — Tests** (`tests/test_pr_cmd.py`)
+  - 30 new tests covering: dry-run, skip/force, missing token, JSON output, PR body template, branch name, fork creation, custom title, custom body file
+
+- [x] **D5 — Docs + release prep**
+  - `agentkit_cli/templates/pr_body.md` — PR body template
+  - README: new `agentkit pr` section with full usage example
+  - CHANGELOG: v0.38.0 entry
+  - `pyproject.toml` version bump: 0.37.0 → 0.38.0
+  - `agentkit_cli/__init__.py` version bump
+
+### Test Results
+
+- Baseline: 1441 tests
+- New: 30 tests
+- Final: **1471 tests passing** ✓
+
+---
+
 # BUILD-REPORT: agentkit-cli v0.37.0
 
 **Status:** BUILT

@@ -109,6 +109,7 @@ agentkit gate --profile strict --min-score 99
 - `agentkit insights` — cross-repo pattern synthesis
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
 - `agentkit org <owner>` — score every public repo in a GitHub org or user account
+- `agentkit pr github:<owner>/<repo>` — submit a CLAUDE.md PR to any public GitHub repo
 
 ## Org Analysis
 
@@ -352,6 +353,42 @@ agentkit serve --live
 ```
 
 The dashboard connects via SSE (`/events`) and re-renders the runs table in-place when new pipeline results arrive. A **● Live** indicator shows connection status; it drops to **○ Offline** if the server stops.
+
+## agentkit pr — Submit CLAUDE.md PRs to Open Source Repos
+
+`agentkit pr` is a viral distribution mechanic: one command generates a `CLAUDE.md` for any public GitHub repo and opens a PR against it.
+
+```bash
+# Submit a CLAUDE.md PR to a public repo
+agentkit pr github:owner/repo
+
+# Preview what would happen (no git or API calls)
+agentkit pr github:owner/repo --dry-run
+
+# Generate AGENTS.md instead
+agentkit pr github:owner/repo --file AGENTS.md
+
+# Force overwrite if CLAUDE.md already exists
+agentkit pr github:owner/repo --force
+
+# JSON output
+agentkit pr github:owner/repo --json
+```
+
+**Requires:** `GITHUB_TOKEN` environment variable with `repo` and `workflow` scopes.
+
+```bash
+export GITHUB_TOKEN=ghp_...
+agentkit pr github:vercel/next.js
+```
+
+What it does:
+1. Clones the repo (shallow, depth 1)
+2. Runs `agentmd generate .` to create CLAUDE.md
+3. Forks the repo under your authenticated GitHub account (if needed)
+4. Creates a branch `agentkit/add-claude-md`
+5. Commits and pushes the generated file
+6. Opens a PR against the original repo
 
 ## Release Check
 
