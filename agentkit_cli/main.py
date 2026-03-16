@@ -543,9 +543,10 @@ def serve(
     json_output: bool = typer.Option(False, "--json", help="Print server URL as JSON and exit"),
     once: bool = typer.Option(False, "--once", help="Render dashboard once to stdout and exit"),
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+    live: bool = typer.Option(False, "--live", help="Poll DB every 5s and push SSE refresh events"),
 ) -> None:
     """Start a local web dashboard showing all toolkit runs."""
-    serve_command(port=port, open_browser=open_browser, json_output=json_output, once=once, db_path=db_path)
+    serve_command(port=port, open_browser=open_browser, json_output=json_output, once=once, db_path=db_path, live=live)
 
 
 @app.command("watch")

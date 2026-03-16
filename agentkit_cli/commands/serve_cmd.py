@@ -17,6 +17,7 @@ def serve_command(
     json_output: bool = False,
     once: bool = False,
     db_path: Optional[Path] = None,
+    live: bool = False,
 ) -> None:
     """Start the agentkit local dashboard server."""
     url = f"http://localhost:{port}"
@@ -30,4 +31,7 @@ def serve_command(
         sys.stdout.write(html)
         return
 
-    start_server(port=port, open_browser=open_browser, db_path=db_path)
+    if live:
+        typer.echo(f"Dashboard (live): http://localhost:{port}")
+
+    start_server(port=port, open_browser=open_browser, db_path=db_path, live=live)
