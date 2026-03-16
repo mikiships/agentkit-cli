@@ -1,88 +1,82 @@
-# BUILD-REPORT: agentkit-cli v0.34.0
+# BUILD-REPORT: agentkit-cli v0.36.0
 
-## Summary
-
-Resolved M34 architectural debt: centralized all quartet tool invocations into a single ToolAdapter class, added a golden smoke test suite, and integrated smoke tests into the release-check pipeline.
+**Date:** 2026-03-16
+**Contract:** all-day-build-contract-agentkit-cli-v0.36.0-org.md
+**Status:** BUILT (all deliverables complete, tests green, not pushed to PyPI)
 
 ## Deliverables
 
-| # | Deliverable | Status |
-|---|-------------|--------|
-| D1 | ToolAdapter class in tools.py | ✅ Complete |
-| D2 | Migrate all hand-rolled quartet calls | ✅ Complete |
-| D3 | Golden smoke test suite (9 tests) | ✅ Complete |
-| D4 | SmokeTestCheck in release_check.py | ✅ Complete |
-| D5 | Docs, CHANGELOG, version bump, reports | ✅ Complete |
+### D1 — GitHub org/user repo listing + core org command ✅
+- `agentkit_cli/github_api.py`: GitHub REST API client
+  - `list_repos(owner, include_forks, include_archived, token, limit)` with full pagination
+  - Org-first, user-fallback on 404
+  - Rate-limit header awareness (`X-RateLimit-Remaining` / `X-RateLimit-Reset`)
+  - Filters: forks, archived, empty repos (size=0)
+- `agentkit_cli/commands/org_cmd.py`: `OrgCommand` class + `org_command()` function
+  - Accepts `github:<owner>` or bare owner
+  - Rich live progress display during analysis
+  - Ranked Rich table output with score, grade, top finding
+  - `--json` output: `{owner, repo_count, analyzed, skipped, failed, ranked: [...]}`
+  - `--include-forks`, `--include-archived`, `--limit N` flags
+- `agentkit_cli/main.py`: `org` command registered with all flags
+
+### D2 — HTML report + `--share` ✅
+- `agentkit_cli/org_report.py`: `OrgReport` class with `render()` method
+  - Dark-theme HTML matching existing report style (duel/tournament/trending)
+  - Summary stats: avg score, top repo banner, most common finding, repo count
+  - `--share` via existing `upload_scorecard()` from `share.py`
+  - `--output <file>` saves HTML to disk
+
+### D3 — Parallel analysis + rate limiting ✅
+- `ThreadPoolExecutor` with configurable `--parallel N` (default: 3)
+- Rate-limit awareness in `github_api.py`
+- Per-repo `--timeout N` (default: 120s) with graceful error capture
+- Summary counts: `analyzed` / `skipped` (timeout) / `failed`
+
+### D4 — Docs, CHANGELOG, version bump ✅
+- `README.md`: Added `agentkit org` to Quick Start and Command Reference; added full Org Analysis section with examples
+- `CHANGELOG.md`: v0.36.0 entry with full feature list
+- `pyproject.toml`: `0.35.0` → `0.36.0`
+- `agentkit_cli/__init__.py`: `0.34.0` → `0.36.0`
 
 ## Test Results
 
-- **Total tests:** 1330 passed
-- **New tests:** 49 (34 ToolAdapter + 9 smoke + 6 SmokeTestCheck)
-- **Existing tests:** 1281 (all passing, no regressions)
-- **Requirement:** >= 1325 ✅
+| Suite | Count |
+|---|---|
+| Pre-existing tests | 1349 |
+| New tests (D1/D2/D3) | 42 |
+| **Total** | **1391** |
+| Failures | 0 |
+
+New tests cover:
+- `github_api.py`: header building, rate-limit check, list_repos filtering (forks/archived/empty), pagination, limit, org→user fallback, 404 error
+- `OrgCommand`: github: prefix parsing, bare owner, ranked output sorted by score, JSON structure, empty org, flag passing, error handling
+- `OrgReport`: HTML structure, repo names, scores, grades, summary stats, top banner, empty results, grade/score-class helpers
+- `--output` flag: file creation and HTML content
+- Parallel: ThreadPoolExecutor worker count, result aggregation, timeout field, summary counts
+- CLI integration: `--json`, `--limit`, `--include-forks`, `--include-archived`, 5-repo integration test
+
+## Commits
+
+1. `475115b` D1: Add agentkit org command + github_api.py
+2. `2a5b0a9` D2: Add org_report.py — dark-theme HTML report for agentkit org
+3. `380e91d` D3: Parallel analysis + rate limiting already in D1 commit
+4. (this commit) D4: Docs, CHANGELOG, version bump, BUILD-REPORT
 
 ## Files Changed
 
-- `agentkit_cli/tools.py` — added ToolAdapter class (7 methods + helpers)
-- `agentkit_cli/report_runner.py` — delegates to ToolAdapter
-- `agentkit_cli/commands/suggest_cmd.py` — migrated to ToolAdapter
-- `agentkit_cli/commands/compare_cmd.py` — migrated to ToolAdapter
-- `agentkit_cli/doctor.py` — migrated check_context_freshness
-- `agentkit_cli/analyze.py` — migrated pipeline steps
-- `agentkit_cli/release_check.py` — added check_smoke_tests
-- `tests/test_tool_adapter.py` — 34 new tests
-- `tests/test_smoke_integration.py` — 9 smoke tests
-- `tests/test_release_check.py` — 6 new SmokeTestCheck tests
-- `tests/test_report.py` — updated mock paths
-- `tests/test_doctor.py` — updated mock paths
-- `tests/fixtures/smoke_project/` — fixture project
-- `CHANGELOG.md` — v0.34.0 entry
-- `README.md` — Architecture section
-- `pyproject.toml` — version bump + pytest markers
+| File | Change |
+|---|---|
+| `agentkit_cli/github_api.py` | New — GitHub API client |
+| `agentkit_cli/commands/org_cmd.py` | New — org command |
+| `agentkit_cli/org_report.py` | New — HTML report |
+| `agentkit_cli/main.py` | Modified — register org command |
+| `tests/test_org.py` | New — 42 tests |
+| `README.md` | Modified — org docs |
+| `CHANGELOG.md` | Modified — v0.36.0 entry |
+| `pyproject.toml` | Modified — version bump |
+| `agentkit_cli/__init__.py` | Modified — version bump |
 
-ALL DELIVERABLES COMPLETE. Tests: 1330 passed.
+## Status
 
----
-
-## v0.35.0 Addendum — agentkit quickstart
-
-**Date:** 2026-03-16
-**Contract:** all-day-build-contract-agentkit-cli-v0.35.0-quickstart.md
-
-### Deliverables
-
-| # | Deliverable | Status |
-|---|-------------|--------|
-| D1 | `agentkit_cli/commands/quickstart_cmd.py` core command + 19 tests | ✅ Complete |
-| D2 | `agentkit_cli/main.py` wiring + quickstart prominent in help | ✅ Complete |
-| D3 | README Quick Start + Commands section updated | ✅ Complete |
-| D4 | Show HN draft updated with quickstart as primary onboarding command | ✅ Complete |
-| D5 | CHANGELOG v0.35.0, version bump, BUILD-REPORT addendum | ✅ Complete |
-
-### Validation Gates
-
-- [x] `python3 -m pytest -q` passes (1349 tests, no regressions)
-- [x] `agentkit quickstart --help` exits 0
-- [x] New tests: 19 (requirement: 15+)
-- [x] Version in pyproject.toml = "0.35.0"
-- [x] CHANGELOG has v0.35.0 entry
-- [x] BUILD-REPORT.md has v0.35.0 addendum
-- [x] Show HN draft updated with `agentkit quickstart` as primary onboarding command
-
-### Test Results
-
-- **Total tests:** 1349 passed (up from 1330)
-- **New tests:** 19 (all in tests/test_quickstart.py)
-- **Regressions:** 0
-
-### Files Changed
-
-- `agentkit_cli/commands/quickstart_cmd.py` — new quickstart command
-- `agentkit_cli/main.py` — quickstart registered + listed first
-- `tests/test_quickstart.py` — 19 new tests
-- `README.md` — quickstart elevated as onboarding entry point
-- `CHANGELOG.md` — v0.35.0 entry
-- `pyproject.toml` — version bump to 0.35.0
-- `/Users/mordecai/.openclaw/workspace/memory/drafts/show-hn-quartet.md` — updated (external)
-
-ALL DELIVERABLES COMPLETE. Status: BUILT (local, not published to PyPI).
+BUILT — code complete, tests green, committed. Not pushed to git, not published to PyPI.

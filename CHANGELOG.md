@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.36.0] - 2026-03-16
+
+### Added
+- **`agentkit org`** command: score every public repo in a GitHub org or user account in one command
+  - Accepts `github:<owner>` or bare owner name (e.g. `agentkit org github:vercel`)
+  - Tries GitHub org API first, falls back to user API on 404
+  - Paginated repo listing with `GITHUB_TOKEN` support
+  - Filters forks, archived, and empty repos by default (`--include-forks`, `--include-archived`)
+  - `--limit N` to cap number of repos analyzed
+  - Rich live progress display during multi-repo analysis
+  - Ranked Rich table output with score, grade, and top finding per repo
+  - `--parallel N` flag (default: 3) for concurrent analysis via `ThreadPoolExecutor`
+  - Per-repo `--timeout N` (default: 120s) with graceful error handling
+  - Summary counts: analyzed / skipped (timeout) / failed
+  - `--json` output: `{owner, repo_count, analyzed, skipped, failed, ranked: [...]}`
+  - `--output <file>` saves dark-theme HTML report to disk
+  - `--share` uploads HTML report to here.now and prints URL
+- `agentkit_cli/github_api.py`: GitHub REST API client with pagination and rate-limit awareness
+- `agentkit_cli/org_report.py`: dark-theme HTML report generator for org analysis
+
 ## [0.35.0] - 2026-03-16
 
 ### Added

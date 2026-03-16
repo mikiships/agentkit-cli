@@ -20,3 +20,25 @@ Added `check_smoke_tests()` to `release_check.py`. Runs `pytest -m smoke -q`. In
 - pytest fixtures excluded from collection via conftest.py
 
 ## Final: 1330 passed
+
+## v0.36.0 — 2026-03-16 (agentkit org)
+
+### D1: GitHub org/user repo listing + core org command
+- `agentkit_cli/github_api.py`: list_repos() with pagination, rate-limit awareness, org→user fallback
+- `agentkit_cli/commands/org_cmd.py`: OrgCommand + org_command, Rich progress, ranked table, --json
+- `agentkit_cli/main.py`: org command registered
+- Tests: 42 new tests (D1/D2/D3 coverage)
+
+### D2: HTML report
+- `agentkit_cli/org_report.py`: OrgReport.render(), dark-theme HTML, summary stats, --output, --share
+
+### D3: Parallel analysis + rate limiting
+- ThreadPoolExecutor (--parallel N), rate-limit headers, per-repo timeout, summary counts
+- All implemented alongside D1
+
+### D4: Docs, CHANGELOG, version bump
+- README: Quick Start + Org Analysis section added
+- CHANGELOG: v0.36.0 entry
+- pyproject.toml + __init__.py: 0.35.0 / 0.34.0 → 0.36.0
+
+### Final: 1391 passed (1349 pre-existing + 42 new), 0 failures

@@ -21,6 +21,7 @@ agentkit quickstart    # 🚀 fastest path to a score — start here
 agentkit run           # run the full pipeline
 agentkit score         # compute composite score
 agentkit gate          # fail if score < threshold
+agentkit org github:vercel   # score every public repo in a GitHub org
 ```
 
 ## Configuration
@@ -107,6 +108,31 @@ agentkit gate --profile strict --min-score 99
 - `agentkit leaderboard` — compare runs by label
 - `agentkit insights` — cross-repo pattern synthesis
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
+- `agentkit org <owner>` — score every public repo in a GitHub org or user account
+
+## Org Analysis
+
+`agentkit org` answers: "Which repos in this GitHub org are most AI-agent-ready?"
+
+```bash
+# Score all public repos in an org or user account
+agentkit org github:vercel
+
+# Include forked and archived repos, cap at 20
+agentkit org github:microsoft --include-forks --include-archived --limit 20
+
+# Parallel analysis with 5 workers, save HTML report
+agentkit org github:anthropics --parallel 5 --output report.html
+
+# Share report online
+agentkit org github:openai --share
+
+# JSON output for scripting
+agentkit org github:tiangolo --json
+
+# Use GitHub token to avoid rate limits
+agentkit org github:google --token ghp_xxx
+```
 
 ## Trending Analysis
 
