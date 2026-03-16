@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.29.0] - 2026-03-15
+
+### Added
+- `agentkit trending` command: fetch trending GitHub repos and rank them by agent quality score
+  - `--period [day|week|month]`: trending time window (default: week)
+  - `--topic TEXT`: filter by GitHub topic (e.g. ai-agent)
+  - `--limit INT`: max repos to fetch (default: 10, max 25)
+  - `--category [ai|python|all]`: pre-defined repo category (default: ai)
+  - `--share`: publish dark-theme HTML report to here.now and print URL
+  - `--json`: output JSON with schema `{period, topic, repos: [{rank, full_name, stars, score, grade, url}]}`
+  - `--no-analyze`: fast mode — list repos without scoring
+  - `--min-stars INT`: filter repos below this star count (default: 100)
+  - `--token TEXT`: GitHub API token (or GITHUB_TOKEN env var)
+- `agentkit_cli/trending.py`: `fetch_trending()` and `fetch_popular()` with graceful rate-limit handling
+- `agentkit_cli/trending_report.py`: `generate_html()` and `publish_report()` for dark-theme HTML reports
+- Fallback: if here.now publish fails, saves HTML to `./trending-report.html`
+- 49 new tests (total suite: 1106 tests)
+
 ## [0.28.0] - 2026-03-15
 
 ### Added

@@ -1,63 +1,47 @@
-# Progress Log — agentkit-cli v0.23.0 profiles
+# Progress Log — agentkit-cli v0.29.0
 
-## Session: 2026-03-15
+## D1 — `agentkit_cli/trending.py` ✅
 
-### D1: Profile engine + bundled presets ✅
+**Built:** `fetch_trending(period, topic, limit, token)` and `fetch_popular(category, limit, token)`.
+- Uses GitHub Search API with `created:>DATE` filter for trending, topic queries for popular
+- Graceful handling: rate-limit 403 and network errors return empty list with warning
+- Normalizes raw GitHub items to `{full_name, description, stars, language, url}` schema
+- Token from arg or GITHUB_TOKEN env var
 
-- Created `agentkit_cli/profiles.py`
-- `ProfileDefinition` dataclass with all required fields
-- `ProfileRegistry` with built-in presets: strict (85/3/fail), balanced (70/10/never), minimal (50/20/never)
-- `apply_profile()` with CLI flag precedence (cli_min_score/cli_max_drop params)
-- User profiles loaded from `~/.agentkit/profiles/*.toml`
-- Case-insensitive lookup
-- `tests/test_profiles.py` — 40 tests, all passing
+**Tests pass:** 21 new tests covering period/topic/limit/token/rate-limit/network-error/empty/invalid-args.
 
-### D2: `agentkit profile` command ✅
+## D2 — `agentkit_cli/commands/trending_cmd.py` ✅
 
-- Created `agentkit_cli/commands/profile_cmd.py`
-- `profile list` — Rich table with all profiles
-- `profile show <name>` — key-value table
-- `profile create <name> [--from <base>]` — writes to `~/.agentkit/profiles/`
-- `profile use <name>` — writes `profile.active` to `.agentkit.toml`
-- `profile export <name> [--format toml|json]`
-- Wired into `main.py` as `agentkit profile`
-- `tests/test_profile_command.py` — 19 tests, all passing
+**Built:** `trending_command()` with all flags:
+- `--period`, `--topic`, `--limit`, `--category`, `--share`, `--json`, `--no-analyze`, `--min-stars`, `--token`
+- Fetches repos, filters by min-stars, optionally analyzes each, sorts by score, renders Rich table or JSON
+- Registered in `main.py` as `@app.command("trending")`
+- `--share` generates HTML + publishes; falls back to local file on PublishError
 
-### D3: `--profile` flag in 5 commands ✅
+**Tests pass:** 14 new CLI tests.
 
-- Added `--profile` to gate, run, sweep, score, analyze in `main.py` and each command file
-- Profile name shown in gate Rich output ("Profile: strict")
-- Explicit CLI flags override profile values
-- Invalid profile exits with code 2
-- `tests/test_profile_integration.py` — 16 tests, all passing
+## D3 — `agentkit_cli/trending_report.py` ✅
 
-### D4: Docs, CHANGELOG, version bump ✅
+**Built:** `generate_html(results)` and `publish_report(html, api_key)`.
+- Dark theme: #0d1117 background, #58a6ff accent, summary cards (repos analyzed, avg score, top scorer)
+- Ranked table with grade/score color coding
+- 3-step here.now API publish (POST publish → PUT file → POST finalize)
+- Footer with version + pip install agentkit-cli
 
-- `README.md` created with Profiles section (after Config section)
-- `CHANGELOG.md` v0.23.0 entry added
-- Version bumped: 0.22.0 → 0.23.0 in `pyproject.toml` + `__init__.py`
-- `BUILD-REPORT.md` updated with v0.23.0 summary
-- Fixed pre-existing test_action.py failure (README.md was missing)
-- Fixed version assertions in test_main.py and test_leaderboard.py
+**Tests pass:** 14 new HTML generation tests.
 
-## Final Test Results
+## D4 — Version, docs, changelog, build report ✅
+
+- Version bumped to 0.29.0 in pyproject.toml and __init__.py
+- CHANGELOG.md: added [0.29.0] entry
+- README.md: added trending to commands list + "Trending Analysis" section with examples
+- BUILD-REPORT.md: written with deliverable status and test counts
+- progress-log.md: this file
+
+## Final Test Run
 
 ```
-892 passed in 14.49s
-0 failed
+1106 passed in 16.42s
 ```
 
-## Commits
-
-1. `feat(profiles): D1 - ProfileDefinition, ProfileRegistry, built-in presets, apply_profile`
-2. `feat(profiles): D2 - agentkit profile list/show/create/use/export command`
-3. `feat(profiles): D3 - --profile flag wired into gate, run, sweep, score, analyze`
-4. `chore(release): v0.23.0 - docs, CHANGELOG, version bump`
-5. `fix(tests): update version assertions to 0.23.0, add GitHub Action section to README`
-
-## Notes
-
-- All 4 deliverables complete
-- 75 new tests across test_profiles.py (40), test_profile_command.py (19), test_profile_integration.py (16)
-- Pre-existing test_action.py failure resolved (README.md now exists)
-- Did NOT publish to PyPI
+49 new tests. All 1057+ existing tests still pass. No regressions.

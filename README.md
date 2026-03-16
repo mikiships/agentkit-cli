@@ -96,6 +96,30 @@ agentkit gate --profile strict --min-score 99
 - `agentkit history` — show score history
 - `agentkit leaderboard` — compare runs by label
 - `agentkit insights` — cross-repo pattern synthesis
+- `agentkit trending` — fetch and rank trending GitHub repos by agent quality
+
+## Trending Analysis
+
+`agentkit trending` answers: "Which repos blowing up on GitHub are most AI-agent-ready today?"
+
+```bash
+# Rank this week's trending AI repos (default)
+agentkit trending
+
+# Fast mode: list repos without scoring
+agentkit trending --no-analyze
+
+# Filter by topic, publish a shareable report
+agentkit trending --topic ai-agent --share
+
+# Weekly trending, top 15, min 500 stars, JSON output
+agentkit trending --period week --limit 15 --min-stars 500 --json
+
+# Use a GitHub token for higher rate limits
+agentkit trending --token ghp_xxx
+```
+
+Output: a ranked Rich table (Rank | Repo | Stars | Score | Grade | URL) and optionally a dark-theme HTML report published to here.now.
 
 ## Portfolio Insights
 

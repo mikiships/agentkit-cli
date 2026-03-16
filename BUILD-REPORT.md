@@ -1,95 +1,50 @@
-# BUILD-REPORT — agentkit-cli v0.27.0
+# BUILD-REPORT: agentkit-cli v0.29.0 — `agentkit trending`
 
-**Date:** 2026-03-15
-**Feature:** `agentkit release-check`
+Date: 2026-03-15
+Contract: all-day-build-contract-agentkit-cli-v0.29.0-trending.md
 
----
-
-## Deliverable Status (D1–D5)
+## Deliverable Status
 
 | # | Deliverable | Status |
-|---|-------------|--------|
-| D1 | `agentkit_cli/release_check.py` — 4-surface check engine | ✅ DONE |
-| D2 | `agentkit release-check` CLI command with all flags | ✅ DONE |
-| D3 | `--release-check` flag on `agentkit run` and `agentkit gate` | ✅ DONE |
-| D4 | 52 new tests (min 30 required), full suite 1012 passing | ✅ DONE |
-| D5 | README section, CHANGELOG entry, version 0.27.0, BUILD-REPORT | ✅ DONE |
-
----
+|---|------------|--------|
+| D1 | `agentkit_cli/trending.py` — GitHub trending/popular fetcher | ✅ DONE |
+| D2 | `agentkit_cli/commands/trending_cmd.py` — CLI command, registered in main.py | ✅ DONE |
+| D3 | `agentkit_cli/trending_report.py` — HTML report generation + here.now publish | ✅ DONE |
+| D4 | Version bump, CHANGELOG, README, BUILD-REPORT, progress-log | ✅ DONE |
 
 ## Test Results
 
-```
-1012 passed in 15.29s
-```
+- **New tests:** 49 (across test_trending.py)
+- **Total suite:** 1106 passed, 0 failed
+- **Test categories covered:**
+  - D1: fetch_trending() — period filtering, topic filtering, rate-limit handling, network errors, token auth, limit capping, empty results
+  - D1: fetch_popular() — all categories, invalid category, limit, rate-limit
+  - D2: CLI flags — --no-analyze, --json, schema validation, --min-stars, --limit, --period, --topic, --share, fallback on publish error, command registration
+  - D3: generate_html() — structure, repo names, links, stars, version, pip install, dark theme colors, null score handling, empty results
+  - Integration: --no-analyze end-to-end with mocked GitHub response (single repo, multiple repos, filter by min-stars)
 
-- Previous count: ~960
-- New tests added: 52 (file: `tests/test_release_check.py`)
-- All existing tests: passing
-- New tests: passing
+## Files Created/Modified
 
----
+### New
+- `agentkit_cli/trending.py` — fetch_trending(), fetch_popular(), graceful rate-limit handling
+- `agentkit_cli/trending_report.py` — generate_html(), publish_report() (3-step here.now API)
+- `agentkit_cli/commands/trending_cmd.py` — trending_command() with all flags
+- `tests/test_trending.py` — 49 tests
 
-## Files Changed
+### Modified
+- `agentkit_cli/main.py` — registered @app.command("trending")
+- `agentkit_cli/__init__.py` — bumped to v0.29.0
+- `pyproject.toml` — bumped to v0.29.0
+- `CHANGELOG.md` — added [0.29.0] entry
+- `README.md` — added trending to commands table + "Trending Analysis" section
 
-| File | Change |
-|------|--------|
-| `agentkit_cli/release_check.py` | New — 4-surface engine |
-| `agentkit_cli/commands/release_check_cmd.py` | New — CLI command |
-| `agentkit_cli/main.py` | Added `release-check` command + `--release-check` flags to `run` and `gate` |
-| `tests/test_release_check.py` | New — 52 tests |
-| `pyproject.toml` | Version bumped 0.26.1 → 0.27.0 |
-| `agentkit_cli/__init__.py` | Version bumped 0.26.0 → 0.27.0 |
-| `CHANGELOG.md` | v0.27.0 entry added |
-| `README.md` | `agentkit release-check` section added |
+## Feature Summary
 
----
+`agentkit trending` fetches trending/popular GitHub repos via the GitHub Search API and optionally scores each with `agentkit analyze`. Key behaviors:
 
-## What Was Built
-
-### D1: Engine (`release_check.py`)
-
-Four independent check functions:
-1. `check_tests(path)` — runs `python3 -m pytest -q --tb=no`, checks exit code
-2. `check_git_push(path)` — compares `git log` hash vs `git ls-remote origin HEAD`
-3. `check_git_tag(path, version)` — checks `git ls-remote --tags origin vX.Y.Z`
-4. `check_registry_pypi/npm(pkg, ver)` — HTTP GET to PyPI or npm registry
-
-Structured output: `ReleaseCheckResult` with per-check `CheckResult` (status, detail, hint) and overall verdict: `SHIPPED | RELEASE-READY | BUILT | UNKNOWN`.
-
-Auto-detects package name, version, and registry from `pyproject.toml` or `package.json`.
-
-### D2: CLI Command
-
-```
-agentkit release-check [PATH] [--version V] [--package N] [--registry pypi|npm|auto] [--skip-tests] [--json]
-```
-
-- Exit code 0 = SHIPPED
-- Exit code 1 = not fully shipped (CI-safe)
-- Exit code 2 = invalid args
-- `--json` outputs structured JSON for CI integration
-- Rich table output with colored per-check status
-
-### D3: Integration Flags
-
-- `agentkit run --release-check` — appends release check table after pipeline
-- `agentkit gate --release-check` — prepends release check table before gate eval
-
-### D4: Tests
-
-52 tests in `tests/test_release_check.py` covering:
-- All 4 check functions (pass/fail/error/timeout paths)
-- `resolve_metadata` and `_detect_registry` helpers
-- `run_release_check` integration (mocked subprocess + HTTP)
-- CLI invocation: `--json`, `--skip-tests`, exit codes, `--help`, invalid args
-- `CheckResult` and `ReleaseCheckResult` dataclass contracts
-
----
-
-## Notes
-
-- No PyPI publish performed (build-loop handles publishing)
-- No git tags pushed (build-loop handles tagging)
-- No GitHub push performed (build-loop handles pushing)
-- Registry checks use only public HTTP, no auth required
+- **Fetching:** merges trending (by creation date) + popular (by topic/category) repos, deduplicating by full_name
+- **Scoring:** calls analyze_target() for each repo unless --no-analyze is set
+- **Ranking:** sorts by score desc (unscored repos last), renumbers ranks
+- **Output:** Rich table in terminal; JSON with --json; dark-theme HTML report with --share
+- **Publish:** 3-step here.now API; falls back to ./trending-report.html if publish fails
+- **Rate limits:** graceful warning + empty list on 403 or network error; supports GITHUB_TOKEN
