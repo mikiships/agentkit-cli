@@ -45,3 +45,26 @@
 ```
 
 49 new tests. All 1057+ existing tests still pass. No regressions.
+
+## v0.32.0 — 2026-03-16
+
+### D1: agentkit_cli/serve.py
+Built `AgenkitDashboard(BaseHTTPRequestHandler)` and `start_server()`. Reads history SQLite DB, generates dark-theme HTML dashboard with auto-refresh. No external deps (stdlib only).
+
+### D2: CLI command
+`agentkit_cli/commands/serve_cmd.py` with `--port`, `--open`, `--once`, `--json` flags. Registered in `main.py`.
+
+### D3: Dashboard HTML quality
+Dark theme (#0f172a), summary bar, score-colored table, grade logic, empty-state message, Refresh button, version in footer.
+
+### D4: Integration
+- `agentkit run --serve` prints `Dashboard: http://localhost:7890` after pipeline
+- `agentkit doctor` now includes `publish.serve` check (pass when serve is importable)
+
+### D5: Docs + version bump
+- `__init__.py` → 0.32.0
+- `pyproject.toml` → 0.32.0
+- `CHANGELOG.md`: v0.32.0 entry
+- `README.md`: Local Dashboard section
+
+### Final test count: 1268 passed (1212 existing + 56 new)
