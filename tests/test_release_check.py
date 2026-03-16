@@ -17,6 +17,7 @@ from agentkit_cli.release_check import (
     check_git_tag,
     check_registry_npm,
     check_registry_pypi,
+    check_smoke_tests,
     check_tests,
     resolve_metadata,
     run_release_check,
@@ -612,3 +613,71 @@ class TestDataclasses:
         d = r.as_dict()
         assert "verdict" in d
         assert d["checks"] == []
+
+
+# ---------------------------------------------------------------------------
+# SmokeTestCheck tests (D4 v0.34.0)
+# ---------------------------------------------------------------------------
+
+class TestSmokeTestCheck:
+    def test_smoke_pass(self, tmp_path):
+        mock_result = MagicMock(
+            returncode=0,
+            stdout="9 passed in 2.00s\n",
+            stderr="",
+        )
+        with patch("agentkit_cli.release_check.subprocess.run", return_value=mock_result):
+            result = check_smoke_tests(tmp_path)
+        assert result.status == "pass"
+        assert "9 passed" in result.detail
+
+    def test_smoke_fail(self, tmp_path):
+        mock_result = MagicMock(
+            returncode=1,
+            stdout="2 failed, 7 passed in 3.00s\n",
+            stderr="",
+        )
+        with patch("agentkit_cli.release_check.subprocess.run", return_value=mock_result):
+            result = check_smoke_tests(tmp_path)
+        assert result.status == "fail"
+        assert "failed" in result.detail
+
+    def test_smoke_no_tests(self, tmp_path):
+        mock_result = MagicMock(
+            returncode=5,
+            stdout="no tests ran\n",
+            stderr="",
+        )
+        with patch("agentkit_cli.release_check.subprocess.run", return_value=mock_result):
+            result = check_smoke_tests(tmp_path)
+        assert result.status == "skip"
+
+    def test_smoke_pytest_not_found(self, tmp_path):
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=FileNotFoundError):
+            result = check_smoke_tests(tmp_path)
+        assert result.status == "error"
+
+    def test_smoke_timeout(self, tmp_path):
+        with patch("agentkit_cli.release_check.subprocess.run",
+                    side_effect=subprocess.TimeoutExpired("pytest", 120)):
+            result = check_smoke_tests(tmp_path)
+        assert result.status == "error"
+        assert "timed out" in result.detail
+
+    def test_smoke_in_release_check(self, tmp_path):
+        """run_release_check includes smoke_tests check."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nname = "test"\nversion = "0.1.0"\n')
+        with patch("agentkit_cli.release_check.check_smoke_tests") as mock_smoke, \
+             patch("agentkit_cli.release_check.check_tests") as mock_tests, \
+             patch("agentkit_cli.release_check.check_git_push") as mock_push, \
+             patch("agentkit_cli.release_check.check_git_tag") as mock_tag, \
+             patch("agentkit_cli.release_check.check_registry_pypi") as mock_reg:
+            mock_smoke.return_value = CheckResult("smoke_tests", "pass", "9 passed")
+            mock_tests.return_value = CheckResult("tests", "pass", "100 passed")
+            mock_push.return_value = CheckResult("git_push", "pass", "ok")
+            mock_tag.return_value = CheckResult("git_tag", "pass", "ok")
+            mock_reg.return_value = CheckResult("registry", "pass", "ok")
+            result = run_release_check(path=tmp_path)
+        assert result.verdict == "SHIPPED"
+        check_names = [c.name for c in result.checks]
+        assert "smoke_tests" in check_names

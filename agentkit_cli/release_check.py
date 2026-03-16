@@ -221,6 +221,60 @@ def check_git_tag(path: Path, version: str) -> CheckResult:
         )
 
 
+def check_smoke_tests(path: Path) -> CheckResult:
+    """Run smoke test suite (pytest -m smoke) and return pass/fail."""
+    try:
+        result = subprocess.run(
+            ["python3", "-m", "pytest", "-m", "smoke", "-q", "--tb=no"],
+            cwd=str(path),
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        passed = result.returncode == 0
+        output = (result.stdout + result.stderr).strip()
+        # Extract summary line
+        summary = ""
+        for line in reversed(output.splitlines()):
+            line = line.strip()
+            if line and ("passed" in line or "failed" in line or "error" in line):
+                summary = line
+                break
+        if not summary and "no tests ran" in output.lower():
+            return CheckResult(
+                name="smoke_tests",
+                status="skip",
+                detail="No smoke tests found (pytest -m smoke matched 0 tests).",
+                hint="Add smoke tests with @pytest.mark.smoke marker.",
+            )
+        return CheckResult(
+            name="smoke_tests",
+            status="pass" if passed else "fail",
+            detail=f"Smoke tests: {summary}" if summary else output[:200],
+            hint="" if passed else "Run `pytest -m smoke` to see failures.",
+        )
+    except FileNotFoundError:
+        return CheckResult(
+            name="smoke_tests",
+            status="error",
+            detail="pytest not found",
+            hint="Install pytest: pip install pytest",
+        )
+    except subprocess.TimeoutExpired:
+        return CheckResult(
+            name="smoke_tests",
+            status="error",
+            detail="Smoke tests timed out after 120s",
+            hint="Check for hanging tests.",
+        )
+    except Exception as exc:
+        return CheckResult(
+            name="smoke_tests",
+            status="error",
+            detail=str(exc),
+        )
+
+
 def check_registry_pypi(package: str, version: str) -> CheckResult:
     """Check if package@version is live on PyPI."""
     url = f"https://pypi.org/pypi/{package}/{version}/json"
@@ -414,6 +468,9 @@ def run_release_check(
         path=str(root),
     )
 
+    # Check 0: Smoke tests (lightweight, run first)
+    result.checks.append(check_smoke_tests(root))
+
     # Check 1: Tests
     if skip_tests:
         result.checks.append(CheckResult(
@@ -455,15 +512,16 @@ def run_release_check(
     # Compute verdict
     statuses = {c.name: c.status for c in result.checks}
     tests_ok = statuses.get("tests") in ("pass", "skip")
+    smoke_ok = statuses.get("smoke_tests") in ("pass", "skip")
     push_ok = statuses.get("git_push") == "pass"
     tag_ok = statuses.get("git_tag") in ("pass", "skip")
     registry_ok = statuses.get("registry") == "pass"
 
-    if tests_ok and push_ok and tag_ok and registry_ok:
+    if tests_ok and smoke_ok and push_ok and tag_ok and registry_ok:
         result.verdict = "SHIPPED"
-    elif tests_ok and push_ok and tag_ok:
+    elif tests_ok and smoke_ok and push_ok and tag_ok:
         result.verdict = "RELEASE-READY"
-    elif tests_ok:
+    elif tests_ok and smoke_ok:
         result.verdict = "BUILT"
     else:
         result.verdict = "UNKNOWN"
