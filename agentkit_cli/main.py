@@ -554,9 +554,11 @@ def watch(
     extensions: Optional[List[str]] = typer.Option(None, "--extensions", help="File extensions to watch (e.g. .py,.md)"),
     debounce: float = typer.Option(2.0, "--debounce", help="Debounce delay in seconds"),
     ci: bool = typer.Option(False, "--ci", help="Run pipeline in CI mode on changes"),
+    serve: bool = typer.Option(False, "--serve", help="Also start the dashboard HTTP server"),
+    port: int = typer.Option(DEFAULT_PORT, "--port", help="Dashboard port (used with --serve)"),
 ) -> None:
     """Watch the project for changes and re-run the pipeline automatically."""
-    watch_command(path=path, extensions=extensions, debounce=debounce, ci=ci)
+    watch_command(path=path, extensions=extensions, debounce=debounce, ci=ci, serve=serve, port=port)
 
 
 @app.callback(invoke_without_command=True)

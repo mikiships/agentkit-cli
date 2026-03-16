@@ -1,6 +1,7 @@
 """agentkit watch command — re-run pipeline on file changes."""
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -10,6 +11,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import typer
+
+from agentkit_cli.serve import DEFAULT_PORT, SseBroker, _broker, start_server
 
 
 def _run_pipeline(cwd: str, ci: bool = False) -> None:
@@ -29,11 +32,13 @@ class _ChangeHandler:
         extensions: List[str],
         debounce: float,
         ci: bool,
+        broker: Optional[SseBroker] = None,
     ) -> None:
         self.cwd = cwd
         self.extensions = [e.lstrip(".") for e in extensions]
         self.debounce = debounce
         self.ci = ci
+        self.broker = broker
         self._timer: Optional[threading.Timer] = None
         self._lock = threading.Lock()
         self._last_file: Optional[str] = None
@@ -69,6 +74,9 @@ class _ChangeHandler:
         typer.echo(f"\n[changed] {fname}")
         typer.echo("Re-running agentkit pipeline...\n")
         _run_pipeline(self.cwd, ci=self.ci)
+        # Notify SSE clients if broker is active
+        if self.broker is not None:
+            self.broker.broadcast(json.dumps({"type": "refresh"}))
         typer.echo("\nWatching for changes... (Ctrl+C to stop)")
 
 
@@ -77,6 +85,8 @@ def watch_command(
     extensions: Optional[List[str]] = None,
     debounce: float = 2.0,
     ci: bool = False,
+    serve: bool = False,
+    port: int = DEFAULT_PORT,
 ) -> None:
     """Watch the project for file changes and re-run the pipeline."""
     try:
@@ -95,12 +105,24 @@ def watch_command(
     root = path or find_project_root()
     cwd_str = str(root)
 
+    broker: Optional[SseBroker] = None
+    if serve:
+        broker = _broker
+        serve_thread = threading.Thread(
+            target=start_server,
+            kwargs={"port": port, "open_browser": False, "db_path": None},
+            daemon=True,
+        )
+        serve_thread.start()
+        typer.echo(f"Watching {root}  •  Dashboard: http://localhost:{port}")
+
     ext_list: List[str] = extensions or ["py", "md", "yaml", "yml"]
     handler_obj = _ChangeHandler(
         cwd=cwd_str,
         extensions=ext_list,
         debounce=debounce,
         ci=ci,
+        broker=broker,
     )
 
     class _WatchdogBridge(FileSystemEventHandler):
