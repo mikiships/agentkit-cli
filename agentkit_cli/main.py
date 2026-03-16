@@ -5,6 +5,7 @@ import typer
 from typing import List, Optional
 from pathlib import Path
 
+from agentkit_cli.commands.quickstart_cmd import quickstart_command
 from agentkit_cli.commands.init_cmd import init_command
 from agentkit_cli.commands.run_cmd import run_command
 from agentkit_cli.commands.status_cmd import status_command
@@ -46,6 +47,16 @@ app = typer.Typer(
 app.add_typer(notify_app, name="notify")
 app.add_typer(config_app, name="config")
 app.add_typer(profile_app, name="profile")
+
+
+@app.command("quickstart")
+def quickstart(
+    target: str = typer.Argument(".", help="Local path or github:owner/repo"),
+    no_share: bool = typer.Option(False, "--no-share", help="Skip publishing the score card"),
+    timeout: int = typer.Option(30, "--timeout", help="Per-tool timeout in seconds (default 30)"),
+) -> None:
+    """🚀 Fastest path to an impressive agentkit result. Run this first."""
+    quickstart_command(target=target, no_share=no_share, timeout=timeout)
 
 
 @app.command("init")
