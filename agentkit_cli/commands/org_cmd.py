@@ -58,12 +58,20 @@ def _analyze_repo(full_name: str, timeout: int = 120) -> dict:
             timeout=timeout,
             no_generate=True,
         )
-        # Pick top finding: first tool with a non-empty finding
+        # Pick top finding: first tool with a non-empty human-readable finding
         top_finding = ""
         for tool_info in result.tools.values():
             finding = tool_info.get("finding", "") if isinstance(tool_info, dict) else getattr(tool_info, "finding", "")
-            if finding:
-                top_finding = finding[:80]
+            if not finding:
+                continue
+            # Skip raw JSON findings (agentmd returns JSON list)
+            stripped = finding.strip()
+            if stripped.startswith("[") or stripped.startswith("{"):
+                continue
+            # Use first non-empty line as the finding summary
+            first_line = next((l.strip() for l in stripped.splitlines() if l.strip()), "")
+            if first_line:
+                top_finding = first_line[:80]
                 break
         return {
             "score": result.composite_score,

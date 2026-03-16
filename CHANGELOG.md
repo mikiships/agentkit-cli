@@ -562,3 +562,7 @@ Initial release.
 - `--benchmark` flag to opt-in to the coderace benchmark step
 - Rich terminal output throughout
 - 25+ tests with typer CliRunner
+
+## [0.36.1] - 2026-03-16
+### Fixed
+- `agentkit org`: Top Finding column now shows human-readable text instead of raw JSON for agentmd findings
