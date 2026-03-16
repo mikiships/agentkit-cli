@@ -602,6 +602,37 @@ def check_herenow_api_key() -> DoctorCheckResult:
 
 
 # ---------------------------------------------------------------------------
+# D5: Serve availability check
+# ---------------------------------------------------------------------------
+
+
+def check_serve_available() -> DoctorCheckResult:
+    """Verify that agentkit serve command is importable and functional."""
+    try:
+        from agentkit_cli import serve as _serve_mod  # noqa: F401
+        from agentkit_cli.commands import serve_cmd as _serve_cmd  # noqa: F401
+        return DoctorCheckResult(
+            id="publish.serve",
+            name="agentkit serve",
+            status="pass",
+            summary="agentkit serve is available.",
+            details="Run 'agentkit serve' to start the local dashboard.",
+            fix_hint="",
+            category="publish",
+        )
+    except ImportError as exc:
+        return DoctorCheckResult(
+            id="publish.serve",
+            name="agentkit serve",
+            status="fail",
+            summary="agentkit serve is not importable.",
+            details=str(exc),
+            fix_hint="Reinstall agentkit-cli: pip install -U agentkit-cli",
+            category="publish",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Core runner
 # ---------------------------------------------------------------------------
 
@@ -625,6 +656,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         check_output_dir(project_root),
         check_herenow_api_key(),
     ]
+    checks.append(check_serve_available())
     return DoctorReport(root=str(project_root), checks=checks)
 
 

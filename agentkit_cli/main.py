@@ -35,6 +35,8 @@ from agentkit_cli.commands.insights_cmd import insights_command
 from agentkit_cli.commands.trending_cmd import trending_command
 from agentkit_cli.commands.duel_cmd import duel_command
 from agentkit_cli.commands.tournament_cmd import tournament_command
+from agentkit_cli.commands.serve_cmd import serve_command
+from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
     name="agentkit",
@@ -74,9 +76,13 @@ def run(
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after run and print the URL"),
     release_check: bool = typer.Option(False, "--release-check", help="Verify release surfaces after pipeline completes"),
     record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
+    serve: bool = typer.Option(False, "--serve", help="Print dashboard URL after run completes"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
     run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings)
+    if serve:
+        from agentkit_cli.serve import DEFAULT_PORT
+        typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
     if release_check:
         from agentkit_cli.release_check import run_release_check
         from agentkit_cli.commands.release_check_cmd import _render_table
@@ -528,6 +534,18 @@ def tournament(
         timeout=timeout,
         keep=keep,
     )
+
+
+@app.command("serve")
+def serve(
+    port: int = typer.Option(DEFAULT_PORT, "--port", help="Port to serve on (default: 7890)"),
+    open_browser: bool = typer.Option(False, "--open", help="Auto-open browser after start"),
+    json_output: bool = typer.Option(False, "--json", help="Print server URL as JSON and exit"),
+    once: bool = typer.Option(False, "--once", help="Render dashboard once to stdout and exit"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+) -> None:
+    """Start a local web dashboard showing all toolkit runs."""
+    serve_command(port=port, open_browser=open_browser, json_output=json_output, once=once, db_path=db_path)
 
 
 @app.command("watch")

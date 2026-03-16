@@ -80,6 +80,7 @@ def run_command(
     profile: Optional[str] = None,
     share: bool = False,
     record_findings: bool = False,
+    serve: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -469,6 +470,11 @@ def run_command(
         fire_notifications(_notify_configs, verdict=_notify_verdict, score=_notify_score, top_findings=_notify_findings)
     except Exception:
         pass
+
+    # Print dashboard URL if --serve was requested
+    if serve:
+        from agentkit_cli.serve import DEFAULT_PORT
+        active_console.print(f"Dashboard: http://localhost:{DEFAULT_PORT}")
 
     # Final status
     if failed_count > 0:
