@@ -1,82 +1,76 @@
-# BUILD-REPORT: agentkit-cli v0.36.0
+# BUILD-REPORT: agentkit-cli v0.37.0
+
+**Status:** BUILT
 
 **Date:** 2026-03-16
-**Contract:** all-day-build-contract-agentkit-cli-v0.36.0-org.md
-**Status:** BUILT (all deliverables complete, tests green, not pushed to PyPI)
 
-## Deliverables
+---
 
-### D1 — GitHub org/user repo listing + core org command ✅
-- `agentkit_cli/github_api.py`: GitHub REST API client
-  - `list_repos(owner, include_forks, include_archived, token, limit)` with full pagination
-  - Org-first, user-fallback on 404
-  - Rate-limit header awareness (`X-RateLimit-Remaining` / `X-RateLimit-Reset`)
-  - Filters: forks, archived, empty repos (size=0)
-- `agentkit_cli/commands/org_cmd.py`: `OrgCommand` class + `org_command()` function
-  - Accepts `github:<owner>` or bare owner
-  - Rich live progress display during analysis
-  - Ranked Rich table output with score, grade, top finding
-  - `--json` output: `{owner, repo_count, analyzed, skipped, failed, ranked: [...]}`
-  - `--include-forks`, `--include-archived`, `--limit N` flags
-- `agentkit_cli/main.py`: `org` command registered with all flags
+## Deliverables Checklist
 
-### D2 — HTML report + `--share` ✅
-- `agentkit_cli/org_report.py`: `OrgReport` class with `render()` method
-  - Dark-theme HTML matching existing report style (duel/tournament/trending)
-  - Summary stats: avg score, top repo banner, most common finding, repo count
-  - `--share` via existing `upload_scorecard()` from `share.py`
-  - `--output <file>` saves HTML to disk
+- [x] **D1 — `--generate` flag on `agentkit org`**
+  - `--generate` flag added to CLI and `OrgCommand`
+  - `_generate_for_repo()` helper: clones to temp dir, runs `agentmd generate`, re-scores, returns before/after dict
+  - `--generate-only-below N` flag (default: 80) — skips repos at or above threshold
+  - `generate_summary` in JSON output: `generated_count` and `avg_score_lift`
+  - No remote writes — all generation in local temp clones
 
-### D3 — Parallel analysis + rate limiting ✅
-- `ThreadPoolExecutor` with configurable `--parallel N` (default: 3)
-- Rate-limit awareness in `github_api.py`
-- Per-repo `--timeout N` (default: 120s) with graceful error capture
-- Summary counts: `analyzed` / `skipped` (timeout) / `failed`
+- [x] **D2 — Before/After display**
+  - CLI table shows Before / After / Delta columns (replaces Score / Grade) when `--generate` is active
+  - Color-coded delta: green ≥10pts, yellow <10pts improvement, red ≤0pts
+  - Summary line: "Generated context for X repos. Avg score lift: +Y pts"
+  - `OrgReport` accepts `generate_mode=True` — renders Before / After / Delta columns with CSS delta badges
+  - `--share` with `--generate` produces HTML with before/after columns
 
-### D4 — Docs, CHANGELOG, version bump ✅
-- `README.md`: Added `agentkit org` to Quick Start and Command Reference; added full Org Analysis section with examples
-- `CHANGELOG.md`: v0.36.0 entry with full feature list
-- `pyproject.toml`: `0.35.0` → `0.36.0`
-- `agentkit_cli/__init__.py`: `0.34.0` → `0.36.0`
+- [ ] **D3 — `--generate-branch` flag** *(optional bonus — not implemented, D1+D2+D4+D5 complete)*
 
-## Test Results
+- [x] **D4 — Tests**
+  - 50 new tests in `tests/test_org_generate.py`
+  - Covers: flag wiring, `_generate_for_repo` logic, before/after data structure, CLI table display, delta color coding, HTML before/after columns, JSON output with `generate_summary`, threshold enforcement
+  - All 1391 existing tests still pass
 
-| Suite | Count |
-|---|---|
-| Pre-existing tests | 1349 |
-| New tests (D1/D2/D3) | 42 |
-| **Total** | **1391** |
-| Failures | 0 |
+- [x] **D5 — Docs, version bump, BUILD-REPORT**
+  - `agentkit_cli/__init__.py`: 0.36.1 → 0.37.0
+  - `pyproject.toml`: 0.36.1 → 0.37.0
+  - `CHANGELOG.md`: v0.37.0 entry added
+  - `README.md`: `agentkit org` section updated with `--generate` flag docs and example
+  - `BUILD-REPORT.md`: this file
 
-New tests cover:
-- `github_api.py`: header building, rate-limit check, list_repos filtering (forks/archived/empty), pagination, limit, org→user fallback, 404 error
-- `OrgCommand`: github: prefix parsing, bare owner, ranked output sorted by score, JSON structure, empty org, flag passing, error handling
-- `OrgReport`: HTML structure, repo names, scores, grades, summary stats, top banner, empty results, grade/score-class helpers
-- `--output` flag: file creation and HTML content
-- Parallel: ThreadPoolExecutor worker count, result aggregation, timeout field, summary counts
-- CLI integration: `--json`, `--limit`, `--include-forks`, `--include-archived`, 5-repo integration test
+---
 
-## Commits
+## Test Count
 
-1. `475115b` D1: Add agentkit org command + github_api.py
-2. `2a5b0a9` D2: Add org_report.py — dark-theme HTML report for agentkit org
-3. `380e91d` D3: Parallel analysis + rate limiting already in D1 commit
-4. (this commit) D4: Docs, CHANGELOG, version bump, BUILD-REPORT
+```
+1441 passed, 1 warning in 27.00s
+```
+
+- Existing: 1391
+- New (test_org_generate.py): 50
+- Total: **1441**
+
+---
 
 ## Files Changed
 
-| File | Change |
-|---|---|
-| `agentkit_cli/github_api.py` | New — GitHub API client |
-| `agentkit_cli/commands/org_cmd.py` | New — org command |
-| `agentkit_cli/org_report.py` | New — HTML report |
-| `agentkit_cli/main.py` | Modified — register org command |
-| `tests/test_org.py` | New — 42 tests |
-| `README.md` | Modified — org docs |
-| `CHANGELOG.md` | Modified — v0.36.0 entry |
-| `pyproject.toml` | Modified — version bump |
-| `agentkit_cli/__init__.py` | Modified — version bump |
+- `agentkit_cli/__init__.py` — version bump
+- `pyproject.toml` — version bump
+- `agentkit_cli/commands/org_cmd.py` — `--generate` flag, `_generate_for_repo()`, updated `OrgCommand`, updated `_render_table`
+- `agentkit_cli/org_report.py` — `generate_mode` parameter, before/after HTML columns, delta CSS badges
+- `agentkit_cli/main.py` — `--generate` and `--generate-only-below` Typer options on `org` command
+- `CHANGELOG.md` — v0.37.0 entry
+- `README.md` — `--generate` docs
+- `tests/test_org_generate.py` — 50 new tests
 
-## Status
+---
 
-BUILT — code complete, tests green, committed. Not pushed to git, not published to PyPI.
+## Known Issues
+
+None. All validation gates pass:
+- Full test suite: 1441 passed
+- Before/after scores shown in CLI table when `--generate` is active
+- `--share` with `--generate` produces HTML with before/after columns
+- No remote writes to GitHub (temp-only clones via `tempfile.mkdtemp`)
+
+---
+
+Do NOT push to git or PyPI — build loop handles that.

@@ -102,9 +102,10 @@ def _score_class(score: Optional[float]) -> str:
 class OrgReport:
     """Generate a dark-theme HTML report for an org analysis."""
 
-    def __init__(self, owner: str, results: list[dict]) -> None:
+    def __init__(self, owner: str, results: list[dict], generate_mode: bool = False) -> None:
         self.owner = owner
         self.results = results
+        self.generate_mode = generate_mode
 
     def render(self) -> str:
         now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -141,17 +142,49 @@ class OrgReport:
 
         # Table rows
         rows = ""
-        for r in self.results:
-            rank = r.get("rank", "")
-            full_name = r.get("full_name", r.get("repo", ""))
-            score = r.get("score")
-            grade_str = _grade(score)
-            grade_class = f"grade-{grade_str}" if grade_str != "-" else "score-na"
-            score_class = _score_class(score)
-            score_str = f"{score:.1f}" if score is not None else "-"
-            top_finding = r.get("top_finding", "") or ""
-            rank_class = "rank-1" if rank == 1 else ""
-            rows += f"""<tr class="{rank_class}">
+        if self.generate_mode:
+            for r in self.results:
+                rank = r.get("rank", "")
+                full_name = r.get("full_name", r.get("repo", ""))
+                score_before = r.get("score_before")
+                score_after = r.get("score_after")
+                delta = r.get("delta")
+                grade_before = _grade(score_before)
+                grade_after = _grade(score_after)
+                before_class = _score_class(score_before)
+                after_class = _score_class(score_after)
+                before_str = f"{score_before:.1f}" if score_before is not None else "-"
+                after_str = f"{score_after:.1f}" if score_after is not None else "-"
+                rank_class = "rank-1" if rank == 1 else ""
+
+                if delta is None:
+                    delta_html = '<span class="delta-na">—</span>'
+                elif delta >= 10:
+                    delta_html = f'<span class="delta-green">+{delta:.1f}</span>'
+                elif delta > 0:
+                    delta_html = f'<span class="delta-yellow">+{delta:.1f}</span>'
+                else:
+                    delta_html = f'<span class="delta-red">{delta:.1f}</span>'
+
+                rows += f"""<tr class="{rank_class}">
+  <td class="rank-cell">{rank}</td>
+  <td>{full_name}</td>
+  <td class="{before_class}">{before_str} <span style="color:#8b949e;font-size:0.8rem;">{grade_before}</span></td>
+  <td class="{after_class}">{after_str} <span style="color:#8b949e;font-size:0.8rem;">{grade_after}</span></td>
+  <td>{delta_html}</td>
+</tr>\n"""
+        else:
+            for r in self.results:
+                rank = r.get("rank", "")
+                full_name = r.get("full_name", r.get("repo", ""))
+                score = r.get("score")
+                grade_str = _grade(score)
+                grade_class = f"grade-{grade_str}" if grade_str != "-" else "score-na"
+                score_class = _score_class(score)
+                score_str = f"{score:.1f}" if score is not None else "-"
+                top_finding = r.get("top_finding", "") or ""
+                rank_class = "rank-1" if rank == 1 else ""
+                rows += f"""<tr class="{rank_class}">
   <td class="rank-cell">{rank}</td>
   <td>{full_name}</td>
   <td class="{score_class}">{score_str}</td>
@@ -159,7 +192,20 @@ class OrgReport:
   <td>{top_finding[:80]}</td>
 </tr>\n"""
 
+        table_header = (
+            "<tr><th>#</th><th>Repo</th><th>Before</th><th>After</th><th>Delta</th></tr>"
+            if self.generate_mode
+            else "<tr><th>#</th><th>Repo</th><th>Score</th><th>Grade</th><th>Top Finding</th></tr>"
+        )
+
         common_finding_html = f"<p style='color:#8b949e;font-size:0.85rem;'>Most common finding: <em>{most_common_finding[:100]}</em></p>" if most_common_finding else ""
+
+        delta_css = """
+.delta-green { color: #3fb950; font-weight: bold; }
+.delta-yellow { color: #d29922; font-weight: bold; }
+.delta-red { color: #f85149; font-weight: bold; }
+.delta-na { color: #8b949e; }
+"""
 
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -167,7 +213,7 @@ class OrgReport:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>agentkit org — {self.owner}</title>
-<style>{_ORG_CSS}</style>
+<style>{_ORG_CSS}{delta_css}</style>
 </head>
 <body>
 <div class="container">
@@ -177,7 +223,7 @@ class OrgReport:
   {top_banner}
   <h2>Ranked Repos</h2>
   <table>
-    <tr><th>#</th><th>Repo</th><th>Score</th><th>Grade</th><th>Top Finding</th></tr>
+    {table_header}
     {rows}
   </table>
   {common_finding_html}

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.37.0] - 2026-03-16
+
+### Added
+- **`agentkit org --generate`** flag: auto-generates CLAUDE.md files via agentmd for repos below threshold, then re-scores and shows before/after score lift
+  - `--generate-only-below N` (default: 80): only regenerate repos scoring below N
+  - CLI table shows Before / After / Delta columns instead of Score / Grade when `--generate` is active
+  - Color-coded delta: green ≥10pts improvement, yellow <10pts improvement, red if degraded
+  - Summary line: "Generated context for X repos. Avg score lift: +Y pts"
+  - `--share` with `--generate` produces HTML report with Before / After columns and delta badges
+  - No remote writes — all generation happens in local temp clones
+
 ## [0.36.0] - 2026-03-16
 
 ### Added

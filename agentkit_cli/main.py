@@ -560,6 +560,8 @@ def org(
     output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to file"),
     json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
     token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN env var)"),
+    generate: bool = typer.Option(False, "--generate", help="Auto-generate CLAUDE.md for repos below threshold, then re-score and show before/after lift"),
+    generate_only_below: int = typer.Option(80, "--generate-only-below", help="Only regenerate repos scoring below N (default: 80)"),
 ) -> None:
     """Score every public repo in a GitHub org or user account."""
     org_command(
@@ -573,6 +575,8 @@ def org(
         output=output,
         json_output=json_output,
         token=token,
+        generate=generate,
+        generate_only_below=generate_only_below,
     )
 
 

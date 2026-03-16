@@ -132,7 +132,28 @@ agentkit org github:tiangolo --json
 
 # Use GitHub token to avoid rate limits
 agentkit org github:google --token ghp_xxx
+
+# Auto-generate CLAUDE.md for repos below 80 and show before/after score lift
+agentkit org github:pallets --generate
+
+# Only generate for repos scoring below 60, share an HTML before/after report
+agentkit org github:pallets --generate --generate-only-below 60 --share
 ```
+
+### `--generate` flag
+
+`--generate` turns the audit from read-only to actionable: for every repo below the threshold (default: 80), it clones the repo locally, runs `agentmd generate` to create a CLAUDE.md, re-scores the repo, and shows the before/after lift.
+
+```
+Before: pallets/flask  28.6/F
+After:  pallets/flask  91.4/A  (+62.8 pts)
+```
+
+All generation is done in temporary local clones — no remote writes to GitHub.
+
+Options:
+- `--generate-only-below N` — only generate for repos scoring below N (default: 80)
+- `--share` with `--generate` — HTML report shows Before / After columns with color-coded delta badges
 
 ## Trending Analysis
 
