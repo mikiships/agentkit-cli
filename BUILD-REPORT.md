@@ -41,3 +41,48 @@ Resolved M34 architectural debt: centralized all quartet tool invocations into a
 - `pyproject.toml` — version bump + pytest markers
 
 ALL DELIVERABLES COMPLETE. Tests: 1330 passed.
+
+---
+
+## v0.35.0 Addendum — agentkit quickstart
+
+**Date:** 2026-03-16
+**Contract:** all-day-build-contract-agentkit-cli-v0.35.0-quickstart.md
+
+### Deliverables
+
+| # | Deliverable | Status |
+|---|-------------|--------|
+| D1 | `agentkit_cli/commands/quickstart_cmd.py` core command + 19 tests | ✅ Complete |
+| D2 | `agentkit_cli/main.py` wiring + quickstart prominent in help | ✅ Complete |
+| D3 | README Quick Start + Commands section updated | ✅ Complete |
+| D4 | Show HN draft updated with quickstart as primary onboarding command | ✅ Complete |
+| D5 | CHANGELOG v0.35.0, version bump, BUILD-REPORT addendum | ✅ Complete |
+
+### Validation Gates
+
+- [x] `python3 -m pytest -q` passes (1349 tests, no regressions)
+- [x] `agentkit quickstart --help` exits 0
+- [x] New tests: 19 (requirement: 15+)
+- [x] Version in pyproject.toml = "0.35.0"
+- [x] CHANGELOG has v0.35.0 entry
+- [x] BUILD-REPORT.md has v0.35.0 addendum
+- [x] Show HN draft updated with `agentkit quickstart` as primary onboarding command
+
+### Test Results
+
+- **Total tests:** 1349 passed (up from 1330)
+- **New tests:** 19 (all in tests/test_quickstart.py)
+- **Regressions:** 0
+
+### Files Changed
+
+- `agentkit_cli/commands/quickstart_cmd.py` — new quickstart command
+- `agentkit_cli/main.py` — quickstart registered + listed first
+- `tests/test_quickstart.py` — 19 new tests
+- `README.md` — quickstart elevated as onboarding entry point
+- `CHANGELOG.md` — v0.35.0 entry
+- `pyproject.toml` — version bump to 0.35.0
+- `/Users/mordecai/.openclaw/workspace/memory/drafts/show-hn-quartet.md` — updated (external)
+
+ALL DELIVERABLES COMPLETE. Status: BUILT (local, not published to PyPI).

@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.35.0] - 2026-03-16
+
+### Added
+- **`agentkit quickstart`** command: fastest path to an impressive agentkit result in under 60 seconds
+  - Runs doctor check summary, fast composite score (agentlint + agentmd, timeout=30s), Rich panel output
+  - Optional score card publish to here.now via `--share` / `HERENOW_API_KEY`
+  - `--no-share` flag to skip publishing; `--timeout N` for per-tool timeout
+  - Supports `github:owner/repo` targets (delegates to analyze_target)
+  - Graceful degradation: partial score when some tools not installed
+- **19 new tests** in `tests/test_quickstart.py`
+- README: `agentkit quickstart` elevated as primary onboarding entry point in Quick Start and Commands sections
+
+### Changed
+- `agentkit --help` now lists `quickstart` prominently as first user-facing command
+
 ## [0.34.0] - 2026-03-16
 
 ### Added
