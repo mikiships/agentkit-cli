@@ -13,6 +13,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from agentkit_cli.tools import get_adapter
 from agentkit_cli.suggest_engine import (
     Finding,
     CONTEXT_FILE_PATTERNS,
@@ -35,23 +36,12 @@ CONTEXT_GLOBS = ["CLAUDE.md", "AGENTS.md", ".agents/*.md"]
 
 
 def _run_agentlint_check_context(path: Path) -> Optional[dict]:
-    """Run agentlint check-context --json and return parsed JSON, or None on failure."""
-    try:
-        result = subprocess.run(
-            ["agentlint", "check-context", str(path), "--format", "json"],
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        if result.stdout.strip():
-            return json.loads(result.stdout)
-    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
-        pass
-    return None
+    """Run agentlint check-context via ToolAdapter."""
+    return get_adapter().agentlint_check_context(str(path))
 
 
 def _run_agentlint_diff(path: Path) -> Optional[dict]:
-    """Run agentlint on recent git diff --json and return parsed JSON, or None on failure."""
+    """Run agentlint on recent git diff via ToolAdapter."""
     try:
         diff_result = subprocess.run(
             ["git", "-C", str(path), "diff", "HEAD~1"],
@@ -62,16 +52,8 @@ def _run_agentlint_diff(path: Path) -> Optional[dict]:
         diff_text = diff_result.stdout.strip()
         if not diff_text:
             return None
-        result = subprocess.run(
-            ["agentlint", "check", "--format", "json"],
-            input=diff_text,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        if result.stdout.strip():
-            return json.loads(result.stdout)
-    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
+        return get_adapter().agentlint_diff(diff_text, str(path))
+    except (FileNotFoundError, subprocess.TimeoutExpired):
         pass
     return None
 

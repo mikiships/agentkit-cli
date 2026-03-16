@@ -488,7 +488,7 @@ def test_check_source_files_id_and_category(tmp_path: Path) -> None:
 
 
 def test_check_context_freshness_warn_when_no_agentlint() -> None:
-    with patch("shutil.which", return_value=None):
+    with patch("agentkit_cli.tools.is_installed", return_value=False):
         result = check_context_freshness(Path("."))
 
     assert result.status == "warn"
@@ -497,45 +497,45 @@ def test_check_context_freshness_warn_when_no_agentlint() -> None:
 
 
 def test_check_context_freshness_warn_when_agentlint_fails(tmp_path: Path) -> None:
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run") as mock_run:
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=1, stdout="", stderr="error!")
         result = check_context_freshness(tmp_path)
 
     assert result.status == "warn"
-    assert "non-zero" in result.summary
+    assert "failed" in result.summary.lower()
 
 
 def test_check_context_freshness_warn_when_subprocess_error(tmp_path: Path) -> None:
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run", side_effect=OSError("boom")):
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run", side_effect=OSError("boom")):
         result = check_context_freshness(tmp_path)
 
     assert result.status == "warn"
-    assert "boom" in result.details
+    assert "failed" in result.summary.lower() or "None" in result.details
 
 
 def test_check_context_freshness_warn_when_non_json(tmp_path: Path) -> None:
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run") as mock_run:
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(
             returncode=0, stdout="not json output", stderr=""
         )
         result = check_context_freshness(tmp_path)
 
     assert result.status == "warn"
-    assert "non-JSON" in result.summary
+    assert "failed" in result.summary.lower() or "unparseable" in result.summary.lower()
 
 
 def test_check_context_freshness_uses_format_json_flag(tmp_path: Path) -> None:
     """Regression: doctor must call 'agentlint check-context --format json', not '--json'."""
     payload = json.dumps({"fresh": True, "age_days": 1})
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run") as mock_run:
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
         check_context_freshness(tmp_path)
 
-    call_args = mock_run.call_args[0][0]  # first positional arg = command list
+    call_args = mock_run.call_args[0][0]
     assert "--format" in call_args, "Must use --format flag"
     assert "json" in call_args, "Must pass json as format value"
     assert "--json" not in call_args, "Must not use deprecated --json flag"
@@ -543,8 +543,8 @@ def test_check_context_freshness_uses_format_json_flag(tmp_path: Path) -> None:
 
 def test_check_context_freshness_pass_when_fresh(tmp_path: Path) -> None:
     payload = json.dumps({"fresh": True, "age_days": 2})
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run") as mock_run:
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
         result = check_context_freshness(tmp_path)
 
@@ -553,8 +553,8 @@ def test_check_context_freshness_pass_when_fresh(tmp_path: Path) -> None:
 
 def test_check_context_freshness_warn_when_stale(tmp_path: Path) -> None:
     payload = json.dumps({"fresh": False, "age_days": 30})
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run") as mock_run:
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run") as mock_run:
         mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
         result = check_context_freshness(tmp_path)
 
@@ -563,8 +563,8 @@ def test_check_context_freshness_warn_when_stale(tmp_path: Path) -> None:
 
 
 def test_check_context_freshness_timeout_degrades_gracefully(tmp_path: Path) -> None:
-    with patch("shutil.which", return_value="/usr/bin/agentlint"), \
-         patch("subprocess.run", side_effect=subprocess.TimeoutExpired("agentlint", 15)):
+    with patch("agentkit_cli.tools.is_installed", return_value=True), \
+         patch("agentkit_cli.tools.subprocess.run", side_effect=subprocess.TimeoutExpired("agentlint", 15)):
         result = check_context_freshness(tmp_path)
 
     assert result.status == "warn"

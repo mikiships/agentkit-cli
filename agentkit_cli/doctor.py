@@ -447,9 +447,10 @@ def check_source_files(root: Path) -> DoctorCheckResult:
 
 
 def check_context_freshness(root: Path) -> DoctorCheckResult:
-    """Run agentlint check-context --json if available; degrade gracefully."""
-    binary = shutil.which("agentlint")
-    if binary is None:
+    """Run agentlint check-context via ToolAdapter; degrade gracefully."""
+    from agentkit_cli.tools import is_installed, get_adapter
+
+    if not is_installed("agentlint"):
         return DoctorCheckResult(
             id="context.freshness",
             name="Context freshness",
@@ -460,73 +461,42 @@ def check_context_freshness(root: Path) -> DoctorCheckResult:
             category="context",
         )
 
-    try:
-        result = subprocess.run(
-            [binary, "check-context", "--format", "json"],
-            cwd=root,
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-    except (OSError, subprocess.SubprocessError) as exc:
+    payload = get_adapter().agentlint_check_context(str(root))
+
+    if payload is None:
         return DoctorCheckResult(
             id="context.freshness",
             name="Context freshness",
             status="warn",
-            summary="agentlint check-context failed unexpectedly.",
-            details=str(exc),
+            summary="agentlint check-context failed or returned unparseable output.",
+            details="ToolAdapter returned None (non-zero exit, timeout, or bad JSON).",
             fix_hint="Run 'agentlint check-context' manually to diagnose.",
             category="context",
         )
 
-    if result.returncode != 0:
-        stderr_hint = (result.stderr or "").strip()[:200]
+    fresh = payload.get("fresh", True)
+    age_days = payload.get("age_days")
+    detail = json.dumps(payload)[:200]
+    if fresh:
         return DoctorCheckResult(
             id="context.freshness",
             name="Context freshness",
-            status="warn",
-            summary="agentlint check-context returned a non-zero exit code.",
-            details=stderr_hint or "No error detail available.",
-            fix_hint="Run 'agentlint check-context' to see full output.",
-            category="context",
-        )
-
-    try:
-        payload = json.loads(result.stdout)
-        fresh = payload.get("fresh", True)
-        age_days = payload.get("age_days")
-        detail = result.stdout.strip()[:200]
-        if fresh:
-            return DoctorCheckResult(
-                id="context.freshness",
-                name="Context freshness",
-                status="pass",
-                summary="Context files are up to date.",
-                details=detail,
-                fix_hint="",
-                category="context",
-            )
-        age_label = f" ({age_days}d old)" if age_days is not None else ""
-        return DoctorCheckResult(
-            id="context.freshness",
-            name="Context freshness",
-            status="warn",
-            summary=f"Context files may be stale{age_label}.",
+            status="pass",
+            summary="Context files are up to date.",
             details=detail,
-            fix_hint="Run 'agentmd generate .' to refresh context files.",
+            fix_hint="",
             category="context",
         )
-    except (json.JSONDecodeError, ValueError):
-        # agentlint ran but returned non-JSON; treat as graceful degradation
-        return DoctorCheckResult(
-            id="context.freshness",
-            name="Context freshness",
-            status="warn",
-            summary="agentlint check-context returned non-JSON output.",
-            details=(result.stdout or result.stderr or "").strip()[:200],
-            fix_hint="Run 'agentlint check-context' manually to inspect output.",
-            category="context",
-        )
+    age_label = f" ({age_days}d old)" if age_days is not None else ""
+    return DoctorCheckResult(
+        id="context.freshness",
+        name="Context freshness",
+        status="warn",
+        summary=f"Context files may be stale{age_label}.",
+        details=detail,
+        fix_hint="Run 'agentmd generate .' to refresh context files.",
+        category="context",
+    )
 
 
 def check_output_dir(root: Path) -> DoctorCheckResult:

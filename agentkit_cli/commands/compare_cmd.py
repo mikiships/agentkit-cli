@@ -12,7 +12,7 @@ from rich.console import Console
 from rich.table import Table
 from rich import box
 
-from agentkit_cli.tools import is_installed, INSTALL_HINTS
+from agentkit_cli.tools import is_installed, INSTALL_HINTS, get_adapter
 from agentkit_cli.utils.git_utils import Worktree, git_root, changed_files, GitError, resolve_ref
 
 console = Console()
@@ -73,7 +73,10 @@ def _extract_score(output: str) -> Optional[float]:
 
 
 def _run_tool_for_score(tool: str, cwd: Path) -> dict:
-    """Run a quartet tool against a worktree directory, return score dict."""
+    """Run a quartet tool against a worktree directory, return score dict.
+
+    Uses ToolAdapter for the canonical correct flags.
+    """
     if not is_installed(tool):
         return {
             "tool": tool,
@@ -82,41 +85,41 @@ def _run_tool_for_score(tool: str, cwd: Path) -> dict:
             "score": None,
         }
 
-    context_file = cwd / "CLAUDE.md"
-    args_template = SCORE_TOOLS[tool]
-    args = [
-        a.replace("{cwd}", str(cwd)).replace("{context_file}", str(context_file))
-        for a in args_template
-    ]
-
-    import shutil
-    tool_path = shutil.which(tool)
-    if not tool_path:
-        return {"tool": tool, "status": "skipped", "reason": "not found in PATH", "score": None}
-
+    adapter = get_adapter()
+    cwd_str = str(cwd)
     start = time.monotonic()
+
+    # Map tool to the appropriate ToolAdapter method
     try:
-        result = subprocess.run(
-            [tool_path] + args,
-            capture_output=True,
-            text=True,
-            cwd=str(cwd),
-            timeout=120,
-        )
-        duration = round(time.monotonic() - start, 2)
-        output = (result.stdout + result.stderr).strip()
-        score = _extract_score(output)
-        return {
-            "tool": tool,
-            "status": "ok" if result.returncode == 0 else "error",
-            "score": score,
-            "duration": duration,
-            "output": output[:500],
-        }
-    except subprocess.TimeoutExpired:
-        return {"tool": tool, "status": "timeout", "score": None, "reason": "timed out after 120s"}
+        if tool == "agentlint":
+            data = adapter.agentlint_check_context(cwd_str)
+        elif tool == "agentmd":
+            data = adapter.agentmd_score(cwd_str)
+        elif tool == "coderace":
+            data = adapter.coderace_benchmark_history(cwd_str)
+        elif tool == "agentreflect":
+            data = adapter.agentreflect_from_git(cwd_str)
+        else:
+            data = None
     except Exception as e:
         return {"tool": tool, "status": "error", "score": None, "reason": str(e)}
+
+    duration = round(time.monotonic() - start, 2)
+
+    if data is None:
+        return {"tool": tool, "status": "error", "score": None, "duration": duration,
+                "reason": "tool returned no data"}
+
+    # Extract score from returned data
+    output = json.dumps(data) if isinstance(data, dict) else str(data)
+    score = _extract_score(output)
+    return {
+        "tool": tool,
+        "status": "ok",
+        "score": score,
+        "duration": duration,
+        "output": output[:500],
+    }
 
 
 def _score_ref(ref: str, tools: list[str], repo_root: Path) -> dict[str, dict]:

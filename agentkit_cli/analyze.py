@@ -10,7 +10,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
 
-from agentkit_cli.tools import is_installed, run_tool, which
+from agentkit_cli.tools import is_installed, run_tool, which, get_adapter
 from agentkit_cli.composite import CompositeScoreEngine, _compute_grade
 
 
@@ -191,64 +191,78 @@ def analyze_target(
             (Path(work_dir) / "AGENTS.md").exists()
         )
 
+        adapter = get_adapter()
+
         # agentmd generate (if no context and not --no-generate)
         if not no_generate and not context_exists:
-            status, output = _run_pipeline_step(
-                "agentmd", ["generate", work_dir], work_dir, timeout
-            )
-            if status == "pass":
+            gen_data = adapter.agentmd_generate(work_dir)
+            if gen_data is not None:
                 generated_context = True
+                status = "pass"
+            else:
+                status = "fail"
             tool_results["agentmd_generate"] = ToolResult(
                 tool="agentmd",
                 status=status,
                 score=None,
-                finding=output[:120] if output else "Context generated",
+                finding="Context generated" if gen_data else "agentmd generate failed",
             )
 
         # agentmd score
-        # If --no-generate and no context file exists, score 0 (repo is not agent-ready)
         if no_generate and not context_exists:
             tool_results["agentmd"] = ToolResult(
                 tool="agentmd", status="fail", score=0.0,
                 finding="No CLAUDE.md / AGENTS.md found. Run `agentmd generate` to create one."
             )
         else:
-            status, output = _run_pipeline_step(
-                "agentmd", ["score", work_dir], work_dir, timeout
-            )
-            score = _status_to_score(status, output)
-            finding = output.splitlines()[0][:100] if output else ""
-            tool_results["agentmd"] = ToolResult(tool="agentmd", status=status, score=score, finding=finding)
+            md_data = adapter.agentmd_score(work_dir)
+            if md_data is not None:
+                output = json.dumps(md_data)
+                score = _status_to_score("pass", output)
+                finding = output[:100]
+                tool_results["agentmd"] = ToolResult(tool="agentmd", status="pass", score=score, finding=finding)
+            else:
+                tool_results["agentmd"] = ToolResult(tool="agentmd", status="fail", score=0.0, finding="agentmd score failed")
 
-        # agentlint check-context --format json
-        status, output = _run_pipeline_step(
-            "agentlint", ["check-context", "--format", "json"], work_dir, timeout
-        )
-        lint_score = _status_to_score(status, output)
-        lint_finding = ""
-        if output:
-            try:
-                lint_data = json.loads(output)
-                # Try to get a meaningful finding from JSON
-                if isinstance(lint_data, dict):
-                    lint_finding = lint_data.get("summary", lint_data.get("finding", ""))[:100]
-                    raw_score = lint_data.get("score")
-                    if raw_score is not None:
-                        try:
-                            lint_score = float(raw_score)
-                        except (TypeError, ValueError):
-                            pass
-            except json.JSONDecodeError:
-                lint_finding = output.splitlines()[0][:100]
-        tool_results["agentlint"] = ToolResult(tool="agentlint", status=status, score=lint_score, finding=lint_finding)
+        # agentlint check-context
+        lint_data = adapter.agentlint_check_context(work_dir)
+        if lint_data is not None:
+            lint_score: Optional[float] = None
+            lint_finding = ""
+            if isinstance(lint_data, dict):
+                lint_finding = lint_data.get("summary", lint_data.get("finding", ""))[:100]
+                raw_score = lint_data.get("score")
+                if raw_score is not None:
+                    try:
+                        lint_score = float(raw_score)
+                    except (TypeError, ValueError):
+                        pass
+            if lint_score is None:
+                lint_score = 100.0  # passed
+            tool_results["agentlint"] = ToolResult(tool="agentlint", status="pass", score=lint_score, finding=lint_finding)
+        else:
+            lint_score_val = _status_to_score("skipped", "") if not is_installed("agentlint") else 0.0
+            tool_results["agentlint"] = ToolResult(
+                tool="agentlint",
+                status="skipped" if not is_installed("agentlint") else "fail",
+                score=lint_score_val,
+                finding="agentlint not installed" if not is_installed("agentlint") else "agentlint check failed",
+            )
 
         # agentreflect generate
-        status, output = _run_pipeline_step(
-            "agentreflect", ["generate", "--from-git", "--format", "markdown"], work_dir, timeout
-        )
-        reflect_score = _status_to_score(status, output)
-        reflect_finding = output.splitlines()[0][:100] if output else ""
-        tool_results["agentreflect"] = ToolResult(tool="agentreflect", status=status, score=reflect_score, finding=reflect_finding)
+        reflect_data = adapter.agentreflect_from_git(work_dir)
+        if reflect_data is not None:
+            reflect_output = reflect_data.get("suggestions_md", "")
+            reflect_score = _status_to_score("pass", reflect_output)
+            reflect_finding = reflect_output.splitlines()[0][:100] if reflect_output else ""
+            tool_results["agentreflect"] = ToolResult(tool="agentreflect", status="pass", score=reflect_score, finding=reflect_finding)
+        else:
+            tool_results["agentreflect"] = ToolResult(
+                tool="agentreflect",
+                status="skipped" if not is_installed("agentreflect") else "fail",
+                score=_status_to_score("skipped", "") if not is_installed("agentreflect") else 0.0,
+                finding="agentreflect not installed" if not is_installed("agentreflect") else "agentreflect failed",
+            )
 
     finally:
         if temp_dir and not keep:

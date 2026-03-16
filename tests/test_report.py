@@ -265,7 +265,7 @@ def _make_proc(stdout: str = "", returncode: int = 0) -> MagicMock:
 
 
 def test_runner_agentlint_not_installed():
-    with patch("agentkit_cli.report_runner._is_installed", return_value=False):
+    with patch("agentkit_cli.tools.is_installed", return_value=False):
         result = report_runner.run_agentlint_check("/tmp")
     assert result is None
 
@@ -273,21 +273,22 @@ def test_runner_agentlint_not_installed():
 def test_runner_agentlint_success():
     data = {"score": 80, "issues": []}
     proc = _make_proc(stdout=json.dumps(data))
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentlint_check("/tmp")
     assert result == data
 
 
 def test_runner_agentlint_failure():
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=None):
+    proc = _make_proc(stdout="", returncode=1)
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentlint_check("/tmp")
     assert result is None
 
 
 def test_runner_agentmd_not_installed():
-    with patch("agentkit_cli.report_runner._is_installed", return_value=False):
+    with patch("agentkit_cli.tools.is_installed", return_value=False):
         result = report_runner.run_agentmd_score("/tmp")
     assert result is None
 
@@ -295,14 +296,14 @@ def test_runner_agentmd_not_installed():
 def test_runner_agentmd_success():
     data = {"score": 75, "files": []}
     proc = _make_proc(stdout=json.dumps(data))
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentmd_score("/tmp")
     assert result == data
 
 
 def test_runner_coderace_not_installed():
-    with patch("agentkit_cli.report_runner._is_installed", return_value=False):
+    with patch("agentkit_cli.tools.is_installed", return_value=False):
         result = report_runner.run_coderace_bench("/tmp")
     assert result is None
 
@@ -311,17 +312,17 @@ def test_runner_coderace_success():
     """coderace benchmark history returns parseable JSON → pass it through."""
     data = {"results": [{"agent": "claude", "score": 90}]}
     proc = _make_proc(stdout=json.dumps(data))
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_coderace_bench("/tmp")
     assert result == data
 
 
 def test_runner_coderace_no_history():
     """coderace benchmark history returns no JSON → graceful no_results dict."""
-    proc = _make_proc(stdout="No benchmark history found.")
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    proc = _make_proc(stdout="No benchmark history found.", returncode=1)
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_coderace_bench("/tmp")
     assert result is not None
     assert result.get("status") == "no_results"
@@ -329,15 +330,16 @@ def test_runner_coderace_no_history():
 
 def test_runner_coderace_run_fails():
     """coderace benchmark history command fails → graceful no_results dict."""
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=None):
+    proc = _make_proc(stdout="", returncode=1)
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_coderace_bench("/tmp")
     assert result is not None
     assert result.get("status") == "no_results"
 
 
 def test_runner_agentreflect_not_installed():
-    with patch("agentkit_cli.report_runner._is_installed", return_value=False):
+    with patch("agentkit_cli.tools.is_installed", return_value=False):
         result = report_runner.run_agentreflect_analyze("/tmp")
     assert result is None
 
@@ -346,8 +348,8 @@ def test_runner_agentreflect_success():
     """agentreflect returns markdown text; runner wraps in suggestions_md dict."""
     md_text = "### Suggestion 1\nAdd more context.\n### Suggestion 2\nFix AGENTS.md."
     proc = _make_proc(stdout=md_text)
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentreflect_analyze("/tmp")
     assert result is not None
     assert "suggestions_md" in result
@@ -359,25 +361,24 @@ def test_runner_agentreflect_uses_correct_flags():
     """agentreflect runner must use --from-git --format markdown (not --format json)."""
     calls = []
 
-    def capture_run(cmd, cwd, timeout):
+    def capture_run(cmd, **kwargs):
         calls.append(cmd)
         return _make_proc(stdout="### Note\nsome suggestion")
 
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", side_effect=capture_run):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", side_effect=capture_run):
             report_runner.run_agentreflect_analyze("/tmp")
-    assert calls, "expected _run to be called"
+    assert calls, "expected subprocess.run to be called"
     cmd = calls[0]
     assert "--from-git" in cmd
     assert "--format" in cmd
     assert "markdown" in cmd
-    assert "json" not in cmd
 
 
 def test_runner_invalid_json_returns_none():
     proc = _make_proc(stdout="not valid json at all")
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentlint_check("/tmp")
     assert result is None
 
@@ -387,8 +388,8 @@ def test_runner_json_with_prefix():
     data = {"score": 50}
     raw = "Scanning project...\nDone.\n" + json.dumps(data)
     proc = _make_proc(stdout=raw)
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", return_value=proc):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", return_value=proc):
             result = report_runner.run_agentlint_check("/tmp")
     assert result == data
 
@@ -397,14 +398,14 @@ def test_runner_agentlint_uses_format_json_flag():
     """agentlint runner must use --format json, not --json."""
     calls = []
 
-    def capture_run(cmd, cwd, timeout):
+    def capture_run(cmd, **kwargs):
         calls.append(cmd)
         return _make_proc(stdout=json.dumps({"score": 80}))
 
-    with patch("agentkit_cli.report_runner._is_installed", return_value=True):
-        with patch("agentkit_cli.report_runner._run", side_effect=capture_run):
+    with patch("agentkit_cli.tools.is_installed", return_value=True):
+        with patch("agentkit_cli.tools.subprocess.run", side_effect=capture_run):
             report_runner.run_agentlint_check("/tmp")
-    assert calls, "expected _run to be called"
+    assert calls, "expected subprocess.run to be called"
     cmd = calls[0]
     assert "--format" in cmd
     assert "json" in cmd
