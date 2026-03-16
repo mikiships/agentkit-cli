@@ -42,6 +42,11 @@ agentkit = "agentkit_cli.main:app"
 [tool.hatch.build.targets.wheel]
 packages = ["agentkit_cli"]
 
+[tool.pytest.ini_options]
+markers = [
+    "smoke: golden smoke tests for release gating",
+]
+
 [dependency-groups]
 dev = [
     "pyyaml>=6.0.3",

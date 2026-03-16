@@ -1,0 +1,3 @@
+# Smoke project config — minimal, no max_drop
+[gate]
+min_score = 50
