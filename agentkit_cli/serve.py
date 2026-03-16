@@ -372,13 +372,28 @@ def _render_dashboard_html(db_path: Optional[Path] = None) -> str:
     border-top: 1px solid #1e293b;
     margin-top: 24px;
   }}
+  .live-indicator {{
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }}
+  .live-indicator.connected {{
+    color: #22c55e;
+    background: rgba(34,197,94,0.12);
+  }}
+  .live-indicator.disconnected {{
+    color: #94a3b8;
+    background: rgba(148,163,184,0.12);
+  }}
 </style>
 </head>
 <body>
 <header>
   <h1>⚡ agentkit Dashboard</h1>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span class="badge">Live</span>
+    <span id="live-indicator" class="live-indicator disconnected">○ Offline</span>
     <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
   </div>
 </header>
@@ -397,12 +412,76 @@ def _render_dashboard_html(db_path: Optional[Path] = None) -> str:
   </div>
 </div>
 <main>
-  {table_html}
+  <div id="runs-container">{table_html}</div>
 </main>
-<footer>agentkit-cli v{version} &mdash; Dashboard auto-refreshes every 30s</footer>
+<footer>agentkit-cli v{version} &mdash; Dashboard updates live via SSE</footer>
 <script>
-  // Also set a JS fallback refresh every 30s
-  setTimeout(function() {{ location.reload(); }}, 30000);
+(function() {{
+  var indicator = document.getElementById('live-indicator');
+
+  function setConnected(on) {{
+    if (on) {{
+      indicator.textContent = '● Live';
+      indicator.className = 'live-indicator connected';
+    }} else {{
+      indicator.textContent = '○ Offline';
+      indicator.className = 'live-indicator disconnected';
+    }}
+  }}
+
+  function scoreColor(score) {{
+    if (score >= 80) return '#22c55e';
+    if (score >= 60) return '#eab308';
+    return '#ef4444';
+  }}
+
+  function renderTable(rows) {{
+    var container = document.getElementById('runs-container');
+    if (!rows || rows.length === 0) {{
+      container.innerHTML = '<div class="empty-state"><p>No runs yet. Try: <code>agentkit run --help</code></p></div>';
+      return;
+    }}
+    var tbody = '';
+    rows.forEach(function(r) {{
+      var color = scoreColor(r.score);
+      var toolsStr = Object.keys(r.tools || {{}}).sort().map(function(t) {{
+        return t + ': ' + r.tools[t];
+      }}).join(', ') || '—';
+      var ts = r.ts ? r.ts.slice(0,19).replace('T',' ') : '—';
+      tbody += '<tr>' +
+        '<td class="project">' + r.project + '</td>' +
+        '<td style="color:' + color + ';font-weight:bold;">' + r.score + '</td>' +
+        '<td style="color:' + color + ';">' + r.grade + '</td>' +
+        '<td class="tools-cell">' + toolsStr + '</td>' +
+        '<td class="ts">' + ts + '</td>' +
+        '<td class="run-id">#' + r.run_id + '</td>' +
+        '</tr>';
+    }});
+    container.innerHTML = '<table>' +
+      '<thead><tr>' +
+      '<th>Project</th><th>Latest Score</th><th>Grade</th>' +
+      '<th>Tools Run</th><th>Timestamp</th><th>Run ID</th>' +
+      '</tr></thead>' +
+      '<tbody>' + tbody + '</tbody>' +
+      '</table>';
+  }}
+
+  function fetchAndRender() {{
+    fetch('/api/runs').then(function(r) {{ return r.json(); }}).then(function(rows) {{
+      renderTable(rows);
+    }}).catch(function() {{}});
+  }}
+
+  var es = new EventSource('/events');
+  es.onopen = function() {{ setConnected(true); }};
+  es.onmessage = function(e) {{
+    try {{
+      var msg = JSON.parse(e.data);
+      if (msg.type === 'refresh') {{ fetchAndRender(); }}
+    }} catch(err) {{}}
+  }};
+  es.onerror = function() {{ setConnected(false); }};
+}});
 </script>
 </body>
 </html>"""
