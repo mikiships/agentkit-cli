@@ -228,9 +228,9 @@ def test_watch_custom_debounce_passed_to_handler(tmp_path):
     created_debounce = []
     original_init = _ChangeHandler.__init__
 
-    def capturing_init(self, cwd, extensions, debounce, ci):
+    def capturing_init(self, cwd, extensions, debounce, ci, broker=None):
         created_debounce.append(debounce)
-        original_init(self, cwd=cwd, extensions=extensions, debounce=debounce, ci=ci)
+        original_init(self, cwd=cwd, extensions=extensions, debounce=debounce, ci=ci, broker=broker)
 
     with _mock_watchdog(mock_observer):
         with patch.object(_ChangeHandler, "__init__", capturing_init):

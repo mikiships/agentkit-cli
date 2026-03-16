@@ -281,6 +281,20 @@ agentkit serve --once > out.html  # render to file
 
 No external dependencies — uses Python stdlib only (`http.server`, `threading`, `webbrowser`).
 
+## Live Dashboard
+
+Run once and watch scores update in real-time:
+
+```bash
+# Combined: watch files + serve dashboard (updates without reload)
+agentkit watch --serve --port 7890
+
+# Or start server in live mode (polls for external writes):
+agentkit serve --live
+```
+
+The dashboard connects via SSE (`/events`) and re-renders the runs table in-place when new pipeline results arrive. A **● Live** indicator shows connection status; it drops to **○ Offline** if the server stops.
+
 ## Release Check
 
 `agentkit release-check` verifies the 4-part release surface to confirm a package is truly shipped, not just locally complete:

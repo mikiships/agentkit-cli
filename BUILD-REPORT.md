@@ -49,3 +49,10 @@ Status: COMPLETE
 - `74f571a` D5: bump to v0.32.0, changelog, README Local Dashboard section
 
 BUILD COMPLETE: 1268 passed
+
+## v0.33.0 — Live Dashboard (2026-03-16)
+- D1: SSE broker + /events + /api/runs
+- D2: Dashboard JS EventSource live table updates (● Live / ○ Offline indicator)
+- D3: agentkit watch --serve combined mode
+- D4: agentkit serve --live flag for external-write polling
+- D5: Tests (1281 passing), docs, version bump to 0.33.0

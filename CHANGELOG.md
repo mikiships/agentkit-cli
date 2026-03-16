@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.33.0] - 2026-03-16
+
+### Added
+- SSE (Server-Sent Events) live-push to `agentkit serve` dashboard
+  - `SseBroker` class: thread-safe client registration, `broadcast()`, auto-remove disconnected clients
+  - `GET /events` SSE endpoint in `AgenkitDashboard` — keeps connection open, sends keepalive comments every 15s
+  - Dashboard JS: `EventSource('/events')` reconnects automatically; re-renders runs table in-place via `GET /api/runs`
+  - Live indicator: **● Live** (green) when SSE connected, **○ Offline** (grey) when disconnected
+- `agentkit watch --serve [--port N]`: combined file-watcher + dashboard server in one process
+  - Starts HTTP server in a daemon thread before watcher loop
+  - After each pipeline run, calls `broker.broadcast({"type": "refresh"})` to push live update
+  - Prints: `Watching <path>  •  Dashboard: http://localhost:<port>`
+- `agentkit serve --live`: polls DB every 5s, broadcasts SSE refresh event when run count changes
+  - Prints: `Dashboard (live): http://localhost:<port>`
+- `start_server()` extended with optional `live: bool = False` kwarg (backward-compatible)
+
 ## [0.32.0] - 2026-03-16
 
 ### Added
