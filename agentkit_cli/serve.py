@@ -3,12 +3,54 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
+import queue
 import sqlite3
 import threading
+import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Optional
+
+
+class SseBroker:
+    """Thread-safe SSE broker for broadcasting events to connected clients."""
+
+    def __init__(self) -> None:
+        self._clients: list[queue.Queue[str]] = []
+        self._lock = threading.Lock()
+
+    def subscribe(self) -> "queue.Queue[str]":
+        """Register a new client and return its queue."""
+        q: queue.Queue[str] = queue.Queue(maxsize=100)
+        with self._lock:
+            self._clients.append(q)
+        return q
+
+    def unsubscribe(self, q: "queue.Queue[str]") -> None:
+        """Remove a client queue."""
+        with self._lock:
+            try:
+                self._clients.remove(q)
+            except ValueError:
+                pass
+
+    def broadcast(self, data: str) -> None:
+        """Send data to all connected clients; remove dead ones."""
+        with self._lock:
+            clients = list(self._clients)
+        dead = []
+        for q in clients:
+            try:
+                q.put_nowait(data)
+            except queue.Full:
+                dead.append(q)
+        for q in dead:
+            self.unsubscribe(q)
+
+
+# Module-level singleton broker
+_broker = SseBroker()
 
 DEFAULT_PORT = 7890
 _DB_DIR = Path.home() / ".config" / "agentkit"
@@ -371,6 +413,7 @@ class AgenkitDashboard(BaseHTTPRequestHandler):
     """HTTP request handler for the agentkit dashboard."""
 
     db_path: Optional[Path] = None
+    broker: SseBroker = _broker
 
     def do_GET(self) -> None:
         if self.path in ("/", "/index.html"):
@@ -389,6 +432,32 @@ class AgenkitDashboard(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+        elif self.path == "/events":
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Connection", "keep-alive")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            q = self.broker.subscribe()
+            try:
+                # Send initial ping to confirm connection
+                self.wfile.write(b": ping\n\n")
+                self.wfile.flush()
+                while True:
+                    try:
+                        data = q.get(timeout=15)
+                        msg = f"data: {data}\n\n".encode("utf-8")
+                        self.wfile.write(msg)
+                        self.wfile.flush()
+                    except queue.Empty:
+                        # Send keepalive comment
+                        self.wfile.write(b": keepalive\n\n")
+                        self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError, OSError):
+                pass
+            finally:
+                self.broker.unsubscribe(q)
         else:
             self.send_response(404)
             self.end_headers()
@@ -402,13 +471,14 @@ def start_server(
     port: int = DEFAULT_PORT,
     open_browser: bool = False,
     db_path: Optional[Path] = None,
+    live: bool = False,
 ) -> None:
     """Start the dashboard HTTP server (blocks until Ctrl-C)."""
     # Create a handler class with db_path bound
     handler_class = type(
         "BoundDashboard",
         (AgenkitDashboard,),
-        {"db_path": db_path},
+        {"db_path": db_path, "broker": _broker},
     )
 
     server = HTTPServer(("localhost", port), handler_class)
@@ -420,6 +490,23 @@ def start_server(
     if open_browser:
         # Open browser in a thread so we don't block server start
         threading.Timer(0.5, lambda: webbrowser.open(url)).start()
+
+    if live:
+        # Background thread: poll DB every 5s, broadcast refresh if run count changed
+        def _poll_db() -> None:
+            last_count = len(_query_latest_runs(db_path))
+            while True:
+                time.sleep(5)
+                try:
+                    current = len(_query_latest_runs(db_path))
+                    if current != last_count:
+                        last_count = current
+                        _broker.broadcast(json.dumps({"type": "refresh"}))
+                except Exception:
+                    pass
+
+        poll_thread = threading.Thread(target=_poll_db, daemon=True)
+        poll_thread.start()
 
     try:
         server.serve_forever()
