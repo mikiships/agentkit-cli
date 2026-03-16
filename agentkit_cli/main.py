@@ -34,6 +34,7 @@ from agentkit_cli.commands.profile_cmd import profile_app
 from agentkit_cli.commands.insights_cmd import insights_command
 from agentkit_cli.commands.trending_cmd import trending_command
 from agentkit_cli.commands.duel_cmd import duel_command
+from agentkit_cli.commands.tournament_cmd import tournament_command
 
 app = typer.Typer(
     name="agentkit",
@@ -496,6 +497,34 @@ def duel(
         target2=target2,
         share=share,
         json_output=json_output,
+        timeout=timeout,
+        keep=keep,
+    )
+
+
+@app.command("tournament")
+def tournament(
+    repos: List[str] = typer.Argument(..., help="Repos to include: github:owner/repo or local paths (4-16)"),
+    share: bool = typer.Option(False, "--share/--no-share", help="Publish HTML report to here.now"),
+    json_output: bool = typer.Option(False, "--json", help="Output full results as JSON"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress Rich output; show only final standings"),
+    parallel: bool = typer.Option(True, "--parallel/--no-parallel", help="Run pairings concurrently (default: parallel)"),
+    min_repos: int = typer.Option(4, "--min-repos", help="Minimum repos required (default: 4)"),
+    max_repos: int = typer.Option(16, "--max-repos", help="Maximum repos allowed (default: 16)"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Write HTML report to this file"),
+    timeout: int = typer.Option(120, "--timeout", help="Per-repo analysis timeout in seconds"),
+    keep: bool = typer.Option(False, "--keep", help="Keep cloned repos after analysis"),
+) -> None:
+    """Run a round-robin tournament across N repos (4-16). Rank by win/loss record."""
+    tournament_command(
+        repos=list(repos),
+        share=share,
+        json_output=json_output,
+        quiet=quiet,
+        parallel=parallel,
+        min_repos=min_repos,
+        max_repos=max_repos,
+        output=output,
         timeout=timeout,
         keep=keep,
     )

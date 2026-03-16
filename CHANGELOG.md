@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.31.0] - 2026-03-16
+
+### Added
+- `agentkit tournament` command: round-robin bracket across 4-16 repos
+- `agentkit_cli/tournament.py`: tournament engine with parallel execution via `concurrent.futures`
+- `agentkit_cli/tournament_report.py`: dark-theme HTML bracket report with standings table and match results matrix
+- `agentkit_cli/commands/tournament_cmd.py`: CLI with `--share`, `--json`, `--quiet`, `--parallel/--no-parallel`, `--output` flags
+- `tests/test_tournament.py`: 57 tests covering engine, CLI, HTML report, and publish flow
+
 ## [0.30.0] - 2026-03-16
 
 ### Added

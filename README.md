@@ -92,6 +92,7 @@ agentkit gate --profile strict --min-score 99
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
+- `agentkit tournament <repo1> ... <repoN>` — round-robin bracket across 4-16 repos
 - `agentkit profile <sub>` — manage quality profiles
 - `agentkit config <sub>` — manage configuration
 - `agentkit history` — show score history
@@ -121,6 +122,27 @@ agentkit trending --token ghp_xxx
 ```
 
 Output: a ranked Rich table (Rank | Repo | Stars | Score | Grade | URL) and optionally a dark-theme HTML report published to here.now.
+
+## Tournament
+
+`agentkit tournament` runs a round-robin bracket across 4-16 repos and ranks them by win/loss record with avg score tiebreak.
+
+```bash
+# Run a 4-repo tournament
+agentkit tournament github:fastapi/fastapi github:tiangolo/starlette github:django/django github:pallets/flask
+
+# Publish a shareable HTML bracket report
+agentkit tournament github:fastapi/fastapi github:tiangolo/starlette github:django/django github:pallets/flask --share
+
+# JSON output for CI/scripting
+agentkit tournament github:fastapi/fastapi github:tiangolo/starlette github:django/django github:pallets/flask --json
+
+# Sequential (no parallel), quiet mode, save HTML
+agentkit tournament github:fastapi/fastapi github:tiangolo/starlette github:django/django github:pallets/flask \
+  --no-parallel --quiet --output bracket.html
+```
+
+Output: standings table (Rank | Repo | W-L | Avg Score | Grade), match results matrix, and winner banner. Use `--share` to publish a dark-theme HTML bracket to here.now.
 
 ## Portfolio Insights
 
