@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.32.0] - 2026-03-16
+
+### Added
+- `agentkit serve` command: local web dashboard server showing all toolkit runs from the history SQLite DB
+  - Dark-theme HTML dashboard (`#0f172a` background, matching existing agentkit report aesthetic)
+  - Summary bar: total runs, unique projects, average score
+  - Score-colored table: green ≥80, yellow ≥60, red <60, with A/B/C/D/F grade
+  - Auto-refresh every 30s via `<meta http-equiv="refresh">` and JS fallback
+  - `--port PORT` (default: 7890), `--open` (auto-open browser), `--once` (render HTML to stdout), `--json` (print URL as JSON)
+  - Empty-state message when no runs exist
+  - Version in footer
+- `agentkit_cli/serve.py`: `AgenkitDashboard(BaseHTTPRequestHandler)` + `start_server()` — stdlib only, no new deps
+- `agentkit_cli/commands/serve_cmd.py`: CLI command wrapper
+- `agentkit run --serve`: print dashboard URL after pipeline completes
+- `agentkit doctor`: new `publish.serve` check verifying serve is importable
+- `tests/test_serve.py`: 56 tests covering server, HTML generation, CLI flags, score coloring, grade logic, doctor integration
+
 ## [0.31.0] - 2026-03-16
 
 ### Added

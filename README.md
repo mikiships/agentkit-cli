@@ -256,6 +256,31 @@ Or install and run directly:
 
 See `agentkit setup-ci` for automated workflow generation.
 
+## Local Dashboard
+
+`agentkit serve` starts a lightweight local web dashboard showing all toolkit runs from the history database:
+
+```
+agentkit serve [OPTIONS]
+
+Options:
+  --port PORT    Port to serve on (default: 7890)
+  --open         Auto-open the dashboard in your browser on start
+  --once         Render dashboard HTML to stdout and exit (no server)
+  --json         Print server URL as JSON and exit (useful for scripts)
+```
+
+The dashboard shows a dark-theme summary of every project run: latest score, grade (A–F), per-tool breakdown, timestamp, and run ID. Scores are color-coded green (≥80), yellow (≥60), and red (<60). The page auto-refreshes every 30 seconds.
+
+**Quick start:**
+```bash
+agentkit serve --open           # start server + open browser
+agentkit run --serve            # run pipeline, then print dashboard URL
+agentkit serve --once > out.html  # render to file
+```
+
+No external dependencies — uses Python stdlib only (`http.server`, `threading`, `webbrowser`).
+
 ## Release Check
 
 `agentkit release-check` verifies the 4-part release surface to confirm a package is truly shipped, not just locally complete:
