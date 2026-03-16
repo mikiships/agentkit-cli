@@ -1,0 +1,164 @@
+# All-Day Build Contract: agentkit-cli v0.29.0 — `agentkit trending`
+
+Status: In Progress
+Date: 2026-03-15
+Owner: Codex execution pass
+Scope type: Deliverable-gated (no hour promises)
+
+## 1. Objective
+
+Build `agentkit trending` — a command that fetches trending/popular GitHub repos via the GitHub API, scores each with `agentkit analyze`, and produces a shareable ranked report. 
+
+This is a viral distribution mechanic: "Which trending repos are most AI-agent-ready today?" The output is a beautiful HTML report publishable via here.now, and a terminal table for quick consumption. It creates fresh, repeatable, shareable content without needing new features.
+
+This contract is considered complete only when every deliverable and validation gate below is satisfied.
+
+## 2. Non-Negotiable Build Rules
+
+1. No time-based completion claims.
+2. Completion is allowed only when all checklist items are checked.
+3. Full test suite must pass at the end (all 1057 existing tests + new ones).
+4. New features must ship with docs and report addendum updates in the same pass.
+5. CLI outputs must be deterministic and schema-backed where specified.
+6. Never modify files outside the project directory (~repos/agentkit-cli/).
+7. Commit after each completed deliverable (not at the end).
+8. If stuck on same issue for 3 attempts, stop and write a blocker report.
+9. Do NOT refactor, restyle, or "improve" code outside the deliverables.
+10. Read existing tests and docs before writing new code.
+11. Do NOT publish to PyPI or push to GitHub — build-loop handles releases.
+12. Do NOT deploy or publish to here.now — that's for the build-loop to decide.
+
+## 3. Feature Deliverables
+
+### D1. GitHub Trending Fetcher (`agentkit_cli/trending.py`)
+
+Build a module that fetches popular GitHub repos via the GitHub Search API (no auth required for basic use, uses `GITHUB_TOKEN` if set for higher rate limits).
+
+Default sources (configurable via CLI flags):
+- **Trending today**: `https://api.github.com/search/repositories?q=created:>YESTERDAY&sort=stars&order=desc&per_page=10`
+- **Weekly trending**: created in last 7 days, sorted by stars
+- **Topic-scoped**: `q=topic:ai+topic:agent created:>WEEK` for AI agent repos
+
+Required file: `agentkit_cli/trending.py`
+
+Functions:
+- `fetch_trending(period: str = "day", topic: str | None = None, limit: int = 10, token: str | None = None) -> list[dict]`
+  - period: "day", "week", "month"
+  - topic: optional GitHub topic filter (e.g. "ai-agent", "llm")
+  - Returns list of `{full_name, description, stars, language, url}` dicts
+- `fetch_popular(category: str = "ai", limit: int = 10, token: str | None = None) -> list[dict]`
+  - category: "ai" (query `topic:ai-agent OR topic:llm`), "python", "all"
+  - Returns same format
+
+- [ ] `agentkit_cli/trending.py` with `fetch_trending()` and `fetch_popular()`
+- [ ] Graceful handling of rate limits (print warning, return empty list)
+- [ ] Unit tests using mocked HTTP responses (no real API calls in tests)
+- [ ] Tests for period filtering, topic filtering, error handling
+
+### D2. `agentkit trending` CLI command (`agentkit_cli/commands/trending_cmd.py`)
+
+New top-level command: `agentkit trending [OPTIONS]`
+
+Options:
+- `--period [day|week|month]` — trending time window (default: "week")
+- `--topic TEXT` — filter by GitHub topic (e.g. "ai-agent")
+- `--limit INT` — max repos to fetch (default: 10, max: 25)
+- `--category [ai|python|all]` — pre-defined repo category (default: "ai")
+- `--share` — publish HTML report to here.now and print URL
+- `--json` — output JSON instead of table
+- `--no-analyze` — skip agentkit analysis, just list repos (fast mode)
+- `--min-stars INT` — filter repos below this star count (default: 100)
+- `--token TEXT` — GitHub API token (or GITHUB_TOKEN env var)
+
+Behavior:
+1. Fetch repos from GitHub (with `fetch_trending()` or `fetch_popular()`)
+2. Filter by `--min-stars`
+3. For each repo: run `agentkit analyze github:<full_name>` (unless `--no-analyze`)
+4. Display ranked Rich table: Rank | Repo | Stars | Score | Grade | URL
+5. With `--share`: generate dark-theme HTML report + publish via here.now API
+
+Required file: `agentkit_cli/commands/trending_cmd.py`
+
+Register in `agentkit_cli/main.py` as `app.add_typer(trending_app, name="trending")` or `@app.command("trending")`.
+
+- [ ] `trending_cmd.py` with all options
+- [ ] Rich table output matching existing toolkit style (dark theme)
+- [ ] `--no-analyze` fast mode (just list, no scoring)
+- [ ] `--json` output with schema: `{period, topic, repos: [{rank, full_name, stars, score, grade, url}]}`
+- [ ] Registered in `main.py`
+- [ ] Tests for CLI parsing, flag combinations, `--no-analyze` output
+
+### D3. HTML Report for `--share`
+
+When `--share` is used, generate a dark-theme HTML report (matching the scorecard style from jade-rosette-v48x.here.now) with:
+- Page title: "Trending Repos: Agent Quality Rankings"
+- Subtitle: "Generated by agentkit-cli | {date}"
+- Summary card: repos analyzed, avg score, top scorer
+- Ranked table: Rank | Repo (linked to GitHub) | Stars ⭐ | Score | Grade
+- Footer with agentkit-cli version + "pip install agentkit-cli"
+- Publish via the 3-step here.now API (same flow as `agentkit share`)
+- Print the live URL to stdout
+
+Required file: `agentkit_cli/trending_report.py`
+
+The here.now publish flow:
+```python
+# Step 1: POST https://here.now/api/v1/publish with file list
+# Step 2: PUT to each upload URL  
+# Step 3: POST finalizeUrl with versionId
+```
+
+- [ ] `trending_report.py` with `generate_html(results) -> str` and `publish_report(html) -> str` (returns URL)
+- [ ] HTML template matching dark scorecard style (#0d1117 background, #58a6ff accent)
+- [ ] here.now publish via 3-step API
+- [ ] Fallback: if here.now publish fails, save HTML to `./trending-report.html` and print path
+- [ ] Tests for HTML generation (structure checks, not pixel-perfect)
+
+### D4. Version bump + docs + CHANGELOG + BUILD-REPORT
+
+- Bump version in `pyproject.toml` and `agentkit_cli/__init__.py` to `0.29.0`
+- Update `CHANGELOG.md` with `## [0.29.0] - 2026-03-15`
+- Update `README.md`: add `agentkit trending` to the commands table and add a "Trending Analysis" section showing example usage
+- Write `BUILD-REPORT.md` in the repo root (not a new file, overwrite existing) with results summary
+- Update `progress-log.md` at each deliverable
+
+- [ ] Version bumped to 0.29.0 in pyproject.toml + __init__.py
+- [ ] CHANGELOG.md entry written
+- [ ] README.md updated with trending command
+- [ ] BUILD-REPORT.md written with deliverable status + test counts
+- [ ] All 1057+ tests passing
+
+## 4. Test Requirements
+
+- [ ] Unit tests for `trending.py` functions (mocked HTTP, no real API calls)
+- [ ] Unit tests for `trending_cmd.py` CLI (flag parsing, output format)
+- [ ] Unit tests for `trending_report.py` HTML generation
+- [ ] Integration test: `--no-analyze` mode end-to-end with mocked GitHub response
+- [ ] Edge cases: rate limit response, empty results, single repo, stars below min-stars
+- [ ] All 1057 existing tests still pass
+- [ ] Total new tests: at least 35
+
+## 5. Reports
+
+- Write progress to `progress-log.md` after each deliverable
+- Include: what was built, what tests pass, what's next, any blockers
+- Final summary when all deliverables done or stopped
+
+## 6. Stop Conditions
+
+- All deliverables checked and all tests passing → DONE
+- 3 consecutive failed attempts on same issue → STOP, write blocker report
+- Scope creep detected (new requirements discovered) → STOP, report what's new
+- All tests passing but deliverables remain → continue to next deliverable
+- Do NOT publish to PyPI or push to GitHub — stop at local commit
+
+## 7. Reference
+
+Existing similar commands to study before starting:
+- `agentkit_cli/commands/analyze_cmd.py` — GitHub repo cloning + analysis
+- `agentkit_cli/commands/sweep_cmd.py` — batch analysis of multiple repos
+- `agentkit_cli/commands/share_cmd.py` — here.now publish flow
+- `agentkit_cli/commands/report_cmd.py` — HTML report generation style
+- `agentkit_cli/here_now.py` (if exists) or inline publish in share_cmd.py — here.now API
+
+Study these before writing new code. Do not duplicate logic; extract shared utilities if needed.

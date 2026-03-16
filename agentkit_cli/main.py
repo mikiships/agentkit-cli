@@ -33,6 +33,7 @@ from agentkit_cli.commands.config_cmd import config_app
 from agentkit_cli.commands.profile_cmd import profile_app
 from agentkit_cli.commands.insights_cmd import insights_command
 from agentkit_cli.commands.trending_cmd import trending_command
+from agentkit_cli.commands.duel_cmd import duel_command
 
 app = typer.Typer(
     name="agentkit",
@@ -477,6 +478,26 @@ def insights(
         trending=trending,
         all_sections=all_sections,
         json_output=json_output,
+    )
+
+
+@app.command("duel")
+def duel(
+    target1: str = typer.Argument(..., help="First target: github:owner/repo or local path"),
+    target2: str = typer.Argument(..., help="Second target: github:owner/repo or local path"),
+    share: bool = typer.Option(False, "--share/--no-share", help="Publish comparison to here.now"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON payload"),
+    timeout: int = typer.Option(120, "--timeout", help="Per-repo analysis timeout in seconds"),
+    keep: bool = typer.Option(False, "--keep", help="Keep cloned repos after analysis"),
+) -> None:
+    """Head-to-head agent-readiness comparison of two GitHub repos."""
+    duel_command(
+        target1=target1,
+        target2=target2,
+        share=share,
+        json_output=json_output,
+        timeout=timeout,
+        keep=keep,
     )
 
 

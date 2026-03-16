@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.30.0] - 2026-03-16
+
+### Added
+- `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison of two GitHub repos
+  - Runs both analyses in parallel using `ThreadPoolExecutor(max_workers=2)`
+  - Determines winner (or tie if scores within 5 points) with delta visualization
+  - `--share` / `--no-share`: publish dark-theme HTML comparison report to here.now
+  - `--json`: output structured JSON payload with scores, breakdown, winner, delta
+  - `--timeout INT`: per-repo analysis timeout (default: 120s)
+  - `--keep`: keep cloned repos after analysis
+  - Handles partial failures gracefully (one side can fail, other side wins)
+- `agentkit_cli/duel.py`: core duel engine with `DuelResult` dataclass and `run_duel()`
+- `agentkit_cli/duel_report.py`: dark-theme two-column HTML report generation and here.now upload
+
 ## [0.29.0] - 2026-03-15
 
 ### Added

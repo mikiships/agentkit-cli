@@ -91,6 +91,7 @@ agentkit gate --profile strict --min-score 99
 - `agentkit gate` — fail if score < threshold
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
+- `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
 - `agentkit profile <sub>` — manage quality profiles
 - `agentkit config <sub>` — manage configuration
 - `agentkit history` — show score history
