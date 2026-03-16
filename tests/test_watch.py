@@ -53,11 +53,12 @@ class TestChangeHandler:
 
     def test_debounce_resets_on_rapid_changes(self):
         """Rapid changes reset the debounce timer, firing only once."""
-        handler, calls = self._make_handler(debounce=0.1)
+        handler, calls = self._make_handler(debounce=0.15)
         for i in range(5):
             handler.on_modified(f"/tmp/test/file{i}.py")
             time.sleep(0.02)
-        time.sleep(0.25)
+        # Wait well past debounce (5×20ms=100ms for events + 150ms debounce + 200ms buffer)
+        time.sleep(0.5)
         # Only one fire should happen (last file)
         assert len(calls) == 1
 
