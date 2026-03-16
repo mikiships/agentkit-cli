@@ -36,6 +36,7 @@ from agentkit_cli.commands.insights_cmd import insights_command
 from agentkit_cli.commands.trending_cmd import trending_command
 from agentkit_cli.commands.duel_cmd import duel_command
 from agentkit_cli.commands.tournament_cmd import tournament_command
+from agentkit_cli.commands.org_cmd import org_command
 from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.serve import DEFAULT_PORT
 
@@ -544,6 +545,34 @@ def tournament(
         output=output,
         timeout=timeout,
         keep=keep,
+    )
+
+
+@app.command("org")
+def org(
+    target: str = typer.Argument(..., help="GitHub org or user to analyze: 'github:vercel' or 'vercel'"),
+    include_forks: bool = typer.Option(False, "--include-forks", help="Include forked repos"),
+    include_archived: bool = typer.Option(False, "--include-archived", help="Include archived repos"),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Max repos to analyze"),
+    parallel: int = typer.Option(3, "--parallel", help="Parallel analysis workers (default: 3)"),
+    timeout: int = typer.Option(120, "--timeout", help="Per-repo timeout in seconds"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML report to here.now and print URL"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to file"),
+    json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN env var)"),
+) -> None:
+    """Score every public repo in a GitHub org or user account."""
+    org_command(
+        target=target,
+        include_forks=include_forks,
+        include_archived=include_archived,
+        limit=limit,
+        parallel=parallel,
+        timeout=timeout,
+        share=share,
+        output=output,
+        json_output=json_output,
+        token=token,
     )
 
 
