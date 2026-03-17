@@ -98,6 +98,7 @@ agentkit gate --profile strict --min-score 99
 - `agentkit run` — run the full pipeline
 - `agentkit score` — compute composite score
 - `agentkit gate` — fail if score < threshold
+- `agentkit redteam [PATH]` — adversarial eval: score how well your agent context resists attacks
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
@@ -538,3 +539,45 @@ Run `pytest -m smoke` before any release to catch integration regressions.
 ## License
 
 MIT
+
+## Red-Team Your Agent Setup
+
+`agentkit redteam` scores how well your agent context file (`CLAUDE.md` / `AGENTS.md`) resists adversarial attacks. Static analysis only — no LLM required. Truly model-agnostic.
+
+```bash
+# Analyze current directory
+agentkit redteam
+
+# Analyze a specific project
+agentkit redteam ./my-agent-project
+
+# CI gate: fail if resistance score < 70
+agentkit redteam --min-score 70
+
+# JSON output for programmatic use
+agentkit redteam --json
+
+# Save HTML report
+agentkit redteam --output redteam-report.html
+
+# Share HTML report via here.now
+agentkit redteam --share
+```
+
+**Categories checked:**
+- `prompt_injection` — attempts to inject instructions via user input
+- `jailbreak` — persona and restriction bypass attempts
+- `context_confusion` — fake context and history injection
+- `instruction_override` — priority and mode override attempts
+- `data_extraction` — system prompt and credential extraction
+- `role_escalation` — privilege and authority escalation
+
+**CI integration:**
+```yaml
+- name: Red-team agent config
+  run: agentkit redteam --min-score 70
+```
+
+Exit code 1 if `--min-score` threshold is not met. Combine with `agentkit run --redteam` to add adversarial eval to your full pipeline.
+
+**Distribution angle:** After OpenAI's $86M acquisition of Promptfoo, teams using non-OpenAI models need a neutral red-team tool. Static analysis = no model dependency = truly model-agnostic.

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.41.0] - 2026-03-17
+
+### Added
+- `agentkit redteam` command: adversarial eval of agent context files with static analysis resistance scoring
+- `RedTeamEngine`: deterministic attack generation across 6 categories (48 templates, no LLM required)
+- `RedTeamScorer`: static analysis resistance scoring with 7 vulnerability rules, per-category and composite score
+- Dark-theme self-contained HTML report with collapsible attack samples and recommendations
+- `--min-score` CI gate: exit 1 if overall score < N — fail the build before unsafe configs ship
+- `--json`, `--output`, `--share`, `--categories`, `--attacks-per-category` options
+- `agentkit run --redteam` flag to run adversarial eval after full pipeline
+- `agentkit score` now includes redteam score in composite when context file is present
+- 79 new tests (1663 total)
+
 ## [0.40.1] - 2026-03-17
 
 ### Fixed
