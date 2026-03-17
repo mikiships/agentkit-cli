@@ -40,6 +40,7 @@ from agentkit_cli.commands.org_cmd import org_command
 from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.commands.campaign_cmd import campaign_command
+from agentkit_cli.commands.track_cmd import track_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -647,6 +648,24 @@ def campaign(
         json_output=json_output,
         no_filter=no_filter,
         skip_pr=skip_pr,
+        share=share,
+    )
+
+
+@app.command("track")
+def track(
+    campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Filter to a specific campaign"),
+    limit: int = typer.Option(20, "--limit", help="Max PRs to show (default 20)"),
+    all_prs: bool = typer.Option(False, "--all", help="Show all tracked PRs (no limit)"),
+    json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
+    share: bool = typer.Option(False, "--share", help="Upload dark-theme HTML report to here.now"),
+) -> None:
+    """Track PR status for campaign-submitted pull requests."""
+    track_command(
+        campaign_id=campaign_id,
+        limit=limit,
+        all_prs=all_prs,
+        json_output=json_output,
         share=share,
     )
 
