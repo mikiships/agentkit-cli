@@ -42,10 +42,25 @@ CREATE INDEX IF NOT EXISTS idx_runs_project ON runs(project);
 CREATE INDEX IF NOT EXISTS idx_runs_ts      ON runs(ts DESC);
 """
 
+_CAMPAIGNS_DDL = """
+CREATE TABLE IF NOT EXISTS campaigns (
+    campaign_id TEXT PRIMARY KEY,
+    target_spec TEXT NOT NULL,
+    started_at  TEXT NOT NULL,
+    completed_at TEXT,
+    total_repos INTEGER DEFAULT 0,
+    pr_count    INTEGER DEFAULT 0,
+    skip_count  INTEGER DEFAULT 0,
+    fail_count  INTEGER DEFAULT 0
+);
+"""
+
 _MIGRATIONS = [
     "ALTER TABLE runs ADD COLUMN label TEXT",
     "CREATE INDEX IF NOT EXISTS idx_runs_label ON runs(label)",
     "ALTER TABLE runs ADD COLUMN findings TEXT",
+    _CAMPAIGNS_DDL,
+    "ALTER TABLE runs ADD COLUMN campaign_id TEXT REFERENCES campaigns(campaign_id)",
 ]
 
 
@@ -93,6 +108,7 @@ class HistoryDB:
         details: Optional[dict] = None,
         label: Optional[str] = None,
         findings: Optional[list] = None,
+        campaign_id: Optional[str] = None,
     ) -> None:
         """Insert one run record."""
         ts = datetime.now(timezone.utc).isoformat()
@@ -100,8 +116,8 @@ class HistoryDB:
         findings_json = json.dumps(findings) if findings is not None else None
         with self._connect() as conn:
             conn.execute(
-                "INSERT INTO runs (ts, project, tool, score, details, label, findings) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (ts, project, tool, float(score), details_json, label, findings_json),
+                "INSERT INTO runs (ts, project, tool, score, details, label, findings, campaign_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (ts, project, tool, float(score), details_json, label, findings_json, campaign_id),
             )
 
     def get_history(
@@ -231,6 +247,57 @@ class HistoryDB:
         # Sort by avg descending
         results.sort(key=lambda r: r["avg_score"], reverse=True)
         return results
+
+    def record_campaign(self, result: "CampaignResult") -> None:
+        """Insert a campaign result into the campaigns table."""
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO campaigns
+                    (campaign_id, target_spec, started_at, completed_at, total_repos, pr_count, skip_count, fail_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    result.campaign_id,
+                    result.target_spec,
+                    now,
+                    now,
+                    len(result.submitted) + len(result.skipped) + len(result.failed),
+                    len(result.submitted),
+                    len(result.skipped),
+                    len(result.failed),
+                ),
+            )
+            # Update any runs with this campaign_id
+            conn.execute(
+                "UPDATE runs SET campaign_id = ? WHERE campaign_id = ?",
+                (result.campaign_id, result.campaign_id),
+            )
+
+    def get_campaigns(self, limit: int = 20) -> list[dict]:
+        """Return campaign rows newest-first."""
+        sql = "SELECT * FROM campaigns ORDER BY started_at DESC LIMIT ?"
+        with self._connect() as conn:
+            rows = conn.execute(sql, (limit,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_campaign_runs(self, campaign_id: str) -> list[dict]:
+        """Return all runs associated with a campaign_id."""
+        sql = "SELECT * FROM runs WHERE campaign_id = ? ORDER BY ts DESC"
+        with self._connect() as conn:
+            rows = conn.execute(sql, (campaign_id,)).fetchall()
+        result = []
+        for row in rows:
+            d = dict(row)
+            if d.get("details"):
+                try:
+                    d["details"] = json.loads(d["details"])
+                except Exception:
+                    pass
+            result.append(d)
+        return result
 
     def clear_history(self, project: Optional[str] = None) -> int:
         """Delete history rows. Returns count deleted."""

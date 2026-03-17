@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.39.0] - 2026-03-17
+
+### Added
+- `agentkit campaign` — batch PR submission to multiple repos in one command
+  - Supports `github:owner`, `topic:TOPIC`, and `repos-file:PATH` target specs
+  - Filters repos that already have CLAUDE.md or AGENTS.md
+  - Submits PRs via `agentkit pr` (rate-limited, max 5 by default)
+  - `--dry-run` mode shows what would happen without opening PRs
+  - `--skip-pr` for discovery-only mode
+  - `--share` uploads a dark-theme HTML report to here.now
+  - Rich table output with per-repo status (✅ PR / ⏭ skip / ❌ err)
+- Campaign history: `campaigns` table in history DB, `--campaigns` and `--campaign-id` flags on `agentkit history`
+- `agentkit_cli/campaign.py` — CampaignEngine with find_repos, has_context_file, filter_missing_context, run_campaign
+- `agentkit_cli/campaign_report.py` — dark-theme HTML campaign report generator
+
 ## [0.38.0] - 2026-03-16
 
 ### Added

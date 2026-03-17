@@ -39,6 +39,7 @@ from agentkit_cli.commands.tournament_cmd import tournament_command
 from agentkit_cli.commands.org_cmd import org_command
 from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.commands.pr_cmd import pr_command
+from agentkit_cli.commands.campaign_cmd import campaign_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -291,6 +292,8 @@ def history(
     yes: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation for --clear"),
     all_projects: bool = typer.Option(False, "--all-projects", help="Show history for all projects"),
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+    campaigns: bool = typer.Option(False, "--campaigns", help="Show campaign-grouped summary"),
+    campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Show all PRs from a specific campaign"),
 ) -> None:
     """Show agent quality score history and trends."""
     history_command(
@@ -303,6 +306,8 @@ def history(
         yes=yes,
         all_projects=all_projects,
         db_path=db_path,
+        campaigns=campaigns,
+        campaign_id=campaign_id,
     )
 
 
@@ -613,6 +618,36 @@ def pr(
         pr_title=pr_title,
         pr_body_file=pr_body_file,
         json_output=json_output,
+    )
+
+
+@app.command("campaign")
+def campaign(
+    target: str = typer.Argument(..., help="Target spec: github:owner, topic:TOPIC, or repos-file:PATH"),
+    limit: int = typer.Option(5, "--limit", help="Max repos to target [default: 5]"),
+    language: Optional[str] = typer.Option(None, "--language", help="Filter by language (e.g. python, typescript)"),
+    min_stars: int = typer.Option(100, "--min-stars", help="Minimum stars threshold [default: 100]"),
+    file: str = typer.Option("CLAUDE.md", "--file", help="Context file name to generate [default: CLAUDE.md]"),
+    force: bool = typer.Option(False, "--force", help="Submit PR even if context file exists"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would happen, no PRs opened"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of rich table"),
+    no_filter: bool = typer.Option(False, "--no-filter", help="Skip the 'already has context file' check"),
+    skip_pr: bool = typer.Option(False, "--skip-pr", help="Only discover repos, don't submit PRs"),
+    share: bool = typer.Option(False, "--share", help="Generate and upload a shareable campaign report"),
+) -> None:
+    """Submit CLAUDE.md PRs to multiple repos in one command."""
+    campaign_command(
+        target=target,
+        limit=limit,
+        language=language,
+        min_stars=min_stars,
+        file=file,
+        force=force,
+        dry_run=dry_run,
+        json_output=json_output,
+        no_filter=no_filter,
+        skip_pr=skip_pr,
+        share=share,
     )
 
 

@@ -56,6 +56,8 @@ def history_command(
     yes: bool = typer.Option(False, "--yes", "-y", help="Skip confirmation prompt for --clear"),
     all_projects: bool = typer.Option(False, "--all-projects", help="Show history for all projects"),
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+    campaigns: bool = typer.Option(False, "--campaigns", help="Show campaign-grouped summary"),
+    campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Show all PRs from a specific campaign"),
 ) -> None:
     """Show agent quality history and trends."""
     db = HistoryDB(db_path) if db_path else HistoryDB()
@@ -70,6 +72,16 @@ def history_command(
                 raise typer.Exit()
         deleted = db.clear_history(project_name)
         typer.echo(f"Deleted {deleted} record(s) for project '{project_name}'.")
+        return
+
+    # --campaigns
+    if campaigns:
+        _show_campaigns(db, json_output, limit)
+        return
+
+    # --campaign-id
+    if campaign_id:
+        _show_campaign_detail(db, campaign_id, json_output)
         return
 
     # --all-projects
@@ -175,4 +187,59 @@ def _show_all_projects(db: HistoryDB, json_output: bool) -> None:
         )
 
     console.print()
+    console.print(table)
+
+
+def _show_campaigns(db: HistoryDB, json_output: bool, limit: int = 20) -> None:
+    rows = db.get_campaigns(limit=limit)
+    if json_output:
+        typer.echo(json.dumps(rows, indent=2))
+        return
+    if not rows:
+        console.print("[dim]No campaigns found.[/dim]")
+        return
+    table = Table(title="Campaign History", show_header=True, header_style="bold")
+    table.add_column("Campaign ID")
+    table.add_column("Target")
+    table.add_column("When", style="dim")
+    table.add_column("PRs", justify="right")
+    table.add_column("Skipped", justify="right")
+    table.add_column("Failed", justify="right")
+    for row in rows:
+        table.add_row(
+            row["campaign_id"],
+            row["target_spec"],
+            (row["started_at"] or "")[:16].replace("T", " "),
+            str(row["pr_count"]),
+            str(row["skip_count"]),
+            str(row["fail_count"]),
+        )
+    console.print(table)
+
+
+def _show_campaign_detail(db: HistoryDB, campaign_id: str, json_output: bool) -> None:
+    runs = db.get_campaign_runs(campaign_id)
+    campaigns = db.get_campaigns(limit=100)
+    campaign = next((c for c in campaigns if c["campaign_id"] == campaign_id), None)
+    if json_output:
+        typer.echo(json.dumps({"campaign": campaign, "runs": runs}, indent=2))
+        return
+    if campaign:
+        console.print(f"[bold]Campaign:[/bold] {campaign_id}")
+        console.print(f"  Target: {campaign['target_spec']}  PRs: {campaign['pr_count']}  Skipped: {campaign['skip_count']}  Failed: {campaign['fail_count']}")
+    if not runs:
+        console.print("[dim]No run records linked to this campaign.[/dim]")
+        return
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("Project")
+    table.add_column("Tool")
+    table.add_column("Score", justify="right")
+    table.add_column("When", style="dim")
+    for run in runs:
+        table.add_row(
+            run["project"],
+            run["tool"],
+            f"{run['score']:.1f}",
+            (run["ts"] or "")[:16].replace("T", " "),
+        )
     console.print(table)

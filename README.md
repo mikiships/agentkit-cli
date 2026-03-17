@@ -110,6 +110,66 @@ agentkit gate --profile strict --min-score 99
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
 - `agentkit org <owner>` — score every public repo in a GitHub org or user account
 - `agentkit pr github:<owner>/<repo>` — submit a CLAUDE.md PR to any public GitHub repo
+- `agentkit campaign <target>` — batch PR submission to multiple repos in one command
+
+## Campaign: Batch PR Submission
+
+`agentkit campaign` finds repos missing CLAUDE.md and submits PRs to all of them in one command.
+
+```bash
+# Submit CLAUDE.md PRs to all public repos in an org (up to 5, default)
+agentkit campaign github:pallets
+
+# Discover repos without submitting PRs (dry run)
+agentkit campaign github:pallets --dry-run --limit 10
+
+# Target by topic
+agentkit campaign topic:ai-agents --language python --min-stars 500
+
+# Use a file of repos
+agentkit campaign repos-file:my-targets.txt
+
+# Only discover repos (no PRs)
+agentkit campaign github:pallets --skip-pr
+
+# Generate and share an HTML report
+agentkit campaign github:pallets --share
+```
+
+Example output:
+```
+Campaign ID: abc12345
+Target: github:pallets  Limit: 5  File: CLAUDE.md
+
+┌────────────┬────────┬────────┬────────────────────────────────┐
+│ Repo       │ Stars  │ Status │ PR URL / Note                  │
+├────────────┼────────┼────────┼────────────────────────────────┤
+│ flask      │ ★ 68k  │ ✅ PR  │ https://github.com/.../pull/42 │
+│ click      │ ★ 15k  │ ✅ PR  │ https://github.com/.../pull/7  │
+│ jinja      │ ★ 10k  │ ⏭ skip│ Already has context file       │
+│ werkzeug   │ ★ 7k   │ ✅ PR  │ https://github.com/.../pull/12 │
+│ markupsafe │ ★ 600  │ ❌ err │ Fork creation failed           │
+└────────────┴────────┴────────┴────────────────────────────────┘
+Campaign complete. 3 PRs opened, 1 skipped, 1 failed.
+```
+
+Options:
+- `--limit N` — max repos to target (default: 5)
+- `--language TEXT` — filter by language (e.g. python, typescript)
+- `--min-stars N` — minimum stars threshold (default: 100)
+- `--file TEXT` — context file name (default: CLAUDE.md)
+- `--force` — submit PR even if context file exists
+- `--dry-run` — show what would happen, no PRs opened
+- `--json` — output CampaignResult as JSON
+- `--no-filter` — skip the "already has context file" check
+- `--skip-pr` — only discover repos, don't submit PRs
+- `--share` — upload HTML report to here.now
+
+View campaign history with:
+```bash
+agentkit history --campaigns
+agentkit history --campaign-id <id>
+```
 
 ## Org Analysis
 
