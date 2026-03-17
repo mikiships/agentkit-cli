@@ -41,6 +41,7 @@ from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.commands.campaign_cmd import campaign_command
 from agentkit_cli.commands.track_cmd import track_command
+from agentkit_cli.commands.redteam_cmd import redteam_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -92,6 +93,7 @@ def run(
     release_check: bool = typer.Option(False, "--release-check", help="Verify release surfaces after pipeline completes"),
     record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
     serve: bool = typer.Option(False, "--serve", help="Print dashboard URL after run completes"),
+    run_redteam: bool = typer.Option(False, "--redteam", help="Run adversarial eval after pipeline completes"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
     run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings)
@@ -103,6 +105,16 @@ def run(
         from agentkit_cli.commands.release_check_cmd import _render_table
         result = run_release_check(path=path or None)
         _render_table(result)
+    if run_redteam:
+        redteam_command(
+            path=path,
+            categories=None,
+            attacks_per_category=3,
+            json_output=json_output,
+            share=False,
+            min_score=None,
+            output=None,
+        )
 
 
 @app.command("doctor")
@@ -667,6 +679,28 @@ def track(
         all_prs=all_prs,
         json_output=json_output,
         share=share,
+    )
+
+
+@app.command("redteam")
+def redteam(
+    path: Optional[Path] = typer.Argument(None, help="Project directory to analyze (default: cwd)"),
+    categories: Optional[str] = typer.Option(None, "--categories", help="Comma-separated categories to test (default: all)"),
+    attacks_per_category: int = typer.Option(3, "--attacks-per-category", help="Attack samples per category (default: 3)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit JSON output"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML report to here.now and print URL"),
+    min_score: Optional[int] = typer.Option(None, "--min-score", help="Exit 1 if overall score < N (CI gate)"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
+) -> None:
+    """Adversarial eval: score how well your agent context file resists attacks. CI-gate ready."""
+    redteam_command(
+        path=path,
+        categories=categories,
+        attacks_per_category=attacks_per_category,
+        json_output=json_output,
+        share=share,
+        min_score=min_score,
+        output=output,
     )
 
 

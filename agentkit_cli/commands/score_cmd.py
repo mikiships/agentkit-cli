@@ -98,6 +98,16 @@ def score_command(
     for tool in ("coderace", "agentmd", "agentreflect"):
         tool_scores[tool] = _get_last_tool_score(project, tool)
 
+    # Optionally include redteam score if context file is present
+    from agentkit_cli.redteam_scorer import RedTeamScorer as _RTScorer
+    try:
+        _rt_scorer = _RTScorer(n_per_category=1)
+        _rt_report = _rt_scorer.score_resistance(root)
+        if _rt_report.score_overall > 0:
+            tool_scores["redteam"] = _rt_report.score_overall
+    except Exception:
+        pass
+
     engine = CompositeScoreEngine()
 
     try:
