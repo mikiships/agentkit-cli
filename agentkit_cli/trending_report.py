@@ -216,14 +216,16 @@ def publish_report(html: str, api_key: Optional[str] = None) -> str:
 
     content_bytes = html.encode("utf-8")
 
-    # Step 1: request upload URLs
+    # Step 1: request upload URLs (use same schema as publish.publish_html)
     publish_url = f"{HERENOW_API_BASE}/publish"
-    body = {"files": [{"name": "index.html", "contentType": "text/html"}]}
+    body = {"files": [{"path": "index.html", "contentType": "text/html; charset=utf-8", "size": len(content_bytes)}]}
     resp = _json_post(publish_url, body, headers=headers)
 
-    uploads: list = resp.get("files") or resp.get("uploads") or []
-    version_id: Optional[str] = resp.get("versionId") or resp.get("version_id")
-    finalize_url: Optional[str] = resp.get("finalizeUrl") or resp.get("finalize_url")
+    upload_info = resp.get("upload") or {}
+    uploads: list = upload_info.get("uploads") or resp.get("uploadUrls") or []
+    version_id: Optional[str] = upload_info.get("versionId") or resp.get("versionId")
+    finalize_url: Optional[str] = upload_info.get("finalizeUrl") or resp.get("finalizeUrl")
+    live_url: Optional[str] = resp.get("siteUrl") or resp.get("url")
 
     if not uploads or not finalize_url:
         raise PublishError(f"Unexpected response from here.now publish: {resp}")
@@ -233,11 +235,12 @@ def publish_report(html: str, api_key: Optional[str] = None) -> str:
     put_url = upload.get("url") or upload.get("uploadUrl")
     if not put_url:
         raise PublishError(f"No upload URL in response: {upload}")
-    _put_file(put_url, content_bytes, content_type="text/html")
+    _put_file(put_url, content_bytes, content_type="text/html; charset=utf-8")
 
     # Step 3: finalize
     final_resp = _finalize(finalize_url, version_id=version_id)
-    live_url = final_resp.get("url") or final_resp.get("deployUrl") or final_resp.get("site_url")
+    if not live_url:
+        live_url = final_resp.get("url") or final_resp.get("deployUrl") or final_resp.get("siteUrl")
     if not live_url:
         raise PublishError(f"No URL in finalize response: {final_resp}")
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.40.1] - 2026-03-17
+
+### Fixed
+- `agentkit trending --share`: here.now publish API call was missing `path` and `size` fields in the files payload, causing HTTP 400 errors. Fixed by aligning `trending_report.publish_report` schema with the working `publish.publish_html` implementation.
+
 ## [0.40.0] - 2026-03-17
 
 ### Added
