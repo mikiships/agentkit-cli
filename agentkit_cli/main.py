@@ -42,6 +42,7 @@ from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.commands.campaign_cmd import campaign_command
 from agentkit_cli.commands.track_cmd import track_command
 from agentkit_cli.commands.redteam_cmd import redteam_command
+from agentkit_cli.commands.harden_cmd import harden_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -94,9 +95,10 @@ def run(
     record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
     serve: bool = typer.Option(False, "--serve", help="Print dashboard URL after run completes"),
     run_redteam: bool = typer.Option(False, "--redteam", help="Run adversarial eval after pipeline completes"),
+    run_harden: bool = typer.Option(False, "--harden", help="Run harden on detected context file after pipeline"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -691,6 +693,8 @@ def redteam(
     share: bool = typer.Option(False, "--share", help="Upload HTML report to here.now and print URL"),
     min_score: Optional[int] = typer.Option(None, "--min-score", help="Exit 1 if overall score < N (CI gate)"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
+    fix: bool = typer.Option(False, "--fix", help="Auto-patch detected vulnerabilities in place"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what --fix would change without writing"),
 ) -> None:
     """Adversarial eval: score how well your agent context file resists attacks. CI-gate ready."""
     redteam_command(
@@ -701,7 +705,22 @@ def redteam(
         share=share,
         min_score=min_score,
         output=output,
+        fix=fix,
+        dry_run=dry_run,
     )
+
+
+@app.command("harden")
+def harden(
+    path: Optional[Path] = typer.Argument(None, help="Context file or directory (default: cwd)"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write hardened file to this path"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would change without writing"),
+    report: bool = typer.Option(False, "--report", help="Generate dark-theme HTML report"),
+    share: bool = typer.Option(False, "--share", help="Upload report to here.now and return URL"),
+    json_output: bool = typer.Option(False, "--json", help="Emit structured JSON output"),
+) -> None:
+    """Analyze and auto-harden an agent context file. Applies all safe remediations and shows score lift."""
+    harden_command(path=path, output=output, dry_run=dry_run, report=report, share=share, json_output=json_output)
 
 
 @app.command("watch")

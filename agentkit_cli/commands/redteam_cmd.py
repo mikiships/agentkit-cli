@@ -18,6 +18,44 @@ from agentkit_cli.redteam_report import save_html, publish_report
 console = Console()
 
 
+def _render_fix_table(original_report, fixed_report, result) -> None:
+    """Render before/after fix table."""
+    from agentkit_cli.redteam_fixer import FixResult
+    table = Table(title="Remediation Results", show_header=True, header_style="bold dim")
+    table.add_column("Category", style="bold")
+    table.add_column("Before", justify="right")
+    table.add_column("After", justify="right")
+    table.add_column("Delta", justify="right")
+    table.add_column("Status", justify="center")
+
+    for cat_str in original_report.score_by_category:
+        before = original_report.score_by_category[cat_str]
+        after = fixed_report.score_by_category.get(cat_str, before)
+        delta = after - before
+        label = cat_str.replace("_", " ").title()
+        before_color = _score_color(before)
+        after_color = _score_color(after)
+        delta_color = "green" if delta > 0 else ("red" if delta < 0 else "dim")
+        delta_str = f"+{delta:.0f}" if delta > 0 else f"{delta:.0f}"
+        # Was this rule applied?
+        was_applied = cat_str in result.rules_applied
+        status = "[green]✓ Fixed[/green]" if was_applied else "[dim]—[/dim]"
+        table.add_row(
+            label,
+            f"[{before_color}]{before:.0f}[/{before_color}]",
+            f"[{after_color}]{after:.0f}[/{after_color}]",
+            f"[{delta_color}]{delta_str}[/{delta_color}]",
+            status,
+        )
+    console.print(table)
+    console.print(
+        f"\n  Overall: [{_score_color(original_report.score_overall)}]"
+        f"{original_report.score_overall:.0f}[/{_score_color(original_report.score_overall)}]"
+        f" → [{_score_color(fixed_report.score_overall)}]"
+        f"{fixed_report.score_overall:.0f}[/{_score_color(fixed_report.score_overall)}]"
+    )
+
+
 def _score_color(score: float) -> str:
     if score >= 80:
         return "green"
@@ -38,6 +76,8 @@ def redteam_command(
     share: bool,
     min_score: Optional[int],
     output: Optional[Path],
+    fix: bool = False,
+    dry_run: bool = False,
 ) -> None:
     """Run adversarial eval on an agent context file and report resistance score."""
     target = (path or Path(".")).resolve()
@@ -88,6 +128,54 @@ def redteam_command(
         except Exception as e:
             if not json_output:
                 console.print(f"[yellow]Share failed: {e}[/yellow]")
+
+    if fix:
+        # Determine the actual context file path
+        from agentkit_cli.redteam_fixer import RedTeamFixer
+        ctx_path = Path(report.path)
+        fixer = RedTeamFixer()
+        fix_result = fixer.apply(ctx_path, report, dry_run=dry_run)
+
+        if fix_result.rules_applied:
+            # Re-score the fixed file
+            scorer2 = RedTeamScorer(n_per_category=attacks_per_category)
+            fixed_report = scorer2.score_resistance(ctx_path if not dry_run else ctx_path)
+            if dry_run:
+                # Score the in-memory fixed text
+                import tempfile, shutil
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as tf:
+                    tf.write(fix_result.fixed_text)
+                    tmp_name = tf.name
+                try:
+                    fixed_report = scorer2.score_resistance(Path(tmp_name))
+                finally:
+                    Path(tmp_name).unlink(missing_ok=True)
+        else:
+            fixed_report = report
+
+        if json_output:
+            out = {
+                "original_score": report.score_overall,
+                "fixed_score": fixed_report.score_overall,
+                "delta": round(fixed_report.score_overall - report.score_overall, 1),
+                "rules_applied": fix_result.rules_applied,
+                "backup_path": fix_result.backup_path,
+                "dry_run": dry_run,
+            }
+            print(json.dumps(out, indent=2))
+        else:
+            console.print()
+            mode_label = "[yellow](dry run)[/yellow]" if dry_run else ""
+            console.print(f"[bold]agentkit redteam --fix[/bold]  [dim]{report.path}[/dim] {mode_label}")
+            _render_fix_table(report, fixed_report, fix_result)
+            if fix_result.backup_path:
+                console.print(f"\n[dim]Backup saved: {fix_result.backup_path}[/dim]")
+            if dry_run:
+                console.print("\n[yellow]Dry run: no files were modified.[/yellow]")
+
+        if min_score is not None and fixed_report.score_overall < min_score:
+            raise typer.Exit(code=1)
+        return
 
     if json_output:
         out = report.to_dict()
