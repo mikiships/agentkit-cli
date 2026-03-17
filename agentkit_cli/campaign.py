@@ -227,14 +227,25 @@ class CampaignEngine:
                             pr_url = "[DRY RUN]"
                         else:
                             pr_url = out.get("pr_url", "")
-                        result.submitted.append(
-                            PRResult(
-                                repo=repo_spec,
-                                pr_url=pr_url,
-                                score_before=out.get("score_before"),
-                                score_after=out.get("score_after"),
-                            )
+                        pr_result = PRResult(
+                            repo=repo_spec,
+                            pr_url=pr_url,
+                            score_before=out.get("score_before"),
+                            score_after=out.get("score_after"),
                         )
+                        result.submitted.append(pr_result)
+                        # Record PR in tracking DB
+                        if not out.get("dry_run"):
+                            try:
+                                from agentkit_cli.history import record_pr as _record_pr
+                                _record_pr(
+                                    repo=repo_spec.full_name,
+                                    pr_number=out.get("pr_number"),
+                                    pr_url=pr_url,
+                                    campaign_id=result.campaign_id,
+                                )
+                            except Exception:
+                                pass
                     except (json.JSONDecodeError, AttributeError):
                         result.submitted.append(PRResult(repo=repo_spec, pr_url=""))
                 else:

@@ -209,3 +209,97 @@ def test_historydb_get_history_empty(db):
     """get_history on empty DB returns empty list."""
     rows = db.get_history()
     assert rows == []
+
+
+# ---------------------------------------------------------------------------
+# D4 — tracked_prs table and helper functions
+# ---------------------------------------------------------------------------
+
+def test_tracked_prs_table_exists(tmp_path):
+    """tracked_prs table should exist after DB creation."""
+    import sqlite3
+    db_path = tmp_path / "history.db"
+    HistoryDB(db_path=db_path)
+    conn = sqlite3.connect(str(db_path))
+    cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='tracked_prs'")
+    assert cursor.fetchone() is not None
+    conn.close()
+
+
+def test_record_pr_returns_row_id(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    row_id = db.record_pr("owner/repo", 42, "https://github.com/owner/repo/pull/42")
+    assert isinstance(row_id, int)
+    assert row_id > 0
+
+
+def test_record_pr_stores_fields(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    db.record_pr("owner/repo", 10, "https://github.com/owner/repo/pull/10", campaign_id="camp1")
+    prs = db.get_tracked_prs()
+    assert len(prs) == 1
+    pr = prs[0]
+    assert pr["repo"] == "owner/repo"
+    assert pr["pr_number"] == 10
+    assert pr["pr_url"] == "https://github.com/owner/repo/pull/10"
+    assert pr["campaign_id"] == "camp1"
+    assert pr["last_status"] == "unknown"
+    assert pr["submitted_at"]
+
+
+def test_record_pr_null_pr_number(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    db.record_pr("owner/repo", None, None)
+    prs = db.get_tracked_prs()
+    assert prs[0]["pr_number"] is None
+
+
+def test_get_tracked_prs_empty(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    assert db.get_tracked_prs() == []
+
+
+def test_get_tracked_prs_filter_by_campaign(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    db.record_pr("a/b", 1, None, campaign_id="camp1")
+    db.record_pr("c/d", 2, None, campaign_id="camp2")
+    db.record_pr("e/f", 3, None, campaign_id="camp1")
+
+    camp1 = db.get_tracked_prs(campaign_id="camp1")
+    assert len(camp1) == 2
+    assert all(p["campaign_id"] == "camp1" for p in camp1)
+
+
+def test_get_tracked_prs_limit(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    for i in range(10):
+        db.record_pr(f"owner/repo{i}", i, None)
+    prs = db.get_tracked_prs(limit=3)
+    assert len(prs) == 3
+
+
+def test_update_pr_status(tmp_path):
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    row_id = db.record_pr("owner/repo", 5, "https://github.com/owner/repo/pull/5")
+    db.update_pr_status(row_id, "merged", "2026-03-17T12:00:00+00:00")
+    prs = db.get_tracked_prs()
+    assert prs[0]["last_status"] == "merged"
+    assert prs[0]["last_checked_at"] == "2026-03-17T12:00:00+00:00"
+
+
+def test_module_level_record_pr(tmp_path):
+    from agentkit_cli.history import record_pr, get_tracked_prs
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    row_id = record_pr("owner/repo", 99, "https://url", db=db)
+    assert row_id > 0
+    prs = get_tracked_prs(db=db)
+    assert len(prs) == 1
+
+
+def test_module_level_update_pr_status(tmp_path):
+    from agentkit_cli.history import record_pr, update_pr_status, get_tracked_prs
+    db = HistoryDB(db_path=tmp_path / "history.db")
+    row_id = record_pr("owner/repo", 1, None, db=db)
+    update_pr_status(row_id, "closed", "2026-03-17T00:00:00+00:00", db=db)
+    prs = get_tracked_prs(db=db)
+    assert prs[0]["last_status"] == "closed"
