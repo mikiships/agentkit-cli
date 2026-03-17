@@ -55,12 +55,26 @@ CREATE TABLE IF NOT EXISTS campaigns (
 );
 """
 
+_TRACKED_PRS_DDL = """
+CREATE TABLE IF NOT EXISTS tracked_prs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    repo TEXT NOT NULL,
+    pr_number INTEGER,
+    pr_url TEXT,
+    campaign_id TEXT,
+    submitted_at TEXT NOT NULL,
+    last_status TEXT DEFAULT 'unknown',
+    last_checked_at TEXT
+);
+"""
+
 _MIGRATIONS = [
     "ALTER TABLE runs ADD COLUMN label TEXT",
     "CREATE INDEX IF NOT EXISTS idx_runs_label ON runs(label)",
     "ALTER TABLE runs ADD COLUMN findings TEXT",
     _CAMPAIGNS_DDL,
     "ALTER TABLE runs ADD COLUMN campaign_id TEXT REFERENCES campaigns(campaign_id)",
+    _TRACKED_PRS_DDL,
 ]
 
 
@@ -310,6 +324,46 @@ class HistoryDB:
                 cur = conn.execute("DELETE FROM runs")
                 return cur.rowcount
 
+    def record_pr(
+        self,
+        repo: str,
+        pr_number: Optional[int],
+        pr_url: Optional[str],
+        campaign_id: Optional[str] = None,
+    ) -> int:
+        """Insert a tracked PR record. Returns the new row id."""
+        submitted_at = datetime.now(timezone.utc).isoformat()
+        with self._connect() as conn:
+            cur = conn.execute(
+                "INSERT INTO tracked_prs (repo, pr_number, pr_url, campaign_id, submitted_at) VALUES (?, ?, ?, ?, ?)",
+                (repo, pr_number, pr_url, campaign_id, submitted_at),
+            )
+            return cur.lastrowid
+
+    def get_tracked_prs(
+        self,
+        campaign_id: Optional[str] = None,
+        limit: int = 50,
+    ) -> list:
+        """Return tracked PR rows newest-first."""
+        if campaign_id is not None:
+            sql = "SELECT * FROM tracked_prs WHERE campaign_id = ? ORDER BY submitted_at DESC LIMIT ?"
+            params = (campaign_id, limit)
+        else:
+            sql = "SELECT * FROM tracked_prs ORDER BY submitted_at DESC LIMIT ?"
+            params = (limit,)
+        with self._connect() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [dict(row) for row in rows]
+
+    def update_pr_status(self, pr_id: int, status: str, last_checked_at: str) -> None:
+        """Update the last_status and last_checked_at for a tracked PR."""
+        with self._connect() as conn:
+            conn.execute(
+                "UPDATE tracked_prs SET last_status = ?, last_checked_at = ? WHERE id = ?",
+                (status, last_checked_at, pr_id),
+            )
+
 
 # ---------------------------------------------------------------------------
 # Module-level convenience that shields callers from DB errors
@@ -355,3 +409,40 @@ def clear_history(
     db: Optional[HistoryDB] = None,
 ) -> int:
     return (db or _get_db()).clear_history(project=project)
+
+
+def record_pr(
+    repo: str,
+    pr_number: Optional[int],
+    pr_url: Optional[str],
+    campaign_id: Optional[str] = None,
+    db: Optional[HistoryDB] = None,
+) -> int:
+    """Record a tracked PR. Returns row id."""
+    try:
+        return (db or _get_db()).record_pr(repo, pr_number, pr_url, campaign_id)
+    except Exception as exc:
+        print(f"[agentkit history] DEBUG: failed to record_pr: {exc}", file=sys.stderr)
+        return -1
+
+
+def get_tracked_prs(
+    campaign_id: Optional[str] = None,
+    limit: int = 50,
+    db: Optional[HistoryDB] = None,
+) -> list:
+    """Return tracked PR rows."""
+    return (db or _get_db()).get_tracked_prs(campaign_id=campaign_id, limit=limit)
+
+
+def update_pr_status(
+    pr_id: int,
+    status: str,
+    last_checked_at: str,
+    db: Optional[HistoryDB] = None,
+) -> None:
+    """Update PR status."""
+    try:
+        (db or _get_db()).update_pr_status(pr_id, status, last_checked_at)
+    except Exception as exc:
+        print(f"[agentkit history] DEBUG: failed to update_pr_status: {exc}", file=sys.stderr)

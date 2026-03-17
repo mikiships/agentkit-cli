@@ -294,6 +294,13 @@ def pr_command(
             console.print(f"[red]PR creation failed:[/red] {e}")
             raise typer.Exit(code=1)
 
+        # Record PR in tracking DB
+        try:
+            from agentkit_cli.history import record_pr as _record_pr
+            _record_pr(repo=f"{owner}/{repo}", pr_number=None, pr_url=pr_url)
+        except Exception:
+            pass
+
         if json_output:
             output = {
                 "pr_url": pr_url,
