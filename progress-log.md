@@ -1,44 +1,71 @@
-# Progress Log — agentkit-cli v0.34.0
+# Build Progress Log — agentkit-cli v0.42.0
 
-## D1 — ToolAdapter class ✅
-Added `ToolAdapter` class to `agentkit_cli/tools.py` with 7 methods covering all quartet invocations. Each method has canonical correct flags, timeout, error handling. `report_runner.py` refactored to delegate. 34 new tests.
+## D1: RedTeamFixer core
+**Status:** Complete  
+**Files:** `agentkit_cli/redteam_fixer.py`, `tests/test_redteam_fixer.py`  
+**Tests:** 26 passing  
+**What was built:**
+- `RedTeamFixer` class with 6 remediation rule handlers (one per attack category)
+- Idempotency: anchor-based detection prevents double-adding sections
+- `apply()` method: threshold-based (only applies if category score < 70)
+- `apply_all()` method: unconditional application (used by `agentkit harden`)
+- Dry-run mode: returns fixed text without writing to disk
+- `FixResult` with `diff_lines()` and `rules_applied` properties
+- Backup creation on write
+**Blockers:** None
 
-## D2 — Migration ✅
-Migrated `suggest_cmd.py`, `compare_cmd.py`, `doctor.py`, `analyze.py` to use ToolAdapter. Updated test mocking paths in `test_report.py` and `test_doctor.py`. All 1315 tests passing after migration.
+## D2: agentkit redteam --fix
+**Status:** Complete  
+**Files:** `agentkit_cli/commands/redteam_cmd.py`, `agentkit_cli/main.py`, `tests/test_redteam_cmd.py` (10 new tests)  
+**Tests:** 23 passing (13 existing + 10 new)  
+**What was built:**
+- `--fix` flag: runs analysis, applies remediations for categories scoring <70, backup original, re-score, show table
+- `--dry-run` flag: shows what would change without writing
+- Before/after Rich table with category, before score, after score, delta, status
+- `--json` output: `{original_score, fixed_score, delta, rules_applied, backup_path, dry_run}`
+- `--min-score` gate works with `--fix` (gates on fixed score)
+**Blockers:** None
 
-## D3 — Golden smoke suite ✅
-Created `tests/fixtures/smoke_project/` with minimal Python project. 9 smoke tests covering doctor, score, analyze, suggest, report, gate (pass/fail), compare, summary. All mock ToolAdapter. Registered `smoke` marker. `pytest -m smoke` runs in ~5s.
+## D3: agentkit harden command
+**Status:** Complete  
+**Files:** `agentkit_cli/commands/harden_cmd.py`, `agentkit_cli/harden_report.py`, `tests/test_harden.py` (17 tests)  
+**Tests:** 17 passing  
+**What was built:**
+- `agentkit harden [PATH]` standalone command
+- Auto-detection of CLAUDE.md / AGENTS.md / SYSTEM.md
+- Score before/after display with grade comparison
+- `--output <path>`: write hardened file to separate path (does not modify original)
+- `--dry-run`: no writes
+- `--report`: generate dark-theme HTML score-card report
+- `--share`: publish to here.now
+- `--json`: structured output
+- Wired into `agentkit_cli/main.py` as `@app.command("harden")`
+- `HardenReport` HTML generator with before/after score, category breakdown, applied/skipped remediations
+**Blockers:** None
 
-## D4 — Release gate integration ✅
-Added `check_smoke_tests()` to `release_check.py`. Runs `pytest -m smoke -q`. Included in `run_release_check()` as blocking check. 6 new tests. Verdict computation updated to require smoke pass.
+## D4: Integration with run, score, doctor
+**Status:** Complete  
+**Files:** `agentkit_cli/commands/run_cmd.py`, `agentkit_cli/commands/score_cmd.py`, `agentkit_cli/doctor.py`, `tests/test_harden_integration.py` (9 tests)  
+**Tests:** 9 passing  
+**What was built:**
+- `agentkit run --harden`: runs harden on detected context file after pipeline completes
+- `agentkit score` harden recommendation: when redteam score < 70, prints estimated lift and suggests `agentkit harden`
+- `agentkit doctor` redteam recency check: warns if no redteam run in last 7 days, shows fix hint `agentkit redteam`
+- Updated 3 existing doctor tests to mock `check_redteam_recency` (avoid test count regression)
+**Blockers:** None
 
-## D5 — Docs, version, reports ✅
-- Version bumped to 0.34.0 in `pyproject.toml` and `__init__.py`
-- CHANGELOG.md: v0.34.0 entry with Added/Changed/Fixed sections
-- README.md: Architecture section added
-- BUILD-REPORT.md and this progress-log.md written
-- pytest fixtures excluded from collection via conftest.py
+## D5: Docs, CHANGELOG, version bump, BUILD-REPORT
+**Status:** Complete  
+**Files:** `README.md`, `CHANGELOG.md`, `agentkit_cli/__init__.py`, `BUILD-REPORT.md`, `progress-log.md`  
+**Tests:** N/A (docs/config)  
+**What was built:**
+- README: new "Auto-Harden Your Agent Context" section with `agentkit harden` examples
+- CHANGELOG: v0.42.0 entry with all new features
+- Version bump: 0.41.0 → 0.42.0
+- BUILD-REPORT.md: deliverable status, test counts, verification commands
+**Blockers:** None
 
-## Final: 1330 passed
-
-## v0.36.0 — 2026-03-16 (agentkit org)
-
-### D1: GitHub org/user repo listing + core org command
-- `agentkit_cli/github_api.py`: list_repos() with pagination, rate-limit awareness, org→user fallback
-- `agentkit_cli/commands/org_cmd.py`: OrgCommand + org_command, Rich progress, ranked table, --json
-- `agentkit_cli/main.py`: org command registered
-- Tests: 42 new tests (D1/D2/D3 coverage)
-
-### D2: HTML report
-- `agentkit_cli/org_report.py`: OrgReport.render(), dark-theme HTML, summary stats, --output, --share
-
-### D3: Parallel analysis + rate limiting
-- ThreadPoolExecutor (--parallel N), rate-limit headers, per-repo timeout, summary counts
-- All implemented alongside D1
-
-### D4: Docs, CHANGELOG, version bump
-- README: Quick Start + Org Analysis section added
-- CHANGELOG: v0.36.0 entry
-- pyproject.toml + __init__.py: 0.35.0 / 0.34.0 → 0.36.0
-
-### Final: 1391 passed (1349 pre-existing + 42 new), 0 failures
+## Final Test Count
+- Baseline: 1663
+- New tests: 26 (D1) + 10 (D2) + 17 (D3) + 9 (D4) = 62 new tests
+- Total: 1725 passing (target: ≥1708)

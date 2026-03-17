@@ -581,3 +581,44 @@ agentkit redteam --share
 Exit code 1 if `--min-score` threshold is not met. Combine with `agentkit run --redteam` to add adversarial eval to your full pipeline.
 
 **Distribution angle:** After OpenAI's $86M acquisition of Promptfoo, teams using non-OpenAI models need a neutral red-team tool. Static analysis = no model dependency = truly model-agnostic.
+
+## Auto-Harden Your Agent Context
+
+`agentkit harden` is the detect→fix loop closed in one command. Run it after `agentkit redteam` to auto-patch all detected vulnerabilities.
+
+```bash
+# Analyze and auto-remediate CLAUDE.md / AGENTS.md in cwd
+agentkit harden
+
+# Harden a specific file or directory
+agentkit harden ./my-agent-project
+
+# Preview what would change without writing
+agentkit harden --dry-run
+
+# Write hardened file to a different path
+agentkit harden --output hardened-CLAUDE.md
+
+# JSON output for CI integration
+agentkit harden --json
+
+# Generate dark-theme HTML score-card report
+agentkit harden --report
+
+# Apply fix flag in redteam command
+agentkit redteam --fix
+
+# Auto-apply with dry-run preview
+agentkit redteam --fix --dry-run
+
+# Run harden after full pipeline
+agentkit run --harden
+```
+
+**What `agentkit harden` does:**
+1. Detects all 6 vulnerability categories (prompt injection, jailbreak, context confusion, instruction override, data extraction, role escalation)
+2. Applies targeted, idempotent remediations (never duplicates existing sections)
+3. Creates a backup (`.bak`) before modifying files
+4. Re-scores the hardened file and shows a before/after table
+
+**Idempotent:** Running it multiple times on an already-hardened file makes no additional changes.

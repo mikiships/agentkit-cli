@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.42.0] - 2026-03-17
+
+### Added
+- `agentkit redteam --fix`: auto-patch detected vulnerabilities in agent context files in place (with backup), re-scores and shows before/after delta table
+- `agentkit redteam --fix --dry-run`: preview what would change without writing to disk
+- `agentkit redteam --fix --min-score N`: only fix categories scoring below N (CI gate)
+- `agentkit harden [PATH]`: standalone command — detect + auto-remediate all vulnerabilities in one step, with score card and report
+- `agentkit harden --output <path>`: write hardened file to a different path
+- `agentkit harden --report`: generate dark-theme HTML hardening report
+- `agentkit harden --share`: publish HTML report to here.now
+- `agentkit harden --json`: structured JSON output for CI integration
+- `agentkit run --harden`: run harden on detected context file after full pipeline
+- `agentkit score` harden recommendation: suggests `agentkit harden` when redteam score < 70
+- `agentkit doctor` redteam recency check: warns if redteam has not been run in the last 7 days
+- `RedTeamFixer` class (`agentkit_cli/redteam_fixer.py`): 6 idempotent remediation rule handlers with dry-run and diff support
+- `HardenReport` HTML generator (`agentkit_cli/harden_report.py`): dark-theme before/after score card
+- 45+ new tests (≥1708 total)
+
 ## [0.41.0] - 2026-03-17
 
 ### Added

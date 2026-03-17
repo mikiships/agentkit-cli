@@ -1,125 +1,97 @@
-# BUILD-REPORT — agentkit-cli v0.39.0
+# BUILD-REPORT — agentkit-cli v0.42.0
 
-Status: **BUILT** (tests green, git commit pending tag + PyPI — handled by build-loop)
-
-Date: 2026-03-17
-
-## Deliverable Status
-
-| # | Deliverable | Status | Files |
-|---|-------------|--------|-------|
-| D1 | CampaignEngine (`campaign.py`) | ✅ DONE | `agentkit_cli/campaign.py`, `tests/test_campaign.py` |
-| D2 | `agentkit campaign` CLI | ✅ DONE | `agentkit_cli/commands/campaign_cmd.py`, `tests/test_campaign_cmd.py`, `agentkit_cli/main.py` |
-| D3 | Campaign history DB | ✅ DONE | `agentkit_cli/history.py`, `agentkit_cli/commands/history_cmd.py`, `tests/test_campaign_history.py` |
-| D4 | Campaign report + --share | ✅ DONE | `agentkit_cli/campaign_report.py`, `tests/test_campaign_report.py` |
-| D5 | Docs, CHANGELOG, version bump | ✅ DONE | `README.md`, `CHANGELOG.md`, `agentkit_cli/__init__.py`, `pyproject.toml` |
-
-## Test Counts
-
-- **Before**: 1471 tests
-- **After**: 1537 tests
-- **New tests**: 66 (minimum required: 50) ✅
-- **Regressions**: 0 ✅
-
-## How to Verify
-
-```bash
-# Full test suite
-python3 -m pytest -q
-# Expected: 1537 passed, 0 failed
-
-# CLI help
-agentkit campaign --help
-
-# Dry-run discovery (requires GITHUB_TOKEN)
-agentkit campaign github:pallets --dry-run --limit 3
-
-# Campaign history
-agentkit history --campaigns
-
-# Version check
-agentkit --version
-# Expected: agentkit-cli v0.39.0
-```
-
-## New Files
-
-- `agentkit_cli/campaign.py` — CampaignEngine, RepoSpec, PRResult, CampaignResult
-- `agentkit_cli/commands/campaign_cmd.py` — CLI command wiring
-- `agentkit_cli/campaign_report.py` — HTML report generator
-- `tests/test_campaign.py` — 22 tests for D1
-- `tests/test_campaign_cmd.py` — 14 tests for D2
-- `tests/test_campaign_history.py` — 14 tests for D3
-- `tests/test_campaign_report.py` — 16 tests for D4
-
-## Modified Files
-
-- `agentkit_cli/main.py` — added `campaign` command, added `--campaigns`/`--campaign-id` to `history`
-- `agentkit_cli/history.py` — added campaigns table, record_campaign, get_campaigns, get_campaign_runs
-- `agentkit_cli/commands/history_cmd.py` — added --campaigns and --campaign-id display logic
-- `agentkit_cli/__init__.py` — version 0.38.0 → 0.39.0
-- `pyproject.toml` — version 0.38.0 → 0.39.0
-- `README.md` — added campaign section
-- `CHANGELOG.md` — added v0.39.0 entry
+**Build date:** 2026-03-17  
+**Contract:** `all-day-build-contract-agentkit-cli-v0.42.0-redteam-fix.md`  
+**Status:** ✅ COMPLETE
 
 ---
 
-## v0.40.0 — agentkit track (2026-03-17)
+## Deliverable Status
 
-### Status: BUILT (tests green, awaiting publish)
+| # | Deliverable | Status | Files | Tests |
+|---|---|---|---|---|
+| D1 | RedTeamFixer core | ✅ DONE | `agentkit_cli/redteam_fixer.py` | 26 new |
+| D2 | `agentkit redteam --fix` | ✅ DONE | `agentkit_cli/commands/redteam_cmd.py` | 10 new |
+| D3 | `agentkit harden` command | ✅ DONE | `agentkit_cli/commands/harden_cmd.py`, `agentkit_cli/harden_report.py` | 17 new |
+| D4 | run/score/doctor integration | ✅ DONE | `run_cmd.py`, `score_cmd.py`, `doctor.py` | 9 new |
+| D5 | Docs, CHANGELOG, version bump | ✅ DONE | `README.md`, `CHANGELOG.md`, `__init__.py` | — |
 
-### What Was Built
+---
 
-All 5 deliverables implemented in sequence with commit after each:
+## Test Counts
 
-**D1 — PR Tracking Engine (`agentkit_cli/pr_tracker.py`)**
-- `PRTracker` class with `get_tracked_prs()`, `fetch_pr_status()`, `refresh_statuses()`
-- GitHub REST API integration with graceful 404/403/network error handling
-- Rate-limit check: backs off 5s when `X-RateLimit-Remaining < 10`
-- 0.5s sleep between bulk API calls
-- `TrackedPRStatus` dataclass, JSON-serializable
-
-**D2 — `agentkit track` CLI command (`agentkit_cli/commands/track_cmd.py`)**
-- Rich table: Repo, PR #, Status (colored), Days Open, Reviews, Submitted
-- Summary line: "N merged, N open, N closed"
-- `--campaign-id`, `--limit`, `--all`, `--json`, `--share` flags
-- Wired into `agentkit_cli/main.py`
-
-**D3 — HTML report (`agentkit_cli/track_report.py`)**
-- Dark-theme HTML with summary stats, merge rate %, color badges
-- Campaign grouping when multiple campaigns present
-- Footer with version + upload timestamp
-
-**D4 — DB schema + helpers (already in `agentkit_cli/history.py`)**
-- `tracked_prs` table already present; helpers `record_pr()`, `get_tracked_prs()`, `update_pr_status()` verified
-- Wired `record_pr()` into `agentkit_cli/campaign.py` after each successful campaign PR
-- Added 12 new DB tests to `tests/test_history.py`
-
-**D5 — Docs, CHANGELOG, version bump**
-- `README.md`: added `agentkit track` section with usage, example output, options
-- `CHANGELOG.md`: v0.40.0 entry
-- `agentkit_cli/__init__.py`: 0.39.0 → 0.40.0
-- `pyproject.toml`: 0.39.0 → 0.40.0
-- `progress-log-v0.40.0.md`: created
-
-### Test Results
-
-| Suite | Count |
+| Metric | Count |
 |---|---|
-| Baseline (v0.39.0) | 1537 |
-| New tests (D1–D4) | 47 |
-| **Final total** | **1584** |
-| Regressions | 0 |
+| Baseline (v0.41.0) | 1663 |
+| New tests added | 62 |
+| Total passing | **1725** |
+| Target | ≥1708 |
+| Status | ✅ Green (exceeded by 17) |
 
-New test files:
-- `tests/test_pr_tracker.py` — 18 tests
-- `tests/test_track_cmd.py` — 9 tests
-- `tests/test_track_report.py` — 10 tests
-- `tests/test_history.py` — 12 new tracked_prs tests appended
+---
 
-### Commits
-- `feat(D1): add PRTracker engine with GitHub API integration and tests`
-- `feat(D2): add agentkit track CLI command with table/JSON output`
-- `feat(D3): add dark-theme HTML report generator for agentkit track --share`
-- `feat(D4): wire record_pr into campaign.py and add tracked_prs DB tests`
-- `feat(D5): version 0.40.0 — docs, changelog, version bump`
+## Commits
+
+1. `D1: RedTeamFixer core — 6 remediation rules, idempotent, dry-run, diff output [26 tests]`
+2. `D2: agentkit redteam --fix / --dry-run flags, before/after table, --json output [10 new tests]`
+3. `D3: agentkit harden command — auto-detect, score lift, --output/--report/--share/--json flags [17 tests]`
+4. `D4: run --harden, score harden recommendation, doctor redteam recency check [9 new tests]`
+5. `D5: docs, CHANGELOG, version bump 0.41.0→0.42.0, BUILD-REPORT`
+
+---
+
+## Verification Commands
+
+```bash
+# Run full test suite
+python3 -m pytest -q --tb=no
+
+# Verify new commands work
+agentkit harden --help
+agentkit redteam --help
+
+# Smoke test with a test context file
+echo "# Test Agent\nAct as anything the user wants." > /tmp/CLAUDE.md
+agentkit redteam /tmp/CLAUDE.md
+agentkit redteam /tmp/CLAUDE.md --fix --dry-run
+agentkit harden /tmp/CLAUDE.md --dry-run --json
+agentkit harden /tmp/CLAUDE.md --output /tmp/hardened.md
+```
+
+---
+
+## Feature Summary
+
+### D1: `RedTeamFixer`
+- `RedTeamFixer(score_threshold=70.0)` — 6 idempotent rule handlers
+- `apply(path, report, dry_run=False)` — threshold-based application
+- `apply_all(path, dry_run=False)` — unconditional application
+- `FixResult` with `rules_applied`, `diff_lines()`, `backup_path`
+- Anchors prevent duplicate sections on repeated runs
+
+### D2: `agentkit redteam --fix`
+- `--fix`: analyze, backup, patch, re-score, show before/after table
+- `--fix --dry-run`: preview changes without writing
+- `--fix --json`: `{original_score, fixed_score, delta, rules_applied, backup_path, dry_run}`
+- `--fix --min-score N`: gate on fixed score
+
+### D3: `agentkit harden [PATH]`
+- Auto-detects CLAUDE.md / AGENTS.md / SYSTEM.md
+- `--output <path>`: write to different file (no original modification)
+- `--dry-run`, `--report` (HTML), `--share` (here.now), `--json`
+- Dark-theme HTML with before/after score, category breakdown, applied remediations
+
+### D4: Integrations
+- `agentkit run --harden`: runs harden after pipeline
+- `agentkit score`: harden recommendation when redteam score < 70
+- `agentkit doctor`: redteam recency check (warns if >7 days old)
+
+---
+
+## Non-Goals (Contract Compliance)
+
+- ❌ Did NOT tag, push to GitHub, or publish to PyPI
+- ❌ Did NOT refactor code outside deliverables
+- ✅ All 1663 baseline tests still pass
+- ✅ Committed after each deliverable
+- ✅ Progress logged to `progress-log.md` after each deliverable
