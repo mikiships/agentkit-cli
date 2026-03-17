@@ -164,6 +164,19 @@ def score_command(
             console.print(
                 f"\n[dim]Missing tools (excluded from score): {', '.join(result.missing_tools)}[/dim]"
             )
+
+        # Harden recommendation: if redteam score is below 70
+        try:
+            rt_score = tool_scores.get("redteam")
+            if rt_score is not None and rt_score < 70:
+                estimated_lift = min(30, int((70 - rt_score) * 0.5))
+                console.print(
+                    f"\n[yellow]Security:[/yellow] Run [bold]`agentkit harden`[/bold] to improve "
+                    f"security posture (+{estimated_lift} pts estimated). "
+                    f"Current redteam score: {rt_score:.0f}/100."
+                )
+        except Exception:
+            pass
         console.print()
 
     if ci and score < min_score:

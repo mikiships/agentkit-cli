@@ -13,6 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli import __version__
+from agentkit_cli.history import get_history
 
 DoctorStatus = Literal["pass", "warn", "fail"]
 
@@ -576,6 +577,62 @@ def check_herenow_api_key() -> DoctorCheckResult:
 # ---------------------------------------------------------------------------
 
 
+def check_redteam_recency(root: Path) -> DoctorCheckResult:
+    """Warn if redteam has not been run in the last 7 days."""
+    try:
+        from datetime import datetime, timezone, timedelta
+        rows = get_history(project=root.name, tool="redteam", limit=1)
+        if not rows:
+            return DoctorCheckResult(
+                id="context.redteam_recency",
+                name="redteam recency",
+                status="warn",
+                summary="No redteam run found for this project.",
+                details="Run 'agentkit redteam' to assess adversarial resistance.",
+                fix_hint="agentkit redteam",
+                category="context",
+            )
+        last_ts = rows[0].get("created_at") or rows[0].get("timestamp", "")
+        try:
+            if isinstance(last_ts, str):
+                last_dt = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
+            else:
+                last_dt = datetime.fromtimestamp(float(last_ts), tz=timezone.utc)
+            cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+            if last_dt < cutoff:
+                days_ago = (datetime.now(timezone.utc) - last_dt).days
+                return DoctorCheckResult(
+                    id="context.redteam_recency",
+                    name="redteam recency",
+                    status="warn",
+                    summary=f"Last redteam run was {days_ago} days ago (>7 days).",
+                    details="Re-run to detect new vulnerabilities after context file changes.",
+                    fix_hint="agentkit redteam",
+                    category="context",
+                )
+        except (ValueError, TypeError):
+            pass
+        return DoctorCheckResult(
+            id="context.redteam_recency",
+            name="redteam recency",
+            status="pass",
+            summary="redteam run is recent (within 7 days).",
+            details="",
+            fix_hint="",
+            category="context",
+        )
+    except Exception as e:
+        return DoctorCheckResult(
+            id="context.redteam_recency",
+            name="redteam recency",
+            status="warn",
+            summary="Could not check redteam history.",
+            details=str(e),
+            fix_hint="agentkit redteam",
+            category="context",
+        )
+
+
 def check_serve_available() -> DoctorCheckResult:
     """Verify that agentkit serve command is importable and functional."""
     try:
@@ -627,6 +684,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         check_herenow_api_key(),
     ]
     checks.append(check_serve_available())
+    checks.append(check_redteam_recency(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 

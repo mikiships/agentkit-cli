@@ -81,6 +81,7 @@ def run_command(
     share: bool = False,
     record_findings: bool = False,
     serve: bool = False,
+    harden: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -475,6 +476,23 @@ def run_command(
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         active_console.print(f"Dashboard: http://localhost:{DEFAULT_PORT}")
+
+    # --harden: run harden on detected context file after pipeline
+    if harden:
+        try:
+            from agentkit_cli.commands.harden_cmd import harden_command
+            harden_command(
+                path=path or root,
+                output=None,
+                dry_run=False,
+                report=False,
+                share=False,
+                json_output=json_output,
+            )
+        except SystemExit:
+            pass
+        except Exception:
+            pass
 
     # Final status
     if failed_count > 0:
