@@ -165,6 +165,45 @@ Options:
 - `--skip-pr` — only discover repos, don't submit PRs
 - `--share` — upload HTML report to here.now
 
+## agentkit track — Monitor Campaign PR Outcomes
+
+After running `agentkit campaign`, use `agentkit track` to see which PRs got merged, closed, or are still open.
+
+```bash
+# Show last 20 tracked PRs
+agentkit track
+
+# Filter to a specific campaign
+agentkit track --campaign-id abc12345
+
+# Show all PRs (no limit)
+agentkit track --all
+
+# JSON output for CI/automation
+agentkit track --json
+
+# Upload a shareable HTML status report
+agentkit track --share
+```
+
+Example output:
+```
+┌──────────────┬──────┬────────┬───────────┬─────────┬────────────┐
+│ Repo         │ PR # │ Status │ Days Open │ Reviews │ Submitted  │
+├──────────────┼──────┼────────┼───────────┼─────────┼────────────┤
+│ pallets/flask│ 6001 │ merged │ 3         │ 2       │ 2026-03-14 │
+│ encode/httpx │ 892  │ open   │ 1         │ 0       │ 2026-03-16 │
+└──────────────┴──────┴────────┴───────────┴─────────┴────────────┘
+2 merged, 1 open, 0 closed
+```
+
+Options:
+- `--campaign-id TEXT` — filter to a specific campaign
+- `--limit N` — max PRs to show (default: 20)
+- `--all` — show all tracked PRs (no limit)
+- `--json` — output structured JSON
+- `--share` — upload dark-theme HTML report to here.now
+
 View campaign history with:
 ```bash
 agentkit history --campaigns

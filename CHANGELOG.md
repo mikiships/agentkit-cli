@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.40.0] - 2026-03-17
+
+### Added
+- `agentkit track` — PR status tracker that monitors campaign-submitted PRs
+  - Queries GitHub API for current PR status (open/merged/closed)
+  - Rich table output with status, days open, review count, and submission date
+  - `--campaign-id` to filter to a specific campaign
+  - `--limit N` / `--all` for controlling output size
+  - `--json` for CI/automation integration
+  - `--share` uploads a dark-theme HTML status report to here.now
+- `agentkit_cli/pr_tracker.py` — PRTracker engine with GitHub API rate-limit handling
+- `agentkit_cli/track_report.py` — dark-theme HTML report with campaign grouping and merge rate stats
+- `agentkit_cli/commands/track_cmd.py` — CLI command wired into main app
+- `tracked_prs` table in history DB with `record_pr`, `get_tracked_prs`, `update_pr_status` helpers
+- `record_pr()` now called automatically after each successful `agentkit campaign` PR submission
+
 ## [0.39.0] - 2026-03-17
 
 ### Added
