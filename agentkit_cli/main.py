@@ -43,6 +43,7 @@ from agentkit_cli.commands.campaign_cmd import campaign_command
 from agentkit_cli.commands.track_cmd import track_command
 from agentkit_cli.commands.redteam_cmd import redteam_command
 from agentkit_cli.commands.harden_cmd import harden_command
+from agentkit_cli.commands.certify_cmd import certify_app
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -53,6 +54,7 @@ app = typer.Typer(
 app.add_typer(notify_app, name="notify")
 app.add_typer(config_app, name="config")
 app.add_typer(profile_app, name="profile")
+app.add_typer(certify_app, name="certify")
 
 
 @app.command("quickstart")

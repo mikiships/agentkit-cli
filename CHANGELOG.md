@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.43.0] - 2026-03-17
+
+### Added
+- `agentkit certify` command: generate a dated, shareable certification report proving a repo passed all agentkit quality checks
+- `CertEngine` class (`agentkit_cli/certify.py`): runs 4 checks (composite score, redteam resistance, context freshness, test count) and produces a signed `CertResult` with SHA256 content hash and cert_id
+- `CertResult` dataclass with PASS/WARN/FAIL verdict logic based on configurable thresholds
+- Dark-theme HTML cert card (`agentkit_cli/certify_report.py`): cert_id, project name, timestamp, verdict badge, 4 sub-score rows with progress bars, SHA256 fingerprint
+- `--output <file>` option: write HTML cert report to file
+- `--json` option: print full JSON cert to stdout for CI integration
+- `--min-score N` gate: exit 1 if composite score < N
+- `--share` option: upload HTML report to here.now (requires `HERENOW_API_KEY`)
+- `--badge` flag: inject/update agentkit certified shields.io badge in README.md (idempotent)
+- `--badge --dry-run`: preview badge change without writing to disk
+- 62+ new tests (≥1787 total)
+
 ## [0.42.0] - 2026-03-17
 
 ### Added

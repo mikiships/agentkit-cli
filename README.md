@@ -536,6 +536,43 @@ All quartet tool invocations (agentmd, agentlint, coderace, agentreflect) go thr
 
 Run `pytest -m smoke` before any release to catch integration regressions.
 
+## agentkit certify
+
+Generate a dated, shareable certification report proving a repo passed all agentkit quality checks.
+
+```bash
+# Run cert on current directory
+agentkit certify .
+
+# Output JSON cert (for CI integration)
+agentkit certify . --json
+
+# Write HTML cert card to file
+agentkit certify . --output cert.html
+
+# Share HTML report via here.now (requires HERENOW_API_KEY)
+agentkit certify . --output cert.html --share
+
+# Fail exit if composite score < 80
+agentkit certify . --min-score 80
+
+# Inject/update cert badge in README.md
+agentkit certify . --badge
+
+# Preview badge change without writing
+agentkit certify . --badge --dry-run
+```
+
+The cert report includes:
+- **cert_id**: 8-char hex fingerprint (prefix of SHA256)
+- **timestamp**: UTC ISO 8601
+- **verdict**: PASS / WARN / FAIL
+- **Composite Score** (agentkit score) — PASS ≥ 80
+- **Redteam Resistance** (agentkit redteam) — PASS ≥ 70
+- **Context Freshness** (agentlint check-context) — PASS ≥ 70
+- **Tests Found** (agentkit doctor)
+- **SHA256** content hash for tamper detection
+
 ## License
 
 MIT
