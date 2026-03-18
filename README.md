@@ -782,3 +782,63 @@ agentkit monitor remove github:owner/repo
 **Notifications:** Configure Slack (`--notify-slack`), Discord (`--notify-discord`), or any generic webhook (`--notify-webhook`). Fires when `abs(score_delta) >= alert_threshold` (default 10 points) or score drops below `--min-score`.
 
 **Daemon:** Runs as a background subprocess, writing structured JSON lines to `~/.agentkit/monitor.log`. PID stored in `~/.agentkit/monitor.pid`. Handles SIGTERM gracefully.
+
+## GitHub Webhook Integration
+
+`agentkit webhook` closes the "outside-in" CI loop: instead of only running agentkit from inside CI, GitHub pushes events to agentkit, which automatically analyzes the repo and fires notifications.
+
+### Quick Start
+
+```bash
+# 1. Configure the HMAC secret (must match GitHub webhook settings)
+agentkit webhook config --set-secret <YOUR_GITHUB_WEBHOOK_SECRET>
+
+# 2. Start the server
+agentkit webhook serve --port 8080
+
+# Listening on http://localhost:8080
+# Point your GitHub webhook at this URL (use ngrok for public exposure)
+```
+
+### Subcommands
+
+| Command | Description |
+|---|---|
+| `agentkit webhook serve [--port P] [--secret S] [--no-verify-sig]` | Start the HTTP server |
+| `agentkit webhook config [--show] [--set-secret S] [--set-port P] [--set-channel URL]` | Manage configuration |
+| `agentkit webhook test [--event push|pull_request] [--repo REPO]` | Simulate an event locally |
+
+### Configuration (`.agentkit.toml`)
+
+```toml
+[webhook]
+port = 8080
+secret = ""          # HMAC secret from GitHub webhook settings
+notify_channels = [] # Reuse existing NotificationService channels
+```
+
+### How It Works
+
+1. GitHub POSTs a `push` or `pull_request` event to your server.
+2. Server verifies the `X-Hub-Signature-256` HMAC and responds 200 immediately.
+3. Background thread calls `EventProcessor.process()`:
+   - Runs `CompositeScoreEngine` on the repo.
+   - Records the score in history DB (`agentkit history`).
+   - Fires a notification if the score dropped by ≥ 5 points vs previous run.
+   - Formats a PR comment body (logged to stdout; actual GitHub API posting is out of scope).
+
+### Doctor Check
+
+`agentkit doctor` reports webhook configuration health under the **Integrations** section:
+
+```
+integrations  webhook config  WARN  Webhook configured but HMAC secret is empty.
+```
+
+### Post Run Notification
+
+```bash
+agentkit run --webhook-notify
+```
+
+After the pipeline completes, POSTs a JSON summary to `notify.webhook_url` from `.agentkit.toml`.

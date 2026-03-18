@@ -637,14 +637,14 @@ class TestVersionBump:
 
     def test_version_is_0_45_0(self):
         from agentkit_cli import __version__
-        assert __version__ == "0.47.0"
+        assert __version__ == "0.48.0"
 
     def test_pyproject_version_matches(self):
         import tomllib
         repo = Path(__file__).parent.parent
         with open(repo / "pyproject.toml", "rb") as f:
             data = tomllib.load(f)
-        assert data["project"]["version"] == "0.47.0"
+        assert data["project"]["version"] == "0.48.0"
 
 
 class TestChangelog:

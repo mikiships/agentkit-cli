@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.48.0] - 2026-03-18
+
+### Added
+- `agentkit webhook` command group: inbound GitHub webhook server for push/pull_request events
+- `agentkit webhook serve [--port PORT] [--secret SECRET] [--no-verify-sig]`: start HMAC-verified HTTP server
+- `agentkit webhook config [--set-secret] [--set-port] [--set-channel] [--show]`: manage `[webhook]` section in `.agentkit.toml`
+- `agentkit webhook test [--event push|pull_request] [--repo REPO]`: simulate events locally without HTTP
+- `agentkit_cli/webhook/` package: `WebhookServer`, `verify_signature`, `EventProcessor`
+- HMAC-SHA256 signature verification (`X-Hub-Signature-256`) — rejects unauthorized payloads with 403
+- Non-blocking event queue: responds 200 immediately, processes in background thread
+- `EventProcessor.process()`: runs composite analysis, records in history DB, fires notifications on regression, formats PR comment body
+- `agentkit doctor` now includes an **Integrations** section with a `webhook config` check
+- `agentkit run --webhook-notify`: POST pipeline result to configured webhook URL after run completes
+- 58 new tests (D1: 21, D2: 14, D3: 14, D4: 9)
+
 ## [0.47.0] - 2026-03-18
 
 ### Added
