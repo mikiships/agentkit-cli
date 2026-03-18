@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.46.0] - 2026-03-18
+
+### Added
+- `agentkit improve` command: end-to-end automated quality improvement workflow
+- `ImproveEngine` class (`agentkit_cli/improve_engine.py`): analyze → fix → re-analyze loop
+- `ImprovementPlan` dataclass: captures baseline_score, final_score, delta, actions_taken, actions_skipped, context_generated, hardening_applied
+- Automatic CLAUDE.md generation when missing or score < 80 (via agentmd)
+- Automatic redteam hardening when resistance score < 80
+- Dark-theme HTML before/after improvement report (`agentkit_cli/templates/improve_report.html`)
+- CLI flags: `--no-generate`, `--no-harden`, `--min-lift N`, `--pr`, `--dry-run`, `--json`, `--share`, `--output FILE`
+- `agentkit run --improve`: post-run auto-improvement if score < threshold (default 80)
+- `agentkit run --improve-no-generate`, `--improve-no-harden`, `--improve-threshold N` passthrough flags
+- `improvement` key in `agentkit run --json` output when `--improve` is active
+
 ## [0.45.0] - 2026-03-18
 
 ### Added

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentkit-cli"
-version = "0.45.0"
+version = "0.46.0"
 description = "Unified CLI for the Agent Quality Toolkit (agentmd, coderace, agentlint, agentreflect)"
 readme = "README.md"
 license = {text = "MIT"}

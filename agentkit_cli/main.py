@@ -46,6 +46,7 @@ from agentkit_cli.commands.harden_cmd import harden_command
 from agentkit_cli.commands.certify_cmd import certify_app
 from agentkit_cli.commands.timeline_cmd import timeline_command
 from agentkit_cli.commands.explain_cmd import explain_command
+from agentkit_cli.commands.improve import improve_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -125,9 +126,13 @@ def run(
     run_timeline: bool = typer.Option(False, "--timeline", help="Generate timeline HTML after run completes"),
     run_explain: bool = typer.Option(False, "--explain", help="Generate LLM coaching report after pipeline completes"),
     no_llm: bool = typer.Option(False, "--no-llm", help="Use template-based explanation (offline, no API key needed)"),
+    run_improve: bool = typer.Option(False, "--improve", help="After run, auto-improve if score < threshold"),
+    improve_no_generate: bool = typer.Option(False, "--improve-no-generate", help="Skip context generation in --improve"),
+    improve_no_harden: bool = typer.Option(False, "--improve-no-harden", help="Skip hardening in --improve"),
+    improve_threshold: float = typer.Option(80.0, "--improve-threshold", help="Score threshold below which --improve runs (default 80)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -781,6 +786,32 @@ def explain(
         model=model,
         no_llm=no_llm,
         json_output=json_output,
+        output=output,
+    )
+
+
+@app.command("improve")
+def improve(
+    target: Optional[str] = typer.Argument(None, help="Local path or github:owner/repo (default: current dir)"),
+    no_generate: bool = typer.Option(False, "--no-generate", help="Skip CLAUDE.md generation step"),
+    no_harden: bool = typer.Option(False, "--no-harden", help="Skip redteam hardening step"),
+    min_lift: Optional[float] = typer.Option(None, "--min-lift", help="Exit 1 if score delta < N"),
+    pr: bool = typer.Option(False, "--pr", help="Open a GitHub PR with changes after improving"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Plan without applying changes"),
+    json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
+) -> None:
+    """Analyze → fix → re-analyze. Shows before/after score and what changed."""
+    improve_command(
+        target=target,
+        no_generate=no_generate,
+        no_harden=no_harden,
+        min_lift=min_lift,
+        pr=pr,
+        dry_run=dry_run,
+        json_output=json_output,
+        share=share,
         output=output,
     )
 

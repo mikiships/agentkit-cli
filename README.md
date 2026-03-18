@@ -537,6 +537,20 @@ All quartet tool invocations (agentmd, agentlint, coderace, agentreflect) go thr
 
 Run `pytest -m smoke` before any release to catch integration regressions.
 
+## Automated Improvement (`agentkit improve`)
+
+`agentkit improve` closes the full loop: analyze → identify improvements → apply fixes → re-analyze → show delta.
+
+```bash
+agentkit improve
+agentkit improve --dry-run
+agentkit improve --no-generate --no-harden
+agentkit improve --min-lift 10
+agentkit improve --json
+agentkit improve --output report.html
+agentkit run --improve
+```
+
 ## AI-Powered Explanations
 
 `agentkit explain` calls an LLM (Claude via Anthropic API) to generate a human-readable coaching report explaining *why* your scores are what they are — not just what to fix, but what it means for agents working on your codebase.

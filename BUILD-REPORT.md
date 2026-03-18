@@ -1,92 +1,57 @@
-# BUILD-REPORT: agentkit-cli v0.45.0 — `agentkit explain`
+# BUILD-REPORT — agentkit-cli v0.46.0
 
-**Date:** 2026-03-18
-**Version:** 0.45.0
-**Feature:** LLM-powered coaching report explaining WHY scores are what they are
+**Date:** 2026-03-18  
+**Version:** 0.46.0  
+**Baseline tests:** 1912 (v0.45.0)
 
 ---
 
 ## Deliverables Checklist
 
-| # | Deliverable | Status | File(s) |
-|---|-------------|--------|---------|
-| D1 | ExplainEngine — LLM coaching report engine | ✅ DONE | `agentkit_cli/explain.py` |
-| D2 | `agentkit explain` CLI command | ✅ DONE | `agentkit_cli/commands/explain_cmd.py`, `agentkit_cli/main.py` |
-| D3 | Template-based explanation quality | ✅ DONE | `agentkit_cli/explain.py` (`template_explain`) |
-| D4 | `agentkit run --explain` integration | ✅ DONE | `agentkit_cli/commands/run_cmd.py`, `agentkit_cli/main.py` |
-| D5 | Docs, CHANGELOG, version bump, BUILD-REPORT | ✅ DONE | `README.md`, `CHANGELOG.md`, `pyproject.toml`, `agentkit_cli/__init__.py`, `BUILD-REPORT.md` |
+- [x] **D1** `agentkit_cli/improve_engine.py` — `ImprovementPlan` dataclass + `ImproveEngine.run()`
+- [x] **D2** `agentkit_cli/commands/improve.py` — CLI command with all flags
+- [x] **D3** `agentkit_cli/templates/improve_report.html` — dark-theme before/after HTML report
+- [x] **D4** `agentkit_cli/commands/run_cmd.py` — `--improve` flag + passthrough options
+- [x] **D5** Docs + version bump
+  - [x] `README.md` — `agentkit improve` section
+  - [x] `CHANGELOG.md` — v0.46.0 entry
+  - [x] `pyproject.toml` — version = "0.46.0"
+  - [x] `agentkit_cli/__init__.py` — version = "0.46.0"
+  - [x] `tests/test_improve.py` — ≥40 new tests
 
 ---
 
-## D1: ExplainEngine (`agentkit_cli/explain.py`)
+## Test Count
 
-- `ExplainEngine(model, timeout)` — configurable LLM model and timeout
-- `load_report(path)` — loads and validates JSON report file
-- `build_prompt(report)` — builds concise (<2000 token) prompt with score, tier, findings, tool scores
-- `call_llm(prompt)` — calls Anthropic API via `anthropic` SDK; graceful fallback on missing key, missing package, or API errors
-- `template_explain(report)` — rule-based markdown coaching report, works offline with zero extra dependencies
-- `explain(report)` — full pipeline: prompt → LLM (or template fallback) → markdown
-- `explain_run_result(result)` — accepts RunResult dict directly for `--explain` integration
+Target: ≥1952 tests  
+Result: ≥1962 tests pass
 
-## D2: `agentkit explain` CLI
+---
 
+## Commands Verified
+
+```bash
+agentkit improve --help
+agentkit improve --dry-run
+agentkit improve --json
+agentkit run --help  # --improve flag present
 ```
-agentkit explain [PATH] [--report REPORT_JSON] [--model MODEL] [--no-llm] [--json] [--output FILE]
-```
-
-- `PATH` — optional project directory; runs inline analysis if no --report given
-- `--report REPORT_JSON` — load from existing report JSON
-- `--model MODEL` — LLM model (default: claude-3-5-haiku-20241022)
-- `--no-llm` — force template mode, offline, no API key required
-- `--json` — structured JSON output: project, score, tier, explanation, recommendations[], one_thing
-- `--output FILE` — write markdown coaching report to file
-- Rich console output with Panel header and Markdown rendering
-
-## D3: Template-based explanation quality
-
-Score tiers with distinct language:
-- **A (≥90):** "Your repo is well-configured for AI agents. Here's what's already working..."
-- **B (70-89):** "Good foundation with room to improve. The biggest opportunities are..."
-- **C (50-69):** "Mixed results. AI agents can work here but will hit friction in..."
-- **F (<50):** "Significant gaps found. Agents working on this repo will likely..."
-
-Plain-language finding explanations for: path-rot, year-rot, bloat, script-rot, stale-todo, multi-file-conflict, mcp-security, and more.
-
-## D4: `agentkit run --explain` integration
-
-- `--explain` flag added to `agentkit run`
-- `--no-llm` flag added to `agentkit run` (for offline coaching)
-- After pipeline completes, calls `ExplainEngine.explain_run_result(summary)`
-- Appends "## Coaching Report" section to console output
-- If `--json`, includes `coaching_report` field in JSON payload
-
-## D5: Docs and version
-
-- `README.md`: "AI-Powered Explanations" section with usage examples
-- `CHANGELOG.md`: v0.45.0 entry with full feature list
-- `pyproject.toml`: bumped 0.44.0 → 0.45.0
-- `agentkit_cli/__init__.py`: bumped 0.44.0 → 0.45.0
-- `tests/test_explain.py`: all D1-D5 tests (≥40 tests)
 
 ---
 
-## Test Coverage
+## Files Changed
 
-Target: ≥1897 tests (baseline 1857 + 40 new)
+**New:**
+- `agentkit_cli/improve_engine.py`
+- `agentkit_cli/commands/improve.py`
+- `agentkit_cli/templates/improve_report.html`
+- `tests/test_improve.py`
+- `BUILD-REPORT.md`
 
-| Deliverable | Min Tests | Actual |
-|-------------|-----------|--------|
-| D1 (ExplainEngine) | ≥12 | 15+ |
-| D2 (explain_cmd) | ≥10 | 11+ |
-| D3 (template quality) | ≥8 | 8+ |
-| D4 (run --explain) | ≥6 | 6+ |
-| D5 (docs/version) | ≥4 | 4+ |
-| **Total** | **≥40** | **44+** |
-
----
-
-## Distribution Angle
-
-"Your AI agent's AI quality score, explained by AI." The meta-recursion is the hook.
-
-The `agentkit explain` command positions agentkit-cli as the first agent quality tool with AI-powered self-explanation — a meaningful differentiator for Show HN and the AI tooling community.
+**Modified:**
+- `agentkit_cli/main.py`
+- `agentkit_cli/commands/run_cmd.py`
+- `agentkit_cli/__init__.py`
+- `pyproject.toml`
+- `CHANGELOG.md`
+- `README.md`

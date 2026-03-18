@@ -85,6 +85,10 @@ def run_command(
     timeline: bool = False,
     explain: bool = False,
     no_llm: bool = False,
+    improve: bool = False,
+    improve_no_generate: bool = False,
+    improve_no_harden: bool = False,
+    improve_threshold: float = 80.0,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -519,6 +523,46 @@ def run_command(
                 summary["coaching_report"] = _coaching
         except Exception as _exc:
             pass
+
+    # --improve: run improvement workflow if score < threshold
+    if improve:
+        _improve_result: dict | None = None
+        try:
+            from agentkit_cli.improve_engine import ImproveEngine as _ImproveEngine
+            _ie = _ImproveEngine()
+            _improve_plan = _ie.run(
+                str(root),
+                no_generate=improve_no_generate,
+                no_harden=improve_no_harden,
+            )
+            _improve_result = {
+                "baseline": _improve_plan.baseline_score,
+                "final": _improve_plan.final_score,
+                "delta": _improve_plan.delta,
+                "actions_taken": _improve_plan.actions_taken,
+            }
+            delta_sign = "+" if _improve_plan.delta >= 0 else ""
+            if ci:
+                active_console.print(
+                    f"\nImprovement: {_improve_plan.baseline_score:.0f} → {_improve_plan.final_score:.0f}"
+                    f" ({delta_sign}{_improve_plan.delta:.1f} pts)"
+                )
+            else:
+                score_col = "green" if _improve_plan.delta > 0 else "yellow"
+                console.print(
+                    f"\n[bold]Improvement:[/bold] {_improve_plan.baseline_score:.0f} → {_improve_plan.final_score:.0f}"
+                    f"  [{score_col}]{delta_sign}{_improve_plan.delta:.1f} pts[/{score_col}]"
+                )
+        except SystemExit:
+            pass
+        except Exception as _exc:
+            _warn = f"Warning: improve failed — {_exc}"
+            if ci:
+                active_console.print(_warn)
+            else:
+                console.print(f"[yellow]{_warn}[/yellow]")
+        if json_output and _improve_result is not None:
+            summary["improvement"] = _improve_result
 
     # --timeline: generate timeline HTML after run
     if timeline:
