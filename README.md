@@ -737,3 +737,48 @@ agentkit run --harden
 4. Re-scores the hardened file and shows a before/after table
 
 **Idempotent:** Running it multiple times on an already-hardened file makes no additional changes.
+
+## `agentkit monitor` — Continuous Quality Monitoring
+
+Set up continuous quality monitoring for your repos. Get notified on Slack or Discord when scores change significantly.
+
+```bash
+# Add a repo to monitor (default: daily, alert on 10-point change)
+agentkit monitor add github:owner/repo
+
+# Weekly schedule with Slack notification
+agentkit monitor add github:owner/repo --schedule weekly --notify-slack https://hooks.slack.com/...
+
+# Alert when score drops below 80 OR changes by 5+ points
+agentkit monitor add github:owner/repo --min-score 80 --alert-threshold 5
+
+# List all monitored targets (last score, next due, notify configured)
+agentkit monitor list
+
+# Force an immediate check on all due targets
+agentkit monitor run
+
+# Force-check a specific target
+agentkit monitor run --target github:owner/repo
+
+# Start the background daemon (polls every 60 seconds)
+agentkit monitor start
+
+# Check daemon status and next scheduled runs
+agentkit monitor status
+
+# View recent check history
+agentkit monitor logs --limit 20
+
+# Stop the daemon
+agentkit monitor stop
+
+# Remove a target
+agentkit monitor remove github:owner/repo
+```
+
+**Schedules:** `hourly`, `daily` (default), `weekly`
+
+**Notifications:** Configure Slack (`--notify-slack`), Discord (`--notify-discord`), or any generic webhook (`--notify-webhook`). Fires when `abs(score_delta) >= alert_threshold` (default 10 points) or score drops below `--min-score`.
+
+**Daemon:** Runs as a background subprocess, writing structured JSON lines to `~/.agentkit/monitor.log`. PID stored in `~/.agentkit/monitor.pid`. Handles SIGTERM gracefully.

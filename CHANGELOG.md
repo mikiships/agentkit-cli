@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.47.0] - 2026-03-18
+
+### Added
+- `agentkit monitor` command: continuous quality monitoring daemon for repos and local paths
+- `MonitorTarget` dataclass (`agentkit_cli/monitor_config.py`): stores target, schedule, notification URLs, thresholds, and last run state
+- `MonitorConfig` class: load/save from `.agentkit.toml` `[monitor.targets]` section without clobbering other sections
+- `MonitorEngine` class (`agentkit_cli/monitor_engine.py`): orchestrates scheduled checks, computes score deltas, fires notifications
+- `MonitorResult` dataclass: captures target, score, prev_score, delta, timestamp, notify_fired, error
+- `monitor_daemon.py`: background polling process with SIGTERM handling and structured JSON log output
+- Daemon PID file: `~/.agentkit/monitor.pid`; log file: `~/.agentkit/monitor.log`
+- Subcommands: `add`, `remove`, `list`, `run`, `start`, `stop`, `status`, `logs`
+- `--schedule daily|weekly|hourly`, `--notify-slack`, `--notify-discord`, `--notify-webhook`, `--min-score`, `--alert-threshold`
+- `agentkit monitor list` shows Rich table with last score, last checked, next due, notify configured
+- `agentkit monitor run [--target T] [--all]` forces immediate check with Rich results table
+- `agentkit monitor start/stop/status` control daemon lifecycle via PID file
+- `agentkit monitor logs [--limit N]` reads structured JSON log, renders Rich table
+- Notifications via existing NotificationEngine when abs(score delta) ≥ alert_threshold (default 10 points)
+
 ## [0.46.0] - 2026-03-18
 
 ### Added

@@ -1,71 +1,42 @@
-# Build Progress Log — agentkit-cli v0.42.0
+# Progress Log — agentkit-cli v0.47.0 monitor build
 
-## D1: RedTeamFixer core
-**Status:** Complete  
-**Files:** `agentkit_cli/redteam_fixer.py`, `tests/test_redteam_fixer.py`  
-**Tests:** 26 passing  
-**What was built:**
-- `RedTeamFixer` class with 6 remediation rule handlers (one per attack category)
-- Idempotency: anchor-based detection prevents double-adding sections
-- `apply()` method: threshold-based (only applies if category score < 70)
-- `apply_all()` method: unconditional application (used by `agentkit harden`)
-- Dry-run mode: returns fixed text without writing to disk
-- `FixResult` with `diff_lines()` and `rules_applied` properties
-- Backup creation on write
-**Blockers:** None
+## D1: MonitorConfig + Persistence Layer
+**Status:** COMPLETE
+**Tests:** 29 passing (tests/test_monitor_config.py)
+**Files:** agentkit_cli/monitor_config.py
 
-## D2: agentkit redteam --fix
-**Status:** Complete  
-**Files:** `agentkit_cli/commands/redteam_cmd.py`, `agentkit_cli/main.py`, `tests/test_redteam_cmd.py` (10 new tests)  
-**Tests:** 23 passing (13 existing + 10 new)  
-**What was built:**
-- `--fix` flag: runs analysis, applies remediations for categories scoring <70, backup original, re-score, show table
-- `--dry-run` flag: shows what would change without writing
-- Before/after Rich table with category, before score, after score, delta, status
-- `--json` output: `{original_score, fixed_score, delta, rules_applied, backup_path, dry_run}`
-- `--min-score` gate works with `--fix` (gates on fixed score)
-**Blockers:** None
+Built MonitorTarget dataclass with all required fields (schedule, notify URLs, min_score, alert_threshold, last_checked, last_score). MonitorConfig class loads/saves from .agentkit.toml [monitor.targets] section without clobbering other TOML sections. Key challenge: TOML keys with `:` and `/` (github:owner/repo) need quoting — implemented _toml_key() to handle bare vs quoted key requirements per TOML spec. 29 tests cover all methods, round-trip persistence, schedule validation, and edge cases.
 
-## D3: agentkit harden command
-**Status:** Complete  
-**Files:** `agentkit_cli/commands/harden_cmd.py`, `agentkit_cli/harden_report.py`, `tests/test_harden.py` (17 tests)  
-**Tests:** 17 passing  
-**What was built:**
-- `agentkit harden [PATH]` standalone command
-- Auto-detection of CLAUDE.md / AGENTS.md / SYSTEM.md
-- Score before/after display with grade comparison
-- `--output <path>`: write hardened file to separate path (does not modify original)
-- `--dry-run`: no writes
-- `--report`: generate dark-theme HTML score-card report
-- `--share`: publish to here.now
-- `--json`: structured output
-- Wired into `agentkit_cli/main.py` as `@app.command("harden")`
-- `HardenReport` HTML generator with before/after score, category breakdown, applied/skipped remediations
-**Blockers:** None
+## D2: MonitorEngine + Daemon Runner
+**Status:** COMPLETE
+**Tests:** 21 passing (tests/test_monitor_engine.py)
+**Files:** agentkit_cli/monitor_engine.py
 
-## D4: Integration with run, score, doctor
-**Status:** Complete  
-**Files:** `agentkit_cli/commands/run_cmd.py`, `agentkit_cli/commands/score_cmd.py`, `agentkit_cli/doctor.py`, `tests/test_harden_integration.py` (9 tests)  
-**Tests:** 9 passing  
-**What was built:**
-- `agentkit run --harden`: runs harden on detected context file after pipeline completes
-- `agentkit score` harden recommendation: when redteam score < 70, prints estimated lift and suggests `agentkit harden`
-- `agentkit doctor` redteam recency check: warns if no redteam run in last 7 days, shows fix hint `agentkit redteam`
-- Updated 3 existing doctor tests to mock `check_redteam_recency` (avoid test count regression)
-**Blockers:** None
+MonitorResult dataclass captures all check outputs. check_target() accepts injectable analyze_fn for testability — production uses subprocess `agentkit analyze --json`. should_notify() handles both delta threshold and min_score crossing. run_all_due() filters by is_due() which compares now vs last_checked + schedule_seconds. Notification wired to notifier.py's notify_result(). All tests mock the analyze fn — no real GitHub calls.
 
-## D5: Docs, CHANGELOG, version bump, BUILD-REPORT
-**Status:** Complete  
-**Files:** `README.md`, `CHANGELOG.md`, `agentkit_cli/__init__.py`, `BUILD-REPORT.md`, `progress-log.md`  
-**Tests:** N/A (docs/config)  
-**What was built:**
-- README: new "Auto-Harden Your Agent Context" section with `agentkit harden` examples
-- CHANGELOG: v0.42.0 entry with all new features
-- Version bump: 0.41.0 → 0.42.0
-- BUILD-REPORT.md: deliverable status, test counts, verification commands
-**Blockers:** None
+## D3: agentkit monitor CLI Command
+**Status:** COMPLETE
+**Tests:** 24 passing (tests/test_monitor_cmd.py)
+**Files:** agentkit_cli/commands/monitor.py, agentkit_cli/main.py
 
-## Final Test Count
-- Baseline: 1663
-- New tests: 26 (D1) + 10 (D2) + 17 (D3) + 9 (D4) = 62 new tests
-- Total: 1725 passing (target: ≥1708)
+Full Typer app with all 8 subcommands. Rich tables for list, run, logs, status. JSON output on all display commands. Daemon lifecycle (start/stop/status) via PID file. Wired into main.py as app.add_typer(monitor_app, name="monitor"). Tests use Typer's CliRunner with --config override for isolated test configs.
+
+## D4: Daemon Background Process
+**Status:** COMPLETE
+**Tests:** 9 passing (tests/test_monitor_daemon.py)
+**Files:** agentkit_cli/monitor_daemon.py
+
+Simple polling daemon using sleep loop (not sched, not threading — per contract rule 11). SIGTERM handler sets _running=False cleanly. Structured JSON log entries for startup, per-run results, errors, and exit. _test_max_cycles param enables deterministic testing without real sleep. Includes subprocess integration tests that launch/SIGTERM the real process.
+
+## D5: Docs, CHANGELOG, Version Bump
+**Status:** COMPLETE
+**Tests:** 10 passing (tests/test_monitor_d5.py)
+**Files:** README.md, CHANGELOG.md, agentkit_cli/__init__.py, pyproject.toml, BUILD-REPORT.md
+
+Version bumped to 0.47.0 in all surfaces. README.md has full monitor section with all subcommand examples. CHANGELOG.md has complete v0.47.0 entry. Fixed pre-existing version hardcodes in test_timeline_d5.py, test_certify_d5.py, test_explain.py, test_improve.py. BUILD-REPORT.md updated.
+
+## Final Results
+- **Baseline tests:** 1969
+- **New tests:** 93 (D1:29 + D2:21 + D3:24 + D4:9 + D5:10)
+- **Total passing:** 2062
+- **All deliverables complete**
