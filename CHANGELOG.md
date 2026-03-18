@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.49.0] - 2026-03-18
+
+### Added
+- GitHub Checks API integration: `agentkit run` and `agentkit gate` now post native GitHub Check Runs with score, grade, and per-tool breakdown visible in the PR UI
+- `agentkit checks` command group: `verify`, `post`, `status` subcommands for manual Checks API interaction
+- `--checks / --no-checks` flag on `agentkit run` and `agentkit gate` (default: auto-detect GitHub Actions)
+- `agentkit_cli/checks_client.py`: `GitHubChecksClient` with `create_check_run()` and `update_check_run()`
+- `agentkit_cli/checks_formatter.py`: `format_check_output()` converts scores to Check Run markdown output with per-tool table and annotations
+- CI workflow template (`agentkit ci`) now includes `checks: write` permission
+- 63 new tests (D1: 18, D2: 21, D3: 12, D4: 12)
+
 ## [0.48.0] - 2026-03-18
 
 ### Added

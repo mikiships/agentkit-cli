@@ -842,3 +842,41 @@ agentkit run --webhook-notify
 ```
 
 After the pipeline completes, POSTs a JSON summary to `notify.webhook_url` from `.agentkit.toml`.
+
+## GitHub Checks API
+
+When running in GitHub Actions, `agentkit run` and `agentkit gate` automatically post a native **GitHub Check Run** with your composite score, grade, and per-tool breakdown — visible directly in the PR UI.
+
+### Automatic Mode (CI)
+
+No extra config needed. When `GITHUB_ACTIONS=true` and `GITHUB_TOKEN` is available, check runs are posted automatically:
+
+```yaml
+# In your GitHub Actions workflow:
+permissions:
+  contents: read
+  checks: write    # Required for Checks API
+
+steps:
+  - run: agentkit run --ci
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Use `--no-checks` to disable, or `--checks` to force even when auto-detection fails.
+
+### Manual Commands
+
+```bash
+agentkit checks verify              # test that Checks API is configured
+agentkit checks post --score 87     # manually post a check run
+agentkit checks status              # show last check run posted
+```
+
+### What Gets Posted
+
+- **Title:** `Agent Quality: 87/100 (B)`
+- **Summary:** composite score + gate verdict (PASS/FAIL)
+- **Body:** markdown table of per-tool scores with pass/warn/fail indicators
+- **Annotations:** one annotation per failing tool (score < 80)
+- **Linked scorecard** if `--share` is active

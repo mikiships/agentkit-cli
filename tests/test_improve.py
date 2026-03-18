@@ -474,17 +474,17 @@ class TestRunImproveFlag:
 class TestVersionAndDocs:
     def test_version_is_046(self):
         from agentkit_cli import __version__
-        assert __version__ == "0.48.0"
+        assert __version__ == "0.49.0"
 
     def test_pyproject_version(self):
         p = Path(__file__).parent.parent / "pyproject.toml"
         content = p.read_text()
-        assert '0.48.0' in content
+        assert '0.49.0' in content
 
     def test_changelog_has_046(self):
         p = Path(__file__).parent.parent / "CHANGELOG.md"
         content = p.read_text()
-        assert "0.48.0" in content
+        assert "0.49.0" in content
 
     def test_readme_has_improve(self):
         p = Path(__file__).parent.parent / "README.md"
@@ -498,7 +498,7 @@ class TestVersionAndDocs:
     def test_build_report_has_version(self):
         p = Path(__file__).parent.parent / "BUILD-REPORT.md"
         content = p.read_text()
-        assert "0.48.0" in content
+        assert "0.49.0" in content
 
     def test_improve_engine_importable(self):
         from agentkit_cli.improve_engine import ImproveEngine, ImprovementPlan
@@ -511,7 +511,7 @@ class TestVersionAndDocs:
 
     def test_version_cli(self):
         result = runner.invoke(app, ["--version"])
-        assert "0.48.0" in result.output
+        assert "0.49.0" in result.output
 
     def test_improve_in_app_commands(self):
         result = runner.invoke(app, ["--help"])
