@@ -400,6 +400,32 @@ def build_html(project_name: str, results: dict, statuses: list[dict]) -> str:
 # Main command
 # ---------------------------------------------------------------------------
 
+def _llmstxt_card(cwd: Path) -> str:
+    """Generate llms.txt card HTML for the report, if llms.txt exists."""
+    llmstxt_path = cwd / "llms.txt"
+    if not llmstxt_path.exists():
+        return ""
+    try:
+        content = llmstxt_path.read_text(encoding="utf-8", errors="replace")
+        sections = [l[3:] for l in content.splitlines() if l.startswith("## ")]
+        link_count = content.count("](")
+        size = len(content.encode("utf-8"))
+        from agentkit_cli.llmstxt import score_llms_txt
+        score = score_llms_txt(content)
+        score_color = _score_color_css(float(score))
+        sections_html = "".join(f"<li>{s}</li>" for s in sections)
+        return f"""<div class="card" style="margin-top:24px">
+<h2 style="color:#58a6ff">llms.txt</h2>
+<div style="display:flex;gap:16px;align-items:center;margin-bottom:12px">
+<div><span style="font-size:2rem;font-weight:bold;color:{score_color}">{score}</span><div style="color:#8b949e;font-size:12px">quality score</div></div>
+<div style="color:#8b949e;font-size:13px">{len(sections)} sections &nbsp;·&nbsp; {link_count} links &nbsp;·&nbsp; {size:,} bytes</div>
+</div>
+<div style="color:#c9d1d9;font-size:13px"><b>Sections:</b><ul style="margin-left:16px">{sections_html}</ul></div>
+</div>"""
+    except Exception:
+        return ""
+
+
 def report_command(
     path: Optional[Path],
     json_output: bool,
@@ -408,6 +434,7 @@ def report_command(
     publish: bool = False,
     inject_readme: bool = False,
     share: bool = False,
+    llmstxt: bool = False,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -460,8 +487,24 @@ def report_command(
     color = "green" if coverage >= 80 else ("yellow" if coverage >= 50 else "red")
     console.print(f"\n[{color}]Toolkit coverage: {coverage}%[/{color}] ({sum(1 for k in TOOLS if results.get(k) is not None)}/{len(TOOLS)} tools)\n")
 
+    # Optionally generate llms.txt before building report
+    if llmstxt:
+        try:
+            from agentkit_cli.llmstxt import LlmsTxtGenerator
+            _lg = LlmsTxtGenerator()
+            _li = _lg.scan_repo(str(cwd))
+            _lc = _lg.generate_llms_txt(_li)
+            (cwd / "llms.txt").write_text(_lc, encoding="utf-8")
+            console.print(f"[bold]llms.txt generated:[/bold] {cwd / 'llms.txt'}")
+        except Exception as _e:
+            console.print(f"[yellow]Warning: llmstxt generation failed — {_e}[/yellow]")
+
     # Generate HTML
     html = build_html(project_name, results, statuses)
+    # Append llmstxt card if llms.txt exists
+    llmstxt_card_html = _llmstxt_card(cwd)
+    if llmstxt_card_html:
+        html = html.replace("</body>", f"{llmstxt_card_html}\n</body>")
     out_path = output or cwd / "agentkit-report.html"
     out_path.write_text(html, encoding="utf-8")
     console.print(f"[bold]Report saved:[/bold] {out_path}")

@@ -716,6 +716,43 @@ def check_webhook_config(root: Path) -> DoctorCheckResult:
 # Core runner
 # ---------------------------------------------------------------------------
 
+def check_llmstxt_readiness(root: Path) -> DoctorCheckResult:
+    """Check whether the repo is ready to generate llms.txt."""
+    has_readme = any((root / p).exists() for p in ("README.md", "README.rst", "README.txt", "README"))
+    has_docs = any((root / d).is_dir() for d in ("docs", "doc", "documentation"))
+    has_llmstxt = (root / "llms.txt").exists()
+
+    if has_llmstxt:
+        return DoctorCheckResult(
+            id="context.llmstxt",
+            name="llms.txt",
+            status="pass",
+            summary="llms.txt found — repo is AI-accessible.",
+            details=str(root / "llms.txt"),
+            fix_hint="",
+            category="context",
+        )
+    if has_readme:
+        return DoctorCheckResult(
+            id="context.llmstxt",
+            name="llms.txt",
+            status="pass",
+            summary="README found — ready to generate llms.txt. Run 'agentkit llmstxt'.",
+            details=f"docs/: {'found' if has_docs else 'not found'}",
+            fix_hint="Run: agentkit llmstxt",
+            category="context",
+        )
+    return DoctorCheckResult(
+        id="context.llmstxt",
+        name="llms.txt",
+        status="warn",
+        summary="No README or llms.txt found. Add a README.md first, then run 'agentkit llmstxt'.",
+        details="",
+        fix_hint="Add README.md, then run: agentkit llmstxt",
+        category="context",
+    )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -739,6 +776,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_serve_available())
     checks.append(check_redteam_recency(project_root))
     checks.append(check_webhook_config(project_root))
+    checks.append(check_llmstxt_readiness(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 

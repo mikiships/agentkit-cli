@@ -91,6 +91,7 @@ def run_command(
     improve_threshold: float = 80.0,
     webhook_notify: bool = False,
     checks: Optional[bool] = None,
+    llmstxt: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -339,8 +340,7 @@ def run_command(
             import sys
             print(f"[agentkit history] DEBUG: history recording failed: {exc}", file=sys.stderr)
 
-    if json_output:
-        print(json.dumps(summary, indent=2))
+    # json_output deferred to after optional steps (llmstxt, etc.) can add fields
 
     # Optional publish step
     if publish:
@@ -666,6 +666,42 @@ def run_command(
         except Exception as _exc:
             import logging as _logging
             _logging.getLogger(__name__).warning("Checks API update failed: %s", _exc)
+
+    # --llmstxt: generate llms.txt after pipeline
+    llmstxt_generated: bool = False
+    llmstxt_path: Optional[str] = None
+    llmstxt_section_count: int = 0
+    llmstxt_size: int = 0
+    if llmstxt:
+        try:
+            from agentkit_cli.llmstxt import LlmsTxtGenerator
+            _llms_gen = LlmsTxtGenerator()
+            _llms_info = _llms_gen.scan_repo(cwd_str)
+            _llms_content = _llms_gen.generate_llms_txt(_llms_info)
+            _llms_out = root / "llms.txt"
+            _llms_out.write_text(_llms_content, encoding="utf-8")
+            llmstxt_generated = True
+            llmstxt_path = str(_llms_out)
+            llmstxt_section_count = sum(1 for l in _llms_content.splitlines() if l.startswith("## "))
+            llmstxt_size = len(_llms_content.encode("utf-8"))
+            if ci:
+                active_console.print(f"\nllms.txt: generated ({llmstxt_size} bytes, {llmstxt_section_count} sections) → {_llms_out}")
+            else:
+                console.print(f"\n[bold]llms.txt:[/bold] generated ({llmstxt_size} bytes, {llmstxt_section_count} sections) → [dim]{_llms_out}[/dim]")
+        except Exception as _exc:
+            _warn = f"Warning: llmstxt generation failed — {_exc}"
+            if ci:
+                active_console.print(_warn)
+            else:
+                console.print(f"[yellow]{_warn}[/yellow]")
+    if llmstxt:
+        summary["llmstxt_generated"] = llmstxt_generated
+        summary["llmstxt_path"] = llmstxt_path
+        summary["llmstxt_section_count"] = llmstxt_section_count
+        summary["llmstxt_size"] = llmstxt_size
+
+    if json_output:
+        print(json.dumps(summary, indent=2))
 
     # Final status
     if failed_count > 0:

@@ -139,9 +139,10 @@ def run(
     improve_threshold: float = typer.Option(80.0, "--improve-threshold", help="Score threshold below which --improve runs (default 80)"),
     webhook_notify: bool = typer.Option(False, "--webhook-notify", help="POST result to configured webhook URL after run"),
     checks: Optional[bool] = typer.Option(None, "--checks/--no-checks", help="Post a GitHub Check Run (default: auto-detect GitHub Actions env)"),
+    run_llmstxt: bool = typer.Option(False, "--llmstxt", help="Generate llms.txt after pipeline completes"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -220,9 +221,10 @@ def report(
     publish: bool = typer.Option(False, "--publish", help="Publish HTML report to here.now after generation"),
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after report"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after report and print the URL"),
+    report_llmstxt: bool = typer.Option(False, "--llmstxt", help="Include llms.txt card in report and generate llms.txt if missing"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt)
 
 
 @app.command("share")
