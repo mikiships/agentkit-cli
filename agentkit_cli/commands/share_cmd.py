@@ -81,6 +81,8 @@ def _run_score_inline(path: Optional[Path]) -> dict:
     """Run agentkit score --json inline and return parsed result."""
     from agentkit_cli.composite import CompositeScoreEngine
     from agentkit_cli.config import find_project_root
+    from agentkit_cli.commands.score_cmd import _run_agentlint_fast, _get_last_tool_score
+    from pathlib import Path as _Path
 
     cwd = str(path or Path.cwd())
     try:
@@ -88,11 +90,20 @@ def _run_score_inline(path: Optional[Path]) -> dict:
     except Exception:
         root = cwd
 
-    engine = CompositeScoreEngine(root)
-    result = engine.compute()
+    root_path = _Path(root).resolve()
+    project = root_path.name
+
+    # Gather tool scores (same logic as score_cmd)
+    tool_scores: dict = {}
+    tool_scores["agentlint"] = _run_agentlint_fast(str(root_path))
+    for tool in ("coderace", "agentmd", "agentreflect"):
+        tool_scores[tool] = _get_last_tool_score(project, tool)
+
+    engine = CompositeScoreEngine()
+    result = engine.compute(tool_scores)
     return {
-        "composite": result.composite,
-        "breakdown": result.breakdown,
+        "composite": result.score,
+        "breakdown": result.components,
     }
 
 
