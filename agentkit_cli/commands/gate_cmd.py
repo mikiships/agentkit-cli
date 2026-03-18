@@ -80,6 +80,7 @@ def gate_command(
     notify_webhook: Optional[str] = None,
     notify_on: str = "fail",
     profile: Optional[str] = None,
+    checks: Optional[bool] = None,
 ) -> None:
     """Evaluate the current project against gate thresholds."""
     # Apply config defaults when CLI flags were not provided
@@ -113,6 +114,20 @@ def gate_command(
     if notify_on == "fail" and cfg.notify.on != "fail":
         notify_on = cfg.notify.on
 
+    # GitHub Checks API integration
+    _checks_client = None
+    _check_run_id: Optional[int] = None
+    _should_post_checks = checks  # None = auto-detect
+    try:
+        from agentkit_cli.checks_client import GitHubChecksClient, detect_github_env
+        if _should_post_checks is True or _should_post_checks is None:
+            env = detect_github_env()
+            if env is not None:
+                _checks_client = GitHubChecksClient(env=env)
+                _check_run_id = _checks_client.create_check_run(name="agentkit gate", status="in_progress")
+    except Exception:
+        pass
+
     try:
         result = run_gate(
             path=path,
@@ -145,6 +160,24 @@ def gate_command(
             )
         except Exception:
             pass
+
+        # Update GitHub Check Run
+        if _checks_client is not None and _check_run_id is not None:
+            try:
+                from agentkit_cli.checks_formatter import format_check_output
+                _gate_dict = {"passed": result.passed, "failure_reasons": list(result.failure_reasons)}
+                _checks_output = format_check_output(
+                    {"score": result.score, "grade": result.grade, "components": result.components},
+                    gate_result=_gate_dict,
+                )
+                _checks_client.update_check_run(
+                    _check_run_id,
+                    status="completed",
+                    conclusion="success" if result.passed else "failure",
+                    output=_checks_output,
+                )
+            except Exception:
+                pass
 
         if json_output:
             print(json.dumps(payload, indent=2))

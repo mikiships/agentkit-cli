@@ -90,6 +90,7 @@ def run_command(
     improve_no_harden: bool = False,
     improve_threshold: float = 80.0,
     webhook_notify: bool = False,
+    checks: Optional[bool] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -127,6 +128,24 @@ def run_command(
     active_console = ci_console if ci else console
 
     active_console.print(f"\nagentkit run — project: {root}\n" if ci else f"\n[bold]agentkit run[/bold] — project: {root}\n")
+
+    # GitHub Checks API integration
+    _checks_client = None
+    _check_run_id: Optional[int] = None
+    _should_post_checks = checks if checks is not None else None  # None = auto-detect
+    try:
+        from agentkit_cli.checks_client import GitHubChecksClient, detect_github_env
+        if _should_post_checks is True or (_should_post_checks is None):
+            env = detect_github_env()
+            if env is not None:
+                _checks_client = GitHubChecksClient(env=env)
+                _check_run_id = _checks_client.create_check_run(name="agentkit run", status="in_progress")
+            elif _should_post_checks is True:
+                import logging as _logging
+                _logging.getLogger(__name__).warning("--checks requested but not in GitHub Actions environment")
+    except Exception as _exc:
+        import logging as _logging
+        _logging.getLogger(__name__).warning("Checks API: %s", _exc)
 
     context_file = root / "CLAUDE.md"
     results = []
@@ -616,6 +635,37 @@ def run_command(
                 active_console.print(warn)
             else:
                 console.print(f"[yellow]{warn}[/yellow]")
+
+    # Update GitHub Check Run with final results
+    if _checks_client is not None and _check_run_id is not None:
+        try:
+            from agentkit_cli.checks_formatter import format_check_output
+            _checks_score = _composite_score if _composite_score is not None else 0.0
+            from agentkit_cli.composite import _compute_grade as _cg
+            _checks_grade = _cg(_checks_score) if _composite_score is not None else "F"
+            _checks_result = {
+                "score": _checks_score,
+                "grade": _checks_grade,
+                "components": {},
+            }
+            # Try to get components from the composite result
+            try:
+                _checks_result["components"] = {
+                    t: d for t, d in sorted(comp_result.components.items())
+                } if "comp_result" in dir() else {}
+            except Exception:
+                pass
+            _checks_output = format_check_output(_checks_result)
+            _checks_conclusion = "success" if failed_count == 0 else "failure"
+            _checks_client.update_check_run(
+                _check_run_id,
+                status="completed",
+                conclusion=_checks_conclusion,
+                output=_checks_output,
+            )
+        except Exception as _exc:
+            import logging as _logging
+            _logging.getLogger(__name__).warning("Checks API update failed: %s", _exc)
 
     # Final status
     if failed_count > 0:
