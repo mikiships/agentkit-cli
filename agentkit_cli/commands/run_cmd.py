@@ -89,6 +89,7 @@ def run_command(
     improve_no_generate: bool = False,
     improve_no_harden: bool = False,
     improve_threshold: float = 80.0,
+    webhook_notify: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -574,6 +575,47 @@ def run_command(
             pass
         except Exception:
             pass
+
+    # --webhook-notify: POST result to configured webhook URL after run
+    if webhook_notify:
+        try:
+            from agentkit_cli.config import load_config as _load_cfg
+            _wh_cfg = _load_cfg(path)
+            _wh_url = _wh_cfg.notify.webhook_url
+            if _wh_url:
+                import json as _json
+                import urllib.request as _urllib_req
+                _payload = _json.dumps({
+                    "event": "run_complete",
+                    "project": cwd_str,
+                    "passed": passed_count,
+                    "failed": failed_count,
+                    "score": _composite_score if "_composite_score" in dir() else None,
+                }).encode("utf-8")
+                _req = _urllib_req.Request(
+                    _wh_url,
+                    data=_payload,
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with _urllib_req.urlopen(_req, timeout=5) as _resp:
+                    pass
+                if ci:
+                    active_console.print(f"webhook-notify: posted to {_wh_url}")
+                else:
+                    console.print(f"[dim]webhook-notify: posted to {_wh_url}[/dim]")
+            else:
+                warn = "webhook-notify: no webhook URL configured. Set notify.webhook_url in .agentkit.toml"
+                if ci:
+                    active_console.print(warn)
+                else:
+                    console.print(f"[yellow]{warn}[/yellow]")
+        except Exception as _exc:
+            warn = f"webhook-notify failed: {_exc}"
+            if ci:
+                active_console.print(warn)
+            else:
+                console.print(f"[yellow]{warn}[/yellow]")
 
     # Final status
     if failed_count > 0:

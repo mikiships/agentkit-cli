@@ -659,6 +659,59 @@ def check_serve_available() -> DoctorCheckResult:
         )
 
 
+def check_webhook_config(root: Path) -> DoctorCheckResult:
+    """Check whether a webhook is configured and, if so, whether the secret is set."""
+    try:
+        from agentkit_cli.config import TOML_FILENAME, _parse_toml
+        toml_path = root / TOML_FILENAME
+        data = _parse_toml(toml_path) if toml_path.exists() else {}
+        webhook = data.get("webhook", {})
+
+        if not webhook:
+            return DoctorCheckResult(
+                id="integrations.webhook",
+                name="webhook config",
+                status="pass",
+                summary="No webhook configured (optional).",
+                details="Run 'agentkit webhook config --set-secret <secret>' to enable.",
+                fix_hint="agentkit webhook config --set-secret <SECRET>",
+                category="integrations",
+            )
+
+        secret = webhook.get("secret", "")
+        if not secret:
+            return DoctorCheckResult(
+                id="integrations.webhook",
+                name="webhook config",
+                status="warn",
+                summary="Webhook configured but HMAC secret is empty.",
+                details="Without a secret, any HTTP client can trigger analysis.",
+                fix_hint="agentkit webhook config --set-secret <SECRET>",
+                category="integrations",
+            )
+
+        port = webhook.get("port", 8080)
+        return DoctorCheckResult(
+            id="integrations.webhook",
+            name="webhook config",
+            status="pass",
+            summary=f"Webhook configured on port {port} with HMAC secret.",
+            details="Run 'agentkit webhook serve' to start listening.",
+            fix_hint="",
+            category="integrations",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="integrations.webhook",
+            name="webhook config",
+            status="warn",
+            summary="Could not read webhook config.",
+            details=str(exc),
+            fix_hint="agentkit webhook config --show",
+            category="integrations",
+        )
+
+
 # ---------------------------------------------------------------------------
 # Core runner
 # ---------------------------------------------------------------------------
@@ -685,6 +738,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     ]
     checks.append(check_serve_available())
     checks.append(check_redteam_recency(project_root))
+    checks.append(check_webhook_config(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 
