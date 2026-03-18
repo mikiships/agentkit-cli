@@ -537,6 +537,39 @@ All quartet tool invocations (agentmd, agentlint, coderace, agentreflect) go thr
 
 Run `pytest -m smoke` before any release to catch integration regressions.
 
+## AI-Powered Explanations
+
+`agentkit explain` calls an LLM (Claude via Anthropic API) to generate a human-readable coaching report explaining *why* your scores are what they are — not just what to fix, but what it means for agents working on your codebase.
+
+```bash
+# Explain scores for the current project (template mode, no API key needed)
+agentkit explain --no-llm .
+
+# Explain a saved run report (LLM mode, requires ANTHROPIC_API_KEY)
+agentkit explain --report report.json
+
+# Get structured JSON output
+agentkit explain --no-llm . --json
+
+# Save coaching report to a file
+agentkit explain --no-llm . --output coaching.md
+
+# Run the full pipeline then get a coaching report in one command
+agentkit run --explain --no-llm .
+```
+
+The coaching report includes four sections:
+- **What This Score Means** — plain language interpretation for your tier (A/B/C/F)
+- **Key Findings Explained** — why each issue actually hurts agent performance
+- **Top 3 Next Steps** — ordered by impact
+- **If You Do Nothing Else** — the single most important action
+
+Use `--no-llm` for offline mode (CI environments, no API key). Set `ANTHROPIC_API_KEY` for LLM-powered coaching via `claude-3-5-haiku-20241022`.
+
+**The meta-angle:** "Your AI agent's AI quality score, explained by AI."
+
+---
+
 ## agentkit certify
 
 Generate a dated, shareable certification report proving a repo passed all agentkit quality checks.

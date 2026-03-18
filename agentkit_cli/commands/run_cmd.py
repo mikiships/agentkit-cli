@@ -83,6 +83,8 @@ def run_command(
     serve: bool = False,
     harden: bool = False,
     timeline: bool = False,
+    explain: bool = False,
+    no_llm: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -493,6 +495,29 @@ def run_command(
         except SystemExit:
             pass
         except Exception:
+            pass
+
+    # --explain: generate coaching report after pipeline
+    if explain:
+        try:
+            from agentkit_cli.explain import ExplainEngine
+            from rich.markdown import Markdown as _Markdown
+            _engine = ExplainEngine()
+            _coaching = (
+                _engine.template_explain(summary)
+                if no_llm
+                else _engine.explain_run_result(summary)
+            )
+            if ci:
+                active_console.print("\n## Coaching Report")
+                active_console.print(_coaching)
+            else:
+                console.print("\n[bold cyan]## Coaching Report[/bold cyan]")
+                console.print(_Markdown(_coaching))
+            # Append to summary if json_output
+            if json_output:
+                summary["coaching_report"] = _coaching
+        except Exception as _exc:
             pass
 
     # --timeline: generate timeline HTML after run

@@ -45,6 +45,7 @@ from agentkit_cli.commands.redteam_cmd import redteam_command
 from agentkit_cli.commands.harden_cmd import harden_command
 from agentkit_cli.commands.certify_cmd import certify_app
 from agentkit_cli.commands.timeline_cmd import timeline_command
+from agentkit_cli.commands.explain_cmd import explain_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -122,9 +123,11 @@ def run(
     run_redteam: bool = typer.Option(False, "--redteam", help="Run adversarial eval after pipeline completes"),
     run_harden: bool = typer.Option(False, "--harden", help="Run harden on detected context file after pipeline"),
     run_timeline: bool = typer.Option(False, "--timeline", help="Generate timeline HTML after run completes"),
+    run_explain: bool = typer.Option(False, "--explain", help="Generate LLM coaching report after pipeline completes"),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Use template-based explanation (offline, no API key needed)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -760,6 +763,26 @@ def watch(
 ) -> None:
     """Watch the project for changes and re-run the pipeline automatically."""
     watch_command(path=path, extensions=extensions, debounce=debounce, ci=ci, serve=serve, port=port)
+
+
+@app.command("explain")
+def explain(
+    path: Optional[Path] = typer.Argument(None, help="Project directory (default: cwd)"),
+    report: Optional[str] = typer.Option(None, "--report", help="Load from existing report JSON file"),
+    model: str = typer.Option("claude-3-5-haiku-20241022", "--model", help="LLM model to use"),
+    no_llm: bool = typer.Option(False, "--no-llm", help="Force template-based explanation (offline, no API key needed)"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON with score, tier, explanation, recommendations"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write markdown coaching report to file"),
+) -> None:
+    """Generate an LLM-powered coaching report explaining your agent quality scores."""
+    explain_command(
+        path=path,
+        report_path=report,
+        model=model,
+        no_llm=no_llm,
+        json_output=json_output,
+        output=output,
+    )
 
 
 @app.callback(invoke_without_command=True)

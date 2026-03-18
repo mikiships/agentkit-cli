@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.45.0] - 2026-03-18
+
+### Added
+- `agentkit explain` command: LLM-powered coaching report explaining WHY scores are what they are
+- `ExplainEngine` class (`agentkit_cli/explain.py`): loads report JSON, builds prompt, calls Anthropic API, falls back to template
+- `build_prompt(report)`: constructs a concise (<2000 token) prompt including composite score, tier, per-tool scores, and top findings
+- `call_llm(prompt)`: calls `claude-3-5-haiku-20241022` via Anthropic SDK; graceful fallback if key missing or SDK not installed
+- `template_explain(report)`: rule-based markdown coaching report — works offline, no API key needed
+- `explain_run_result(result)`: accepts a RunResult dict directly (for `--explain` integration)
+- Four coaching sections: "What This Score Means", "Key Findings Explained", "Top 3 Next Steps", "If You Do Nothing Else"
+- Score-tier prose: A (≥90), B (70-89), C (50-69), F (<50) each get context-appropriate language
+- Plain-language finding explanations: path-rot, year-rot, bloat, script-rot, mcp-security, and more
+- `agentkit explain [PATH] [--report JSON] [--model MODEL] [--no-llm] [--json] [--output FILE]`
+- `--no-llm` flag: force template mode, offline, no dependencies beyond agentkit-cli
+- `--json` output: structured JSON with project, score, tier, explanation, recommendations[], one_thing
+- `--output FILE`: write markdown coaching report to file
+- `agentkit run --explain`: run full toolkit then append "## Coaching Report" to output
+- `agentkit run --no-llm`: combine with `--explain` for offline coaching
+- Rich console output: Panel header with score/tier, rendered Markdown coaching report
+
 ## [0.44.0] - 2026-03-17
 
 ### Added
