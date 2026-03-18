@@ -49,6 +49,7 @@ from agentkit_cli.commands.explain_cmd import explain_command
 from agentkit_cli.commands.improve import improve_command
 from agentkit_cli.commands.monitor import monitor_app
 from agentkit_cli.commands.webhook import webhook_app
+from agentkit_cli.commands.checks_cmd import checks_app
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -62,6 +63,7 @@ app.add_typer(profile_app, name="profile")
 app.add_typer(certify_app, name="certify")
 app.add_typer(monitor_app, name="monitor")
 app.add_typer(webhook_app, name="webhook")
+app.add_typer(checks_app, name="checks")
 
 
 @app.command("timeline")
