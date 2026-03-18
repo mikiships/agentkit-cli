@@ -92,6 +92,57 @@ Explicit CLI flags always override profile values:
 agentkit gate --profile strict --min-score 99
 ```
 
+## `agentkit llmstxt` — AI-Accessible Documentation
+
+[llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.
+
+```bash
+# Generate llms.txt for current directory
+agentkit llmstxt
+
+# Generate both llms.txt and llms-full.txt (with inline content)
+agentkit llmstxt --full --output ./dist/
+
+# Analyze a GitHub repo
+agentkit llmstxt github:tiangolo/fastapi --json
+
+# Validate an existing llms.txt
+agentkit llmstxt --validate
+
+# Get quality score
+agentkit llmstxt --score --json
+```
+
+Sample `llms.txt` output:
+```
+# my-project v1.2.0
+
+> A fast, lightweight library for building AI agents.
+
+## Docs
+
+- [README](README.md): Project overview and getting started guide.
+- [Changelog](CHANGELOG.md): Version history and release notes.
+- [Guide](docs/guide.md)
+
+## API
+
+- [my-project API](my_project/__init__.py): Main API module.
+
+## Examples
+
+- [Basic Example](examples/basic.md)
+```
+
+**Integration with existing commands:**
+```bash
+# Generate llms.txt as part of standard run pipeline
+agentkit run --llmstxt
+
+# Include llms.txt card in HTML report
+agentkit report --llmstxt
+```
+
 ## Commands
 
 - `agentkit quickstart` — 🚀 fastest path to a score (start here)

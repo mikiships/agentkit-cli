@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.50.0] - 2026-03-18
+
+### Added
+
+- `agentkit llmstxt` — new command to generate `llms.txt` and `llms-full.txt` for any repository, following the [llms.txt specification](https://llmstxt.org/)
+  - Supports local paths and `github:owner/repo` (auto-clone)
+  - `--full`: also generate `llms-full.txt` with inline file content
+  - `--output DIR`: write files to specified directory
+  - `--json`: structured JSON output with section counts and file sizes
+  - `--share`: publish to here.now and return a shareable URL
+  - `--validate`: check an existing llms.txt against the spec (H1, blockquote, sections, links)
+  - `--score`: 0-100 quality score for the generated llms.txt
+- `agentkit run --llmstxt`: generate `llms.txt` as part of the standard pipeline; stores `llmstxt_generated`, `llmstxt_path`, `llmstxt_section_count`, `llmstxt_size` in JSON output
+- `agentkit report --llmstxt`: includes a quality card for `llms.txt` in the HTML report
+- `agentkit doctor`: new `context.llmstxt` readiness check (detects README presence, hints to generate llms.txt)
+- `LlmsTxtGenerator` class (`agentkit_cli/llmstxt.py`): `scan_repo()`, `generate_llms_txt()`, `generate_llms_full_txt()`, `validate_llms_txt()`, `score_llms_txt()`
+
 ## [0.49.0] - 2026-03-18
 
 ### Added
