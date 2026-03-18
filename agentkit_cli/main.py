@@ -53,6 +53,7 @@ from agentkit_cli.commands.checks_cmd import checks_app
 from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
+from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -688,7 +689,7 @@ def pr(
 
 @app.command("campaign")
 def campaign(
-    target: str = typer.Argument(..., help="Target spec: github:owner, topic:TOPIC, or repos-file:PATH"),
+    target: str = typer.Argument("", help="Target spec: github:owner, topic:TOPIC, repos-file:PATH, or leave blank with --from-search"),
     limit: int = typer.Option(5, "--limit", help="Max repos to target [default: 5]"),
     language: Optional[str] = typer.Option(None, "--language", help="Filter by language (e.g. python, typescript)"),
     min_stars: int = typer.Option(100, "--min-stars", help="Minimum stars threshold [default: 100]"),
@@ -699,10 +700,46 @@ def campaign(
     no_filter: bool = typer.Option(False, "--no-filter", help="Skip the 'already has context file' check"),
     skip_pr: bool = typer.Option(False, "--skip-pr", help="Only discover repos, don't submit PRs"),
     share: bool = typer.Option(False, "--share", help="Generate and upload a shareable campaign report"),
+    from_search: Optional[str] = typer.Option(None, "--from-search", help="Auto-discover repos via agentkit search before submitting PRs (provide search query)"),
+    topic: Optional[str] = typer.Option(None, "--topic", help="Topic filter for --from-search"),
 ) -> None:
     """Submit CLAUDE.md PRs to multiple repos in one command."""
+    effective_target = target
+
+    if from_search is not None:
+        # Run search to find missing-context repos, then use them as targets
+        from agentkit_cli.search import SearchEngine
+        from agentkit_cli.campaign import RepoSpec
+        console = __import__("rich.console", fromlist=["Console"]).Console()
+        console.print(f"[bold]--from-search:[/bold] discovering repos for [cyan]{from_search!r}[/cyan]…")
+        engine = SearchEngine()
+        results = engine.search(
+            query=from_search,
+            language=language,
+            min_stars=min_stars if min_stars > 0 else None,
+            topic=topic,
+            limit=limit,
+            missing_only=True,
+        )
+        if not results:
+            console.print("[yellow]No repos found via search. Exiting.[/yellow]")
+            raise typer.Exit(code=0)
+        # Write a temp targets file and use repos-file: target
+        import tempfile, os
+        specs = [{"owner": r.owner, "repo": r.repo, "stars": r.stars, "language": r.language} for r in results]
+        tmpfile = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        import json as _json
+        tmpfile.write(_json.dumps(specs))
+        tmpfile.close()
+        effective_target = f"repos-file:{tmpfile.name}"
+        console.print(f"  Found {len(results)} repos. Running campaign…\n")
+
+    if not effective_target:
+        typer.echo("Error: provide a target argument or --from-search QUERY", err=True)
+        raise typer.Exit(code=1)
+
     campaign_command(
-        target=target,
+        target=effective_target,
         limit=limit,
         language=language,
         min_stars=min_stars,
@@ -887,6 +924,38 @@ def llmstxt(
         validate=validate,
         score=score,
         sync_from=sync_from,
+    )
+
+
+@app.command("search")
+def search(
+    query: str = typer.Argument("", help="Free-text search query (e.g. 'ai agents')"),
+    language: Optional[str] = typer.Option(None, "--language", "-l", help="Filter by language (e.g. python)"),
+    topic: Optional[str] = typer.Option(None, "--topic", "-t", help="Filter by GitHub topic"),
+    min_stars: Optional[int] = typer.Option(None, "--min-stars", help="Minimum star count"),
+    max_stars: Optional[int] = typer.Option(None, "--max-stars", help="Maximum star count"),
+    missing_only: bool = typer.Option(False, "--missing-only", help="Only repos without context files"),
+    limit: int = typer.Option(20, "--limit", "-n", help="Maximum repos to return (default: 20)"),
+    json_output: bool = typer.Option(False, "--json", help="Output raw JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
+    github_token: Optional[str] = typer.Option(None, "--github-token", help="GitHub API token (or set GITHUB_TOKEN)"),
+    no_check: bool = typer.Option(False, "--no-check", help="Skip Contents API checks (faster, no context status)"),
+) -> None:
+    """🔍 Discover GitHub repos missing CLAUDE.md / AGENTS.md."""
+    search_command(
+        query=query,
+        language=language,
+        topic=topic,
+        min_stars=min_stars,
+        max_stars=max_stars,
+        missing_only=missing_only,
+        limit=limit,
+        json_output=json_output,
+        share=share,
+        output=output,
+        github_token=github_token,
+        no_check=no_check,
     )
 
 

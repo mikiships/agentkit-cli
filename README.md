@@ -188,6 +188,30 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit org <owner>` — score every public repo in a GitHub org or user account
 - `agentkit pr github:<owner>/<repo>` — submit a CLAUDE.md PR to any public GitHub repo
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
+- `agentkit search [query]` — discover GitHub repos missing CLAUDE.md / AGENTS.md
+
+## Search: Discover Repos Missing Context Files
+
+`agentkit search` discovers GitHub repos that are missing CLAUDE.md or AGENTS.md — the best targets for `agentkit campaign`.
+
+```bash
+# Find Python AI-agent repos without context files
+agentkit search "ai agents" --language python --missing-only
+
+# Filter by topic and minimum stars
+agentkit search --topic ai-agents --min-stars 500 --limit 30
+
+# Export as JSON (pipe to agentkit campaign targets)
+agentkit search "llm tools" --missing-only --json > targets.json
+
+# Generate a shareable HTML report
+agentkit search "coding agents" --output report.html --share
+
+# Full campaign flywheel: search → campaign
+agentkit campaign --from-search "ai agents" --language python --min-stars 500
+```
+
+The search result table shows each repo's star count, language, and whether CLAUDE.md or AGENTS.md is present.
 
 ## Campaign: Batch PR Submission
 

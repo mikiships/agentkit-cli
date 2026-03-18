@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.52.0] - 2026-03-18
+
+### Added
+
+- `agentkit search` — discover GitHub repos missing CLAUDE.md/AGENTS.md (completes search → campaign → track flywheel)
+  - Supports `--language`, `--topic`, `--min-stars`, `--max-stars`, `--missing-only`, `--limit`, `--json`, `--share`, `--output`
+  - Dark-theme HTML report with missing-context badge count and action buttons
+  - `--share` publishes report to here.now via `HERENOW_API_KEY`
+- `agentkit campaign --from-search QUERY` — auto-discover missing-context repos via search before submitting PRs
+  - Example: `agentkit campaign --from-search "ai agents" --language python --min-stars 500`
+- `SearchEngine` class (`agentkit_cli/search.py`) with GitHub Search + Contents API integration
+
 ## [0.51.0] - 2026-03-18
 
 ### Added
