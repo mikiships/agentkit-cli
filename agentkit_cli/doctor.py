@@ -753,6 +753,68 @@ def check_llmstxt_readiness(root: Path) -> DoctorCheckResult:
     )
 
 
+def check_context_sync(root: Path) -> DoctorCheckResult:
+    """Check whether managed context format files are in sync."""
+    try:
+        from agentkit_cli.migrate import MigrateEngine
+        eng = MigrateEngine()
+        status = eng.get_sync_status(root)
+    except Exception:
+        return DoctorCheckResult(
+            id="context.sync",
+            name="context-sync",
+            status="warn",
+            summary="Could not check context format sync.",
+            details="",
+            fix_hint="Run: agentkit migrate --all",
+            category="context",
+        )
+
+    if not status:
+        return DoctorCheckResult(
+            id="context.sync",
+            name="context-sync",
+            status="pass",
+            summary="No managed context files found — nothing to sync.",
+            details="",
+            fix_hint="",
+            category="context",
+        )
+
+    stale = [fmt for fmt, s in status.items() if s == "stale"]
+    missing = [fmt for fmt, s in status.items() if s == "missing"]
+
+    if stale:
+        return DoctorCheckResult(
+            id="context.sync",
+            name="context-sync",
+            status="warn",
+            summary=f"Context format files out of sync: {', '.join(stale)}",
+            details="Run 'agentkit sync --fix' to update derived files.",
+            fix_hint="Run: agentkit sync --fix",
+            category="context",
+        )
+    if missing:
+        return DoctorCheckResult(
+            id="context.sync",
+            name="context-sync",
+            status="pass",
+            summary=f"Context files present; {len(missing)} format(s) not yet generated.",
+            details="Run 'agentkit migrate --all' to generate missing formats.",
+            fix_hint="Run: agentkit migrate --all",
+            category="context",
+        )
+    return DoctorCheckResult(
+        id="context.sync",
+        name="context-sync",
+        status="pass",
+        summary="All managed context format files are in sync.",
+        details="",
+        fix_hint="",
+        category="context",
+    )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -777,6 +839,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_redteam_recency(project_root))
     checks.append(check_webhook_config(project_root))
     checks.append(check_llmstxt_readiness(project_root))
+    checks.append(check_context_sync(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 

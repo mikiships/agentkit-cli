@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.51.0] - 2026-03-18
+
+### Added
+
+- `agentkit migrate` — convert between AI agent context file formats (`AGENTS.md`, `CLAUDE.md`, `llms.txt`)
+- `agentkit sync` — check and fix sync status between managed context format files
+- `agentkit doctor`: new `context-sync` check
+- `agentkit run --migrate`: auto-generate missing context format files before analysis
+- `agentkit llmstxt --sync-from agents-md|claude-md`: generate `llms.txt` from existing context file
+
 ## [0.50.0] - 2026-03-18
 
 ### Added

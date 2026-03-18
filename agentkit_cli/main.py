@@ -51,6 +51,8 @@ from agentkit_cli.commands.monitor import monitor_app
 from agentkit_cli.commands.webhook import webhook_app
 from agentkit_cli.commands.checks_cmd import checks_app
 from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
+from agentkit_cli.commands.migrate_cmd import migrate_command
+from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -140,9 +142,10 @@ def run(
     webhook_notify: bool = typer.Option(False, "--webhook-notify", help="POST result to configured webhook URL after run"),
     checks: Optional[bool] = typer.Option(None, "--checks/--no-checks", help="Post a GitHub Check Run (default: auto-detect GitHub Actions env)"),
     run_llmstxt: bool = typer.Option(False, "--llmstxt", help="Generate llms.txt after pipeline completes"),
+    run_migrate: bool = typer.Option(False, "--migrate", help="Auto-generate missing context format files before analysis"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -829,6 +832,40 @@ def improve(
     )
 
 
+@app.command("migrate")
+def migrate(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    from_format: Optional[str] = typer.Option(None, "--from", help="Source format: agents-md, claude-md, llmstxt, auto"),
+    to_format: Optional[str] = typer.Option(None, "--to", help="Target format: agents-md, claude-md, llmstxt, all"),
+    all_formats: bool = typer.Option(False, "--all", help="Equivalent to --to all"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print what would be written without writing"),
+    diff: bool = typer.Option(False, "--diff", help="Show before/after diff of each file"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Write to specific file"),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing files without prompting"),
+) -> None:
+    """Convert between AGENTS.md, CLAUDE.md, and llms.txt formats."""
+    migrate_command(
+        path=path,
+        from_format=from_format,
+        to_format=to_format,
+        all_formats=all_formats,
+        dry_run=dry_run,
+        diff=diff,
+        output=output,
+        force=force,
+    )
+
+
+@app.command("sync")
+def sync(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    check: bool = typer.Option(False, "--check", help="Report sync status; exit 1 if stale"),
+    fix: bool = typer.Option(False, "--fix", help="Re-run migrate to bring derived files in sync"),
+) -> None:
+    """Check or fix sync status between AGENTS.md, CLAUDE.md, and llms.txt."""
+    sync_command(path=path, check=check, fix=fix)
+
+
 @app.command("llmstxt")
 def llmstxt(
     target: str = typer.Argument(".", help="Local path or github:owner/repo"),
@@ -838,6 +875,7 @@ def llmstxt(
     share: bool = typer.Option(False, "--share", help="Publish to here.now and return URL"),
     validate: bool = typer.Option(False, "--validate", help="Validate existing llms.txt against spec"),
     score: bool = typer.Option(False, "--score", help="Include quality score (0-100)"),
+    sync_from: Optional[str] = typer.Option(None, "--sync-from", help="Generate llms.txt from agents-md or claude-md"),
 ) -> None:
     """Generate llms.txt (and optionally llms-full.txt) for a repository."""
     llmstxt_command(
@@ -848,6 +886,7 @@ def llmstxt(
         share=share,
         validate=validate,
         score=score,
+        sync_from=sync_from,
     )
 
 

@@ -92,6 +92,7 @@ def run_command(
     webhook_notify: bool = False,
     checks: Optional[bool] = None,
     llmstxt: bool = False,
+    migrate: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -666,6 +667,26 @@ def run_command(
         except Exception as _exc:
             import logging as _logging
             _logging.getLogger(__name__).warning("Checks API update failed: %s", _exc)
+
+    # --migrate: auto-generate missing format files before analysis
+    if migrate:
+        try:
+            from agentkit_cli.migrate import MigrateEngine as _MigrateEngine, FORMAT_FILENAMES as _FMT_FILENAMES
+            _mig_engine = _MigrateEngine()
+            _mig_source = _mig_engine.detect_source(root)
+            if _mig_source is not None:
+                _mig_fmt, _mig_path = _mig_source
+                _mig_content = _mig_path.read_text(encoding="utf-8", errors="replace")
+                _mig_results = _mig_engine.convert_all(_mig_content, _mig_fmt, directory=root)
+                for _mr in _mig_results:
+                    _out = root / _FMT_FILENAMES[_mr.target_format]
+                    if not _out.exists():
+                        _out.write_text(_mr.content, encoding="utf-8")
+                        if not ci:
+                            console.print(f"[dim]migrate: generated {_out.name}[/dim]")
+        except Exception as _mig_exc:
+            if not ci:
+                console.print(f"[yellow]Warning: migrate failed — {_mig_exc}[/yellow]")
 
     # --llmstxt: generate llms.txt after pipeline
     llmstxt_generated: bool = False

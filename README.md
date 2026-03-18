@@ -143,6 +143,30 @@ agentkit run --llmstxt
 agentkit report --llmstxt
 ```
 
+## `agentkit migrate` — Convert Between AI Agent Context Formats
+
+Developers using Claude Code, Codex, and Gemini CLI each expect different context file formats (`CLAUDE.md`, `AGENTS.md`, `llms.txt`). `agentkit migrate` converts between them automatically.
+
+| Source | Target | Notes |
+|--------|--------|-------|
+| `AGENTS.md` | `CLAUDE.md` | Operational rules → project-focused format |
+| `AGENTS.md` | `llms.txt` | Operational rules → llmstxt.org format |
+| `CLAUDE.md` | `AGENTS.md` | Project context → operational format |
+| `CLAUDE.md` | `llms.txt` | Project context → llmstxt.org format |
+| `llms.txt` | `CLAUDE.md` | AI-accessible docs → CLAUDE.md |
+| `llms.txt` | `AGENTS.md` | AI-accessible docs → AGENTS.md |
+
+```bash
+agentkit migrate             # auto-detect source, generate all formats
+agentkit migrate --all --force
+agentkit migrate --from agents-md --to claude-md
+agentkit migrate --dry-run
+agentkit sync --check        # exit 1 if stale
+agentkit sync --fix          # re-generate stale files
+agentkit llmstxt --sync-from agents-md
+agentkit run --migrate       # generate missing formats before analysis
+```
+
 ## Commands
 
 - `agentkit quickstart` — 🚀 fastest path to a score (start here)

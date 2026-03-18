@@ -70,8 +70,38 @@ def llmstxt_command(
     share: bool,
     validate: bool,
     score: bool,
+    sync_from: Optional[str] = None,
 ) -> None:
     """Generate llms.txt (and optionally llms-full.txt) for a repository."""
+    # --sync-from: generate llms.txt from an existing context file via migrate
+    if sync_from:
+        from agentkit_cli.migrate import MigrateEngine, FORMAT_AGENTS_MD, FORMAT_CLAUDE_MD, FORMAT_LLMSTXT, FORMAT_FILENAMES
+        _sync_fmt_map = {
+            "agents-md": FORMAT_AGENTS_MD,
+            "agents": FORMAT_AGENTS_MD,
+            "claude-md": FORMAT_CLAUDE_MD,
+            "claude": FORMAT_CLAUDE_MD,
+        }
+        _sync_src_fmt = _sync_fmt_map.get(sync_from.lower())
+        if _sync_src_fmt is None:
+            console.print(f"[red]Unknown --sync-from format: {sync_from}[/red]")
+            raise typer.Exit(1)
+        _sync_dir = Path(target).expanduser().resolve()
+        _sync_src_file = _sync_dir / FORMAT_FILENAMES[_sync_src_fmt]
+        if not _sync_src_file.exists():
+            console.print(f"[red]Source file not found: {_sync_src_file}[/red]")
+            raise typer.Exit(1)
+        _sync_content = _sync_src_file.read_text(encoding="utf-8", errors="replace")
+        _mig = MigrateEngine()
+        _r = _mig.convert(_sync_content, _sync_src_fmt, FORMAT_LLMSTXT,
+                           source_path=str(_sync_src_file))
+        _out_dir = output_dir or _sync_dir
+        _out_path = Path(_out_dir) / "llms.txt"
+        _out_path.write_text(_r.content, encoding="utf-8")
+        if not json_output:
+            console.print(f"[green]llms.txt generated from {_sync_src_file.name} → {_out_path}[/green]")
+        return
+
     gen = LlmsTxtGenerator()
     tmpdir: Optional[str] = None
     repo_path: str
