@@ -50,6 +50,7 @@ from agentkit_cli.commands.improve import improve_command
 from agentkit_cli.commands.monitor import monitor_app
 from agentkit_cli.commands.webhook import webhook_app
 from agentkit_cli.commands.checks_cmd import checks_app
+from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -823,6 +824,28 @@ def improve(
         json_output=json_output,
         share=share,
         output=output,
+    )
+
+
+@app.command("llmstxt")
+def llmstxt(
+    target: str = typer.Argument(".", help="Local path or github:owner/repo"),
+    full: bool = typer.Option(False, "--full", help="Also generate llms-full.txt with inline file content"),
+    output_dir: Optional[Path] = typer.Option(None, "--output", "-o", help="Write files to directory (default: cwd)"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+    share: bool = typer.Option(False, "--share", help="Publish to here.now and return URL"),
+    validate: bool = typer.Option(False, "--validate", help="Validate existing llms.txt against spec"),
+    score: bool = typer.Option(False, "--score", help="Include quality score (0-100)"),
+) -> None:
+    """Generate llms.txt (and optionally llms-full.txt) for a repository."""
+    llmstxt_command(
+        target=target,
+        full=full,
+        output_dir=output_dir,
+        json_output=json_output,
+        share=share,
+        validate=validate,
+        score=score,
     )
 
 
