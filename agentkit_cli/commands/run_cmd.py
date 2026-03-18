@@ -82,6 +82,7 @@ def run_command(
     record_findings: bool = False,
     serve: bool = False,
     harden: bool = False,
+    timeline: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -489,6 +490,17 @@ def run_command(
                 share=False,
                 json_output=json_output,
             )
+        except SystemExit:
+            pass
+        except Exception:
+            pass
+
+    # --timeline: generate timeline HTML after run
+    if timeline:
+        try:
+            from agentkit_cli.commands.timeline_cmd import timeline_command
+            from pathlib import Path as _Path
+            timeline_command(output=_Path("timeline.html"), share=share)
         except SystemExit:
             pass
         except Exception:

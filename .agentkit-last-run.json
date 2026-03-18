@@ -1,24 +1,24 @@
 {
-  "success": false,
-  "timestamp": "2026-03-14T17:00:48.900862+00:00",
+  "success": true,
+  "timestamp": "2026-03-18T02:57:55.419503+00:00",
   "project": "/Users/mordecai/repos/agentkit-cli",
   "steps": [
     {
       "name": "generate",
-      "status": "pass",
-      "duration_ms": 250,
+      "status": "skipped",
+      "duration_ms": 0,
       "output_file": null
     },
     {
       "name": "lint-context",
-      "status": "pass",
-      "duration_ms": 100,
+      "status": "skipped",
+      "duration_ms": 0,
       "output_file": null
     },
     {
       "name": "lint-diff",
-      "status": "fail",
-      "duration_ms": 150,
+      "status": "skipped",
+      "duration_ms": 0,
       "output_file": null
     },
     {
@@ -29,8 +29,8 @@
     },
     {
       "name": "reflect",
-      "status": "pass",
-      "duration_ms": 50,
+      "status": "skipped",
+      "duration_ms": 0,
       "output_file": null
     }
   ],
@@ -38,21 +38,21 @@
     "steps": [
       {
         "step": "generate",
-        "status": "pass",
-        "duration": 0.25,
-        "notes": "skip  CLAUDE.md  (exists; use --force to overwrite)\n  skip  "
+        "status": "skipped",
+        "duration": 0.0,
+        "notes": "not installed \u2014 pip install agentmd"
       },
       {
         "step": "lint-context",
-        "status": "pass",
-        "duration": 0.1,
-        "notes": "agentlint context check: CLAUDE.md\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500"
+        "status": "skipped",
+        "duration": 0.0,
+        "notes": "not installed \u2014 pip install agentlint"
       },
       {
         "step": "lint-diff",
-        "status": "fail",
-        "duration": 0.15,
-        "notes": "errors=0 warnings=1 info=0\n                                 "
+        "status": "skipped",
+        "duration": 0.0,
+        "notes": "not installed \u2014 pip install agentlint"
       },
       {
         "step": "benchmark",
@@ -62,19 +62,19 @@
       },
       {
         "step": "reflect",
-        "status": "pass",
-        "duration": 0.05,
-        "notes": "## agentreflect suggestions (2026-03-14)\n\n### From: notes\n\n-"
+        "status": "skipped",
+        "duration": 0.0,
+        "notes": "not installed \u2014 pip install agentreflect"
       }
     ],
     "total": 5,
-    "passed": 3,
-    "failed": 1,
-    "skipped": 1,
-    "result": "fail"
+    "passed": 0,
+    "failed": 0,
+    "skipped": 5,
+    "result": "pass"
   },
   "total": 5,
-  "passed": 3,
-  "failed": 1,
-  "skipped": 1
+  "passed": 0,
+  "failed": 0,
+  "skipped": 5
 }

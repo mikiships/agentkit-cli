@@ -106,6 +106,7 @@ agentkit gate --profile strict --min-score 99
 - `agentkit profile <sub>` — manage quality profiles
 - `agentkit config <sub>` — manage configuration
 - `agentkit history` — show score history
+- `agentkit timeline` — visual quality timeline (HTML chart from history DB)
 - `agentkit leaderboard` — compare runs by label
 - `agentkit insights` — cross-repo pattern synthesis
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
@@ -576,6 +577,36 @@ The cert report includes:
 ## License
 
 MIT
+
+## Timeline
+
+`agentkit timeline` generates a dark-theme HTML chart showing your composite score progression over time. Reads from the existing SQLite history DB populated by `agentkit run`.
+
+```bash
+# Generate timeline for all projects
+agentkit timeline
+
+# Filter to one project
+agentkit timeline --project my-agent
+
+# Show only the last 20 runs since a date
+agentkit timeline --limit 20 --since 2026-01-01
+
+# Output raw chart data as JSON
+agentkit timeline --json
+
+# Publish and share
+agentkit timeline --share
+
+# Auto-generate timeline after a run
+agentkit run --timeline
+```
+
+The report includes:
+- **Main chart**: line chart (x = date, y = composite score), one line per project
+- **Per-tool breakdown**: CSS-bar sparklines for lint score, code quality, context freshness, test count
+- **Stats panel**: min/max/avg, trend direction (↑↓→), streak badge (e.g. "12 runs above 80")
+- **Project summary table**: run count, latest score, trend per project
 
 ## Red-Team Your Agent Setup
 

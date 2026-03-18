@@ -61,5 +61,17 @@ def doctor_command(
         typer.echo(json.dumps(report.as_dict(), indent=2))
     else:
         render_human_report(report)
+        # Hint: suggest agentkit timeline if history DB has ≥3 entries
+        try:
+            from agentkit_cli.history import HistoryDB
+            db = HistoryDB()
+            rows = db.get_history(limit=3)
+            if len(rows) >= 3:
+                from rich.console import Console as _Console
+                _Console().print(
+                    "\n[dim]Tip: run [bold]agentkit timeline[/bold] to visualize your score history.[/dim]"
+                )
+        except Exception:
+            pass
 
     raise typer.Exit(code=_exit_code(report, fail_on=fail_on, no_fail_exit=no_fail_exit))

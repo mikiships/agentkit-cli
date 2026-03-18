@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.44.0] - 2026-03-17
+
+### Added
+- `agentkit timeline` command: generate a dark-theme HTML chart showing composite score progression over time
+- `TimelineEngine` class (`agentkit_cli/timeline.py`): loads history DB, builds chart data, and computes summary stats
+- `build_chart_data(runs)`: extracts dates, composite scores, and per-tool scores (lint, code quality, context, test coverage)
+- `compute_stats(runs)`: min/max/avg, trend direction (improving/stable/declining), streak (N consecutive above 80)
+- Multi-project mode: groups runs by project name, renders one line per project on the main chart
+- Per-tool breakdown section: CSS-bar sparklines for agentlint, coderace, agentmd, agentreflect
+- Stats panel: min/max/avg, trend arrow (↑↓→), streak badge
+- `--project NAME`: filter to one project
+- `--limit N`: max runs to show (default: 50)
+- `--since YYYY-MM-DD`: only show runs after this date
+- `--output FILE`: write HTML to file (default: timeline.html)
+- `--share`: publish to here.now and print URL (requires `HERENOW_API_KEY`)
+- `--json`: output raw chart data as JSON
+- `agentkit run --timeline`: generate timeline HTML after run completes
+- `agentkit doctor` hint: suggests `agentkit timeline` when history DB has ≥3 entries
+- Dark-theme HTML report (`agentkit_cli/timeline_report.py`): Chart.js line chart, per-tool sparklines, stats panel, footer
+
 ## [0.43.0] - 2026-03-17
 
 ### Added

@@ -44,6 +44,7 @@ from agentkit_cli.commands.track_cmd import track_command
 from agentkit_cli.commands.redteam_cmd import redteam_command
 from agentkit_cli.commands.harden_cmd import harden_command
 from agentkit_cli.commands.certify_cmd import certify_app
+from agentkit_cli.commands.timeline_cmd import timeline_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -55,6 +56,28 @@ app.add_typer(notify_app, name="notify")
 app.add_typer(config_app, name="config")
 app.add_typer(profile_app, name="profile")
 app.add_typer(certify_app, name="certify")
+
+
+@app.command("timeline")
+def timeline(
+    project: Optional[str] = typer.Option(None, "--project", help="Filter to one project (default: all)"),
+    limit: int = typer.Option(50, "--limit", help="Max runs to show (default: 50)"),
+    since: Optional[str] = typer.Option(None, "--since", help="Only runs after this date (YYYY-MM-DD)"),
+    output: Path = typer.Option(Path("timeline.html"), "--output", "-o", help="Write HTML to file (default: timeline.html)"),
+    share: bool = typer.Option(False, "--share", help="Publish to here.now and print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output raw chart data as JSON"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+) -> None:
+    """Generate a dark-theme HTML quality timeline from history DB."""
+    timeline_command(
+        project=project,
+        limit=limit,
+        since=since,
+        output=output,
+        share=share,
+        json_output=json_output,
+        db_path=db_path,
+    )
 
 
 @app.command("quickstart")
@@ -98,9 +121,10 @@ def run(
     serve: bool = typer.Option(False, "--serve", help="Print dashboard URL after run completes"),
     run_redteam: bool = typer.Option(False, "--redteam", help="Run adversarial eval after pipeline completes"),
     run_harden: bool = typer.Option(False, "--harden", help="Run harden on detected context file after pipeline"),
+    run_timeline: bool = typer.Option(False, "--timeline", help="Generate timeline HTML after run completes"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline)
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
