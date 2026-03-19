@@ -55,6 +55,7 @@ from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
+from agentkit_cli.commands.daily_cmd import daily_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -572,6 +573,30 @@ def trending(
         json_output=json_output,
         no_analyze=no_analyze,
         min_stars=min_stars,
+        token=token,
+    )
+
+
+@app.command("daily")
+def daily(
+    date_str: Optional[str] = typer.Option(None, "--date", help="Date to fetch leaderboard for (YYYY-MM-DD, default: today)"),
+    limit: int = typer.Option(20, "--limit", help="Max repos to fetch (default: 20)"),
+    min_score: float = typer.Option(0.0, "--min-score", help="Filter repos below this composite score"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now and print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of table"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress non-essential output (cron-friendly)"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or GITHUB_TOKEN env var)", envvar="GITHUB_TOKEN"),
+) -> None:
+    """Generate a daily leaderboard of the most agent-ready GitHub repos."""
+    daily_command(
+        date_str=date_str,
+        limit=limit,
+        min_score=min_score,
+        share=share,
+        json_output=json_output,
+        output=output,
+        quiet=quiet,
         token=token,
     )
 

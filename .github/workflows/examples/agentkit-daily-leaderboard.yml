@@ -1,0 +1,44 @@
+name: agentkit Daily Leaderboard
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily-leaderboard:
+    name: Generate Daily Leaderboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install agentkit-cli
+        run: pip install agentkit-cli
+
+      - name: Run daily leaderboard
+        id: leaderboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HERENOW_API_KEY: ${{ secrets.HERENOW_API_KEY }}
+        run: |
+          URL=$(agentkit daily --share --quiet)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Generated leaderboard: $URL"
+
+      - name: Write step summary
+        run: |
+          echo "## Daily Agent-Ready Leaderboard" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Published URL:** ${{ steps.leaderboard.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Run locally: \`agentkit daily --share\`" >> "$GITHUB_STEP_SUMMARY"
+
+    outputs:
+      url: ${{ steps.leaderboard.outputs.url }}

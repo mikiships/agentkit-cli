@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.56.0] - 2026-03-19
+
+### Added
+- `agentkit daily` command: generates a daily leaderboard of the most agent-ready GitHub repos
+- `DailyLeaderboardEngine` (`agentkit_cli/engines/daily_leaderboard.py`): fetches trending repos via GitHub Search API and scores each for agent-readiness
+- Dark-theme HTML renderer (`agentkit_cli/renderers/daily_leaderboard_renderer.py`) with gold/silver/bronze badges for top 3
+- `--share` flag publishes to here.now; `--quiet --share` outputs URL only (cron-friendly)
+- GitHub Actions example workflow (`.github/workflows/examples/agentkit-daily-leaderboard.yml`) for automated daily publishing
+
 ## [0.55.0] - 2026-03-19
 
 ### Added

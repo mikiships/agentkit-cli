@@ -201,6 +201,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit leaderboard` — compare runs by label
 - `agentkit insights` — cross-repo pattern synthesis
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
+- `agentkit daily` — generate a daily leaderboard of the most agent-ready GitHub repos
 - `agentkit org <owner>` — score every public repo in a GitHub org or user account
 - `agentkit pr github:<owner>/<repo>` — submit a CLAUDE.md PR to any public GitHub repo
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
@@ -420,6 +421,56 @@ agentkit trending --token ghp_xxx
 ```
 
 Output: a ranked Rich table (Rank | Repo | Stars | Score | Grade | URL) and optionally a dark-theme HTML report published to here.now.
+
+## Daily Leaderboard
+
+`agentkit daily` is a content flywheel: run once/day, get a shareable ranked HTML report showing "Today's most AI-agent-ready repos."
+
+```bash
+# Show today's leaderboard in the terminal
+agentkit daily
+
+# Specify a date
+agentkit daily --date 2026-03-19
+
+# Publish to here.now and print the URL
+agentkit daily --share
+
+# Cron-friendly: output URL only (pipe into scripts or post to X)
+agentkit daily --share --quiet
+
+# Save HTML report to a file
+agentkit daily --output daily-report.html
+
+# JSON output
+agentkit daily --json
+
+# Filter by minimum score
+agentkit daily --min-score 70
+```
+
+Example output (terminal):
+
+```
+agentkit daily — date: 2026-03-19, limit: 20
+
+ Rank  Repo                      Stars   Score  Top Finding
+ 🥇    microsoft/autogen         30,000   91    Multi-agent framework with strong tool support
+ 🥈    openai/openai-python      25,000   88    Well-structured SDK with clear API surface
+ 🥉    anthropics/anthropic-sdk  12,000   85    Comprehensive documentation and type hints
+ #4    langchain-ai/langchain     8,000   78    Agent/LLM keyword in description
+```
+
+Add to your GitHub Actions for automated daily publishing:
+
+```yaml
+- name: Run daily leaderboard
+  run: |
+    URL=$(agentkit daily --share --quiet)
+    echo "url=$URL" >> "$GITHUB_OUTPUT"
+```
+
+See the full example: `.github/workflows/examples/agentkit-daily-leaderboard.yml`
 
 ## Tournament
 
