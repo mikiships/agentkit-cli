@@ -60,6 +60,7 @@ from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
 from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
 from agentkit_cli.commands.user_duel_cmd import user_duel_command
+from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1256,6 +1257,36 @@ def user_duel(
         json_output=json_output,
         share=share,
         quiet=quiet,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("user-tournament")
+def user_tournament(
+    participants: list[str] = typer.Argument(..., help="GitHub users: github:<user> or bare <user> (≥2 required)"),
+    limit: int = typer.Option(10, "--limit", help="Max repos per user to score"),
+    json_output: bool = typer.Option(False, "--json", help="Emit TournamentResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress, print champion only"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-user scorecard timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🏆  Bracket-style agent-readiness tournament for N GitHub developers."""
+    def _parse_user(t: str) -> str:
+        if t.startswith("github:"):
+            return t[len("github:"):]
+        return t.strip("/").strip()
+
+    parsed = [_parse_user(p) for p in participants]
+    user_tournament_command(
+        participants=parsed,
+        share=share,
+        json_output=json_output,
+        quiet=quiet,
+        output=output,
+        limit=limit,
         timeout=timeout,
         token=token,
     )
