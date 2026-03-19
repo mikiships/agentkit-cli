@@ -1,0 +1,61 @@
+name: Agentkit Org Leaderboard
+
+# Runs every Monday at 8 AM UTC, or manually via workflow_dispatch.
+# This workflow scores all public repos in your org and publishes a
+# GitHub Pages leaderboard at https://<owner>.github.io/agentkit-scores/
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'   # Every Monday 8 AM UTC
+  workflow_dispatch:
+
+jobs:
+  leaderboard:
+    runs-on: ubuntu-latest
+
+    # Required permissions to push to the scores repo
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install agentkit-cli
+        run: pip install agentkit-cli
+
+      - name: Publish org leaderboard to GitHub Pages
+        run: agentkit pages-org github:${{ github.repository_owner }} --quiet
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Setup Guide
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# 1. Enable GitHub Pages on the scores repo
+#    a. The first run creates <owner>/agentkit-scores automatically.
+#    b. In that repo, go to Settings → Pages.
+#    c. Set Source to "Deploy from a branch", branch: main, folder: /docs.
+#    d. Your leaderboard is now live at https://<owner>.github.io/agentkit-scores/
+#
+# 2. Schedule weekly updates
+#    This workflow already runs every Monday at 8 AM UTC via the cron schedule.
+#    To change the schedule, edit the cron expression above.
+#    To run on demand, use Actions → "Agentkit Org Leaderboard" → "Run workflow".
+#
+# 3. Output URL
+#    After the first successful run, your leaderboard is available at:
+#    https://<owner>.github.io/agentkit-scores/
+#    where <owner> is your GitHub organization or username.
+#
+# 4. Custom pages repo
+#    To use a different repo for hosting, add --pages-repo to the run step:
+#    run: agentkit pages-org github:${{ github.repository_owner }} --pages-repo myorg/my-scores --quiet
+#
+# 5. Limit repos scored
+#    To score only the top N repos (by stars), add --limit:
+#    run: agentkit pages-org github:${{ github.repository_owner }} --limit 20 --quiet
