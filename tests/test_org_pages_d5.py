@@ -21,11 +21,11 @@ def _read(path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 def test_version_in_pyproject():
-    assert 'version = "0.60.0"' in _read(PYPROJECT)
+    assert 'version = "0.61.0"' in _read(PYPROJECT)
 
 def test_version_in_init():
     from agentkit_cli import __version__
-    assert __version__ == "0.60.0"
+    assert __version__ == "0.61.0"
 
 def test_version_not_stale():
     content = _read(PYPROJECT)
@@ -38,7 +38,7 @@ def test_version_not_stale():
 
 def test_changelog_has_058_entry():
     content = _read(CHANGELOG)
-    assert "0.60.0" in content
+    assert "0.61.0" in content
 
 def test_changelog_mentions_pages_org():
     content = _read(CHANGELOG)

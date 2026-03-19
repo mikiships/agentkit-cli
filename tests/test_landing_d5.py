@@ -15,11 +15,11 @@ def _changelog() -> str:
 
 
 def test_version_is_0_55_0():
-    assert 'version = "0.60.0"' in _pyproject()
+    assert 'version = "0.61.0"' in _pyproject()
 
 
 def test_changelog_has_0_55_0():
-    assert "0.60.0" in _changelog()
+    assert "0.61.0" in _changelog()
 
 
 def test_changelog_entry_at_top():
@@ -49,4 +49,4 @@ def test_agentkit_version_command():
     )
     # Version may be in stdout or stderr
     combined = result.stdout + result.stderr
-    assert "0.60.0" in combined or result.returncode != 0  # acceptable if version not in --version flag
+    assert "0.61.0" in combined or result.returncode != 0  # acceptable if version not in --version flag

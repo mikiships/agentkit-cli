@@ -10,12 +10,12 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_string():
     from agentkit_cli import __version__
-    assert __version__ == "0.60.0"
+    assert __version__ == "0.61.0"
 
 
 def test_pyproject_version():
     pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.60.0"' in pyproject
+    assert 'version = "0.61.0"' in pyproject
 
 
 def test_changelog_has_053():
@@ -33,7 +33,7 @@ def test_cli_version_flag():
     from agentkit_cli.main import app
     runner = CliRunner()
     result = runner.invoke(app, ["--version"])
-    assert "0.60.0" in result.output
+    assert "0.61.0" in result.output
 
 
 def test_digest_module_importable():

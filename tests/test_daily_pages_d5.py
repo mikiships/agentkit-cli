@@ -19,16 +19,16 @@ def _readme() -> str:
 
 
 def test_version_is_0_57_0():
-    assert 'version = "0.60.0"' in _pyproject()
+    assert 'version = "0.61.0"' in _pyproject()
 
 
 def test_init_version_is_0_57_0():
     from agentkit_cli import __version__
-    assert __version__ == "0.60.0"
+    assert __version__ == "0.61.0"
 
 
 def test_changelog_has_0_57_0():
-    assert "0.60.0" in _changelog()
+    assert "0.61.0" in _changelog()
 
 
 def test_changelog_0_57_0_at_top():

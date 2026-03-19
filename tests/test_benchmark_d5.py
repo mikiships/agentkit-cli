@@ -10,17 +10,17 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_in_init():
     import agentkit_cli
-    assert agentkit_cli.__version__ == "0.60.0"
+    assert agentkit_cli.__version__ == "0.61.0"
 
 
 def test_version_in_pyproject():
     pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.60.0"' in pyproject
+    assert 'version = "0.61.0"' in pyproject
 
 
 def test_changelog_has_entry():
     changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
-    assert "0.60.0" in changelog
+    assert "0.61.0" in changelog
     assert "benchmark" in changelog.lower()
 
 
