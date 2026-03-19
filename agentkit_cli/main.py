@@ -59,6 +59,7 @@ from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
 from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
+from agentkit_cli.commands.user_duel_cmd import user_duel_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -151,9 +152,10 @@ def run(
     run_migrate: bool = typer.Option(False, "--migrate", help="Auto-generate missing context format files before analysis"),
     run_digest: bool = typer.Option(False, "--digest", help="Print a quality digest for this project after the run"),
     agent_benchmark: bool = typer.Option(False, "--agent-benchmark", help="Run cross-agent benchmark after pipeline and include result in output"),
+    run_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Run user duel after pipeline (format: user1:user2)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -248,9 +250,10 @@ def report(
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after report and print the URL"),
     report_llmstxt: bool = typer.Option(False, "--llmstxt", help="Include llms.txt card in report and generate llms.txt if missing"),
     report_digest: bool = typer.Option(False, "--digest", help="Append a quality digest section to the report output"),
+    report_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Include user duel section (format: user1:user2)"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
         proj_name = (path or Path(".")).resolve().name
@@ -1222,6 +1225,36 @@ def user_scorecard(
         json_output=json_output,
         share=share,
         pages=pages,
+        quiet=quiet,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("user-duel")
+def user_duel(
+    user1: str = typer.Argument(..., help="First GitHub user: github:<user> or bare <user>"),
+    user2: str = typer.Argument(..., help="Second GitHub user: github:<user> or bare <user>"),
+    limit: int = typer.Option(10, "--limit", help="Max repos per user to score (default: 10)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit UserDuelResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress, just print winner"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout in seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token (overrides GITHUB_TOKEN env var)", envvar="GITHUB_TOKEN"),
+) -> None:
+    """⚔️  Head-to-head agent-readiness comparison of two GitHub developers."""
+    # Parse github:<user> prefix for both args
+    def _parse_user(t: str) -> str:
+        if t.startswith("github:"):
+            return t[len("github:"):]
+        return t.strip("/").strip()
+
+    user_duel_command(
+        user1=_parse_user(user1),
+        user2=_parse_user(user2),
+        limit=limit,
+        json_output=json_output,
+        share=share,
         quiet=quiet,
         timeout=timeout,
         token=token,
