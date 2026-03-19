@@ -144,9 +144,21 @@ def run(
     checks: Optional[bool] = typer.Option(None, "--checks/--no-checks", help="Post a GitHub Check Run (default: auto-detect GitHub Actions env)"),
     run_llmstxt: bool = typer.Option(False, "--llmstxt", help="Generate llms.txt after pipeline completes"),
     run_migrate: bool = typer.Option(False, "--migrate", help="Auto-generate missing context format files before analysis"),
+    run_digest: bool = typer.Option(False, "--digest", help="Print a quality digest for this project after the run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
     run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate)
+    if run_digest:
+        from agentkit_cli.digest import DigestEngine
+        from agentkit_cli.digest_report import DigestReportRenderer
+        import os
+        proj_name = (path or Path(".")).resolve().name
+        engine = DigestEngine(period_days=7)
+        digest_report = engine.generate(projects=[proj_name])
+        typer.echo(f"\n[digest] {proj_name}: trend={digest_report.overall_trend}, runs={digest_report.runs_in_period}, coverage={digest_report.coverage_pct:.0f}%")
+        for p in digest_report.per_project:
+            if p.score_end is not None:
+                typer.echo(f"  score: {p.score_end:.1f} (delta: {p.delta:+.1f})" if p.delta is not None else f"  score: {p.score_end:.1f}")
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
@@ -226,9 +238,16 @@ def report(
     inject_readme: bool = typer.Option(False, "--readme", help="Inject/update badge in README.md after report"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after report and print the URL"),
     report_llmstxt: bool = typer.Option(False, "--llmstxt", help="Include llms.txt card in report and generate llms.txt if missing"),
+    report_digest: bool = typer.Option(False, "--digest", help="Append a quality digest section to the report output"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
     report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt)
+    if report_digest:
+        from agentkit_cli.digest import DigestEngine
+        proj_name = (path or Path(".")).resolve().name
+        engine = DigestEngine(period_days=7)
+        digest_report = engine.generate(projects=[proj_name])
+        typer.echo(f"\n[digest] {proj_name}: trend={digest_report.overall_trend}, runs={digest_report.runs_in_period}")
 
 
 @app.command("share")
@@ -957,6 +976,103 @@ def search(
         github_token=github_token,
         no_check=no_check,
     )
+
+
+@app.command("digest")
+def digest(
+    period: int = typer.Option(7, "--period", help="Number of days to include in the digest"),
+    projects: Optional[str] = typer.Option(None, "--projects", help="Comma-separated project names to include"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    quiet: bool = typer.Option(False, "--quiet", help="Print summary line only"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
+    share: bool = typer.Option(False, "--share", help="Publish digest to here.now"),
+    notify_slack: Optional[str] = typer.Option(None, "--notify-slack", help="Slack webhook URL for digest"),
+    notify_discord: Optional[str] = typer.Option(None, "--notify-discord", help="Discord webhook URL for digest"),
+    db_path: Optional[Path] = typer.Option(None, "--db-path", help="Custom history DB path (default: ~/.config/agentkit/history.db)", hidden=True),
+) -> None:
+    """Generate a quality digest across all tracked projects."""
+    from agentkit_cli.digest import DigestEngine
+    from agentkit_cli.digest_report import DigestReportRenderer
+
+    project_list = [p.strip() for p in projects.split(",")] if projects else None
+
+    engine = DigestEngine(db_path=db_path, period_days=period)
+    report = engine.generate(projects=project_list)
+
+    if json_output:
+        import json as _json
+        typer.echo(_json.dumps(report.to_dict(), indent=2))
+        raise typer.Exit(0)
+
+    if quiet:
+        typer.echo(
+            f"digest: {report.period_start.strftime('%Y-%m-%d')} → {report.period_end.strftime('%Y-%m-%d')} | "
+            f"{report.projects_tracked} projects | {report.runs_in_period} runs | trend: {report.overall_trend}"
+        )
+        raise typer.Exit(0)
+
+    # Rich console output
+    typer.echo("")
+    typer.echo(f"  agentkit quality digest")
+    typer.echo(f"  Period : {report.period_start.strftime('%Y-%m-%d')} → {report.period_end.strftime('%Y-%m-%d')}")
+    typer.echo(f"  Trend  : {report.overall_trend.upper()}")
+    typer.echo(f"  Projects tracked : {report.projects_tracked}")
+    typer.echo(f"  Runs in period   : {report.runs_in_period}")
+    typer.echo(f"  Coverage         : {report.coverage_pct:.1f}%")
+    typer.echo(f"  Regressions      : {len(report.regressions)}")
+    typer.echo(f"  Improvements     : {len(report.improvements)}")
+    typer.echo("")
+
+    if report.per_project:
+        typer.echo("  Per-project:")
+        typer.echo(f"  {'Project':<30} {'Start':>6} {'End':>6} {'Delta':>7} {'Runs':>5} {'Status'}")
+        typer.echo("  " + "-" * 65)
+        for p in report.per_project:
+            start = f"{p.score_start:.1f}" if p.score_start is not None else "  —  "
+            end = f"{p.score_end:.1f}" if p.score_end is not None else "  —  "
+            delta_str = (f"+{p.delta:.1f}" if p.delta and p.delta > 0 else f"{p.delta:.1f}") if p.delta is not None else "  —  "
+            typer.echo(f"  {p.name:<30} {start:>6} {end:>6} {delta_str:>7} {p.runs:>5}   {p.status}")
+        typer.echo("")
+
+    if report.top_actions:
+        typer.echo("  Top action items:")
+        for action in report.top_actions[:5]:
+            typer.echo(f"    → {action}")
+        typer.echo("")
+
+    renderer = DigestReportRenderer()
+    html = renderer.render(report)
+
+    if output:
+        output.write_text(html, encoding="utf-8")
+        typer.echo(f"  Digest report written to: {output}")
+
+    if share:
+        from agentkit_cli.share import upload_scorecard
+        url = upload_scorecard(html)
+        if url:
+            typer.echo(f"  Shared at: {url}")
+        else:
+            typer.echo("  Share failed (check HERENOW_API_KEY)", err=True)
+
+    if notify_slack or notify_discord:
+        from agentkit_cli.notifier import resolve_notify_configs, fire_notifications
+        summary = (
+            f"agentkit digest | {report.period_start.strftime('%Y-%m-%d')} → {report.period_end.strftime('%Y-%m-%d')} | "
+            f"trend: {report.overall_trend} | {report.projects_tracked} projects | {report.runs_in_period} runs"
+        )
+        configs = resolve_notify_configs(
+            notify_slack=notify_slack,
+            notify_discord=notify_discord,
+            notify_on="always",
+            project_name="agentkit-digest",
+        )
+        for cfg in configs:
+            from agentkit_cli.notifier import NotifyConfig, build_payload, _send_with_retry
+            payload = build_payload(cfg, 0.0, "DIGEST", [summary[:200]], None)
+            _send_with_retry(cfg.url, payload)
+
+    raise typer.Exit(0)
 
 
 @app.callback(invoke_without_command=True)

@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.53.0] - 2026-03-18
+
+### Added
+
+- `agentkit digest` — weekly/daily quality digest across all tracked projects
+  - Shows trend (improving/stable/regressing), per-project score deltas, regressions, improvements, top action items
+  - Options: `--period N`, `--projects`, `--json`, `--quiet`, `--output FILE`, `--share`, `--notify-slack`, `--notify-discord`
+  - Dark-theme HTML report (same palette as all agentkit reports: `#0d1117` bg, `#58a6ff` accent)
+  - `--share` publishes to here.now via `HERENOW_API_KEY`
+  - `--notify-slack` / `--notify-discord` posts digest summary via existing NotificationManager
+- `DigestEngine` class (`agentkit_cli/digest.py`) — read-only HistoryDB query engine, no schema changes
+- `DigestReportRenderer` class (`agentkit_cli/digest_report.py`) — HTML renderer with CSS-only bar charts
+- `agentkit run --digest` — print project digest after each run
+- `agentkit report --digest` — include digest section in existing report output
+
 ## [0.52.0] - 2026-03-18
 
 ### Added
