@@ -194,6 +194,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
 - `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
+- `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]` — bracket-style agent-readiness tournament for N GitHub developers
 - `agentkit tournament <repo1> ... <repoN>` — round-robin bracket across 4-16 repos
 - `agentkit profile <sub>` — manage quality profiles
 - `agentkit config <sub>` — manage configuration
@@ -1202,3 +1203,23 @@ agentkit user-duel github:tiangolo github:kennethreitz --quiet
 ```
 
 Dimensions compared: avg_score, letter_grade, repo_count, agent_ready_repos. Overall winner is determined by majority of dimension wins. Tie-friendly output included.
+
+## `agentkit user-tournament`
+
+`agentkit user-tournament` runs a bracket-style agent-readiness tournament for N GitHub developers. Round-robin mode for ≤8 participants, bracket mode for >8. Champion is determined by wins with avg score as tiebreak.
+
+```bash
+# Run a tournament between three developers
+agentkit user-tournament github:tiangolo github:kennethreitz github:mikiships
+
+# Output as JSON
+agentkit user-tournament github:tiangolo github:kennethreitz --json
+
+# Publish and share HTML report
+agentkit user-tournament github:tiangolo github:kennethreitz github:mikiships --share
+
+# Save HTML to local file
+agentkit user-tournament github:tiangolo github:kennethreitz --output tournament.html
+```
+
+Use `--limit N` to cap comparisons and `--quiet` for scripting-friendly champion-only output.

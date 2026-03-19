@@ -436,6 +436,7 @@ def report_command(
     share: bool = False,
     llmstxt: bool = False,
     user_duel: Optional[str] = None,
+    user_tournament: Optional[str] = None,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -586,3 +587,23 @@ def report_command(
                 results["user_duel"] = {"error": str(_duel_exc)}
             else:
                 console.print(f"[yellow]Warning: user-duel failed — {_duel_exc}[/yellow]")
+
+    if user_tournament:
+        try:
+            from agentkit_cli.engines.user_tournament import UserTournamentEngine
+            _t_parts = [p.strip() for p in user_tournament.split(":") if p.strip()]
+            if len(_t_parts) >= 2:
+                _t_engine = UserTournamentEngine()
+                _t_result = _t_engine.run(_t_parts)
+                if json_output:
+                    results["user_tournament"] = _t_result.to_dict()
+                else:
+                    console.print(f"\n[bold]User Tournament:[/bold] champion=[green]{_t_result.champion}[/green]")
+            else:
+                if json_output:
+                    results["user_tournament"] = {"error": "Invalid --user-tournament format. Use user1:user2:..."}
+        except Exception as _t_exc:
+            if json_output:
+                results["user_tournament"] = {"error": str(_t_exc)}
+            else:
+                console.print(f"[yellow]Warning: user-tournament failed — {_t_exc}[/yellow]")
