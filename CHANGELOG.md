@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.60.0] - 2026-03-19
+
+### Added
+- `agentkit user-scorecard github:<user>`: new command — fetch all public repos for a GitHub user, score each for agent-readiness, and generate a shareable dark-theme HTML profile card with an A–D developer grade
+- `UserScorecardEngine` (`agentkit_cli/user_scorecard.py`): core engine — lists public repos (paginated), runs AnalyzeEngine per repo, aggregates into `UserScorecardResult` + `RepoResult` dataclasses
+- `UserScorecardReportRenderer` (`agentkit_cli/user_scorecard_report.py`): self-contained dark-theme HTML profile card with GitHub avatar, grade badge, ranked repo table with score bars, "Needs Improvement" section with copy-paste CLI commands, and footer crediting agentkit-cli
+- Grade system: A≥80, B≥65, C≥50, D<50 with matching colors (A=green, B=blue, C=yellow, D=red)
+- `--limit N` (default: 20): cap repos analyzed
+- `--min-stars N` (default: 0): skip repos below star count
+- `--skip-forks / --no-skip-forks` (default: True): exclude forked repos
+- `--json`: machine-readable JSON output with full result schema
+- `--share`: upload HTML report to here.now and print shareable URL
+- `--pages github:<owner>/<repo>`: publish HTML to GitHub Pages using existing OrgPagesEngine git push pattern
+- `--quiet`: print only final URL (cron/scripting friendly)
+- `--timeout N` (default: 60): per-repo analysis timeout in seconds
+- Rich terminal output: grade banner, stats row, top repos table, needs-improvement section
+- `context_coverage_pct`: tracks % of repos with CLAUDE.md, AGENTS.md, or AGENTS/ directory
+- `docs/index.html`: "Developer Profile Card" feature card added
+
 ## [0.59.0] - 2026-03-19
 
 ### Added
