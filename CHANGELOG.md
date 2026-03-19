@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.62.0] - 2026-03-19
+
+### Added
+- `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]`: new command — bracket-style developer agent-readiness tournament for N GitHub users; round-robin for ≤8, bracket mode for >8
+- `UserTournamentEngine` (`agentkit_cli/engines/user_tournament.py`): core engine — runs `UserDuelEngine` for each matchup, tracks wins/losses/avg scores, determines champion
+- `TournamentResult` / `Standings` dataclasses with full `to_dict()` schema
+- `UserTournamentReportRenderer`: self-contained dark-theme HTML report with champion card, standings table, and collapsible match results
+- `publish_user_tournament`: upload tournament HTML to here.now, return URL
+- `--share`: publish HTML tournament report to here.now
+- `--json`: emit `TournamentResult` as JSON
+- `--quiet`: suppress progress, print champion only
+- `--output PATH`: save HTML report to local path
+- `--limit N`: max comparisons cap
+- `--timeout N`: per-user scorecard timeout (default: 60s)
+- `--user-tournament user1:user2:...` flag on `agentkit run`: triggers tournament after pipeline
+- `--user-tournament user1:user2:...` flag on `agentkit report`: includes tournament section in report output
+
 ## [0.61.0] - 2026-03-19
 
 ### Added

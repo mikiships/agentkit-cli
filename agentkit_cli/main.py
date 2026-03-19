@@ -154,9 +154,10 @@ def run(
     run_digest: bool = typer.Option(False, "--digest", help="Print a quality digest for this project after the run"),
     agent_benchmark: bool = typer.Option(False, "--agent-benchmark", help="Run cross-agent benchmark after pipeline and include result in output"),
     run_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Run user duel after pipeline (format: user1:user2)"),
+    run_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Run user tournament after pipeline (format: user1:user2:...)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -252,9 +253,10 @@ def report(
     report_llmstxt: bool = typer.Option(False, "--llmstxt", help="Include llms.txt card in report and generate llms.txt if missing"),
     report_digest: bool = typer.Option(False, "--digest", help="Append a quality digest section to the report output"),
     report_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Include user duel section (format: user1:user2)"),
+    report_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Include user tournament section (format: user1:user2:...)"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
         proj_name = (path or Path(".")).resolve().name
