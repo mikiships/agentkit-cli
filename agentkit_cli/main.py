@@ -58,6 +58,7 @@ from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
+from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1196,6 +1197,34 @@ def benchmark(
         output=output,
         share=share,
         quiet=quiet,
+    )
+
+
+@app.command("user-scorecard")
+def user_scorecard(
+    target: str = typer.Argument(..., help="GitHub username: github:<user> or bare <user>"),
+    limit: int = typer.Option(20, "--limit", help="Max repos to analyze (default: 20)"),
+    min_stars: int = typer.Option(0, "--min-stars", help="Skip repos below this star count"),
+    skip_forks: bool = typer.Option(True, "--skip-forks/--no-skip-forks", help="Exclude forked repos (default: True)"),
+    json_output: bool = typer.Option(False, "--json", help="Machine-readable JSON output"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML report to here.now and print URL"),
+    pages: Optional[str] = typer.Option(None, "--pages", help="Publish HTML to GitHub Pages repo (github:<owner>/<repo>)"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Print only final URL (for cron/scripting)"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout in seconds (default: 60)"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token (overrides GITHUB_TOKEN env var)"),
+) -> None:
+    """🧑‍💻 Generate an agent-readiness profile card for a GitHub user's public repos."""
+    user_scorecard_command(
+        target=target,
+        limit=limit,
+        min_stars=min_stars,
+        skip_forks=skip_forks,
+        json_output=json_output,
+        share=share,
+        pages=pages,
+        quiet=quiet,
+        timeout=timeout,
+        token=token,
     )
 
 
