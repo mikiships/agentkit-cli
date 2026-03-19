@@ -14,11 +14,11 @@ BUILD_REPORT_PATH = REPO_ROOT / "BUILD-REPORT.md"
 
 def test_version_is_0_59_0():
     content = PYPROJECT_PATH.read_text()
-    assert 'version = "0.59.0"' in content
+    assert 'version = "0.60.0"' in content
 
 def test_changelog_has_0_59_0_section():
     content = CHANGELOG_PATH.read_text()
-    assert "0.59.0" in content
+    assert "0.60.0" in content
 
 def test_changelog_mentions_pages_trending():
     content = CHANGELOG_PATH.read_text()
@@ -26,7 +26,7 @@ def test_changelog_mentions_pages_trending():
 
 def test_changelog_section_at_top():
     content = CHANGELOG_PATH.read_text()
-    idx_059 = content.index("0.59.0")
+    idx_059 = content.index("0.60.0")
     idx_058 = content.index("0.58.0")
     assert idx_059 < idx_058
 

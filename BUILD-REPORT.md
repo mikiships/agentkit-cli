@@ -1,4 +1,4 @@
-# BUILD-REPORT — agentkit-cli v0.59.0
+# BUILD-REPORT — agentkit-cli v0.60.0
 
 **Build date:** 2026-03-19
 **Feature:** `agentkit pages-trending`
