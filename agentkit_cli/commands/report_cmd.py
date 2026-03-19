@@ -435,6 +435,7 @@ def report_command(
     inject_readme: bool = False,
     share: bool = False,
     llmstxt: bool = False,
+    user_duel: Optional[str] = None,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -564,3 +565,24 @@ def report_command(
                 console.print(f"\n[bold]Score card:[/bold] {_share_url}")
         except Exception as _e:
             console.print(f"[yellow]Warning: share failed — {_e}[/yellow]")
+
+    if user_duel:
+        try:
+            from agentkit_cli.user_duel import UserDuelEngine
+            _duel_parts = user_duel.split(":")
+            if len(_duel_parts) == 2:
+                _u1, _u2 = _duel_parts[0].strip(), _duel_parts[1].strip()
+                _duel_engine = UserDuelEngine()
+                _duel_result = _duel_engine.run(_u1, _u2)
+                if json_output:
+                    results["user_duel"] = _duel_result.to_dict()
+                else:
+                    _winner = _duel_result.user1 if _duel_result.overall_winner == "user1" else (
+                        _duel_result.user2 if _duel_result.overall_winner == "user2" else "tie"
+                    )
+                    console.print(f"\n[bold]User Duel:[/bold] winner=[green]{_winner}[/green]")
+        except Exception as _duel_exc:
+            if json_output:
+                results["user_duel"] = {"error": str(_duel_exc)}
+            else:
+                console.print(f"[yellow]Warning: user-duel failed — {_duel_exc}[/yellow]")

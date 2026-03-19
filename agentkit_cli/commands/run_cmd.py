@@ -94,6 +94,7 @@ def run_command(
     llmstxt: bool = False,
     migrate: bool = False,
     agent_benchmark: bool = False,
+    user_duel: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -735,6 +736,25 @@ def run_command(
             summary["benchmark_result"] = {"error": str(_bm_exc)}
             if not ci:
                 console.print(f"[yellow]Warning: agent benchmark failed — {_bm_exc}[/yellow]")
+
+    if user_duel:
+        try:
+            from agentkit_cli.user_duel import UserDuelEngine
+            _duel_parts = user_duel.split(":")
+            if len(_duel_parts) == 2:
+                _u1, _u2 = _duel_parts[0].strip(), _duel_parts[1].strip()
+                _duel_engine = UserDuelEngine()
+                _duel_result = _duel_engine.run(_u1, _u2)
+                summary["user_duel"] = _duel_result.to_dict()
+                if not ci and not json_output:
+                    _winner = _duel_result.user1 if _duel_result.overall_winner == "user1" else (
+                        _duel_result.user2 if _duel_result.overall_winner == "user2" else "tie"
+                    )
+                    console.print(f"\n[bold]User Duel:[/bold] winner=[green]{_winner}[/green]")
+            else:
+                summary["user_duel"] = {"error": "Invalid --user-duel format. Use user1:user2"}
+        except Exception as _duel_exc:
+            summary["user_duel"] = {"error": str(_duel_exc)}
 
     if json_output:
         print(json.dumps(summary, indent=2))
