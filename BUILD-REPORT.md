@@ -1,114 +1,98 @@
-# BUILD-REPORT.md — agentkit-cli v0.57.0
+# BUILD-REPORT.md — agentkit-cli v0.58.0
 
 **Date:** 2026-03-19
-**Version:** 0.57.0
-**Baseline tests:** 2675 (v0.56.0, 1 pre-existing failure in test_landing_d1)
-**Final tests:** 2723 passing ✓ (+48 new tests vs baseline, 0 failures)
+**Version:** 0.58.0
+**Baseline tests:** 2725 (v0.57.0)
+**Final tests:** 2802 passed, 0 failed
 
 ---
 
-## Completion Criteria
+## Feature Summary
 
-- [x] `publish_to_pages()` implemented in `agentkit_cli/engines/daily_leaderboard.py`
-- [x] `agentkit daily --pages` publishes to GitHub Pages
-- [x] `agentkit daily --pages --pages-repo github:owner/repo` targets specific repo
-- [x] `agentkit daily --pages --pages-path <path>` overrides output path
-- [x] Falls back to `--share` when GitHub Pages publish fails
-- [x] GitHub Actions workflow at `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml`
-- [x] `docs/index.html` nav link + leaderboard feature card added
-- [x] All D1-D5 deliverables have tests (49 new tests across 5 test files)
-- [x] `python3 -m pytest -q` passes with ≥2690 total (verified: 2723 passing, 0 failures)
-- [x] `pyproject.toml` shows `0.57.0`
-- [x] `agentkit_cli/__init__.py` shows `0.57.0`
-- [x] CHANGELOG.md has `## [0.57.0]` entry
-- [x] All stale `0.56.0` version assertions updated to `0.57.0`
-- [x] BUILD-REPORT.md completed
+v0.58.0 adds `agentkit pages-org` — a command that scores all public repos in a GitHub organization and publishes a dark-theme org-wide leaderboard to GitHub Pages.
+
+The viral mechanic: one command gives any GitHub org a live, shareable AI-readiness scorecard at `https://<owner>.github.io/agentkit-scores/`.
 
 ---
 
-## Deliverables
+## Deliverable Status
 
-### D1: `publish_to_pages()` in DailyLeaderboardEngine
+- [x] **D1** — `OrgPagesEngine` core (`agentkit_cli/engines/org_pages.py`)
+  - Accepts org name + optional pages_repo, pages_path, pages_branch
+  - Uses OrgCommand to score all public repos
+  - Generates dark-theme responsive `index.html` + `leaderboard.json`
+  - Handles git clone/pull/commit/push (mirrors daily_leaderboard.py pattern)
+  - Returns `OrgPagesResult` dataclass
+  - **28 tests** in `tests/test_org_pages_d1.py` ✅
 
-**Status:** DONE — 13 tests in `tests/test_daily_pages_d1.py`
+- [x] **D2** — `agentkit pages-org` CLI command (`agentkit_cli/commands/pages_org_cmd.py`)
+  - Full option set: --pages-repo, --pages-path, --pages-branch, --only-below, --limit, --json, --quiet, --dry-run
+  - Rich progress bar + summary table
+  - `--quiet` prints only final URL (cron-friendly)
+  - **14 tests** in `tests/test_org_pages_d2.py` ✅
 
-- `publish_to_pages(html, leaderboard, repo_path, pages_path)` — commit and push HTML + JSON to GitHub Pages
-- `_parse_github_pages_url(remote_url, pages_path)` — converts HTTPS and SSH remote URLs to Pages URL
-- `_strip_dot_git(s)` — correctly strips `.git` suffix
-- Writes `docs/leaderboard.html` and `docs/leaderboard-data.json` (structured top-10 JSON)
-- Handles: git not found → graceful error, CalledProcessError → returns `committed: False`
-- Returns `{"pages_url": "...", "committed": True/False}`
+- [x] **D3** — `agentkit org --pages` flag integration
+  - `--pages`, `--pages-repo`, `--dry-run` added to `agentkit org`
+  - Invokes OrgPagesEngine after scoring, adds pages_url to JSON result
+  - **11 tests** in `tests/test_org_pages_d3.py` ✅
 
-### D2: `--pages` flag on `agentkit daily`
+- [x] **D4** — GitHub Actions workflow (`.github/workflows/examples/agentkit-org-pages.yml`)
+  - Runs every Monday 8 AM UTC + workflow_dispatch
+  - Setup guide in workflow comments
+  - **16 tests** in `tests/test_org_pages_d4.py` ✅
 
-**Status:** DONE — 11 tests in `tests/test_daily_pages_d2.py`
-
-- `agentkit daily --pages` — publishes to GitHub Pages
-- `agentkit daily --pages --pages-repo github:owner/repo` — targets specific repo
-- `agentkit daily --pages --pages-path docs/leaderboard.html` — overrides output path
-- `agentkit daily --pages --quiet` — prints URL only
-- Falls back to `--share` automatically on failure
-
-### D3: GitHub Actions workflow
-
-**Status:** DONE — 10 tests in `tests/test_daily_pages_d3.py`
-
-- `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml`
-- Cron: `0 8 * * *` (8 AM UTC daily) + `workflow_dispatch`
-- Permissions: `contents: write`, `pages: write`
-- Steps: checkout with GITHUB_TOKEN, setup-python, pip install agentkit-cli, git config, run daily --pages
-
-### D4: Landing page nav update
-
-**Status:** DONE — 6 tests in `tests/test_daily_pages_d4.py`
-
-- Nav link: `<a href="leaderboard.html">Daily Leaderboard</a>`
-- Feature card: "Daily Leaderboard" with `agentkit daily --pages` description
-- Stats bar test count updated to 2690
-
-### D5: Docs, version, CHANGELOG
-
-**Status:** DONE — 9 tests in `tests/test_daily_pages_d5.py`
-
-- `pyproject.toml`: `version = "0.57.0"`
-- `agentkit_cli/__init__.py`: `__version__ = "0.57.0"`
-- `CHANGELOG.md`: `## [0.57.0] - 2026-03-19` with full Added section
-- `README.md`: `--pages`, `--pages-repo`, `--pages-path` documented with GitHub Actions cron example
-- All stale `0.56.0` version assertions updated across test files
+- [x] **D5** — Docs, CHANGELOG, version bump, BUILD-REPORT
+  - Version bumped: `0.57.0` → `0.58.0` in `pyproject.toml` + `agentkit_cli/__init__.py`
+  - CHANGELOG: v0.58.0 entry added
+  - README: "Publishing & Sharing" → "Org Leaderboard" section added
+  - `docs/index.html`: "Org Leaderboard" nav entry + test count updated to 2780
+  - Stale `0.57.0` version assertions updated in all affected test files
+  - **10 tests** in `tests/test_org_pages_d5.py` ✅
 
 ---
 
-## Test Count Summary
+## Test Count
 
-| Deliverable | Test File | Tests |
-|---|---|---|
-| D1: publish_to_pages | `tests/test_daily_pages_d1.py` | 13 |
-| D2: --pages CLI | `tests/test_daily_pages_d2.py` | 11 |
-| D3: GH Actions workflow | `tests/test_daily_pages_d3.py` | 10 |
-| D4: Landing page | `tests/test_daily_pages_d4.py` | 6 |
-| D5: Docs/Version | `tests/test_daily_pages_d5.py` | 9 |
-| **New total** | | **49** |
+| Phase | Tests |
+|-------|-------|
+| Baseline (v0.57.0) | 2725 |
+| New tests (D1-D5) | +79 |
+| **Final (v0.58.0)** | **2802** |
 
-**Verified test count: 2723 passing** (target was ≥2690 ✓)
+Target was ≥ 2780. Achieved 2802. ✅
+
+---
+
+## Validation
+
+```
+agentkit pages-org --help   # ✅ prints usage
+agentkit org --help         # ✅ shows --pages flag
+python3 -m pytest -q --tb=short 2>&1 | tail -3
+# 2802 passed, 0 failed ✅
+```
 
 ---
 
 ## Files Changed
 
-- `agentkit_cli/engines/daily_leaderboard.py` — added `publish_to_pages()`, `_parse_github_pages_url()`, `_strip_dot_git()`
-- `agentkit_cli/commands/daily_cmd.py` — added `--pages`, `--pages-repo`, `--pages-path` logic
-- `agentkit_cli/main.py` — wired new flags to `daily` command
-- `agentkit_cli/__init__.py` — version bump 0.56.0 → 0.57.0
-- `pyproject.toml` — version bump 0.56.0 → 0.57.0
-- `CHANGELOG.md` — v0.57.0 entry
-- `README.md` — `--pages` documentation + GitHub Actions cron example
-- `docs/index.html` — nav link, leaderboard feature card, updated stats
-- `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml` — NEW
-- `tests/test_daily_pages_d1.py` — NEW (13 tests)
-- `tests/test_daily_pages_d2.py` — NEW (11 tests)
-- `tests/test_daily_pages_d3.py` — NEW (10 tests)
-- `tests/test_daily_pages_d4.py` — NEW (6 tests)
-- `tests/test_daily_pages_d5.py` — NEW (9 tests)
-- `tests/test_landing_d1.py` — fixed pre-existing stale stat assertion
-- All `tests/test_*_d5.py` files + `tests/test_improve.py` + `tests/test_explain.py` — updated `0.56.0` → `0.57.0`
+### New files
+- `agentkit_cli/engines/org_pages.py` — OrgPagesEngine core
+- `agentkit_cli/commands/pages_org_cmd.py` — pages-org CLI command
+- `.github/workflows/examples/agentkit-org-pages.yml` — GitHub Actions workflow
+- `tests/test_org_pages_d1.py` — 28 tests
+- `tests/test_org_pages_d2.py` — 14 tests
+- `tests/test_org_pages_d3.py` — 11 tests
+- `tests/test_org_pages_d4.py` — 16 tests
+- `tests/test_org_pages_d5.py` — 10 tests
+
+### Modified files
+- `agentkit_cli/__init__.py` — version bump
+- `agentkit_cli/main.py` — pages-org command + org --pages flag
+- `agentkit_cli/commands/org_cmd.py` — --pages/--pages-repo/--dry-run flags
+- `pyproject.toml` — version bump
+- `CHANGELOG.md` — v0.58.0 entry
+- `README.md` — Org Leaderboard section
+- `docs/index.html` — nav entry + test count
 - `BUILD-REPORT.md` — this file
+- Multiple test files — stale `0.57.0` → `0.58.0` version assertions

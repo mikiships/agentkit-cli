@@ -606,6 +606,33 @@ agentkit analyze github:owner/repo --record-findings
 }
 ```
 
+## Publishing & Sharing
+
+### Org Leaderboard (New in v0.58.0)
+
+Publish a live org-wide AI-readiness leaderboard to GitHub Pages with one command:
+
+```bash
+# Score all public repos in an org and publish a leaderboard
+agentkit pages-org github:myorg
+
+# Publish from within agentkit org (after scoring)
+agentkit org github:myorg --pages
+
+# Options
+agentkit pages-org github:myorg --pages-repo myorg/custom-scores
+agentkit pages-org github:myorg --only-below 80   # only repos below score 80
+agentkit pages-org github:myorg --limit 20
+agentkit pages-org github:myorg --dry-run          # skip git push
+agentkit pages-org github:myorg --quiet            # print URL only (cron mode)
+```
+
+The leaderboard is published to `https://<owner>.github.io/agentkit-scores/` by default.
+Enable GitHub Pages on `<owner>/agentkit-scores` (Settings → Pages → branch: main, folder: /docs).
+
+For weekly automated updates, use the example workflow:
+`.github/workflows/examples/agentkit-org-pages.yml`
+
 ## Sharing Results
 
 Share your agent quality score card with a single command:

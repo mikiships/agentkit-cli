@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.58.0] - 2026-03-19
+
+### Added
+- `agentkit pages-org github:<owner>`: new command — scores all public repos in a GitHub org and publishes a dark-theme org-wide leaderboard to GitHub Pages at `https://<owner>.github.io/agentkit-scores/`
+- `OrgPagesEngine` (`agentkit_cli/engines/org_pages.py`): core engine — generates `index.html` + `leaderboard.json`, handles git clone/pull/commit/push of the Pages repo
+- `agentkit org --pages`: flag on the existing `org` command; after scoring, triggers `OrgPagesEngine` to publish results
+- `agentkit org --pages-repo <repo>`: override target Pages repo (default: `<owner>/agentkit-scores`)
+- `agentkit org --dry-run`: score repos but skip git push (safe preview mode)
+- `agentkit pages-org --only-below <N>`: filter to repos below a score threshold
+- `agentkit pages-org --limit <N>`: cap repos scored (default: 50)
+- `agentkit pages-org --quiet`: print only the final Pages URL (cron-friendly)
+- GitHub Actions example workflow: `.github/workflows/examples/agentkit-org-pages.yml` (runs every Monday 8 AM UTC)
+- Viral mechanic: one command gives any GitHub org a live, shareable AI-readiness scorecard
+
 ## [0.57.0] - 2026-03-19
 
 ### Added
