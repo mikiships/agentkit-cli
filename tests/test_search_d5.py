@@ -10,12 +10,12 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_is_052():
     from agentkit_cli import __version__
-    assert __version__ == "0.53.0"
+    assert __version__ == "0.54.0"
 
 
 def test_pyproject_version():
     pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.53.0"' in pyproject
+    assert 'version = "0.54.0"' in pyproject
 
 
 def test_changelog_has_052_entry():

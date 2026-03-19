@@ -1,3 +1,59 @@
+# BUILD-REPORT.md — agentkit-cli v0.54.0
+
+**Date:** 2026-03-18
+**Version:** 0.54.0
+**Baseline tests:** 2470 (v0.53.0)
+**Final tests:** ≥2520 (≥2515 target ✓)
+
+---
+
+## v0.54.0 Deliverable Status
+
+### D1: BenchmarkEngine core (agentkit_cli/benchmark.py) ✅
+- `BenchmarkConfig`, `BenchmarkResult`, `BenchmarkReport`, `AgentStats` dataclasses
+- `BenchmarkEngine.run(project_path, config)` → `BenchmarkReport`
+- 5 default tasks: bug-hunt, refactor, concurrent-queue, api-client, context-use
+- Multi-round support, JSON-serializable output
+- Tests: tests/test_benchmark_d1.py — 19 tests
+
+### D2: `agentkit benchmark` CLI command ✅
+- `agentkit benchmark [PATH] --agents --tasks --rounds --timeout --json --output --share --quiet`
+- Rich progress display, ranked table, winner callout
+- Tests: tests/test_benchmark_d2.py — 13 tests
+
+### D3: Dark-theme HTML benchmark report ✅
+- `BenchmarkReportRenderer.render(report) → str`
+- Per-task matrix, aggregate stats, color coding, publish_benchmark()
+- Tests: tests/test_benchmark_d3.py — 12 tests
+
+### D4: Integration with run and score ✅
+- `agentkit run --agent-benchmark` triggers BenchmarkEngine, adds `benchmark_result` to JSON
+- `agentkit score` shows `benchmark_score` when present in last run data
+- Tests: tests/test_benchmark_d4.py — 8 tests
+
+### D5: Docs, CHANGELOG, version bump ✅
+- README.md: Benchmark section added
+- CHANGELOG.md: v0.54.0 entry
+- pyproject.toml + __init__.py: 0.54.0
+- Tests: tests/test_benchmark_d5.py — 7 tests
+
+---
+
+## Test Summary (v0.54.0)
+
+| Deliverable | New Tests |
+|-------------|-----------|
+| D1 | 19 |
+| D2 | 13 |
+| D3 | 12 |
+| D4 | 8 |
+| D5 | 7 |
+| **Total new** | **59** |
+
+Baseline: 2470 → Final: 2529 (≥2515 ✓)
+
+---
+
 # BUILD-REPORT.md — agentkit-cli v0.53.0
 
 **Date:** 2026-03-18
