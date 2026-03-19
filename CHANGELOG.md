@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.54.0] - 2026-03-18
+
+### Added
+- `agentkit benchmark` command: cross-agent benchmarking (Claude vs Codex vs Gemini) on your own codebase
+- `BenchmarkEngine` core with configurable agents, tasks, rounds, and timeout
+- 5 built-in benchmark tasks: bug-hunt, refactor, concurrent-queue, api-client, context-use
+- Dark-theme HTML benchmark report with per-task matrix and aggregate stats
+- `--share` flag to publish benchmark report to here.now
+- `--agent-benchmark` flag on `agentkit run` to run cross-agent benchmark after pipeline
+- `agentkit score` now displays benchmark_score when present in last run data
+- Version bumped to 0.54.0
+
 ## [0.53.0] - 2026-03-18
 
 ### Added

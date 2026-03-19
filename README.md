@@ -356,6 +356,32 @@ Options:
 - `--generate-only-below N` — only generate for repos scoring below N (default: 80)
 - `--share` with `--generate` — HTML report shows Before / After columns with color-coded delta badges
 
+## Benchmark
+
+`agentkit benchmark` answers: "Which AI agent — Claude, Codex, or Gemini — performs best on YOUR specific codebase?"
+
+```bash
+# Benchmark all three agents on current project (default tasks)
+agentkit benchmark
+
+# Custom agents and tasks
+agentkit benchmark --agents claude,codex --tasks bug-hunt,refactor
+
+# 3 rounds for statistical confidence
+agentkit benchmark --rounds 3
+
+# Export JSON results
+agentkit benchmark --json > results.json
+
+# Save HTML report
+agentkit benchmark --output report.html
+
+# Publish shareable dark-theme report
+agentkit benchmark --share
+```
+
+The benchmark runs 5 built-in tasks (bug-hunt, refactor, concurrent-queue, api-client, context-use) against each agent via coderace and produces a ranked comparison table showing mean score, mean time, and win rate.
+
 ## Trending Analysis
 
 `agentkit trending` answers: "Which repos blowing up on GitHub are most AI-agent-ready today?"
