@@ -35,7 +35,7 @@ def test_changelog_0_57_0_at_top():
     lines = _changelog().splitlines()
     for line in lines:
         if line.startswith("## ["):
-            assert "0.60.0" in line, f"First version in CHANGELOG is not 0.58.0: {line}"
+            assert "0.61.0" in line, f"First version in CHANGELOG should be 0.61.0: {line}"
             break
 
 

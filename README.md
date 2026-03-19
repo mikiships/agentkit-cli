@@ -193,6 +193,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
+- `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
 - `agentkit tournament <repo1> ... <repoN>` — round-robin bracket across 4-16 repos
 - `agentkit profile <sub>` — manage quality profiles
 - `agentkit config <sub>` — manage configuration
@@ -1181,3 +1182,23 @@ agentkit checks status              # show last check run posted
 - **Body:** markdown table of per-tool scores with pass/warn/fail indicators
 - **Annotations:** one annotation per failing tool (score < 80)
 - **Linked scorecard** if `--share` is active
+
+## User Duel: Head-to-Head Developer Comparison
+
+`agentkit user-duel` compares two GitHub developers' agent-readiness side-by-side. It runs `user-scorecard` for each and declares a winner per dimension.
+
+```bash
+# Basic comparison
+agentkit user-duel github:tiangolo github:kennethreitz
+
+# Limit repos per user and output JSON
+agentkit user-duel github:mikiships github:tiangolo --limit 3 --json
+
+# Share a duel report link
+agentkit user-duel github:tiangolo github:kennethreitz --share
+
+# Just print the winner (cron/scripting friendly)
+agentkit user-duel github:tiangolo github:kennethreitz --quiet
+```
+
+Dimensions compared: avg_score, letter_grade, repo_count, agent_ready_repos. Overall winner is determined by majority of dimension wins. Tie-friendly output included.

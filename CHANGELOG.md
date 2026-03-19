@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.61.0] - 2026-03-19
+
+### Added
+- `agentkit user-duel github:<user1> github:<user2>`: new command — head-to-head agent-readiness comparison between two GitHub developers, with per-dimension winner breakdown and shareable dark-theme HTML duel report
+- `UserDuelEngine` (`agentkit_cli/user_duel.py`): core engine — runs `UserScorecardEngine` for each user and compares across four dimensions: avg_score, letter_grade, repo_count, agent_ready_repos
+- `UserDuelResult` / `DuelDimension` dataclasses with full `to_dict()` schema
+- `UserDuelReportRenderer`: self-contained dark-theme HTML report (`#0d1117` bg) with GitHub avatars side-by-side, dimension table with winner highlights, per-user top-5 repo cards, and overall winner/tie banner
+- `--limit N` (default: 10): max repos per user to score
+- `--json`: emit `UserDuelResult` as JSON
+- `--share`: publish HTML duel report to here.now, print URL
+- `--quiet`: suppress progress, print only winner/tie line
+- `--user-duel user1:user2` flag on `agentkit run`: triggers duel after pipeline, includes result in JSON output
+- `--user-duel user1:user2` flag on `agentkit report`: includes duel section in report output
+
 ## [0.60.0] - 2026-03-19
 
 ### Added

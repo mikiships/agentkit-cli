@@ -48,7 +48,7 @@ def test_changelog_058_is_first_entry():
     content = _read(CHANGELOG)
     for line in content.splitlines():
         if line.startswith("## ["):
-            assert "0.60.0" in line, f"First version entry in CHANGELOG is not 0.58.0: {line}"
+            assert "0.61.0" in line, f"First version entry in CHANGELOG should be 0.61.0: {line}"
             break
 
 
