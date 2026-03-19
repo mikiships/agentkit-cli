@@ -37,6 +37,7 @@ from agentkit_cli.commands.trending_cmd import trending_command
 from agentkit_cli.commands.duel_cmd import duel_command
 from agentkit_cli.commands.tournament_cmd import tournament_command
 from agentkit_cli.commands.org_cmd import org_command
+from agentkit_cli.commands.pages_org_cmd import pages_org_command
 from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.commands.campaign_cmd import campaign_command
@@ -704,6 +705,34 @@ def org(
         token=token,
         generate=generate,
         generate_only_below=generate_only_below,
+    )
+
+
+@app.command("pages-org")
+def pages_org(
+    target: str = typer.Argument(..., help="GitHub org to score: 'github:vercel'"),
+    pages_repo: Optional[str] = typer.Option(None, "--pages-repo", help="GitHub repo for Pages (default: <owner>/agentkit-scores)"),
+    pages_path: str = typer.Option("docs/", "--pages-path", help="Subdirectory in repo for HTML (default: docs/)"),
+    pages_branch: str = typer.Option("main", "--pages-branch", help="Branch (default: main)"),
+    only_below: Optional[int] = typer.Option(None, "--only-below", help="Only include repos scoring below this threshold"),
+    limit: int = typer.Option(50, "--limit", help="Max repos to score (default: 50)"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON result instead of rich table"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress progress, print only final URL"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Score repos but skip git push"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN env var)"),
+) -> None:
+    """Score all public repos in a GitHub org and publish an org-wide leaderboard to GitHub Pages."""
+    pages_org_command(
+        target=target,
+        pages_repo=pages_repo,
+        pages_path=pages_path,
+        pages_branch=pages_branch,
+        only_below=only_below,
+        limit=limit,
+        json_output=json_output,
+        quiet=quiet,
+        dry_run=dry_run,
+        token=token,
     )
 
 
