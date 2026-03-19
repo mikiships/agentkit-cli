@@ -1,5 +1,8 @@
 # agentkit-cli
 
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://mikiships.github.io/agentkit-cli/)
+[![PyPI](https://img.shields.io/pypi/v/agentkit-cli)](https://pypi.org/project/agentkit-cli/)
+
 Unified CLI for the Agent Quality Toolkit (agentmd, coderace, agentlint, agentreflect).
 
 ## Installation
@@ -23,6 +26,19 @@ agentkit score         # compute composite score
 agentkit gate          # fail if score < threshold
 agentkit org github:vercel   # score every public repo in a GitHub org
 ```
+
+## Demo
+
+<!-- demo.gif placeholder — generate with: agentkit demo --record && vhs demo.tape -->
+
+Record a terminal demo with [VHS](https://github.com/charmbracelet/vhs):
+
+```bash
+agentkit demo --record    # generates demo.tape
+vhs demo.tape             # renders demo.gif
+```
+
+The tape records the full quickstart → run → benchmark flow.
 
 ## Configuration
 

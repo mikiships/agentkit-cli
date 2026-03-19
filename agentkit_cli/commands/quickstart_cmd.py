@@ -237,29 +237,38 @@ def quickstart_command(
     ))
 
     # Step 5: Publish (share)
+    _PAGES_URL = "https://mikiships.github.io/agentkit-cli/"
+    console.print(f"[bold]Docs:[/bold] {_PAGES_URL}")
+
     if not no_share:
         api_key = os.environ.get("HERENOW_API_KEY") or None
-        try:
-            score_dict: dict = {"composite": score}
-            if composite:
-                for tool_name, comp_data in composite.components.items():
-                    score_dict[tool_name] = comp_data.get("raw_score")
-            html = generate_scorecard_html(
-                score_dict,
-                project_name=project_name,
-                ref=target,
-                repo_url=target if is_github else None,
-                repo_name=project_name,
-            )
-            share_url = upload_scorecard(html, api_key=api_key)
-            if share_url:
-                console.print(f"\n[bold green]Score card:[/bold green] {share_url}")
-            else:
-                console.print("\n[dim](Share unavailable — network or API error)[/dim]")
-        except Exception:
-            console.print("\n[dim](Share unavailable)[/dim]")
+        if not api_key:
+            console.print("[dim](Skipping share — set HERENOW_API_KEY to publish a scorecard)[/dim]")
+        else:
+            try:
+                score_dict: dict = {"composite": score}
+                if composite:
+                    for tool_name, comp_data in composite.components.items():
+                        score_dict[tool_name] = comp_data.get("raw_score")
+                html = generate_scorecard_html(
+                    score_dict,
+                    project_name=project_name,
+                    ref=target,
+                    repo_url=target if is_github else None,
+                    repo_name=project_name,
+                )
+                share_url = upload_scorecard(html, api_key=api_key)
+                if share_url:
+                    console.print(f"\n[bold green]Score card:[/bold green] {share_url}")
+                else:
+                    console.print("\n[dim](Share unavailable — network or API error)[/dim]")
+            except Exception:
+                console.print("\n[dim](Share unavailable)[/dim]")
 
-    # Step 6: Next step
+    # Step 6: Next steps
     console.print()
-    console.print(f"[bold]Next:[/bold] run [cyan]`agentkit run {target}`[/cyan] for the full analysis.")
+    console.print("[bold]Next steps:[/bold]")
+    console.print(f"  [cyan]agentkit run .[/cyan]                  -- full analysis")
+    console.print(f"  [cyan]agentkit analyze github:owner/repo[/cyan]  -- analyze any public repo")
+    console.print(f"  [cyan]agentkit benchmark[/cyan]                  -- compare Claude vs Codex on your tasks")
     console.print()

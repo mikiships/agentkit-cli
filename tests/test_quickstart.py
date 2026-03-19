@@ -54,6 +54,7 @@ def test_quickstart_local_project(tmp_path):
               return_value=_mock_tool_adapter_results()),
         patch("agentkit_cli.commands.quickstart_cmd.upload_scorecard", return_value="https://here.now/abc123"),
         patch("agentkit_cli.commands.quickstart_cmd.generate_scorecard_html", return_value="<html>"),
+        patch.dict("os.environ", {"HERENOW_API_KEY": "test-key"}),
     ):
         result = runner.invoke(app, ["quickstart", str(tmp_path), "--timeout", "5"])
 

@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.55.0] - 2026-03-19
+
+### Added
+- GitHub Pages landing site (`docs/index.html`) — dark-theme single-page site at https://mikiships.github.io/agentkit-cli/
+  - Hero: "Benchmark AI Coding Agents on YOUR Repo"
+  - Pipeline diagram: MEASURE → GENERATE → GUARD → LEARN → BENCHMARK
+  - Feature grid: 6 tools with descriptions
+  - Live stats bar with test count, package count, versions shipped
+  - Command reference table
+- `docs/.nojekyll` for GitHub Pages compatibility
+- `.github/workflows/update-pages.yml` — auto-updates stats bar on push to main
+- `agentkit quickstart` improvements:
+  - Prints GitHub Pages URL alongside scorecard
+  - "Next steps" section: `agentkit run`, `agentkit analyze github:owner/repo`, `agentkit benchmark`
+  - Graceful no-key fallback: completes without error when `HERENOW_API_KEY` is unset
+- `agentkit demo --record` — generates `demo.tape` VHS file for terminal recording
+  - Prints exact VHS and asciinema recording instructions
+- README: Documentation badge, Demo section with VHS recording instructions
+
+### Changed
+- `agentkit quickstart`: share step now skipped gracefully when `HERENOW_API_KEY` is not set
+
 ## [0.54.0] - 2026-03-18
 
 ### Added

@@ -225,9 +225,12 @@ def demo(
     agents: Optional[str] = typer.Option(None, "--agents", help="Comma-separated agents, e.g. claude,codex"),
     skip_benchmark: bool = typer.Option(False, "--skip-benchmark", help="Skip coderace benchmark step"),
     json_output: bool = typer.Option(False, "--json", help="Emit results as JSON"),
+    record: bool = typer.Option(False, "--record", help="Generate VHS tape for terminal recording"),
+    record_output: Optional[str] = typer.Option(None, "--record-output", help="Path for generated demo.tape"),
 ) -> None:
     """Zero-config demo: shows the toolkit in action without any setup."""
-    demo_command(task=task, agents=agents, skip_benchmark=skip_benchmark, json_output=json_output)
+    demo_command(task=task, agents=agents, skip_benchmark=skip_benchmark, json_output=json_output,
+                 record=record, record_output=record_output)
 
 
 @app.command("report")

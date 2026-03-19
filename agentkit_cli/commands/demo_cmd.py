@@ -135,6 +135,73 @@ def _run_benchmark_step(agent: str, task: str, cwd: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Demo record command
+# ---------------------------------------------------------------------------
+
+_DEMO_TAPE_CONTENT = """\
+# demo.tape — VHS terminal recording for agentkit-cli
+# Run with: vhs demo.tape
+# Install VHS: brew install charmbracelet/tap/vhs
+
+Output demo.gif
+
+Set FontSize 14
+Set Width 1200
+Set Height 600
+Set Theme "Dracula"
+
+Type "pip install agentkit-cli" Sleep 500ms Enter
+Sleep 2s
+
+Type "agentkit quickstart" Sleep 500ms Enter
+Sleep 15s
+
+Type "agentkit run ." Sleep 500ms Enter
+Sleep 10s
+
+Type "agentkit benchmark" Sleep 500ms Enter
+Sleep 8s
+"""
+
+
+def demo_record_command(output: Optional[str] = None) -> None:
+    """Print VHS tape instructions for a terminal recording session."""
+    tape_path = Path(output) if output else Path.cwd() / "demo.tape"
+
+    console.print()
+    console.print(Panel(
+        "[bold cyan]agentkit demo --record[/bold cyan]\n"
+        "[dim]Generates a VHS tape for terminal demo recording.[/dim]",
+        border_style="cyan",
+        expand=False,
+    ))
+    console.print()
+    console.print(f"[bold]Writing VHS tape to:[/bold] {tape_path}")
+    tape_path.write_text(_DEMO_TAPE_CONTENT)
+    console.print(f"[green]✓[/green] {tape_path} created")
+    console.print()
+    console.print("[bold]To record the demo:[/bold]")
+    console.print("  [dim]1. Install VHS:[/dim]  [cyan]brew install charmbracelet/tap/vhs[/cyan]")
+    console.print("  [dim]2. Record:[/dim]        [cyan]vhs demo.tape[/cyan]")
+    console.print("  [dim]3. Output:[/dim]        [cyan]demo.gif[/cyan] (place in README or docs/)")
+    console.print()
+    console.print("[bold]Alternatively with asciinema:[/bold]")
+    console.print("  [dim]1. Install:[/dim]   [cyan]pip install asciinema[/cyan]")
+    console.print("  [dim]2. Record:[/dim]    [cyan]asciinema rec demo.cast[/cyan]")
+    console.print("  [dim]3. Play:[/dim]      [cyan]asciinema play demo.cast[/cyan]")
+    console.print()
+    console.print("[dim]VHS tape contents:[/dim]")
+    console.print()
+    for line in _DEMO_TAPE_CONTENT.splitlines():
+        if line.startswith("#"):
+            console.print(f"  [dim]{line}[/dim]")
+        elif line:
+            console.print(f"  [cyan]{line}[/cyan]")
+        else:
+            console.print()
+
+
+# ---------------------------------------------------------------------------
 # Main demo command
 # ---------------------------------------------------------------------------
 
@@ -143,8 +210,14 @@ def demo_command(
     agents: Optional[str] = None,
     skip_benchmark: bool = False,
     json_output: bool = False,
+    record: bool = False,
+    record_output: Optional[str] = None,
 ) -> None:
     """Zero-config first-run demo of the Agent Quality Toolkit."""
+    if record:
+        demo_record_command(output=record_output)
+        return
+
     cwd = Path.cwd()
 
     # --- Header ---
