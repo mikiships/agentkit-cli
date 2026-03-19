@@ -7,6 +7,8 @@ import shutil
 import subprocess
 import tempfile
 import sys
+
+from agentkit_cli.engines.org_pages import OrgPagesEngine
 from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError as FuturesTimeout
 from datetime import datetime, timezone
 from pathlib import Path
@@ -510,6 +512,9 @@ def org_command(
     token: Optional[str] = None,
     generate: bool = False,
     generate_only_below: int = 80,
+    pages: bool = False,
+    pages_repo: Optional[str] = None,
+    dry_run: bool = False,
 ) -> None:
     """Analyze all public repos in a GitHub org or user account."""
     # Parse github:<owner> or bare owner
@@ -536,4 +541,29 @@ def org_command(
         generate=generate,
         generate_only_below=generate_only_below,
     )
-    cmd.run()
+    result = cmd.run()
+
+    # --pages: publish org leaderboard to GitHub Pages
+    if pages:
+        ranked = result.get("ranked", [])
+        engine = OrgPagesEngine(
+            org=owner,
+            pages_repo=pages_repo,
+            token=token,
+            dry_run=dry_run,
+            _org_results=ranked,
+        )
+        pages_result = engine.run()
+
+        if pages_result.published:
+            if not json_output:
+                console.print(f"\n[bold green]Org leaderboard (permanent):[/bold green] {pages_result.pages_url}")
+            result["pages_url"] = pages_result.pages_url
+        else:
+            err = pages_result.error or "unknown error"
+            if not json_output:
+                console.print(f"[yellow]Warning: GitHub Pages publish failed ({err})[/yellow]")
+            result["pages_error"] = err
+
+        if json_output:
+            print(json.dumps(result, indent=2))

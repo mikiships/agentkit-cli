@@ -690,6 +690,9 @@ def org(
     token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN env var)"),
     generate: bool = typer.Option(False, "--generate", help="Auto-generate CLAUDE.md for repos below threshold, then re-score and show before/after lift"),
     generate_only_below: int = typer.Option(80, "--generate-only-below", help="Only regenerate repos scoring below N (default: 80)"),
+    pages: bool = typer.Option(False, "--pages", help="After scoring, publish org leaderboard to GitHub Pages"),
+    pages_repo: Optional[str] = typer.Option(None, "--pages-repo", help="GitHub Pages repo (default: <owner>/agentkit-scores)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Score repos but skip git push when --pages is set"),
 ) -> None:
     """Score every public repo in a GitHub org or user account."""
     org_command(
@@ -705,6 +708,9 @@ def org(
         token=token,
         generate=generate,
         generate_only_below=generate_only_below,
+        pages=pages,
+        pages_repo=pages_repo,
+        dry_run=dry_run,
     )
 
 
