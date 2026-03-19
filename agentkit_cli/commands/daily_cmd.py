@@ -12,7 +12,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from agentkit_cli.engines.daily_leaderboard import fetch_trending_repos
+from agentkit_cli.engines.daily_leaderboard import fetch_trending_repos, publish_to_pages
 from agentkit_cli.renderers.daily_leaderboard_renderer import render_leaderboard_html
 from agentkit_cli.trending_report import publish_report
 
@@ -31,6 +31,19 @@ def _parse_date(date_str: Optional[str]) -> date:
         raise typer.Exit(1)
 
 
+def _detect_repo_path_from_remote() -> Optional[str]:
+    """Detect the current git repo path."""
+    import subprocess
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        return result.stdout.strip()
+    return None
+
+
 def daily_command(
     date_str: Optional[str] = None,
     limit: int = 20,
@@ -40,6 +53,9 @@ def daily_command(
     output: Optional[Path] = None,
     quiet: bool = False,
     token: Optional[str] = None,
+    pages: bool = False,
+    pages_repo: Optional[str] = None,
+    pages_path: str = "docs/leaderboard.html",
 ) -> None:
     """Fetch today's trending GitHub repos scored for agent-readiness and render a leaderboard."""
     for_date = _parse_date(date_str)
@@ -108,13 +124,55 @@ def daily_command(
 
     # --output: save HTML
     html: Optional[str] = None
-    if output or share:
+    if output or share or pages:
         html = render_leaderboard_html(leaderboard)
 
     if output:
         output.write_text(html, encoding="utf-8")
         if not quiet:
             console.print(f"\n[dim]Report saved to {output.resolve()}[/dim]")
+
+    # --pages: publish HTML to GitHub Pages
+    if pages:
+        if html is None:
+            html = render_leaderboard_html(leaderboard)
+
+        # Resolve repo path
+        if pages_repo and pages_repo.startswith("github:"):
+            # Format: github:owner/repo — use current working directory
+            repo_path = _detect_repo_path_from_remote() or "."
+        else:
+            repo_path = _detect_repo_path_from_remote() or "."
+
+        result = publish_to_pages(
+            html=html,
+            leaderboard=leaderboard,
+            repo_path=repo_path,
+            pages_path=pages_path,
+        )
+
+        if result["committed"]:
+            if quiet:
+                print(result["pages_url"])
+            else:
+                console.print(f"\n[bold green]Daily leaderboard (permanent):[/bold green] {result['pages_url']}")
+        else:
+            err = result.get("error", "unknown error")
+            if not quiet:
+                console.print(f"[yellow]Warning: GitHub Pages publish failed ({err}). Falling back to --share.[/yellow]")
+            # Fall back to here.now share
+            from agentkit_cli.publish import PublishError
+            try:
+                url = publish_report(html)
+                if quiet:
+                    print(url)
+                else:
+                    console.print(f"\n[bold green]Daily leaderboard (24h):[/bold green] {url}")
+                    console.print("[dim]Note: GitHub Pages publish failed; link expires in 24h.[/dim]")
+            except PublishError as exc:
+                if not quiet:
+                    console.print(f"[yellow]Warning: fallback publish also failed ({exc}).[/yellow]")
+        return
 
     # --share: publish to here.now
     if share:

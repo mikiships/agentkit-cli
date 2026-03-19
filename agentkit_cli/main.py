@@ -587,6 +587,9 @@ def daily(
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
     quiet: bool = typer.Option(False, "--quiet", help="Suppress non-essential output (cron-friendly)"),
     token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or GITHUB_TOKEN env var)", envvar="GITHUB_TOKEN"),
+    pages: bool = typer.Option(False, "--pages", help="Publish HTML to GitHub Pages (permanent URL)"),
+    pages_repo: Optional[str] = typer.Option(None, "--pages-repo", help="Target repo for Pages publish (format: github:owner/repo)"),
+    pages_path: str = typer.Option("docs/leaderboard.html", "--pages-path", help="Output path within repo (default: docs/leaderboard.html)"),
 ) -> None:
     """Generate a daily leaderboard of the most agent-ready GitHub repos."""
     daily_command(
@@ -598,6 +601,9 @@ def daily(
         output=output,
         quiet=quiet,
         token=token,
+        pages=pages,
+        pages_repo=pages_repo,
+        pages_path=pages_path,
     )
 
 

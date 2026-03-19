@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 from urllib import error as urllib_error, request as urllib_request
 from urllib.request import Request
@@ -224,3 +226,140 @@ def fetch_trending_repos(
         generated_at=datetime.now(timezone.utc),
         total_fetched=len(raw_items),
     )
+
+
+def _strip_dot_git(s: str) -> str:
+    """Strip trailing .git suffix if present."""
+    if s.endswith(".git"):
+        return s[:-4]
+    return s
+
+
+def _parse_github_pages_url(remote_url: str, pages_path: str) -> str:
+    """Convert a git remote URL to a GitHub Pages URL.
+
+    Handles both HTTPS (https://github.com/owner/repo.git) and
+    SSH (git@github.com:owner/repo.git) formats.
+    """
+    remote = remote_url.strip()
+    # SSH format: git@github.com:owner/repo.git
+    if remote.startswith("git@github.com:"):
+        owner_repo = _strip_dot_git(remote[len("git@github.com:"):].rstrip("/"))
+    # HTTPS format: https://github.com/owner/repo[.git]
+    elif "github.com/" in remote:
+        owner_repo = _strip_dot_git(remote.split("github.com/", 1)[1].rstrip("/"))
+    else:
+        # Unknown format — return a placeholder
+        owner_repo = _strip_dot_git(remote)
+
+    # pages_path like "docs/leaderboard.html" → strip "docs/" prefix (Pages serves from docs/)
+    html_file = Path(pages_path).name
+    parts = owner_repo.split("/", 1)
+    if len(parts) == 2:
+        owner, repo = parts[0], parts[1]
+        return f"https://{owner}.github.io/{repo}/{html_file}"
+    return f"https://{owner_repo}.github.io/{html_file}"
+
+
+def publish_to_pages(
+    html: str,
+    leaderboard: "DailyLeaderboard",
+    repo_path: str = ".",
+    pages_path: str = "docs/leaderboard.html",
+) -> dict:
+    """Commit and push the leaderboard HTML to a GitHub Pages branch.
+
+    Parameters
+    ----------
+    html:
+        Rendered HTML content.
+    leaderboard:
+        DailyLeaderboard instance (used to build the JSON data file).
+    repo_path:
+        Path to the git repository root.
+    pages_path:
+        Relative path within the repo for the HTML file.
+
+    Returns
+    -------
+    dict with keys:
+        ``pages_url`` — the inferred GitHub Pages URL
+        ``committed`` — True if the commit succeeded, False otherwise
+        ``error`` — present only on failure, human-readable message
+    """
+    # Verify gh CLI / git are available (we use git directly)
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, check=True)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return {
+            "pages_url": "",
+            "committed": False,
+            "error": "git CLI not found. Install git to use --pages.",
+        }
+
+    repo_root = Path(repo_path).resolve()
+    full_path = repo_root / pages_path
+    full_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write HTML
+    full_path.write_text(html, encoding="utf-8")
+
+    # Write JSON data file alongside HTML
+    data_path = full_path.parent / "leaderboard-data.json"
+    top10 = leaderboard.repos[:10]
+    data = {
+        "generated": leaderboard.date.isoformat(),
+        "generated_at": leaderboard.generated_at.isoformat(),
+        "repos": [
+            {
+                "rank": r.rank,
+                "full_name": r.full_name,
+                "composite_score": r.composite_score,
+                "stars": r.stars,
+                "language": r.language,
+                "top_finding": r.top_finding,
+            }
+            for r in top10
+        ],
+    }
+    data_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+    # Detect remote URL for Pages URL derivation
+    remote_result = subprocess.run(
+        ["git", "remote", "get-url", "origin"],
+        cwd=str(repo_root),
+        capture_output=True,
+        text=True,
+    )
+    remote_url = remote_result.stdout.strip() if remote_result.returncode == 0 else ""
+    pages_url = _parse_github_pages_url(remote_url, pages_path) if remote_url else ""
+
+    # Stage files
+    try:
+        subprocess.run(
+            ["git", "add", str(full_path), str(data_path)],
+            cwd=str(repo_root),
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "commit", "-m", "chore: update daily leaderboard [skip ci]"],
+            cwd=str(repo_root),
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "push"],
+            cwd=str(repo_root),
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        stderr = exc.stderr.decode("utf-8", errors="replace") if exc.stderr else ""
+        return {
+            "pages_url": pages_url,
+            "committed": False,
+            "error": f"git operation failed: {stderr.strip() or str(exc)}",
+        }
+
+    return {"pages_url": pages_url, "committed": True}

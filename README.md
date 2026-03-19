@@ -461,6 +461,60 @@ agentkit daily — date: 2026-03-19, limit: 20
  #4    langchain-ai/langchain     8,000   78    Agent/LLM keyword in description
 ```
 
+### Permanent GitHub Pages URL
+
+Use `--pages` to publish a permanent, auto-updating leaderboard to GitHub Pages:
+
+```bash
+# Publish to GitHub Pages (auto-detects repo from git remote)
+agentkit daily --pages
+
+# Target a specific repo
+agentkit daily --pages --pages-repo github:owner/repo
+
+# Override the output path (default: docs/leaderboard.html)
+agentkit daily --pages --pages-path docs/leaderboard.html
+```
+
+On success, prints: `https://owner.github.io/repo/leaderboard.html`
+
+If GitHub Pages publish fails, falls back to `--share` (here.now 24h link) automatically.
+
+### GitHub Actions cron example
+
+```yaml
+# .github/workflows/examples/agentkit-daily-leaderboard-pages.yml
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 8 AM UTC daily
+permissions:
+  contents: write
+  pages: write
+jobs:
+  publish-leaderboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: pip install agentkit-cli
+      - run: agentkit daily --pages --pages-repo github:${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+See full example: `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml`
+
+### Share (24h URL, default)
+
+```bash
+# Publish to here.now and print the URL (24h expiry)
+agentkit daily --share
+
+# Cron-friendly: output URL only
+agentkit daily --share --quiet
+```
+
 Add to your GitHub Actions for automated daily publishing:
 
 ```yaml

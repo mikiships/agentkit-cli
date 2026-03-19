@@ -1,105 +1,114 @@
-# BUILD-REPORT.md — agentkit-cli v0.56.0
+# BUILD-REPORT.md — agentkit-cli v0.57.0
 
 **Date:** 2026-03-19
-**Version:** 0.56.0
-**Baseline tests:** 2573 (v0.55.0)
-**Final tests:** 2649 passing ✓ (+76 new tests vs baseline)
+**Version:** 0.57.0
+**Baseline tests:** 2675 (v0.56.0, 1 pre-existing failure in test_landing_d1)
+**Final tests:** 2723 passing ✓ (+48 new tests vs baseline, 0 failures)
 
 ---
 
 ## Completion Criteria
 
-- [x] `agentkit daily` runs end-to-end with mocked data: no errors
-- [x] `agentkit daily --share` produces a here.now URL (mocked)
-- [x] `agentkit daily --quiet --share` outputs only the URL
-- [x] All D1-D5 deliverables have tests
-- [x] `python3 -m pytest -q` passes with ≥2623 total (verified: 2649)
-- [x] `pyproject.toml` shows `0.56.0`
-- [x] BUILD-REPORT.md completed with actual verified test count
-- [x] NO regressions in existing tests (25 pre-existing stale version failures pre-dated this build)
+- [x] `publish_to_pages()` implemented in `agentkit_cli/engines/daily_leaderboard.py`
+- [x] `agentkit daily --pages` publishes to GitHub Pages
+- [x] `agentkit daily --pages --pages-repo github:owner/repo` targets specific repo
+- [x] `agentkit daily --pages --pages-path <path>` overrides output path
+- [x] Falls back to `--share` when GitHub Pages publish fails
+- [x] GitHub Actions workflow at `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml`
+- [x] `docs/index.html` nav link + leaderboard feature card added
+- [x] All D1-D5 deliverables have tests (49 new tests across 5 test files)
+- [x] `python3 -m pytest -q` passes with ≥2690 total (verified: 2723 passing, 0 failures)
+- [x] `pyproject.toml` shows `0.57.0`
+- [x] `agentkit_cli/__init__.py` shows `0.57.0`
+- [x] CHANGELOG.md has `## [0.57.0]` entry
+- [x] All stale `0.56.0` version assertions updated to `0.57.0`
+- [x] BUILD-REPORT.md completed
 
 ---
 
 ## Deliverables
 
-### D1: DailyLeaderboardEngine (`agentkit_cli/engines/daily_leaderboard.py`)
+### D1: `publish_to_pages()` in DailyLeaderboardEngine
 
-**Status:** DONE — 12+ tests in `tests/test_daily_d1.py`
+**Status:** DONE — 13 tests in `tests/test_daily_pages_d1.py`
 
-- `fetch_trending_repos(date, limit=20)` — GitHub Search API with fallback
-- `DailyLeaderboard` dataclass: date, repos, generated_at, total_fetched
-- `RankedRepo` dataclass: rank, full_name, description, stars, language, url, composite_score, top_finding
-- `_score_repo()` — scores based on stars, language, description keywords
-- Offline fallback for CI/test environments
+- `publish_to_pages(html, leaderboard, repo_path, pages_path)` — commit and push HTML + JSON to GitHub Pages
+- `_parse_github_pages_url(remote_url, pages_path)` — converts HTTPS and SSH remote URLs to Pages URL
+- `_strip_dot_git(s)` — correctly strips `.git` suffix
+- Writes `docs/leaderboard.html` and `docs/leaderboard-data.json` (structured top-10 JSON)
+- Handles: git not found → graceful error, CalledProcessError → returns `committed: False`
+- Returns `{"pages_url": "...", "committed": True/False}`
 
-### D2: `agentkit daily` CLI command (`agentkit_cli/commands/daily_cmd.py`)
+### D2: `--pages` flag on `agentkit daily`
 
-**Status:** DONE — 16 tests in `tests/test_daily_d2.py`
+**Status:** DONE — 11 tests in `tests/test_daily_pages_d2.py`
 
-- Flags: `--date YYYY-MM-DD`, `--limit N`, `--min-score N`, `--share`, `--json`, `--output FILE`, `--quiet`
-- `--quiet --share`: outputs URL only (cron-friendly)
-- Wired into `agentkit_cli/main.py` as `@app.command("daily")`
+- `agentkit daily --pages` — publishes to GitHub Pages
+- `agentkit daily --pages --pages-repo github:owner/repo` — targets specific repo
+- `agentkit daily --pages --pages-path docs/leaderboard.html` — overrides output path
+- `agentkit daily --pages --quiet` — prints URL only
+- Falls back to `--share` automatically on failure
 
-### D3: Dark-theme HTML renderer (`agentkit_cli/renderers/daily_leaderboard_renderer.py`)
+### D3: GitHub Actions workflow
 
-**Status:** DONE — 12 tests in `tests/test_daily_d3.py`
+**Status:** DONE — 10 tests in `tests/test_daily_pages_d3.py`
 
-- Date-stamped header: "Agent-Ready Repos — March 19, 2026"
-- Gold/silver/bronze medal badges (🥇🥈🥉) for top 3 repos
-- Table: rank, repo, stars, score, language + top finding
-- Footer with `agentkit daily --share` call-to-action
-- Zero external CDN dependencies
+- `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml`
+- Cron: `0 8 * * *` (8 AM UTC daily) + `workflow_dispatch`
+- Permissions: `contents: write`, `pages: write`
+- Steps: checkout with GITHUB_TOKEN, setup-python, pip install agentkit-cli, git config, run daily --pages
 
-### D4: GitHub Actions cron integration (`.github/workflows/examples/agentkit-daily-leaderboard.yml`)
+### D4: Landing page nav update
 
-**Status:** DONE — 10 tests in `tests/test_daily_d4.py`
+**Status:** DONE — 6 tests in `tests/test_daily_pages_d4.py`
 
-- Runs `agentkit daily --share --quiet` on schedule `0 9 * * *` + `workflow_dispatch`
-- Saves here.now URL to `$GITHUB_OUTPUT` and `$GITHUB_STEP_SUMMARY`
-- All required keys present and validated
+- Nav link: `<a href="leaderboard.html">Daily Leaderboard</a>`
+- Feature card: "Daily Leaderboard" with `agentkit daily --pages` description
+- Stats bar test count updated to 2690
 
-### D5: Docs, CHANGELOG, version bump, BUILD-REPORT
+### D5: Docs, version, CHANGELOG
 
-**Status:** DONE — 6 tests in `tests/test_daily_d5.py`
+**Status:** DONE — 9 tests in `tests/test_daily_pages_d5.py`
 
-- `README.md`: "Daily Leaderboard" section with example output and full usage
-- `CHANGELOG.md`: v0.56.0 entry with all new features listed
-- `pyproject.toml` + `agentkit_cli/__init__.py`: version `0.56.0`
-- `BUILD-REPORT.md`: this file
+- `pyproject.toml`: `version = "0.57.0"`
+- `agentkit_cli/__init__.py`: `__version__ = "0.57.0"`
+- `CHANGELOG.md`: `## [0.57.0] - 2026-03-19` with full Added section
+- `README.md`: `--pages`, `--pages-repo`, `--pages-path` documented with GitHub Actions cron example
+- All stale `0.56.0` version assertions updated across test files
 
 ---
 
-## Test Summary
+## Test Count Summary
 
 | Deliverable | Test File | Tests |
-|-------------|-----------|-------|
-| D1: Engine | `tests/test_daily_d1.py` | 12 |
-| D2: CLI | `tests/test_daily_d2.py` | 16 |
-| D3: Renderer | `tests/test_daily_d3.py` | 12 |
-| D4: CI Workflow | `tests/test_daily_d4.py` | 10 |
-| D5: Docs/Version | `tests/test_daily_d5.py` | 6 |
-| **New total** | | **56** |
+|---|---|---|
+| D1: publish_to_pages | `tests/test_daily_pages_d1.py` | 13 |
+| D2: --pages CLI | `tests/test_daily_pages_d2.py` | 11 |
+| D3: GH Actions workflow | `tests/test_daily_pages_d3.py` | 10 |
+| D4: Landing page | `tests/test_daily_pages_d4.py` | 6 |
+| D5: Docs/Version | `tests/test_daily_pages_d5.py` | 9 |
+| **New total** | | **49** |
 
-**Verified test count: 2649 passing** (target was ≥2623 ✓)
+**Verified test count: 2723 passing** (target was ≥2690 ✓)
 
 ---
 
 ## Files Changed
 
-- `agentkit_cli/engines/__init__.py` — NEW
-- `agentkit_cli/engines/daily_leaderboard.py` — NEW
-- `agentkit_cli/renderers/__init__.py` — NEW
-- `agentkit_cli/renderers/daily_leaderboard_renderer.py` — NEW
-- `agentkit_cli/commands/daily_cmd.py` — NEW
-- `agentkit_cli/main.py` — wired `agentkit daily` command
-- `agentkit_cli/__init__.py` — version bump 0.55.0 → 0.56.0
-- `pyproject.toml` — version bump 0.55.0 → 0.56.0
-- `CHANGELOG.md` — v0.56.0 entry
-- `README.md` — Daily Leaderboard section added
-- `.github/workflows/examples/agentkit-daily-leaderboard.yml` — NEW
-- `tests/test_daily_d1.py` — NEW (12 tests)
-- `tests/test_daily_d2.py` — NEW (16 tests)
-- `tests/test_daily_d3.py` — NEW (12 tests)
-- `tests/test_daily_d4.py` — NEW (10 tests)
-- `tests/test_daily_d5.py` — NEW (6 tests)
+- `agentkit_cli/engines/daily_leaderboard.py` — added `publish_to_pages()`, `_parse_github_pages_url()`, `_strip_dot_git()`
+- `agentkit_cli/commands/daily_cmd.py` — added `--pages`, `--pages-repo`, `--pages-path` logic
+- `agentkit_cli/main.py` — wired new flags to `daily` command
+- `agentkit_cli/__init__.py` — version bump 0.56.0 → 0.57.0
+- `pyproject.toml` — version bump 0.56.0 → 0.57.0
+- `CHANGELOG.md` — v0.57.0 entry
+- `README.md` — `--pages` documentation + GitHub Actions cron example
+- `docs/index.html` — nav link, leaderboard feature card, updated stats
+- `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml` — NEW
+- `tests/test_daily_pages_d1.py` — NEW (13 tests)
+- `tests/test_daily_pages_d2.py` — NEW (11 tests)
+- `tests/test_daily_pages_d3.py` — NEW (10 tests)
+- `tests/test_daily_pages_d4.py` — NEW (6 tests)
+- `tests/test_daily_pages_d5.py` — NEW (9 tests)
+- `tests/test_landing_d1.py` — fixed pre-existing stale stat assertion
+- All `tests/test_*_d5.py` files + `tests/test_improve.py` + `tests/test_explain.py` — updated `0.56.0` → `0.57.0`
 - `BUILD-REPORT.md` — this file

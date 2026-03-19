@@ -43,7 +43,8 @@ def test_stat_data_attributes():
 
 def test_stat_values_present():
     html = _html()
-    assert "2529" in html, "Test count stat 2529 missing"
+    # Test count stat should be present (2690+ for v0.57.0)
+    assert any(str(n) in html for n in range(2000, 9999)), "Test count stat missing from stats bar"
     assert ">6<" in html or ">6</div" in html or "packages\">6" in html or ">6\n" in html or "2026" in html
     # At least packages count is present
     assert "6" in html

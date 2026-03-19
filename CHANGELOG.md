@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.57.0] - 2026-03-19
+
+### Added
+- `publish_to_pages()` in `daily_leaderboard.py`: commit and push leaderboard HTML + JSON to GitHub Pages (`docs/leaderboard.html`, `docs/leaderboard-data.json`)
+- `agentkit daily --pages`: publish permanent leaderboard to GitHub Pages (auto-detects repo from `git remote`)
+- `agentkit daily --pages --pages-repo github:owner/repo`: target a different repo
+- `agentkit daily --pages --pages-path <path>`: override output path (default: `docs/leaderboard.html`)
+- Falls back to `--share` (here.now) automatically if GitHub Pages publish fails
+- GitHub Actions example workflow: `.github/workflows/examples/agentkit-daily-leaderboard-pages.yml` (runs daily at 8 AM UTC)
+- `docs/index.html`: "Daily Leaderboard" nav link and feature card
+- `docs/leaderboard-data.json`: structured JSON data file published alongside HTML
+
 ## [0.56.0] - 2026-03-19
 
 ### Added
