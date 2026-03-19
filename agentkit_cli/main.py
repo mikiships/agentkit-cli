@@ -61,6 +61,7 @@ from agentkit_cli.commands.daily_cmd import daily_command
 from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
 from agentkit_cli.commands.user_duel_cmd import user_duel_command
 from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
+from agentkit_cli.commands.user_improve_cmd import user_improve_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -155,9 +156,10 @@ def run(
     agent_benchmark: bool = typer.Option(False, "--agent-benchmark", help="Run cross-agent benchmark after pipeline and include result in output"),
     run_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Run user duel after pipeline (format: user1:user2)"),
     run_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Run user tournament after pipeline (format: user1:user2:...)"),
+    run_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Run user-improve after pipeline (format: github:<user>)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -254,9 +256,10 @@ def report(
     report_digest: bool = typer.Option(False, "--digest", help="Append a quality digest section to the report output"),
     report_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Include user duel section (format: user1:user2)"),
     report_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Include user tournament section (format: user1:user2:...)"),
+    report_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Include user-improve section (format: github:<user>)"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
         proj_name = (path or Path(".")).resolve().name
@@ -1290,6 +1293,28 @@ def user_tournament(
         output=output,
         limit=limit,
         timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("user-improve")
+def user_improve(
+    target: str = typer.Argument(..., help="GitHub user: github:<user> or bare <user>"),
+    limit: int = typer.Option(5, "--limit", help="Max repos to improve (default 5, max 20)"),
+    below: int = typer.Option(80, "--below", help="Only target repos scoring below this threshold"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output machine-readable JSON result"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be improved, no changes"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🔧  Find a GitHub user's lowest-scoring repos and auto-improve them."""
+    user_improve_command(
+        target=target,
+        limit=limit,
+        below=below,
+        share=share,
+        json_output=json_output,
+        dry_run=dry_run,
         token=token,
     )
 

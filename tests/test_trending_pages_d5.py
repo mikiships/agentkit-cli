@@ -14,11 +14,11 @@ BUILD_REPORT_PATH = REPO_ROOT / "BUILD-REPORT.md"
 
 def test_version_is_0_59_0():
     content = PYPROJECT_PATH.read_text()
-    assert 'version = "0.62.0"' in content
+    assert ('version = "' + __import__("agentkit_cli").__version__ + '"') in content
 
 def test_changelog_has_0_59_0_section():
     content = CHANGELOG_PATH.read_text()
-    assert "0.62.0" in content
+    assert __import__("agentkit_cli").__version__ in content
 
 def test_changelog_mentions_pages_trending():
     content = CHANGELOG_PATH.read_text()

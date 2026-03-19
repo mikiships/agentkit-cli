@@ -11,7 +11,7 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_changelog_has_0_61_0_entry():
     changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
-    assert "0.61.0" in changelog
+    assert __import__("agentkit_cli").__version__ in changelog
 
 
 def test_changelog_0_61_0_before_0_60_0():

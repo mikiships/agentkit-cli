@@ -1223,3 +1223,26 @@ agentkit user-tournament github:tiangolo github:kennethreitz --output tournament
 ```
 
 Use `--limit N` to cap comparisons and `--quiet` for scripting-friendly champion-only output.
+
+## `agentkit user-improve`
+
+`agentkit user-improve` finds a GitHub user's lowest-scoring public repos and automatically improves them by generating CLAUDE.md context files and applying agent hardening. Displays a before/after quality lift report.
+
+```bash
+# Improve top lowest-scoring repos for a user
+agentkit user-improve github:tiangolo
+
+# Target repos scoring below 70, up to 10 repos
+agentkit user-improve github:kennethreitz --below 70 --limit 10
+
+# Dry run: show what would be improved without applying changes
+agentkit user-improve github:mikiships --dry-run
+
+# Output as JSON
+agentkit user-improve github:tiangolo --json
+
+# Publish HTML improvement report to here.now
+agentkit user-improve github:tiangolo --share
+```
+
+Use `--limit N` (default 5, max 20) to control how many repos are targeted, and `--below N` (default 80) to set the quality threshold.
