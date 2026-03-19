@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli.composite import CompositeScoreEngine, CompositeResult
-from agentkit_cli.config import find_project_root
+from agentkit_cli.config import find_project_root, load_last_run
 from agentkit_cli.history import get_history
 
 console = Console()
@@ -122,6 +122,20 @@ def score_command(
     score = result.score
     grade = result.grade
 
+    # Load benchmark_result from last run if present
+    benchmark_score: Optional[float] = None
+    benchmark_winner: Optional[str] = None
+    try:
+        last_run = load_last_run(root)
+        if last_run and "benchmark_result" in last_run:
+            bm = last_run["benchmark_result"]
+            benchmark_winner = bm.get("winner")
+            summary_data = bm.get("summary", {})
+            if benchmark_winner and benchmark_winner in summary_data:
+                benchmark_score = summary_data[benchmark_winner].get("mean_score")
+    except Exception:
+        pass
+
     if json_output:
         out = {
             "score": score,
@@ -129,6 +143,9 @@ def score_command(
             "components": result.components,
             "missing_tools": result.missing_tools,
         }
+        if benchmark_score is not None:
+            out["benchmark_score"] = benchmark_score
+            out["benchmark_winner"] = benchmark_winner
         print(json.dumps(out, indent=2))
     else:
         color = _score_color(score)
@@ -163,6 +180,13 @@ def score_command(
         if result.missing_tools:
             console.print(
                 f"\n[dim]Missing tools (excluded from score): {', '.join(result.missing_tools)}[/dim]"
+            )
+
+        if benchmark_score is not None:
+            bm_color = _score_color(benchmark_score)
+            console.print(
+                f"[dim]Benchmark score (winner: {benchmark_winner}):[/dim] "
+                f"[{bm_color}]{benchmark_score:.0f}/100[/{bm_color}]"
             )
 
         # Harden recommendation: if redteam score is below 70

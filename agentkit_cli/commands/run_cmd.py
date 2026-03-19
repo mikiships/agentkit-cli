@@ -93,6 +93,7 @@ def run_command(
     checks: Optional[bool] = None,
     llmstxt: bool = False,
     migrate: bool = False,
+    agent_benchmark: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -720,6 +721,20 @@ def run_command(
         summary["llmstxt_path"] = llmstxt_path
         summary["llmstxt_section_count"] = llmstxt_section_count
         summary["llmstxt_size"] = llmstxt_size
+
+    # Optional agent benchmark step (cross-agent comparison)
+    if agent_benchmark:
+        try:
+            from agentkit_cli.benchmark import BenchmarkEngine, BenchmarkConfig
+            _bm_engine = BenchmarkEngine()
+            _bm_report = _bm_engine.run(cwd_str, config=BenchmarkConfig())
+            summary["benchmark_result"] = _bm_report.to_dict()
+            if not ci and not json_output:
+                console.print(f"\n[bold]Agent Benchmark:[/bold] winner=[green]{_bm_report.winner}[/green]")
+        except Exception as _bm_exc:
+            summary["benchmark_result"] = {"error": str(_bm_exc)}
+            if not ci:
+                console.print(f"[yellow]Warning: agent benchmark failed — {_bm_exc}[/yellow]")
 
     if json_output:
         print(json.dumps(summary, indent=2))
