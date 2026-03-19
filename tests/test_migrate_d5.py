@@ -14,13 +14,13 @@ runner = CliRunner()
 class TestVersionBump:
     def test_version_is_0_51_0(self):
         from agentkit_cli import __version__
-        assert __version__ == "0.58.0"
+        assert __version__ == "0.59.0"
 
     def test_pyproject_version(self):
         import tomllib
         pyproject = Path(__file__).parent.parent / "pyproject.toml"
         data = tomllib.loads(pyproject.read_text())
-        assert data["project"]["version"] == "0.58.0"
+        assert data["project"]["version"] == "0.59.0"
 
 
 class TestCliRegistered:

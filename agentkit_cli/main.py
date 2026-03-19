@@ -38,6 +38,7 @@ from agentkit_cli.commands.duel_cmd import duel_command
 from agentkit_cli.commands.tournament_cmd import tournament_command
 from agentkit_cli.commands.org_cmd import org_command
 from agentkit_cli.commands.pages_org_cmd import pages_org_command
+from agentkit_cli.commands.pages_trending_cmd import pages_trending_command
 from agentkit_cli.commands.serve_cmd import serve_command
 from agentkit_cli.commands.pr_cmd import pr_command
 from agentkit_cli.commands.campaign_cmd import campaign_command
@@ -738,6 +739,32 @@ def pages_org(
         json_output=json_output,
         quiet=quiet,
         dry_run=dry_run,
+        token=token,
+    )
+
+
+@app.command("pages-trending")
+def pages_trending(
+    pages_repo: Optional[str] = typer.Option(None, "--pages-repo", help="GitHub repo for Pages (default: detect or <owner>/agentkit-trending)"),
+    limit: int = typer.Option(20, "--limit", help="Max repos to score (1-50, default: 20)"),
+    language: Optional[str] = typer.Option(None, "--language", help="Filter trending by language (e.g. python)"),
+    period: str = typer.Option("today", "--period", help="Trending period: today, week, month (default: today)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Score and generate HTML but skip git push"),
+    quiet: bool = typer.Option(False, "--quiet", help="Print only the final Pages URL"),
+    share: bool = typer.Option(False, "--share", help="Also publish to here.now for 24h preview"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON result"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN)"),
+) -> None:
+    """Fetch trending GitHub repos, score them with agentkit, publish leaderboard to GitHub Pages."""
+    pages_trending_command(
+        pages_repo=pages_repo,
+        limit=limit,
+        language=language,
+        period=period,
+        dry_run=dry_run,
+        quiet=quiet,
+        share=share,
+        json_output=json_output,
         token=token,
     )
 

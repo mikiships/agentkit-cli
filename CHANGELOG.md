@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.59.0] - 2026-03-19
+
+### Added
+- `agentkit pages-trending`: new command — fetch today's trending GitHub repos, score them for agent-readiness, publish a dark-theme daily leaderboard to GitHub Pages at `https://<owner>.github.io/<repo>/trending.html`
+- `TrendingPagesEngine` (`agentkit_cli/engines/trending_pages.py`): core engine — fetches trending repos, scores with agentkit heuristics, generates `trending.html` + `leaderboard.json`, handles git clone/pull/commit/push
+- `--pages-repo github:<owner>/<repo>`: target GitHub Pages repo (auto-detected from current git remote, or defaults to `<owner>/agentkit-trending`)
+- `--limit <N>`: cap repos scored (1-50, default: 20)
+- `--language <lang>`: filter trending by programming language (e.g. `--language python`)
+- `--period <today|week|month>`: trending period (default: `today`)
+- `--dry-run`: score and generate HTML but skip git push
+- `--quiet`: print only the final Pages URL (cron-friendly)
+- `--share`: also publish to here.now for 24h preview link
+- GitHub Actions example workflow: `.github/workflows/examples/agentkit-trending-pages.yml` (runs daily at 8 AM UTC)
+- `docs/index.html`: "Daily Trending" feature card and nav link with "Subscribe to daily AI-ready repos" CTA
+- `agentkit quickstart` next-steps: mentions `agentkit pages-trending`
+- SEO-friendly HTML with og:title, og:description, structured JSON data
+
 ## [0.58.0] - 2026-03-19
 
 ### Added

@@ -1,0 +1,85 @@
+name: Trending Repos → GitHub Pages
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max repos to score (1-50)'
+        required: false
+        default: '20'
+      language:
+        description: 'Filter by language (e.g. python, typescript)'
+        required: false
+        default: ''
+      period:
+        description: 'Trending period: today, week, month'
+        required: false
+        default: 'today'
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  publish-trending-leaderboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install agentkit-cli
+        run: pip install agentkit-cli
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run pages-trending and publish to Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LANG_FLAG=""
+          if [ -n "${{ github.event.inputs.language }}" ]; then
+            LANG_FLAG="--language ${{ github.event.inputs.language }}"
+          fi
+          agentkit pages-trending \
+            --pages-repo github:${{ github.repository }} \
+            --limit ${{ github.event.inputs.limit || '20' }} \
+            --period ${{ github.event.inputs.period || 'today' }} \
+            $LANG_FLAG
+
+      - name: Update docs/index.html nav with Daily Trending link
+        run: |
+          python3 - <<'EOF'
+          import re, pathlib, sys
+          p = pathlib.Path("docs/index.html")
+          if not p.exists():
+              sys.exit(0)
+          content = p.read_text()
+          # Insert trending link if not already present
+          if "trending.html" not in content:
+              content = content.replace(
+                  '<a href="leaderboard.html">Daily Leaderboard</a>',
+                  '<a href="leaderboard.html">Daily Leaderboard</a>\n    <a href="trending.html">Daily Trending</a>',
+              )
+              p.write_text(content)
+              print("Updated docs/index.html with trending link")
+          else:
+              print("trending.html link already present")
+          EOF
+
+      - name: Commit index.html updates
+        run: |
+          git add docs/index.html || true
+          git diff --cached --quiet || git commit -m "chore: update nav with Daily Trending link [skip ci]"
+          git push || true

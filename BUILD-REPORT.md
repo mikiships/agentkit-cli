@@ -1,98 +1,88 @@
-# BUILD-REPORT.md — agentkit-cli v0.58.0
+# BUILD-REPORT — agentkit-cli v0.59.0
 
-**Date:** 2026-03-19
-**Version:** 0.58.0
-**Baseline tests:** 2725 (v0.57.0)
-**Final tests:** 2802 passed, 0 failed
+**Build date:** 2026-03-19
+**Feature:** `agentkit pages-trending`
 
----
+## Summary
 
-## Feature Summary
+Added `agentkit pages-trending` command — fetch today's trending GitHub repos, score them for agent-readiness with agentkit heuristics, and publish a dark-theme daily leaderboard to GitHub Pages at `https://<owner>.github.io/<repo>/trending.html`.
 
-v0.58.0 adds `agentkit pages-org` — a command that scores all public repos in a GitHub organization and publishes a dark-theme org-wide leaderboard to GitHub Pages.
+## Deliverables
 
-The viral mechanic: one command gives any GitHub org a live, shareable AI-readiness scorecard at `https://<owner>.github.io/agentkit-scores/`.
+### D1: TrendingPagesEngine core ✅
+- `agentkit_cli/engines/trending_pages.py`
+- Fetches trending repos via existing `agentkit_cli.trending.fetch_trending` infrastructure
+- Scores repos using `_score_repo()` heuristic (stars, language, description keywords)
+- Generates dark-theme `trending.html` with date, ranked repos, score breakdown, subscribe CTA
+- `leaderboard.json` alongside HTML with structured data
+- GitHub Pages publish: clones/pulls target repo, writes to `docs/` path, commits+pushes
+- Handles: rate limits (graceful skip via fallback), empty results, clone failures
+- Tests: **35 new tests** in `tests/test_trending_pages_d1.py`
 
----
+### D2: `agentkit pages-trending` CLI command ✅
+- `agentkit_cli/commands/pages_trending_cmd.py`
+- Wired in `agentkit_cli/main.py`
+- Flags: `--pages-repo`, `--limit` (1-50, default 20), `--language`, `--period` (today/week/month), `--dry-run`, `--quiet`, `--share`, `--json`
+- Rich progress display
+- Auto-detects pages-repo from current git remote
+- Tests: **25 new tests** in `tests/test_trending_pages_d2.py`
 
-## Deliverable Status
+### D3: GitHub Actions workflow ✅
+- `.github/workflows/examples/agentkit-trending-pages.yml`
+- Cron: daily at 8 AM UTC
+- Uses `GITHUB_TOKEN`
+- Inputs: `limit`, `language`, `period`
+- Updates `docs/index.html` nav after publish
+- Tests: **14 new tests** in `tests/test_trending_pages_d3.py`
 
-- [x] **D1** — `OrgPagesEngine` core (`agentkit_cli/engines/org_pages.py`)
-  - Accepts org name + optional pages_repo, pages_path, pages_branch
-  - Uses OrgCommand to score all public repos
-  - Generates dark-theme responsive `index.html` + `leaderboard.json`
-  - Handles git clone/pull/commit/push (mirrors daily_leaderboard.py pattern)
-  - Returns `OrgPagesResult` dataclass
-  - **28 tests** in `tests/test_org_pages_d1.py` ✅
+### D4: Docs and `docs/index.html` update ✅
+- `docs/index.html`: "Daily Trending" feature card and nav link
+- "Subscribe to daily AI-ready repos" CTA pointing to agentkit-trending repo
+- `agentkit quickstart` next-steps updated to mention `agentkit pages-trending`
+- SEO: og:title, og:description, structured JSON data
+- Tests: **6 new tests** in `tests/test_trending_pages_d4.py`
 
-- [x] **D2** — `agentkit pages-org` CLI command (`agentkit_cli/commands/pages_org_cmd.py`)
-  - Full option set: --pages-repo, --pages-path, --pages-branch, --only-below, --limit, --json, --quiet, --dry-run
-  - Rich progress bar + summary table
-  - `--quiet` prints only final URL (cron-friendly)
-  - **14 tests** in `tests/test_org_pages_d2.py` ✅
-
-- [x] **D3** — `agentkit org --pages` flag integration
-  - `--pages`, `--pages-repo`, `--dry-run` added to `agentkit org`
-  - Invokes OrgPagesEngine after scoring, adds pages_url to JSON result
-  - **11 tests** in `tests/test_org_pages_d3.py` ✅
-
-- [x] **D4** — GitHub Actions workflow (`.github/workflows/examples/agentkit-org-pages.yml`)
-  - Runs every Monday 8 AM UTC + workflow_dispatch
-  - Setup guide in workflow comments
-  - **16 tests** in `tests/test_org_pages_d4.py` ✅
-
-- [x] **D5** — Docs, CHANGELOG, version bump, BUILD-REPORT
-  - Version bumped: `0.57.0` → `0.58.0` in `pyproject.toml` + `agentkit_cli/__init__.py`
-  - CHANGELOG: v0.58.0 entry added
-  - README: "Publishing & Sharing" → "Org Leaderboard" section added
-  - `docs/index.html`: "Org Leaderboard" nav entry + test count updated to 2780
-  - Stale `0.57.0` version assertions updated in all affected test files
-  - **10 tests** in `tests/test_org_pages_d5.py` ✅
-
----
+### D5: README, CHANGELOG, version bump ✅
+- `pyproject.toml`: bumped to `0.59.0`
+- `CHANGELOG.md`: new section at top for 0.59.0
+- `README.md`: `pages-trending` in commands table + full usage section
+- Tests: **10 new tests** in `tests/test_trending_pages_d5.py`
 
 ## Test Count
 
-| Phase | Tests |
+| Suite | Tests |
 |-------|-------|
-| Baseline (v0.57.0) | 2725 |
-| New tests (D1-D5) | +79 |
-| **Final (v0.58.0)** | **2802** |
+| test_trending_pages_d1.py | 35 |
+| test_trending_pages_d2.py | 25 |
+| test_trending_pages_d3.py | 14 |
+| test_trending_pages_d4.py | 6 |
+| test_trending_pages_d5.py | 10 |
+| **New total** | **90** |
+| Baseline | 2804 |
+| **Final total** | **≥2854** |
 
-Target was ≥ 2780. Achieved 2802. ✅
+## Known Issues / Deferred
 
----
+- `--share` integration with here.now: `upload_html` uses existing publish infrastructure; actual 24h URL only generated when `HERENOW_API_KEY` is set and publish succeeds
+- ToolAdapter deep scoring (calling `analyze_target` per repo) is available but not default — the current heuristic is fast and works offline; pass `_prefetched_repos` with `composite_score` fields to use real scores
+- Pages repo creation when repo doesn't exist: current behavior is graceful failure with clear error message; auto-create requires GitHub API calls beyond scope
 
-## Validation
+## Files Added/Modified
 
-```
-agentkit pages-org --help   # ✅ prints usage
-agentkit org --help         # ✅ shows --pages flag
-python3 -m pytest -q --tb=short 2>&1 | tail -3
-# 2802 passed, 0 failed ✅
-```
+**New files:**
+- `agentkit_cli/engines/trending_pages.py`
+- `agentkit_cli/commands/pages_trending_cmd.py`
+- `.github/workflows/examples/agentkit-trending-pages.yml`
+- `tests/test_trending_pages_d1.py`
+- `tests/test_trending_pages_d2.py`
+- `tests/test_trending_pages_d3.py`
+- `tests/test_trending_pages_d4.py`
+- `tests/test_trending_pages_d5.py`
 
----
-
-## Files Changed
-
-### New files
-- `agentkit_cli/engines/org_pages.py` — OrgPagesEngine core
-- `agentkit_cli/commands/pages_org_cmd.py` — pages-org CLI command
-- `.github/workflows/examples/agentkit-org-pages.yml` — GitHub Actions workflow
-- `tests/test_org_pages_d1.py` — 28 tests
-- `tests/test_org_pages_d2.py` — 14 tests
-- `tests/test_org_pages_d3.py` — 11 tests
-- `tests/test_org_pages_d4.py` — 16 tests
-- `tests/test_org_pages_d5.py` — 10 tests
-
-### Modified files
-- `agentkit_cli/__init__.py` — version bump
-- `agentkit_cli/main.py` — pages-org command + org --pages flag
-- `agentkit_cli/commands/org_cmd.py` — --pages/--pages-repo/--dry-run flags
-- `pyproject.toml` — version bump
-- `CHANGELOG.md` — v0.58.0 entry
-- `README.md` — Org Leaderboard section
-- `docs/index.html` — nav entry + test count
-- `BUILD-REPORT.md` — this file
-- Multiple test files — stale `0.57.0` → `0.58.0` version assertions
+**Modified files:**
+- `agentkit_cli/main.py` (added import + `pages-trending` command)
+- `agentkit_cli/commands/quickstart_cmd.py` (next-steps mention)
+- `docs/index.html` (nav link + feature card)
+- `pyproject.toml` (version bump)
+- `CHANGELOG.md` (new 0.59.0 section)
+- `README.md` (commands table + usage section)

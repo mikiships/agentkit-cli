@@ -202,6 +202,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit insights` — cross-repo pattern synthesis
 - `agentkit trending` — fetch and rank trending GitHub repos by agent quality
 - `agentkit daily` — generate a daily leaderboard of the most agent-ready GitHub repos
+- `agentkit pages-trending` — fetch trending repos, score for agent-readiness, publish daily leaderboard to GitHub Pages
 - `agentkit org <owner>` — score every public repo in a GitHub org or user account
 - `agentkit pr github:<owner>/<repo>` — submit a CLAUDE.md PR to any public GitHub repo
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
@@ -632,6 +633,33 @@ Enable GitHub Pages on `<owner>/agentkit-scores` (Settings → Pages → branch:
 
 For weekly automated updates, use the example workflow:
 `.github/workflows/examples/agentkit-org-pages.yml`
+
+## Pages Trending: Daily AI-Ready Repo Leaderboard
+
+`agentkit pages-trending` fetches today's trending GitHub repos, scores them for agent-readiness, and publishes a persistent dark-theme leaderboard to GitHub Pages at `https://<owner>.github.io/<repo>/trending.html`.
+
+```bash
+# Publish daily trending leaderboard (uses GITHUB_TOKEN)
+agentkit pages-trending
+
+# Filter to Python trending repos this week
+agentkit pages-trending --language python --period week
+
+# Dry run — score and generate HTML without pushing
+agentkit pages-trending --dry-run
+
+# Custom pages repo, limit 30 repos
+agentkit pages-trending --pages-repo github:myorg/my-trending --limit 30
+
+# Cron-friendly: print only the URL
+agentkit pages-trending --quiet
+
+# Publish + generate a 24h preview link
+agentkit pages-trending --share
+```
+
+The leaderboard is published to `https://<owner>.github.io/<repo>/trending.html`.
+For daily automated updates, use: `.github/workflows/examples/agentkit-trending-pages.yml`
 
 ## Sharing Results
 

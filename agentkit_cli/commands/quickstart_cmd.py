@@ -271,4 +271,5 @@ def quickstart_command(
     console.print(f"  [cyan]agentkit run .[/cyan]                  -- full analysis")
     console.print(f"  [cyan]agentkit analyze github:owner/repo[/cyan]  -- analyze any public repo")
     console.print(f"  [cyan]agentkit benchmark[/cyan]                  -- compare Claude vs Codex on your tasks")
+    console.print(f"  [cyan]agentkit pages-trending[/cyan]             -- publish daily AI-ready repo leaderboard to GitHub Pages")
     console.print()
