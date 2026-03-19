@@ -54,6 +54,7 @@ from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.search_cmd import search_command
+from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -145,9 +146,10 @@ def run(
     run_llmstxt: bool = typer.Option(False, "--llmstxt", help="Generate llms.txt after pipeline completes"),
     run_migrate: bool = typer.Option(False, "--migrate", help="Auto-generate missing context format files before analysis"),
     run_digest: bool = typer.Option(False, "--digest", help="Print a quality digest for this project after the run"),
+    agent_benchmark: bool = typer.Option(False, "--agent-benchmark", help="Run cross-agent benchmark after pipeline and include result in output"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -1073,6 +1075,32 @@ def digest(
             _send_with_retry(cfg.url, payload)
 
     raise typer.Exit(0)
+
+
+@app.command("benchmark")
+def benchmark(
+    path: Path = typer.Argument(Path("."), help="Project path (default: current dir)"),
+    agents: Optional[str] = typer.Option(None, "--agents", help="Comma-separated agents (default: claude,codex,gemini)"),
+    tasks: Optional[str] = typer.Option(None, "--tasks", help="Comma-separated tasks (default: all 5)"),
+    rounds: int = typer.Option(1, "--rounds", help="Rounds per task (3+ for statistical confidence)"),
+    timeout: int = typer.Option(300, "--timeout", help="Timeout per task in seconds"),
+    json_output: bool = typer.Option(False, "--json", help="Emit JSON to stdout"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Minimal output"),
+) -> None:
+    """🏆 Benchmark Claude vs Codex vs Gemini on your own codebase."""
+    benchmark_command(
+        path=path,
+        agents=agents,
+        tasks=tasks,
+        rounds=rounds,
+        timeout=timeout,
+        json_output=json_output,
+        output=output,
+        share=share,
+        quiet=quiet,
+    )
 
 
 @app.callback(invoke_without_command=True)
