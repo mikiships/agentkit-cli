@@ -16,11 +16,11 @@ REPO_ROOT = Path(__file__).parent.parent
 class TestVersionConsistency:
     def test_init_version(self):
         from agentkit_cli import __version__
-        assert __version__ == "0.59.0"
+        assert __version__ == "0.60.0"
 
     def test_pyproject_version(self):
         pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-        assert 'version = "0.59.0"' in pyproject
+        assert 'version = "0.60.0"' in pyproject
 
     def test_versions_match(self):
         from agentkit_cli import __version__
@@ -41,7 +41,7 @@ class TestChangelog:
 
     def test_has_v056_entry(self):
         content = (REPO_ROOT / "CHANGELOG.md").read_text()
-        assert "0.59.0" in content
+        assert "0.60.0" in content
 
     def test_mentions_daily_leaderboard(self):
         content = (REPO_ROOT / "CHANGELOG.md").read_text()
@@ -90,4 +90,4 @@ class TestBuildReport:
 
     def test_build_report_has_version(self):
         content = (REPO_ROOT / "BUILD-REPORT.md").read_text()
-        assert "0.59.0" in content
+        assert "0.60.0" in content
