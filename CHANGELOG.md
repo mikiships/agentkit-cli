@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.63.0] - 2026-03-19
+
+### Added
+- `agentkit user-improve github:<user>`: new command — find a GitHub user's lowest-scoring public repos, auto-improve them (CLAUDE.md generation + hardening), and display a before/after quality lift report
+- `UserImproveEngine` (`agentkit_cli/user_improve.py`): core engine — fetch repos, score them, select targets below threshold, clone and improve each in tempdir (always cleaned up), aggregate results
+- `UserRepoScore` / `UserImproveResult` / `UserImproveReport` dataclasses with full `to_dict()` schema
+- `UserImproveHTMLRenderer` (`agentkit_cli/renderers/user_improve_html.py`): dark-theme HTML report with avatar header, summary bar, per-repo before/after score bars and lift badges
+- `upload_user_improve_report`: upload improvement HTML to here.now, return URL
+- `--limit N` (default 5, max 20): max repos to improve
+- `--below N` (default 80): only target repos scoring below this threshold
+- `--share`: publish HTML improvement report to here.now
+- `--json`: emit `UserImproveReport` as JSON
+- `--dry-run`: show what would be improved, no changes applied
+- `--user-improve github:<user>` flag on `agentkit run`: triggers user-improve after pipeline
+- `--user-improve github:<user>` flag on `agentkit report`: includes user-improve section in report output
+- History DB: each user-improve run recorded as a row in `runs` table with `tool="user-improve"`
+
 ## [0.62.0] - 2026-03-19
 
 ### Added

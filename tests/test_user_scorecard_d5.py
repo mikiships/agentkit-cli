@@ -20,7 +20,7 @@ def test_changelog_user_scorecard_entry():
 
 def test_pyproject_version_060():
     pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.62.0"' in pyproject
+    assert ('version = "' + __import__("agentkit_cli").__version__ + '"') in pyproject
 
 
 def test_docs_has_user_scorecard_card():

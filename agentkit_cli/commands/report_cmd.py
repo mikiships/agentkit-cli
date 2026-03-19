@@ -437,6 +437,7 @@ def report_command(
     llmstxt: bool = False,
     user_duel: Optional[str] = None,
     user_tournament: Optional[str] = None,
+    user_improve: Optional[str] = None,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -607,3 +608,23 @@ def report_command(
                 results["user_tournament"] = {"error": str(_t_exc)}
             else:
                 console.print(f"[yellow]Warning: user-tournament failed — {_t_exc}[/yellow]")
+
+    if user_improve:
+        try:
+            from agentkit_cli.user_improve import UserImproveEngine
+            _ui_target = user_improve.strip()
+            if _ui_target.startswith("github:"):
+                _ui_user = _ui_target[len("github:"):]
+            else:
+                _ui_user = _ui_target
+            _ui_engine = UserImproveEngine()
+            _ui_report = _ui_engine.run(_ui_user, limit=5, below=80)
+            if json_output:
+                results["user_improve"] = _ui_report.to_dict()
+            else:
+                console.print(f"\n[bold]User Improve:[/bold] @{_ui_user} — {_ui_report.improved} repos improved, avg lift {_ui_report.summary_stats.get('avg_lift', 0.0):+.1f} pts")
+        except Exception as _ui_exc:
+            if json_output:
+                results["user_improve"] = {"error": str(_ui_exc)}
+            else:
+                console.print(f"[yellow]Warning: user-improve failed — {_ui_exc}[/yellow]")
