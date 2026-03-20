@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.71.0] - 2026-03-20
+
+### Added
+- `agentkit ecosystem` — macro "State of AI Agent Readiness" scan across language/tech ecosystems
+  - Built-in presets: `default` (python, typescript, rust, go, java), `extended` (12 ecosystems)
+  - Custom preset via `--topics "python,rust,go"`
+  - `EcosystemEngine` reuses `TopicLeagueEngine` — no duplicated scoring logic
+  - Dark-theme HTML report with winner banner, standings table, per-ecosystem detail cards, insight panel
+  - `--share` uploads via here.now, `--output` saves locally, `--parallel` (default True)
+  - `--json` output with all required keys for pipeline consumers
+  - `agentkit run --ecosystem <preset>` integration
+  - `agentkit doctor` now verifies `agentkit ecosystem` availability
+- `EcosystemHTMLRenderer` in `agentkit_cli/renderers/ecosystem_html.py`
+- Language emoji map (python=🐍, rust=🦀, go=🐹, typescript=📘, java=☕, ...)
+
 ## [0.70.0] - 2026-03-20
 
 ### Added
