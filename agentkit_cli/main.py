@@ -69,6 +69,7 @@ from agentkit_cli.commands.user_rank_cmd import user_rank_command
 from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
 from agentkit_cli.commands.topic_duel_cmd import topic_duel_command
 from agentkit_cli.commands.topic_league_cmd import topic_league_command
+from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -168,9 +169,10 @@ def run(
     run_user_rank_topic: Optional[str] = typer.Option(None, "--topic", help="Run user-rank for topic after pipeline (e.g. python)"),
     run_topic_repos: Optional[str] = typer.Option(None, "--topic-repos", help="Run topic repo-rank after pipeline (e.g. python)"),
     run_topic_league: Optional[str] = typer.Option(None, "--topic-league", help="Run topic-league after pipeline (e.g. python rust go)"),
+    run_ecosystem: Optional[str] = typer.Option(None, "--ecosystem", help="Run ecosystem scan after pipeline (preset: default, extended, or custom)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem)
     if run_topic_repos:
         from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
         topic_rank_command(topic=run_topic_repos.strip())
@@ -1432,6 +1434,40 @@ def topic_league(
     """🏆  Multi-topic standings comparison — rank N GitHub topics by agent-readiness."""
     topic_league_command(
         topics=topics,
+        repos_per_topic=repos_per_topic,
+        parallel=parallel,
+        json_output=json_output,
+        share=share,
+        quiet=quiet,
+        output=output,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("ecosystem")
+def ecosystem(
+    preset: str = typer.Option("default", "--preset", help="Preset: default (5 ecosystems), extended (12), or custom"),
+    topics: Optional[List[str]] = typer.Option(None, "--topics", help="Comma-separated topics for custom preset"),
+    repos_per_topic: int = typer.Option(3, "--repos-per-topic", help="Max repos per ecosystem to score (1-10, default 3)"),
+    parallel: bool = typer.Option(True, "--parallel/--no-parallel", help="Fetch ecosystems in parallel (default True)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit EcosystemResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress output"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🌐  Macro State of AI Agent Readiness scan across language/tech ecosystems."""
+    # topics can be passed as comma-separated in one value or multiple values
+    flat_topics: Optional[List[str]] = None
+    if topics:
+        flat_topics = []
+        for t in topics:
+            flat_topics.extend([x.strip() for x in t.split(",") if x.strip()])
+    ecosystem_command(
+        preset=preset,
+        topics=flat_topics,
         repos_per_topic=repos_per_topic,
         parallel=parallel,
         json_output=json_output,

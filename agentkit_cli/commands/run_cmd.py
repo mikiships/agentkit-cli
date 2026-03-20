@@ -99,6 +99,7 @@ def run_command(
     user_improve: Optional[str] = None,
     user_card: Optional[str] = None,
     user_rank_topic: Optional[str] = None,
+    ecosystem: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -817,6 +818,20 @@ def run_command(
                 console.print(f"\n[bold]User Rank:[/bold] topic={user_rank_topic} — Top: @{_ur_result.top_scorer}, Mean {_ur_result.mean_score:.1f}")
         except Exception as _ur_exc:
             summary["user_rank"] = {"error": str(_ur_exc)}
+
+    if ecosystem:
+        try:
+            from agentkit_cli.engines.ecosystem import EcosystemEngine
+            _eco_preset = ecosystem.strip() or "default"
+            _eco_engine = EcosystemEngine(preset=_eco_preset)
+            _eco_result = _eco_engine.run()
+            summary["ecosystem"] = _eco_result.to_dict()
+            if not ci and not json_output:
+                _winner = _eco_result.winner
+                _w_str = f"{_winner.topic} ({_winner.score:.1f})" if _winner else "n/a"
+                console.print(f"\n[bold]Ecosystem:[/bold] preset={_eco_preset} — Winner: {_w_str}")
+        except Exception as _eco_exc:
+            summary["ecosystem"] = {"error": str(_eco_exc)}
 
     if json_output:
         print(json.dumps(summary, indent=2))
