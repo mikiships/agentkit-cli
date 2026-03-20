@@ -414,7 +414,7 @@ def test_check_toolchain_returns_six_results() -> None:
     with patch("agentkit_cli.doctor._probe_binary_version", return_value=(True, "v1")):
         results = check_toolchain()
 
-    assert len(results) == 6  # 4 core + 2 optional
+    assert len(results) == 7  # 4 core + 2 optional + 1 ecosystem
     categories = {r.category for r in results}
     assert categories == {"toolchain"}
 
