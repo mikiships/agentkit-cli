@@ -633,6 +633,32 @@ def check_redteam_recency(root: Path) -> DoctorCheckResult:
         )
 
 
+def check_ecosystem_available() -> DoctorCheckResult:
+    """Verify that agentkit ecosystem command is importable and functional."""
+    try:
+        from agentkit_cli.commands import ecosystem_cmd as _eco_cmd  # noqa: F401
+        from agentkit_cli.engines import ecosystem as _eco_eng  # noqa: F401
+        return DoctorCheckResult(
+            id="toolchain.ecosystem",
+            name="agentkit ecosystem",
+            status="pass",
+            summary="agentkit ecosystem is available.",
+            details="Run 'agentkit ecosystem' for macro AI-agent-readiness scan.",
+            fix_hint="",
+            category="toolchain",
+        )
+    except ImportError as exc:
+        return DoctorCheckResult(
+            id="toolchain.ecosystem",
+            name="agentkit ecosystem",
+            status="fail",
+            summary="agentkit ecosystem is not importable.",
+            details=str(exc),
+            fix_hint="Reinstall agentkit-cli: pip install -U agentkit-cli",
+            category="toolchain",
+        )
+
+
 def check_serve_available() -> DoctorCheckResult:
     """Verify that agentkit serve command is importable and functional."""
     try:
@@ -836,6 +862,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         check_herenow_api_key(),
     ]
     checks.append(check_serve_available())
+    checks.append(check_ecosystem_available())
     checks.append(check_redteam_recency(project_root))
     checks.append(check_webhook_config(project_root))
     checks.append(check_llmstxt_readiness(project_root))
