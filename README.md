@@ -190,6 +190,7 @@ agentkit run --migrate       # generate missing formats before analysis
 
 - `agentkit quickstart` — 🚀 fastest path to a score (start here)
 - `agentkit run` — run the full pipeline
+- `agentkit gist` — publish analysis output as a permanent GitHub Gist (use `--from <file>`, `--public`, `--description`)
 - `agentkit score` — compute composite score
 - `agentkit gate` — fail if score < threshold
 - `agentkit redteam [PATH]` — adversarial eval: score how well your agent context resists attacks
@@ -705,6 +706,26 @@ agentkit sweep github:owner/repo1 github:owner/repo2 --share
 ```
 
 Score cards are standalone HTML pages (dark theme) showing: composite score, per-tool breakdown, project name, git ref, and timestamp. Anonymous cards expire in 24h; set `HERENOW_API_KEY` for persistent links.
+
+## Permanent Gist Links
+
+```bash
+# Publish a file as a permanent GitHub Gist
+agentkit gist --from agentkit-report.md
+
+# Publish a public gist (no token needed)
+agentkit gist --from report.md --public
+
+# Custom description
+agentkit gist --from report.md --description "My project analysis"
+
+# Auto-publish gist after run/report/analyze
+agentkit run --gist
+agentkit report --gist
+agentkit analyze github:owner/repo --gist
+```
+
+Set `GITHUB_TOKEN` env var or run `gh auth login` for private gists. Public gists work without any token.
 
 ## GitHub Actions
 

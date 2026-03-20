@@ -24,6 +24,7 @@ from agentkit_cli.commands.history_cmd import history_command
 from agentkit_cli.commands.leaderboard_cmd import leaderboard_command
 from agentkit_cli.commands.score_cmd import score_command
 from agentkit_cli.commands.share_cmd import share_command
+from agentkit_cli.commands.gist_cmd import gist_command
 from agentkit_cli.commands.analyze_cmd import analyze_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
@@ -171,9 +172,10 @@ def run(
     run_topic_repos: Optional[str] = typer.Option(None, "--topic-repos", help="Run topic repo-rank after pipeline (e.g. python)"),
     run_topic_league: Optional[str] = typer.Option(None, "--topic-league", help="Run topic-league after pipeline (e.g. python rust go)"),
     run_ecosystem: Optional[str] = typer.Option(None, "--ecosystem", help="Run ecosystem scan after pipeline (preset: default, extended, or custom)"),
+    run_gist: bool = typer.Option(False, "--gist", help="Publish run report as a GitHub Gist after completion"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist)
     if run_topic_repos:
         from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
         topic_rank_command(topic=run_topic_repos.strip())
@@ -280,12 +282,13 @@ def report(
     report_user_card: Optional[str] = typer.Option(None, "--user-card", help="Include user-card section (format: github:<user>)"),
     spotlight_feed: bool = typer.Option(False, "--spotlight-feed", help="Show spotlight run feed instead of project report"),
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+    report_gist: bool = typer.Option(False, "--gist", help="Publish HTML report as a GitHub Gist after generation"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
     if spotlight_feed:
         _show_spotlight_feed(json_output=json_output, db_path=db_path)
         return
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve, user_card=report_user_card)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve, user_card=report_user_card, gist=report_gist)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
         proj_name = (path or Path(".")).resolve().name
@@ -305,6 +308,17 @@ def share(
 ) -> None:
     """Generate a shareable score card and upload it to here.now."""
     share_command(report=report, project=project, no_scores=no_scores, json_output=json_output, path=path, api_key=api_key)
+
+
+@app.command("gist")
+def gist(
+    from_file: Optional[Path] = typer.Option(None, "--from", help="Path to a file to publish as a gist"),
+    public: bool = typer.Option(False, "--public", help="Create a public gist (default: private/secret)"),
+    description: str = typer.Option("agentkit analysis report", "--description", help="Gist description"),
+    fmt: str = typer.Option("markdown", "--format", help="Output format: markdown or html"),
+) -> None:
+    """Publish a report or analysis output as a permanent GitHub Gist."""
+    gist_command(from_file=from_file, public=public, description=description, fmt=fmt)
 
 
 @app.command("publish")
@@ -466,6 +480,7 @@ def analyze(
     profile: Optional[str] = typer.Option(None, "--profile", help="Quality profile to use (strict|balanced|minimal)"),
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after analysis and print the URL"),
     record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
+    analyze_gist: bool = typer.Option(False, "--gist", help="Publish analyze output as a GitHub Gist"),
 ) -> None:
     """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
     analyze_command(
@@ -478,6 +493,7 @@ def analyze(
         profile=profile,
         share=share,
         record_findings=record_findings,
+        gist=analyze_gist,
     )
 
 

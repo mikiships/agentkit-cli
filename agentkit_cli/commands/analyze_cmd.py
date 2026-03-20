@@ -39,6 +39,7 @@ def analyze_command(
     profile: Optional[str] = None,
     share: bool = False,
     record_findings: bool = False,
+    gist: bool = False,
 ) -> None:
     """Analyze a GitHub repo or local path for agent quality."""
     # Validate target early
@@ -136,4 +137,27 @@ def analyze_command(
         console.print(f"[dim]  Clone kept at: {result.temp_dir}[/dim]")
     if result.report_url:
         console.print(f"[bold]Report URL:[/bold] {result.report_url}")
+
+    if gist:
+        try:
+            from agentkit_cli.gist_publisher import GistPublisher as _GistPublisher
+            _gist_pub = _GistPublisher()
+            _gist_lines = [f"# agentkit analyze: {result.repo_name}\n"]
+            _gist_lines.append(f"**Score:** {result.composite_score:.0f}/100 ({result.grade})\n")
+            for _key, _tr in result.tools.items():
+                _sc = _tr.get("score")
+                _sc_str = f"{_sc:.0f}" if _sc is not None else "N/A"
+                _gist_lines.append(f"- **{_tr['tool']}**: {_tr['status']} (score: {_sc_str})")
+            _gist_content = "\n".join(_gist_lines)
+            _gist_result = _gist_pub.publish(
+                content=_gist_content,
+                filename="agentkit-analyze.md",
+                description=f"agentkit analyze: {result.repo_name}",
+                public=False,
+            )
+            if _gist_result:
+                console.print(f"\n[bold]Gist:[/bold] {_gist_result.url}")
+        except Exception as _e:
+            console.print(f"[yellow]Warning: gist publish failed — {_e}[/yellow]")
+
     console.print(f"[dim]{sep}[/dim]\n")

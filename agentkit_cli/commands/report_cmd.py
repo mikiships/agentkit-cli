@@ -439,6 +439,7 @@ def report_command(
     user_tournament: Optional[str] = None,
     user_improve: Optional[str] = None,
     user_card: Optional[str] = None,
+    gist: bool = False,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -568,6 +569,23 @@ def report_command(
                 console.print(f"\n[bold]Score card:[/bold] {_share_url}")
         except Exception as _e:
             console.print(f"[yellow]Warning: share failed — {_e}[/yellow]")
+
+    if gist:
+        try:
+            from agentkit_cli.gist_publisher import GistPublisher as _GistPublisher
+            _gist_pub = _GistPublisher()
+            _gist_content = out_path.read_text(encoding="utf-8") if out_path.exists() else "# agentkit report\n"
+            _gist_fname = out_path.name if out_path.exists() else "agentkit-report.md"
+            _gist_result = _gist_pub.publish(
+                content=_gist_content,
+                filename=_gist_fname,
+                description="agentkit report",
+                public=False,
+            )
+            if _gist_result:
+                console.print(f"\n[bold]Gist:[/bold] {_gist_result.url}")
+        except Exception as _e:
+            console.print(f"[yellow]Warning: gist publish failed — {_e}[/yellow]")
 
     if user_duel:
         try:

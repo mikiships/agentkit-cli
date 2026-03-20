@@ -100,6 +100,7 @@ def run_command(
     user_card: Optional[str] = None,
     user_rank_topic: Optional[str] = None,
     ecosystem: Optional[str] = None,
+    gist: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -416,6 +417,36 @@ def run_command(
                     console.print(f"\n[bold]Score card:[/bold] {_share_url}")
         except Exception as _e:
             _warn = f"Warning: share failed — {_e}"
+            if ci:
+                active_console.print(_warn)
+            else:
+                console.print(f"[yellow]{_warn}[/yellow]")
+
+    # Optional gist step
+    if gist:
+        try:
+            from agentkit_cli.gist_publisher import GistPublisher as _GistPublisher
+            import json as _gist_json
+            _gist_content_lines = ["# agentkit run report\n"]
+            for _r in results:
+                _status = _r.get("status", "unknown")
+                _step = _r.get("step", "")
+                _gist_content_lines.append(f"- **{_step}**: {_status}")
+            _gist_content = "\n".join(_gist_content_lines)
+            _gist_pub = _GistPublisher()
+            _gist_result = _gist_pub.publish(
+                content=_gist_content,
+                filename="agentkit-run-report.md",
+                description="agentkit run report",
+                public=False,
+            )
+            if _gist_result:
+                if ci:
+                    active_console.print(f"\nGist: {_gist_result.url}")
+                else:
+                    console.print(f"\n[bold]Gist:[/bold] {_gist_result.url}")
+        except Exception as _e:
+            _warn = f"Warning: gist publish failed — {_e}"
             if ci:
                 active_console.print(_warn)
             else:

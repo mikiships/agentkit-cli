@@ -56,6 +56,10 @@ inputs:
     description: When to notify — fail (default) or always
     required: false
     default: 'fail'
+  gist-token:
+    description: GitHub token for publishing results as a GitHub Gist (optional). If provided, run results are auto-published and gist-url output is set.
+    required: false
+    default: ''
 
 outputs:
   lint-score:
@@ -73,6 +77,9 @@ outputs:
   leaderboard-json:
     description: JSON string of leaderboard data grouped by label (when save-history=true)
     value: ${{ steps.save-history.outputs.leaderboard-json }}
+  gist-url:
+    description: GitHub Gist URL for the published run results (when gist-token is provided)
+    value: ${{ steps.publish-gist.outputs.gist-url }}
 
 runs:
   using: composite
@@ -123,6 +130,19 @@ runs:
         echo "history-json=$HISTORY_JSON" >> "$GITHUB_OUTPUT"
         LEADERBOARD_JSON=$(agentkit leaderboard --json --project "$PROJECT" 2>/dev/null || echo '{"tool":"overall","project":"'$PROJECT'","leaderboard":[]}')
         echo "leaderboard-json=$LEADERBOARD_JSON" >> "$GITHUB_OUTPUT"
+
+    - name: Publish results as GitHub Gist
+      id: publish-gist
+      if: inputs.gist-token != ''
+      shell: bash
+      env:
+        GIST_TOKEN: ${{ inputs.gist-token }}
+      run: |
+        PROJECT="$(basename $GITHUB_WORKSPACE)"
+        GIST_RESPONSE=$(agentkit gist --public --description "agentkit run: $PROJECT" 2>/dev/null || echo '')
+        GIST_URL=$(echo "$GIST_RESPONSE" | grep -oE 'https://gist\.github\.com/[a-zA-Z0-9/_-]+' | head -1 || echo '')
+        echo "gist-url=$GIST_URL" >> "$GITHUB_OUTPUT"
+        if [ -n "$GIST_URL" ]; then echo "Gist published: $GIST_URL"; fi
 
     - name: Post PR comment
       if: inputs.post-comment == 'true' && github.event_name == 'pull_request'

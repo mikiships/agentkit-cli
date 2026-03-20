@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.73.0] - 2026-03-20
+
+### Added
+- `agentkit gist` command — publish analysis output as a permanent GitHub Gist (solves here.now 24h expiry problem)
+- `GistPublisher` class in `agentkit_cli/gist_publisher.py` — mirrors HereNowPublisher pattern
+  - Auth: `GITHUB_TOKEN` env var OR `gh auth token` CLI fallback
+  - Public gists: no token required (GitHub allows unauthenticated public gist creation)
+  - Private/secret gists: requires token
+  - Returns `GistResult` with `url`, `gist_id`, `raw_url`, `created_at`
+- `--gist` flag on `agentkit run`, `agentkit report`, `agentkit analyze` — auto-publishes results as gist after completion
+- `gist-token` input and `gist-url` output added to `action.yml` for GitHub Actions integration
+
 ## [0.72.0] - 2026-03-20
 
 ### Added
