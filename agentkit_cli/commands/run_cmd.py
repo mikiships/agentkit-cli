@@ -97,6 +97,7 @@ def run_command(
     user_duel: Optional[str] = None,
     user_tournament: Optional[str] = None,
     user_improve: Optional[str] = None,
+    user_card: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -788,6 +789,22 @@ def run_command(
                 console.print(f"\n[bold]User Improve:[/bold] @{_ui_user} — {_ui_report.improved} repos improved, avg lift {_ui_report.summary_stats.get('avg_lift', 0.0):+.1f} pts")
         except Exception as _ui_exc:
             summary["user_improve"] = {"error": str(_ui_exc)}
+
+    if user_card:
+        try:
+            from agentkit_cli.user_card import UserCardEngine
+            _uc_target = user_card.strip()
+            if _uc_target.startswith("github:"):
+                _uc_user = _uc_target[len("github:"):]
+            else:
+                _uc_user = _uc_target
+            _uc_engine = UserCardEngine()
+            _uc_result = _uc_engine.run(_uc_user)
+            summary["user_card"] = _uc_result.to_dict()
+            if not ci and not json_output:
+                console.print(f"\n[bold]User Card:[/bold] @{_uc_user} — Grade {_uc_result.grade}, avg {_uc_result.avg_score:.1f}")
+        except Exception as _uc_exc:
+            summary["user_card"] = {"error": str(_uc_exc)}
 
     if json_output:
         print(json.dumps(summary, indent=2))

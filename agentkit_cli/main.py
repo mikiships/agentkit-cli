@@ -62,6 +62,7 @@ from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
 from agentkit_cli.commands.user_duel_cmd import user_duel_command
 from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
 from agentkit_cli.commands.user_improve_cmd import user_improve_command
+from agentkit_cli.commands.user_card_cmd import user_card_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -157,9 +158,10 @@ def run(
     run_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Run user duel after pipeline (format: user1:user2)"),
     run_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Run user tournament after pipeline (format: user1:user2:...)"),
     run_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Run user-improve after pipeline (format: github:<user>)"),
+    run_user_card: Optional[str] = typer.Option(None, "--user-card", help="Run user-card after pipeline (format: github:<user>)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -257,9 +259,10 @@ def report(
     report_user_duel: Optional[str] = typer.Option(None, "--user-duel", help="Include user duel section (format: user1:user2)"),
     report_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Include user tournament section (format: user1:user2:...)"),
     report_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Include user-improve section (format: github:<user>)"),
+    report_user_card: Optional[str] = typer.Option(None, "--user-card", help="Include user-card section (format: github:<user>)"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
-    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve)
+    report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve, user_card=report_user_card)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
         proj_name = (path or Path(".")).resolve().name
@@ -1315,6 +1318,32 @@ def user_improve(
         share=share,
         json_output=json_output,
         dry_run=dry_run,
+        token=token,
+    )
+
+
+@app.command("user-card")
+def user_card(
+    target: str = typer.Argument(..., help="GitHub user: github:<user> or bare <user>"),
+    limit: int = typer.Option(10, "--limit", help="Max repos to analyze (default 10, max 30)"),
+    min_stars: int = typer.Option(0, "--min-stars", help="Skip repos below this star count"),
+    skip_forks: bool = typer.Option(True, "--skip-forks/--no-skip-forks", help="Skip forked repos (default: True)"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML card to here.now, print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output machine-readable JSON result"),
+    quiet: bool = typer.Option(False, "--quiet", help="Print only the share URL (cron-friendly)"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout in seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🃏  Generate a compact embeddable agent-readiness card for a GitHub user."""
+    user_card_command(
+        target=target,
+        limit=limit,
+        min_stars=min_stars,
+        skip_forks=skip_forks,
+        share=share,
+        json_output=json_output,
+        quiet=quiet,
+        timeout=timeout,
         token=token,
     )
 

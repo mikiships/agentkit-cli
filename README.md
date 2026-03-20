@@ -1246,3 +1246,26 @@ agentkit user-improve github:tiangolo --share
 ```
 
 Use `--limit N` (default 5, max 20) to control how many repos are targeted, and `--below N` (default 80) to set the quality threshold.
+
+## `agentkit user-card`
+
+`agentkit user-card` generates a compact, embeddable agent-readiness card for a GitHub user. The card shows grade, avg score, context coverage, agent-ready repo count, and top repo — all in a shareable dark-theme HTML card.
+
+```bash
+# Generate a card for a user
+agentkit user-card github:tiangolo
+
+# Publish card to here.now and get a shareable URL
+agentkit user-card github:tiangolo --share
+
+# Output as JSON
+agentkit user-card github:tiangolo --json
+
+# Quiet mode (cron-friendly): print only the URL
+agentkit user-card github:tiangolo --share --quiet
+
+# Include forks, analyze up to 20 repos
+agentkit user-card github:mikiships --no-skip-forks --limit 20
+```
+
+Use `--limit N` (default 10, max 30) to control how many repos are analyzed. The HTML card includes a Markdown embed snippet as an HTML comment when `--share` is used.
