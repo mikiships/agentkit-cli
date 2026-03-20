@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.67.0] - 2026-03-20
+
+### Added
+- `agentkit user-rank <topic>` — discover top GitHub contributors for a topic, rank by agent-readiness score
+- `UserRankEngine` in `agentkit_cli/user_rank.py` — search topic contributors, score via `UserScorecardEngine`, rank
+- `UserRankHTMLRenderer` in `agentkit_cli/user_rank_html.py` — dark-theme HTML report with ranked table, grade distribution, top-scorer spotlight
+- `agentkit run --topic <topic>` — optional user-rank step in the run pipeline
+- 45 new tests across 5 test files (D1-D5)
+
 ## [0.66.0] - 2026-03-20
 
 ### Added
