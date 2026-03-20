@@ -405,6 +405,7 @@ def check_toolchain() -> list[DoctorCheckResult]:
         results.append(check_tool_binary(binary, is_core=True))
     for binary in _OPTIONAL_TOOLS:
         results.append(check_tool_binary(binary, is_core=False))
+    results.append(check_ecosystem_available())
     return results
 
 
@@ -862,7 +863,6 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         check_herenow_api_key(),
     ]
     checks.append(check_serve_available())
-    checks.append(check_ecosystem_available())
     checks.append(check_redteam_recency(project_root))
     checks.append(check_webhook_config(project_root))
     checks.append(check_llmstxt_readiness(project_root))
