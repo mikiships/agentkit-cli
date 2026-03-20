@@ -67,6 +67,7 @@ from agentkit_cli.commands.user_card_cmd import user_card_command
 from agentkit_cli.commands.user_team_cmd import user_team_command
 from agentkit_cli.commands.user_rank_cmd import user_rank_command
 from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
+from agentkit_cli.commands.topic_duel_cmd import topic_duel_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1376,6 +1377,32 @@ def topic(
         topic=topic_name,
         limit=limit,
         language=language,
+        json_output=json_output,
+        share=share,
+        quiet=quiet,
+        output=output,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("topic-duel")
+def topic_duel(
+    topic1: str = typer.Argument(..., metavar="TOPIC1", help="First GitHub topic (e.g. fastapi)"),
+    topic2: str = typer.Argument(..., metavar="TOPIC2", help="Second GitHub topic (e.g. django)"),
+    repos_per_topic: int = typer.Option(5, "--repos-per-topic", help="Max repos per topic to score (1-10, default 5)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit TopicDuelResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress output"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """⚔️  Head-to-head agent-readiness comparison of two GitHub topics."""
+    topic_duel_command(
+        topic1=topic1,
+        topic2=topic2,
+        repos_per_topic=repos_per_topic,
         json_output=json_output,
         share=share,
         quiet=quiet,
