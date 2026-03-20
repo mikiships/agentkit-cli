@@ -1224,6 +1224,29 @@ agentkit user-tournament github:tiangolo github:kennethreitz --output tournament
 
 Use `--limit N` to cap comparisons and `--quiet` for scripting-friendly champion-only output.
 
+## `agentkit user-team`
+
+`agentkit user-team` analyzes a GitHub org's top contributors for agent-readiness. Each contributor is scored via `UserScorecardEngine`, then results are aggregated into a team scorecard with a ranked table, aggregate grade, and grade distribution.
+
+```bash
+# Score the top 10 contributors of an org
+agentkit user-team github:pallets
+
+# Limit to 5 contributors
+agentkit user-team github:django --limit 5
+
+# Output as JSON
+agentkit user-team github:pallets --json
+
+# Save HTML report to file
+agentkit user-team github:pallets --output team-report.html
+
+# Publish and share HTML report
+agentkit user-team github:pallets --share
+```
+
+Use `--quiet` for CI-friendly output (only prints share URL if --share is set).
+
 ## `agentkit user-improve`
 
 `agentkit user-improve` finds a GitHub user's lowest-scoring public repos and automatically improves them by generating CLAUDE.md context files and applying agent hardening. Displays a before/after quality lift report.

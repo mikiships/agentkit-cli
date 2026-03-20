@@ -1,3 +1,23 @@
+# BUILD-REPORT — agentkit-cli v0.66.0
+
+**Build date:** 2026-03-20
+**Feature:** `agentkit user-team`
+
+## Deliverables
+
+- [x] D1: `TeamScorecardEngine` in `agentkit_cli/user_team.py` — fetch org contributors, score each via UserScorecardEngine, aggregate team result
+- [x] D2: `agentkit user-team` CLI command with `--limit/--json/--output/--share/--quiet` flags; wired into main.py
+- [x] D3: `TeamScorecardHTMLRenderer` in `agentkit_cli/user_team_html.py` — dark-theme HTML with contributor rankings, grade distribution, top-scorer callout, avatars
+- [x] D4: README updated (user-team section), CHANGELOG updated, version bumped 0.65.0→0.66.0
+
+## Test Count
+
+- **Baseline:** 3232 tests (v0.65.0)
+- **New tests:** ≥38 (test_user_team_d1.py: 13, test_user_team_d2.py: 11, test_user_team_d3.py: 8, test_user_team_d4.py: 8)
+- **Target total:** ≥3270
+
+---
+
 # BUILD-REPORT — agentkit-cli v0.65.0
 
 **Build date:** 2026-03-19
