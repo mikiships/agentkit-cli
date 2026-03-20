@@ -194,6 +194,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
 - `agentkit topic <topic>` — rank top GitHub repos for a topic by agent-readiness (e.g. `python`, `llm`, `agents`)
+- `agentkit topic-duel <topic1> <topic2>` — head-to-head agent-readiness comparison of two GitHub topics (e.g. `fastapi` vs `django`)
 - `agentkit user-rank <topic>` — rank top GitHub contributors for a topic by agent-readiness (e.g. `python`, `rust`, `llm`)
 - `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
 - `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]` — bracket-style agent-readiness tournament for N GitHub developers
@@ -1208,6 +1209,29 @@ agentkit topic go --share
 ```
 
 The output includes: ranked repo table with scores, grades, star counts, and descriptions; top-repo spotlight; grade distribution chart. Use `--topic-repos` flag in `agentkit run` to append topic ranking to any pipeline run.
+
+## `agentkit topic-duel`: Head-to-Head Topic Comparison
+
+`agentkit topic-duel <topic1> <topic2>` fetches the top repos for two GitHub topics and runs a head-to-head agent-readiness comparison. Answers "Which ecosystem is more AI-agent-ready?"
+
+```bash
+# Compare fastapi vs django
+agentkit topic-duel fastapi django
+
+# Score 8 repos per topic
+agentkit topic-duel langchain llamaindex --repos-per-topic 8
+
+# Output as JSON
+agentkit topic-duel rust python --json
+
+# Save HTML report
+agentkit topic-duel pytorch tensorflow --output duel.html
+
+# Publish shareable link
+agentkit topic-duel fastapi flask --share
+```
+
+The output includes: side-by-side ranked tables for both topics, per-dimension comparison (avg score, top score, grade-A count, repo count), and a winner declaration. Use `--repos-per-topic` to control depth (1-10, default 5).
 
 ## `agentkit user-rank`: State of Agent Readiness by Topic
 

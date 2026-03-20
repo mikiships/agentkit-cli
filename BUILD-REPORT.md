@@ -1,4 +1,4 @@
-# Build Report — agentkit-cli v0.68.0
+# Build Report — agentkit-cli v0.69.0
 
 **Feature:** `agentkit user-rank <topic>`
 **Date:** 2026-03-20

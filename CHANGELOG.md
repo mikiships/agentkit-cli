@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.69.0] - 2026-03-20
+
+### Added
+- `agentkit topic-duel <topic1> <topic2>` — head-to-head agent-readiness comparison of two GitHub topics
+- `TopicDuelEngine` in `agentkit_cli/engines/topic_duel.py` — fetch top repos for each topic, score via `TopicRankEngine`, compute per-dimension winners and aggregate scores
+- `TopicDuelResult` dataclass with both topic results, dimension comparison, and overall winner
+- `render_topic_duel_html` in `agentkit_cli/topic_duel_html.py` — dark-theme HTML report with side-by-side ranked tables, winner banner, and dimension comparison table
+- `--repos-per-topic N` (default 5, max 10), `--json`, `--quiet`, `--output FILE`, `--share` options
+- 41 new tests across 4 test files (D1-D4) + 5 D5 tests
+
 ## [0.68.0] - 2026-03-20
 
 ### Added
