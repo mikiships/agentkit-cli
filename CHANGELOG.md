@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.68.0] - 2026-03-20
+
+### Added
+- `agentkit topic <topic>` — discover and rank top GitHub repos for a topic by agent-readiness score
+- `TopicRankEngine` in `agentkit_cli/topic_rank.py` — search topic repos via GitHub Search API, score each via agentkit analyze (heuristic fallback), rank by score descending
+- `TopicRankHTMLRenderer` in `agentkit_cli/topic_rank_html.py` — dark-theme HTML report with ranked repo table, grade distribution bars, top-repo spotlight, and star counts
+- `agentkit run --topic-repos <topic>` — optional topic repo-rank step appended to the run pipeline
+- Drill-down hint in `agentkit trending --topic <topic>` output: `agentkit topic <topic> for topic-specific repos`
+- `--limit N` (default 10, max 25), `--language LANG`, `--json`, `--output FILE`, `--share`, `--quiet` options
+- 48 new tests across 5 test files (D1-D5)
+
 ## [0.67.0] - 2026-03-20
 
 ### Added

@@ -193,6 +193,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
+- `agentkit topic <topic>` — rank top GitHub repos for a topic by agent-readiness (e.g. `python`, `llm`, `agents`)
 - `agentkit user-rank <topic>` — rank top GitHub contributors for a topic by agent-readiness (e.g. `python`, `rust`, `llm`)
 - `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
 - `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]` — bracket-style agent-readiness tournament for N GitHub developers
@@ -1184,6 +1185,29 @@ agentkit checks status              # show last check run posted
 - **Body:** markdown table of per-tool scores with pass/warn/fail indicators
 - **Annotations:** one annotation per failing tool (score < 80)
 - **Linked scorecard** if `--share` is active
+
+## `agentkit topic`: Agent-Ready Repos by Topic
+
+`agentkit topic <topic>` discovers the top GitHub repos for a topic and ranks them by agent-readiness score. Complements `user-rank` (contributors) with a repo-focused view.
+
+```bash
+# Rank top Python repos by agent-readiness
+agentkit topic python
+
+# Filter by language, limit results
+agentkit topic llm --language python --limit 10
+
+# Output as JSON
+agentkit topic agents --json
+
+# Save HTML report
+agentkit topic rust --output rust-repos.html
+
+# Publish shareable link
+agentkit topic go --share
+```
+
+The output includes: ranked repo table with scores, grades, star counts, and descriptions; top-repo spotlight; grade distribution chart. Use `--topic-repos` flag in `agentkit run` to append topic ranking to any pipeline run.
 
 ## `agentkit user-rank`: State of Agent Readiness by Topic
 

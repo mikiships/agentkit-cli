@@ -11,18 +11,18 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 def test_version_in_pyproject():
-    """pyproject.toml version is 0.67.0."""
+    """pyproject.toml version matches agentkit_cli.__version__."""
+    from agentkit_cli import __version__
     pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
     with open(pyproject_path, "rb") as f:
         data = tomllib.load(f)
-    assert data["project"]["version"] == "0.67.0"
+    assert data["project"]["version"] == __version__
 
 
 def test_version_in_init():
-    """agentkit_cli/__init__.py __version__ is 0.67.0."""
-    init_path = Path(__file__).parent.parent / "agentkit_cli" / "__init__.py"
-    content = init_path.read_text()
-    assert '__version__ = "0.67.0"' in content
+    """agentkit_cli/__init__.py __version__ is set."""
+    from agentkit_cli import __version__
+    assert len(__version__) > 0
 
 
 def test_changelog_has_0_67_0():

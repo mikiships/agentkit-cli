@@ -188,6 +188,12 @@ def trending_command(
 
     console.print(table)
 
+    # Drill-down hint
+    if topic:
+        console.print(
+            f"\n[dim]Drill down: [bold]agentkit topic {topic}[/bold] for topic-specific repos[/dim]"
+        )
+
     # --share
     if share:
         from agentkit_cli.trending_report import generate_html, publish_report

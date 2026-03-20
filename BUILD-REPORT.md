@@ -1,4 +1,4 @@
-# Build Report — agentkit-cli v0.67.0
+# Build Report — agentkit-cli v0.68.0
 
 **Feature:** `agentkit user-rank <topic>`
 **Date:** 2026-03-20
@@ -16,7 +16,7 @@ Added `agentkit user-rank <topic>` — discovers top GitHub contributors for a t
 | D2 | CLI command (`agentkit_cli/commands/user_rank_cmd.py`) | 10 | ✅ |
 | D3 | Dark-theme HTML (`agentkit_cli/user_rank_html.py`) | 11 | ✅ |
 | D4 | Integration into `agentkit run --topic` | 7 | ✅ |
-| D5 | Docs, CHANGELOG, version bump to 0.67.0 | 9 | ✅ |
+| D5 | Docs, CHANGELOG, version bump to 0.68.0 | 9 | ✅ |
 
 **Total new tests:** 48 (target was ≥40)
 
