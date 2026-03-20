@@ -197,6 +197,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
+- `agentkit daily-duel` — 🗓️ zero-input daily repo duel (auto-selects contrasting pairs, generates tweet-ready text)
 - `agentkit topic <topic>` — rank top GitHub repos for a topic by agent-readiness (e.g. `python`, `llm`, `agents`)
 - `agentkit topic-duel <topic1> <topic2>` — head-to-head agent-readiness comparison of two GitHub topics (e.g. `fastapi` vs `django`)
 - `agentkit topic-league <topic1> <topic2> ... <topicN>` — multi-topic standings comparison for 2–10 GitHub topics (e.g. `python rust go typescript`)
@@ -433,6 +434,70 @@ agentkit trending --token ghp_xxx
 ```
 
 Output: a ranked Rich table (Rank | Repo | Stars | Score | Grade | URL) and optionally a dark-theme HTML report published to here.now.
+
+## Daily Duel
+
+`agentkit daily-duel` is a zero-input content generator: pick a daily contrasting repo pair, duel them, output tweet-ready text. Designed for automated social media flywheels.
+
+```bash
+# Show today's duel (auto-selects pair by date seed)
+agentkit daily-duel
+
+# Specify a custom seed for reproducibility
+agentkit daily-duel --seed "2026-01-15"
+
+# Override auto-pick with explicit repos
+agentkit daily-duel --pair tiangolo/fastapi pallets/flask
+
+# Include deep-dive redteam dimension
+agentkit daily-duel --deep
+
+# Publish HTML report and include URL in tweet
+agentkit daily-duel --share
+
+# Output only tweet text (for piping to scripts)
+agentkit daily-duel --quiet
+
+# JSON output for automation
+agentkit daily-duel --json
+
+# Preview 7-day schedule without running analysis
+agentkit daily-duel --calendar
+
+# Save HTML report to file
+agentkit daily-duel --output report.html
+```
+
+Example output (terminal):
+
+```
+🗓️  Daily Duel — 2026-03-20
+  tiangolo/fastapi vs pallets/flask  [web-frameworks]
+
+  fastapi  B · 80.5
+  flask    C · 65.2
+
+⚔️  Repo Duel Dimensions
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
+┃ Dimension           ┃ fastapi ┃ Winner ┃  flask ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━┩
+│ Composite Score     │   80.5  │ fastapi│  65.2  │
+│ Context Coverage    │   78.0  │ fastapi│  54.0  │
+│ Test Coverage       │   85.0  │ fastapi│  62.0  │
+│ Lint Score          │   79.0  │ fastapi│  71.0  │
+└─────────────────────┴─────────┴────────┴────────┘
+
+🏆 fastapi wins!  Grade B · 80.5
+
+Tweet-ready
+┌────────────────────────────────────────────────────────────────┐
+│ tiangolo/fastapi vs pallets/flask agent-readiness: fastapi     │
+│ 80/100 (B), flask 65/100 (C). Winner: fastapi on 3/4           │
+│ dimensions.                                                      │
+└────────────────────────────────────────────────────────────────┘
+```
+
+The result is also written to `~/.local/share/agentkit/daily-duel-latest.json` for consumption by automation systems (e.g., x-organic-posts cron).
 
 ## Daily Leaderboard
 
