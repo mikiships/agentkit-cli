@@ -17,7 +17,7 @@ runner = CliRunner()
 
 def test_version_is_0_66_0():
     """Version in __init__.py should be 0.66.0."""
-    assert __version__ == "0.66.0"
+    assert __version__ == "0.67.0"
 
 
 def test_pyproject_version_is_0_66_0():
@@ -26,14 +26,14 @@ def test_pyproject_version_is_0_66_0():
         content = f.read()
     match = re.search(r'version\s*=\s*"([\d.]+)"', content)
     assert match is not None
-    assert match.group(1) == "0.66.0"
+    assert match.group(1) == "0.67.0"
 
 
 def test_changelog_mentions_v0_66_0():
     """CHANGELOG.md should document v0.66.0."""
     with open("CHANGELOG.md") as f:
         content = f.read()
-    assert "0.66.0" in content
+    assert "0.67.0" in content
     assert "user-team" in content.lower()
 
 
@@ -50,7 +50,7 @@ def test_build_report_exists():
     with open("BUILD-REPORT.md") as f:
         content = f.read()
     assert content
-    assert "0.66.0" in content
+    assert "0.67.0" in content
 
 
 def test_user_team_command_help():
@@ -64,7 +64,7 @@ def test_version_command_returns_0_66_0():
     """agentkit --version should return 0.66.0."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "0.66.0" in result.output
+    assert "0.67.0" in result.output
 
 
 def test_user_team_files_exist():

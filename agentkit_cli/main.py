@@ -65,6 +65,7 @@ from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
 from agentkit_cli.commands.user_improve_cmd import user_improve_command
 from agentkit_cli.commands.user_card_cmd import user_card_command
 from agentkit_cli.commands.user_team_cmd import user_team_command
+from agentkit_cli.commands.user_rank_cmd import user_rank_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -161,9 +162,10 @@ def run(
     run_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Run user tournament after pipeline (format: user1:user2:...)"),
     run_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Run user-improve after pipeline (format: github:<user>)"),
     run_user_card: Optional[str] = typer.Option(None, "--user-card", help="Run user-card after pipeline (format: github:<user>)"),
+    run_user_rank_topic: Optional[str] = typer.Option(None, "--topic", help="Run user-rank for topic after pipeline (e.g. python)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic)
     if run_digest:
         from agentkit_cli.digest import DigestEngine
         from agentkit_cli.digest_report import DigestReportRenderer
@@ -1318,6 +1320,30 @@ def user_team(
     """🏢  Analyze a GitHub org's top contributors for agent-readiness."""
     user_team_command(
         target=target,
+        limit=limit,
+        json_output=json_output,
+        share=share,
+        quiet=quiet,
+        output=output,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("user-rank")
+def user_rank(
+    topic: str = typer.Argument(..., help="GitHub topic to search (e.g. python, rust, llm)"),
+    limit: int = typer.Option(20, "--limit", help="Max contributors to rank (default 20)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit UserRankResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress output"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-user scorecard timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🏆  Rank top GitHub contributors for a topic by agent-readiness."""
+    user_rank_command(
+        topic=topic,
         limit=limit,
         json_output=json_output,
         share=share,

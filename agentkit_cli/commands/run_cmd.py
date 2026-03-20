@@ -98,6 +98,7 @@ def run_command(
     user_tournament: Optional[str] = None,
     user_improve: Optional[str] = None,
     user_card: Optional[str] = None,
+    user_rank_topic: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -805,6 +806,17 @@ def run_command(
                 console.print(f"\n[bold]User Card:[/bold] @{_uc_user} — Grade {_uc_result.grade}, avg {_uc_result.avg_score:.1f}")
         except Exception as _uc_exc:
             summary["user_card"] = {"error": str(_uc_exc)}
+
+    if user_rank_topic:
+        try:
+            from agentkit_cli.user_rank import UserRankEngine
+            _ur_engine = UserRankEngine(topic=user_rank_topic.strip())
+            _ur_result = _ur_engine.run()
+            summary["user_rank"] = _ur_result.to_dict()
+            if not ci and not json_output:
+                console.print(f"\n[bold]User Rank:[/bold] topic={user_rank_topic} — Top: @{_ur_result.top_scorer}, Mean {_ur_result.mean_score:.1f}")
+        except Exception as _ur_exc:
+            summary["user_rank"] = {"error": str(_ur_exc)}
 
     if json_output:
         print(json.dumps(summary, indent=2))

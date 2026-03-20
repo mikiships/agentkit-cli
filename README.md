@@ -193,6 +193,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit analyze <target>` — analyze any GitHub repo
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
+- `agentkit user-rank <topic>` — rank top GitHub contributors for a topic by agent-readiness (e.g. `python`, `rust`, `llm`)
 - `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
 - `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]` — bracket-style agent-readiness tournament for N GitHub developers
 - `agentkit tournament <repo1> ... <repoN>` — round-robin bracket across 4-16 repos
@@ -1184,6 +1185,29 @@ agentkit checks status              # show last check run posted
 - **Annotations:** one annotation per failing tool (score < 80)
 - **Linked scorecard** if `--share` is active
 
+## `agentkit user-rank`: State of Agent Readiness by Topic
+
+`agentkit user-rank <topic>` discovers the top GitHub contributors building in a topic/language and ranks them by agent-readiness score. Produces a "State of Agent Readiness in `<topic>`" report.
+
+```bash
+# Rank top Python contributors by agent-readiness
+agentkit user-rank python
+
+# Limit to top 10 and output JSON
+agentkit user-rank rust --limit 10 --json
+
+# Save HTML report to file
+agentkit user-rank llm --output report.html
+
+# Publish shareable link
+agentkit user-rank go --share
+
+# Quiet mode for CI/scripting
+agentkit user-rank python --quiet
+```
+
+The output includes: ranked table with scores and grades, grade distribution, top-scorer spotlight, and mean score across all contributors. Share the dark-theme HTML report with `--share` to publish a `here.now` link.
+
 ## User Duel: Head-to-Head Developer Comparison
 
 `agentkit user-duel` compares two GitHub developers' agent-readiness side-by-side. It runs `user-scorecard` for each and declares a winner per dimension.
@@ -1246,6 +1270,34 @@ agentkit user-team github:pallets --share
 ```
 
 Use `--quiet` for CI-friendly output (only prints share URL if --share is set).
+
+## `agentkit user-rank`
+
+`agentkit user-rank` discovers top GitHub contributors for a topic/language and ranks them by agent-readiness. Each contributor is scored via `UserScorecardEngine`, then ranked into a "State of Agent Readiness in `<topic>`" report with ranked table, mean score, grade distribution, and top-scorer spotlight.
+
+```bash
+# Rank top 20 Python contributors by agent-readiness
+agentkit user-rank python
+
+# Rank top 10 Rust contributors
+agentkit user-rank rust --limit 10
+
+# Output as JSON
+agentkit user-rank python --json
+
+# Save HTML report to file
+agentkit user-rank python --output report.html
+
+# Publish and share HTML report to here.now
+agentkit user-rank python --share
+```
+
+Use `--quiet` for CI-friendly output (only prints share URL if --share is set).
+
+Use `--topic <topic>` in `agentkit run` to include user-rank in the pipeline:
+```bash
+agentkit run --topic python
+```
 
 ## `agentkit user-improve`
 
