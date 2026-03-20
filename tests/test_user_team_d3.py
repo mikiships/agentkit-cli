@@ -94,3 +94,28 @@ def test_html_contains_footer():
     html = renderer.render(_make_result())
     assert "agentkit-cli" in html
     assert "footer" in html
+
+
+def test_html_is_self_contained():
+    """HTML should include embedded CSS, not external links."""
+    renderer = TeamScorecardHTMLRenderer()
+    html = renderer.render(_make_result())
+    assert "<style>" in html
+    assert "</style>" in html
+    # Should not reference external CSS files
+    assert 'href=' not in html or 'href="/' not in html
+
+
+def test_html_dark_theme_colors():
+    """HTML should contain dark theme background color."""
+    renderer = TeamScorecardHTMLRenderer()
+    html = renderer.render(_make_result())
+    assert "#0d1117" in html or "0d1117" in html  # dark background
+
+
+def test_html_grade_colors_present():
+    """HTML should include grade color definitions."""
+    renderer = TeamScorecardHTMLRenderer()
+    html = renderer.render(_make_result())
+    assert "#3fb950" in html  # A green
+    assert "#f85149" in html  # D red

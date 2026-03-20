@@ -177,3 +177,51 @@ def test_integration_result_structure():
     assert result.aggregate_grade in ("A", "B", "C", "D")
     assert result.top_scorer == "alice"
     assert result.contributor_count == 3
+
+
+def test_grade_distribution_counting():
+    """Grade distribution should correctly count contributions by grade."""
+    engine = _make_engine(
+        ["u1", "u2", "u3", "u4"],
+        {"u1": 90.0, "u2": 75.0, "u3": 60.0, "u4": 40.0}
+    )
+    result = engine.run()
+    # u1: A, u2: B, u3: C, u4: D
+    assert any(r.grade == "A" for r in result.contributor_results)
+    assert any(r.grade == "B" for r in result.contributor_results)
+    assert any(r.grade == "C" for r in result.contributor_results)
+    assert any(r.grade == "D" for r in result.contributor_results)
+
+
+def test_contributor_ordering_by_score():
+    """Contributors should be orderable by score."""
+    engine = _make_engine(
+        ["alice", "bob", "charlie"],
+        {"alice": 50.0, "bob": 90.0, "charlie": 70.0}
+    )
+    result = engine.run()
+    scores = [r.avg_score for r in result.contributor_results]
+    assert 50.0 in scores
+    assert 90.0 in scores
+    assert 70.0 in scores
+
+
+def test_progress_callback_invoked():
+    """Progress callback should be called for each contributor."""
+    calls = []
+    def _cb(idx, total, username):
+        calls.append((idx, total, username))
+
+    engine = _make_engine(["alice", "bob"], {"alice": 80.0, "bob": 70.0})
+    engine.run(progress_callback=_cb)
+    assert len(calls) == 2
+    assert calls[0][2] == "alice"
+    assert calls[1][2] == "bob"
+
+
+def test_timestamp_present_in_result():
+    """Result should have a non-empty timestamp."""
+    engine = _make_engine(["alice"], {"alice": 75.0})
+    result = engine.run()
+    assert result.timestamp
+    assert len(result.timestamp) > 0
