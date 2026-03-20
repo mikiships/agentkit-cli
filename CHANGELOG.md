@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.70.0] - 2026-03-20
+
+### Added
+- `agentkit topic-league <topic1> <topic2> ... <topicN>` — multi-topic standings comparison for 2–10 GitHub topics
+- `TopicLeagueEngine` in `agentkit_cli/engines/topic_league.py` — fetch top repos for each topic via `TopicRankEngine`, compute aggregate scores, rank into standings
+- `LeagueResult` dataclass with rank, topic, score, repo_count, top_repo, score_distribution (min/mean/max)
+- `TopicLeagueHTMLRenderer` in `agentkit_cli/renderers/topic_league_html.py` — dark-theme HTML report with standings table (rank/topic/score bar/grade), per-topic detail cards, footer
+- `--repos-per-topic N` (default 5, max 10), `--parallel`, `--json`, `--quiet`, `--output FILE`, `--share` options
+- `agentkit run --topic-league "python rust go"` — optional topic-league step appended to the run pipeline
+- GITHUB_TOKEN guard: warns without crashing when token is missing
+- 50 new tests across 5 test files (D1–D5)
+
 ## [0.69.0] - 2026-03-20
 
 ### Added
