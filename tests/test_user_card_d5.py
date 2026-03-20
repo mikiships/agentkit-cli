@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_is_0_64_0():
     import agentkit_cli
-    assert agentkit_cli.__version__ == "0.64.0"
+    assert agentkit_cli.__version__ == "0.65.0"
 
 
 def test_pyproject_version_is_0_64_0():
@@ -18,7 +18,7 @@ def test_pyproject_version_is_0_64_0():
     pyproject = REPO_ROOT / "pyproject.toml"
     with open(pyproject, "rb") as f:
         data = tomllib.load(f)
-    assert data["project"]["version"] == "0.64.0"
+    assert data["project"]["version"] == "0.65.0"
 
 
 def test_changelog_has_0_64_0():

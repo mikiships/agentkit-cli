@@ -31,6 +31,7 @@ def user_scorecard_command(
     quiet: bool = False,
     timeout: int = 60,
     token: Optional[str] = None,
+    badge: bool = False,
 ) -> None:
     """Fetch all public repos for a GitHub user and generate an agent-readiness profile card."""
     # Parse github:<user> or bare <user>
@@ -104,6 +105,16 @@ def user_scorecard_command(
     if pages:
         pages_url = _push_to_pages(html, pages, username, resolved_token, quiet=quiet, json_output=json_output)
 
+    # Badge generation
+    badge_url: Optional[str] = None
+    badge_markdown: Optional[str] = None
+    if badge or json_output:
+        from agentkit_cli.user_badge import UserBadgeEngine as _BadgeEngine
+        _be = _BadgeEngine()
+        _br = _be.run(user=username, score=result.avg_score, grade=result.grade)
+        badge_url = _br.badge_url
+        badge_markdown = _br.badge_markdown
+
     # JSON output
     if json_output:
         out = result.to_dict()
@@ -111,7 +122,9 @@ def user_scorecard_command(
             out["share_url"] = share_url
         if pages_url:
             out["pages_url"] = pages_url
-        console.print(json.dumps(out, indent=2))
+        if badge_url:
+            out["badge_url"] = badge_url
+        print(json.dumps(out, indent=2))
         return
 
     # Quiet: only URL
@@ -124,6 +137,10 @@ def user_scorecard_command(
 
     # Rich terminal output
     _print_rich_summary(result, share_url=share_url, pages_url=pages_url)
+
+    # --badge: print badge markdown
+    if badge and badge_markdown:
+        console.print(f"\n[bold]Agent-Readiness Badge:[/bold]\n{badge_markdown}\n")
 
 
 def _push_to_pages(

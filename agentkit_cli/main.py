@@ -59,6 +59,7 @@ from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
 from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
+from agentkit_cli.commands.user_badge_cmd import user_badge_command
 from agentkit_cli.commands.user_duel_cmd import user_duel_command
 from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
 from agentkit_cli.commands.user_improve_cmd import user_improve_command
@@ -1224,6 +1225,7 @@ def user_scorecard(
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Print only final URL (for cron/scripting)"),
     timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout in seconds (default: 60)"),
     token: Optional[str] = typer.Option(None, "--token", help="GitHub token (overrides GITHUB_TOKEN env var)"),
+    badge: bool = typer.Option(False, "--badge", help="Print agent-readiness badge markdown after scorecard"),
 ) -> None:
     """🧑‍💻 Generate an agent-readiness profile card for a GitHub user's public repos."""
     user_scorecard_command(
@@ -1237,6 +1239,7 @@ def user_scorecard(
         quiet=quiet,
         timeout=timeout,
         token=token,
+        badge=badge,
     )
 
 
@@ -1333,6 +1336,7 @@ def user_card(
     quiet: bool = typer.Option(False, "--quiet", help="Print only the share URL (cron-friendly)"),
     timeout: int = typer.Option(60, "--timeout", help="Per-repo analysis timeout in seconds"),
     token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+    badge: bool = typer.Option(False, "--badge", help="Print agent-readiness badge markdown after card"),
 ) -> None:
     """🃏  Generate a compact embeddable agent-readiness card for a GitHub user."""
     user_card_command(
@@ -1344,6 +1348,35 @@ def user_card(
         json_output=json_output,
         quiet=quiet,
         timeout=timeout,
+        token=token,
+        badge=badge,
+    )
+
+
+@app.command("user-badge")
+def user_badge(
+    target: str = typer.Argument(..., help="GitHub user: github:<user> or bare <user>"),
+    score: Optional[float] = typer.Option(None, "--score", help="Skip scan, generate badge for this score directly"),
+    grade: Optional[str] = typer.Option(None, "--grade", help="Explicit grade (A/B/C/D/F), used with --score"),
+    output: Optional[str] = typer.Option(None, "--output", help="Write badge markdown to this file"),
+    share: bool = typer.Option(False, "--share", help="Publish scorecard HTML to here.now, print URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output machine-readable JSON result"),
+    inject: bool = typer.Option(False, "--inject", help="Auto-inject badge into local README.md"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be injected, no file changes"),
+    limit: int = typer.Option(20, "--limit", help="Max repos to analyze when running full scan"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🏅  Generate an agent-readiness badge for a GitHub user's profile README."""
+    user_badge_command(
+        target=target,
+        score=score,
+        grade=grade,
+        output=output,
+        share=share,
+        json_output=json_output,
+        inject=inject,
+        dry_run=dry_run,
+        limit=limit,
         token=token,
     )
 

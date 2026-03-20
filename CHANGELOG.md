@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.65.0] - 2026-03-19
+
+### Added
+- `agentkit user-badge github:<user>`: new command — generate a shields.io agent-readiness badge for any GitHub user's profile README
+- `UserBadgeEngine` (`agentkit_cli/user_badge.py`): core engine for badge URL generation, README markdown, anybadge-compatible JSON
+- `--score N` fast mode: skip GitHub scan, generate badge from provided score directly
+- `--grade A` explicit grade override
+- `--output FILE`: write badge markdown to file
+- `--share`: publish user-scorecard HTML to here.now
+- `--inject`: auto-inject badge into local README.md (idempotent, sentinel-based)
+- `--dry-run`: preview inject without modifying files
+- `--badge` flag on `agentkit user-scorecard`: prints badge markdown after scorecard output; adds `badge_url` to JSON
+- `--badge` flag on `agentkit user-card`: prints badge markdown after card output; adds `badge_url` to JSON
+- Badge grade thresholds: A≥90 (brightgreen), B≥75 (green), C≥60 (yellow), D≥45 (orange), F<45 (red)
+
 ## [0.64.0] - 2026-03-19
 
 ### Added

@@ -33,6 +33,7 @@ def user_card_command(
     quiet: bool = False,
     timeout: int = 60,
     token: Optional[str] = None,
+    badge: bool = False,
 ) -> None:
     """Generate a compact embeddable agent-readiness card for a GitHub user."""
     if target.startswith("github:"):
@@ -110,12 +111,24 @@ def user_card_command(
             if not json_output and not quiet:
                 console.print(f"\n[bold green]Card published:[/bold green] {share_url}")
 
+    # Badge generation
+    badge_url: Optional[str] = None
+    badge_markdown: Optional[str] = None
+    if badge or json_output:
+        from agentkit_cli.user_badge import UserBadgeEngine as _BadgeEngine
+        _be = _BadgeEngine()
+        _br = _be.run(user=result.username, score=result.avg_score, grade=result.grade)
+        badge_url = _br.badge_url
+        badge_markdown = _br.badge_markdown
+
     # JSON output
     if json_output:
         out = result.to_dict()
         if share_url:
             out["share_url"] = share_url
-        console.print(json.dumps(out, indent=2))
+        if badge_url:
+            out["badge_url"] = badge_url
+        print(json.dumps(out, indent=2))
         return
 
     # Quiet: only URL
@@ -126,6 +139,10 @@ def user_card_command(
 
     # Rich terminal output
     _print_rich_card(result, share_url=share_url)
+
+    # --badge: print badge markdown
+    if badge and badge_markdown:
+        console.print(f"\n[bold]Agent-Readiness Badge:[/bold]\n{badge_markdown}\n")
 
 
 def _print_rich_card(result, share_url: Optional[str] = None) -> None:

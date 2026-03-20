@@ -1269,3 +1269,37 @@ agentkit user-card github:mikiships --no-skip-forks --limit 20
 ```
 
 Use `--limit N` (default 10, max 30) to control how many repos are analyzed. The HTML card includes a Markdown embed snippet as an HTML comment when `--share` is used.
+
+## `agentkit user-badge`
+
+`agentkit user-badge` generates a shields.io agent-readiness badge for a GitHub user's profile README — a viral mechanic for spreading agent-readiness awareness organically.
+
+```bash
+# Generate badge (runs full scorecard scan)
+agentkit user-badge github:torvalds
+
+# Fast mode — skip scan, generate from explicit score
+agentkit user-badge github:torvalds --score 85
+
+# Inject badge into local README.md (idempotent)
+agentkit user-badge github:torvalds --score 85 --inject
+
+# Preview inject without modifying files
+agentkit user-badge github:torvalds --score 85 --inject --dry-run
+
+# Write badge markdown to file
+agentkit user-badge github:torvalds --score 85 --output badge.md
+
+# JSON output
+agentkit user-badge github:torvalds --score 85 --json
+
+# Show badge after scorecard
+agentkit user-scorecard github:torvalds --badge
+
+# Show badge after user-card
+agentkit user-card github:torvalds --badge
+```
+
+Badge grades: A≥90 (brightgreen), B≥75 (green), C≥60 (yellow), D≥45 (orange), F<45 (red).
+
+Example badge: `[![Agent Readiness](https://img.shields.io/badge/agent--readiness-A%20%2892%2F100%29-brightgreen?style=flat-square)](https://pypi.org/project/agentkit-cli/)`
