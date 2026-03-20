@@ -73,6 +73,7 @@ from agentkit_cli.commands.repo_duel_cmd import repo_duel_command
 from agentkit_cli.commands.topic_league_cmd import topic_league_command
 from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
 from agentkit_cli.commands.spotlight_cmd import spotlight_command
+from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1722,6 +1723,34 @@ def _show_spotlight_feed(json_output: bool = False, db_path=None) -> None:
         ts = r.get("timestamp", "")[:19]
         table.add_row(repo, f"{score:.1f}", ts)
     console.print(table)
+
+
+@app.command("daily-duel")
+def daily_duel(
+    seed: Optional[str] = typer.Option(None, "--seed", help="Custom seed string (default: today YYYY-MM-DD)"),
+    deep: bool = typer.Option(False, "--deep", help="Include redteam dimension"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML report and include URL in tweet"),
+    json_output: bool = typer.Option(False, "--json", help="Print DailyDuelResult as JSON"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
+    pair: Optional[List[str]] = typer.Option(None, "--pair", help="Override auto-pick with explicit REPO1 REPO2"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress rich output, only print tweet_text"),
+    calendar: bool = typer.Option(False, "--calendar", help="Show 7-day schedule preview (no analysis)"),
+    timeout: int = typer.Option(120, "--timeout", hidden=True),
+    token: Optional[str] = typer.Option(None, "--token", hidden=True),
+) -> None:
+    """🗓️  Daily Duel: auto-selects contrasting repos, duels them, outputs tweet-ready text."""
+    daily_duel_command(
+        seed=seed,
+        deep=deep,
+        share=share,
+        json_output=json_output,
+        output=output,
+        pair=pair,
+        quiet=quiet,
+        calendar=calendar,
+        timeout=timeout,
+        token=token,
+    )
 
 
 @app.callback(invoke_without_command=True)

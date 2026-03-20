@@ -1452,3 +1452,48 @@ agentkit user-card github:torvalds --badge
 Badge grades: A≥90 (brightgreen), B≥75 (green), C≥60 (yellow), D≥45 (orange), F<45 (red).
 
 Example badge: `[![Agent Readiness](https://img.shields.io/badge/agent--readiness-A%20%2892%2F100%29-brightgreen?style=flat-square)](https://pypi.org/project/agentkit-cli/)`
+
+## `agentkit daily-duel` — Zero-Input Daily Repo Comparison
+
+`agentkit daily-duel` automatically selects two contrasting GitHub repos, runs a head-to-head agent-readiness duel, and outputs tweet-ready text. No arguments required — the pair is deterministically chosen from 20+ presets based on today's date.
+
+```bash
+# Run today's daily duel (auto-selects pair)
+agentkit daily-duel
+
+# Use a custom seed for reproducibility
+agentkit daily-duel --seed 2026-03-20
+
+# Override the pair manually
+agentkit daily-duel --pair tiangolo/fastapi pallets/flask
+
+# Deep mode (includes redteam dimension)
+agentkit daily-duel --deep
+
+# Print JSON result
+agentkit daily-duel --json
+
+# Quiet mode — only print tweet text
+agentkit daily-duel --quiet
+
+# Upload HTML report and include URL in tweet
+agentkit daily-duel --share
+
+# Write HTML report to file
+agentkit daily-duel --output report.html
+
+# Show 7-day schedule preview (no analysis)
+agentkit daily-duel --calendar
+```
+
+Output includes:
+- Side-by-side duel table (scores, grades, dimension winners)
+- Tweet-ready text (≤280 chars): `{repo1} vs {repo2} agent-readiness: ...`
+- JSON written to `~/.local/share/agentkit/daily-duel-latest.json` (for cron/automation)
+
+**Preset categories:** web-frameworks, http-clients, ml-ai, testing, async-networking, databases, js-frameworks, devtools (20+ pairs).
+
+Example tweet output:
+```
+tiangolo/fastapi vs pallets/flask agent-readiness: tiangolo/fastapi 82/100 (B), pallets/flask 71/100 (B). Winner: tiangolo/fastapi on 3/4 dimensions.
+```

@@ -21,7 +21,7 @@ def test_pyproject_version_is_0_62_0():
 
 def test_changelog_has_0_62_0():
     changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
-    assert "[0.62.0]" in changelog
+    assert "[0.75.0]" in changelog
 
 
 def test_changelog_mentions_user_tournament():

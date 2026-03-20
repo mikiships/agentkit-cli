@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.75.0] - 2026-03-20
+
+### Added
+- `agentkit daily-duel`: zero-input command that auto-selects contrasting GitHub repo pairs (20+ presets across web-frameworks, http-clients, ml-ai, testing, devtools, js-frameworks), runs a repo duel, and outputs tweet-ready text (≤280 chars)
+- `DailyDuelEngine` with deterministic `pick_pair(seed)` (default = today's date) and `run_daily_duel()`
+- `DailyDuelResult` extending `RepoDuelResult` with `tweet_text`, `pair_category`, `seed`
+- `--calendar` flag: shows 7-day schedule preview as a Rich table (no analysis)
+- `--pair REPO1 REPO2`: override auto-pick with explicit repos
+- `--seed`, `--deep`, `--share`, `--json`, `--output`, `--quiet` flags
+- Writes `~/.local/share/agentkit/daily-duel-latest.json` on every run (for cron consumption)
+- History DB integration with label `daily_duel`
+
 ## [0.74.0] - 2026-03-20
 
 ### Added

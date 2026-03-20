@@ -1,48 +1,50 @@
-# Build Progress Log: agentkit-cli v0.50.0
+# Progress Log — agentkit-cli v0.75.0 daily-duel
 
-## D1 + D2 — COMPLETE (2026-03-18)
+## D1: DailyDuelEngine ✅ — 2026-03-20
 
-### D1: LlmsTxtGenerator core
-- `agentkit_cli/llmstxt.py`: LlmsTxtGenerator class with scan_repo(), generate_llms_txt(), generate_llms_full_txt()
-- Also includes validate_llms_txt() and score_llms_txt() (used by D4)
-- RepoInfo and DocFile dataclasses
-- Tests: 30 tests in tests/test_llmstxt.py — all passing
+**File:** `agentkit_cli/daily_duel.py`
 
-### D2: `agentkit llmstxt` CLI command
-- `agentkit_cli/commands/llmstxt_cmd.py`: full command with --full, --output, --json, --share, --validate, --score
-- github:owner/repo clone support
-- Wired into agentkit_cli/main.py
-- Tests: 15 tests in tests/test_llmstxt_cmd.py — all passing
+Implemented:
+- 23 preset contrasting repo pairs across 8 categories
+- `pick_pair(seed)` deterministic via SHA-256 → index
+- `DailyDuelResult` dataclass extending `RepoDuelResult`
+- `run_daily_duel(seed, deep)` delegating to RepoDuelEngine
+- `tweet_text` generation ≤280 chars
+- Atomic JSON write to `~/.local/share/agentkit/daily-duel-latest.json`
+- `calendar(days)` helper
 
-### Test count after D1+D2 commit: 2228 (baseline: 2183, +45)
+Tests: 22 (test_daily_duel_d1.py) — all green
 
----
+## D2: CLI Command ✅ — 2026-03-20
 
-## D3 — COMPLETE (2026-03-18)
+**File:** `agentkit_cli/commands/daily_duel_cmd.py`
+**Wired:** `agentkit_cli/main.py`
 
-- `agentkit run --llmstxt`: generates llms.txt after pipeline, stores metadata in JSON
-- `agentkit report --llmstxt`: HTML llms.txt quality card
-- `agentkit doctor`: context.llmstxt readiness check
-- Tests: 11 tests in tests/test_run_llmstxt.py — all passing
-- Test count after D3: 2239
+Implemented:
+- `daily_duel_command()` with all flags
+- `--calendar` Rich table preview
+- `--pair` explicit override
+- `--share` upload + tweet URL append
+- `--json` / `--quiet` / `--output` / `--seed` / `--deep`
+- History DB save (label: `daily_duel`)
+- Tweet Panel in rich output
 
----
+Tests: 10 (test_daily_duel_d2.py) — all green
 
-## D4 — COMPLETE (2026-03-18)
+## D3: Docs & Version Bump ✅ — 2026-03-20
 
-- validate_llms_txt() and score_llms_txt() already implemented in D1
-- Tests: 15 tests in tests/test_llmstxt_validate.py — all passing
-- Test count after D4: 2239 (tests existed, added new file)
+Implemented:
+- `agentkit_cli/__init__.py`: 0.74.0 → 0.75.0
+- `pyproject.toml`: 0.74.0 → 0.75.0
+- `CHANGELOG.md`: v0.75.0 entry
+- `README.md`: daily-duel section
+- `BUILD-REPORT.md`: updated (preserving v0.74.0 content + adding v0.75.0)
+- `BUILD-REPORT-v0.75.0.md`: versioned copy
 
----
+Tests: 7 (test_daily_duel_d3.py) — all green
 
-## D5 — COMPLETE (2026-03-18)
+## Final Status
 
-- README: Added `agentkit llmstxt` section with examples
-- CHANGELOG: v0.50.0 entry
-- Version bumped: 0.49.0 → 0.50.0
-- BUILD-REPORT.md written
-- All deliverables complete
-
-### Final test count: TBD (after full suite run)
-
+- New tests: 39
+- Total tests: 3782+
+- Zero regressions

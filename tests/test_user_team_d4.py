@@ -30,7 +30,7 @@ def test_pyproject_version_is_0_66_0():
 
 
 def test_changelog_mentions_v0_66_0():
-    """CHANGELOG.md should document user-team (v0.66.0 feature)."""
+    """CHANGELOG.md should document user-team (v0.75.0 feature)."""
     with open("CHANGELOG.md") as f:
         content = f.read()
     assert "user-team" in content.lower()
