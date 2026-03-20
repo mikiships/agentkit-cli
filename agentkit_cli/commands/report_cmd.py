@@ -438,6 +438,7 @@ def report_command(
     user_duel: Optional[str] = None,
     user_tournament: Optional[str] = None,
     user_improve: Optional[str] = None,
+    user_card: Optional[str] = None,
 ) -> None:  # noqa: D401
     """Run all toolkit checks and generate an agent quality report."""
     cwd = path or Path.cwd()
@@ -628,3 +629,24 @@ def report_command(
                 results["user_improve"] = {"error": str(_ui_exc)}
             else:
                 console.print(f"[yellow]Warning: user-improve failed — {_ui_exc}[/yellow]")
+
+
+    if user_card:
+        try:
+            from agentkit_cli.user_card import UserCardEngine
+            _uc_target = user_card.strip()
+            if _uc_target.startswith("github:"):
+                _uc_user = _uc_target[len("github:"):]
+            else:
+                _uc_user = _uc_target
+            _uc_engine = UserCardEngine()
+            _uc_result = _uc_engine.run(_uc_user)
+            if json_output:
+                results["user_card"] = _uc_result.to_dict()
+            else:
+                console.print(f"\n[bold]User Card:[/bold] @{_uc_user} — Grade {_uc_result.grade}, avg {_uc_result.avg_score:.1f}")
+        except Exception as _uc_exc:
+            if json_output:
+                results["user_card"] = {"error": str(_uc_exc)}
+            else:
+                console.print(f"[yellow]Warning: user-card failed — {_uc_exc}[/yellow]")

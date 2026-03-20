@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.64.0] - 2026-03-19
+
+### Added
+- `agentkit user-card github:<user>`: new command — generate a compact, embeddable agent-readiness card for a GitHub user, showing grade, score, context coverage, and top repo in a dark-theme HTML card
+- `UserCardEngine` (`agentkit_cli/user_card.py`): core engine — lightweight wrapper over `UserScorecardEngine` that distils scorecard data into a compact `UserCardResult`
+- `UserCardResult` dataclass with full `to_dict()` schema: username, avatar_url, grade, avg_score, total_repos, analyzed_repos, context_coverage_pct, top_repo_name, top_repo_score, agent_ready_count, summary_line
+- `UserCardHTMLRenderer` (`agentkit_cli/renderers/user_card_html.py`): 400px dark-theme HTML card with avatar, grade badge, stats row, top-repo chip, and footer; includes Markdown embed snippet as HTML comment when `--share` used
+- `upload_user_card`: upload card HTML to here.now, return URL
+- `--limit N` (default 10, max 30): max repos to analyze
+- `--min-stars N` (default 0): skip repos below star count
+- `--skip-forks / --no-skip-forks` (default: True): exclude forked repos
+- `--share`: publish HTML card to here.now
+- `--json`: emit `UserCardResult` as JSON
+- `--quiet`: print only the share URL (cron-friendly)
+- `--user-card github:<user>` flag on `agentkit run`: triggers user-card after pipeline
+- `--user-card github:<user>` flag on `agentkit report`: includes user-card section in report output
+- History DB: each user-card run recorded as a row in `runs` table with `tool="user-card"`
+
 ## [0.63.0] - 2026-03-19
 
 ### Added
