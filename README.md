@@ -195,6 +195,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
 - `agentkit topic <topic>` — rank top GitHub repos for a topic by agent-readiness (e.g. `python`, `llm`, `agents`)
 - `agentkit topic-duel <topic1> <topic2>` — head-to-head agent-readiness comparison of two GitHub topics (e.g. `fastapi` vs `django`)
+- `agentkit topic-league <topic1> <topic2> ... <topicN>` — multi-topic standings comparison for 2–10 GitHub topics (e.g. `python rust go typescript`)
 - `agentkit user-rank <topic>` — rank top GitHub contributors for a topic by agent-readiness (e.g. `python`, `rust`, `llm`)
 - `agentkit user-duel github:<user1> github:<user2>` — head-to-head agent-readiness comparison between two GitHub developers
 - `agentkit user-tournament github:<u1> github:<u2> [github:<uN>...]` — bracket-style agent-readiness tournament for N GitHub developers
