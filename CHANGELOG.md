@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.72.0] - 2026-03-20
+
+### Added
+- `agentkit spotlight` command — Repo of the Day: auto-select trending repo, deep-dive analyze, shareable dark-theme HTML report
+- SpotlightEngine with candidate selection (avoids re-spotlighting), GitHub metadata enrichment, history DB recording
+- SpotlightHTMLRenderer with dark-theme report including score, grade, findings, stars, language
+- `--deep` flag for optional redteam + certify analysis
+- `--topic` and `--language` filters for candidate auto-selection
+- `--share` publishes HTML report to here.now
+- `history --spotlights` flag to filter spotlight runs
+- `report --spotlight-feed` flag for spotlight run feed
+- `check_spotlight_github_access()` doctor check for GitHub API reachability
+
 ## [0.71.0] - 2026-03-20
 
 ### Added

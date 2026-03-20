@@ -70,6 +70,7 @@ from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
 from agentkit_cli.commands.topic_duel_cmd import topic_duel_command
 from agentkit_cli.commands.topic_league_cmd import topic_league_command
 from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
+from agentkit_cli.commands.spotlight_cmd import spotlight_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -277,8 +278,13 @@ def report(
     report_user_tournament: Optional[str] = typer.Option(None, "--user-tournament", help="Include user tournament section (format: user1:user2:...)"),
     report_user_improve: Optional[str] = typer.Option(None, "--user-improve", help="Include user-improve section (format: github:<user>)"),
     report_user_card: Optional[str] = typer.Option(None, "--user-card", help="Include user-card section (format: github:<user>)"),
+    spotlight_feed: bool = typer.Option(False, "--spotlight-feed", help="Show spotlight run feed instead of project report"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
 ) -> None:
     """Run all toolkit checks and generate a self-contained HTML quality report."""
+    if spotlight_feed:
+        _show_spotlight_feed(json_output=json_output, db_path=db_path)
+        return
     report_command(path=path, json_output=json_output, output=output, open_browser=open_browser, publish=publish, inject_readme=inject_readme, share=share, llmstxt=report_llmstxt, user_duel=report_user_duel, user_tournament=report_user_tournament, user_improve=report_user_improve, user_card=report_user_card)
     if report_digest:
         from agentkit_cli.digest import DigestEngine
@@ -415,8 +421,12 @@ def history(
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
     campaigns: bool = typer.Option(False, "--campaigns", help="Show campaign-grouped summary"),
     campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Show all PRs from a specific campaign"),
+    spotlights: bool = typer.Option(False, "--spotlights", help="Show only spotlight runs"),
 ) -> None:
     """Show agent quality score history and trends."""
+    if spotlights:
+        _show_spotlight_history(limit=limit, json_output=json_output, db_path=db_path)
+        return
     history_command(
         limit=limit,
         tool=tool,
@@ -1555,6 +1565,118 @@ def user_badge(
         limit=limit,
         token=token,
     )
+
+
+@app.command("spotlight")
+def spotlight(
+    target: Optional[str] = typer.Argument(None, help="Target repo: owner/repo or github:owner/repo (auto-selects from trending if omitted)"),
+    topic: Optional[str] = typer.Option(None, "--topic", help="Topic filter for auto-selection (e.g. 'machine-learning')"),
+    language: Optional[str] = typer.Option(None, "--language", help="Language filter for auto-selection (e.g. 'python')"),
+    deep: bool = typer.Option(False, "--deep", help="Run redteam + certify in addition to analyze"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of rich terminal display"),
+    output: Optional[str] = typer.Option(None, "--output", help="Write HTML report to file"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress terminal output"),
+    no_history: bool = typer.Option(False, "--no-history", help="Don't record this run to history DB"),
+) -> None:
+    """🔦  Repo of the Day: pick a trending repo, deep-dive analyze, shareable report."""
+    spotlight_command(
+        target=target,
+        topic=topic,
+        language=language,
+        deep=deep,
+        share=share,
+        json_output=json_output,
+        output=output,
+        quiet=quiet,
+        no_history=no_history,
+    )
+
+
+def _show_spotlight_history(limit: int = 10, json_output: bool = False, db_path=None) -> None:
+    """Show only spotlight runs from history DB."""
+    from agentkit_cli.history import HistoryDB
+    import json as _json
+    from rich.console import Console
+    from rich.table import Table
+
+    db = HistoryDB(db_path) if db_path else HistoryDB()
+    rows = db.get_history(tool="spotlight", limit=limit)
+
+    if not rows:
+        if json_output:
+            print("[]")
+        else:
+            Console().print("[dim]No spotlight runs found.[/dim]")
+        return
+
+    if json_output:
+        out = []
+        for r in rows:
+            out.append({
+                "project": r.get("project", ""),
+                "repo": r.get("project", "").removeprefix("spotlight:"),
+                "score": r.get("score", 0),
+                "label": r.get("label", ""),
+                "timestamp": r.get("timestamp", ""),
+                "details": r.get("details", {}),
+            })
+        print(_json.dumps(out, indent=2))
+        return
+
+    console = Console()
+    table = Table(title="Spotlight Runs")
+    table.add_column("Repo")
+    table.add_column("Score", justify="right")
+    table.add_column("Date")
+    for r in rows:
+        repo = r.get("project", "").removeprefix("spotlight:")
+        score = r.get("score", 0)
+        ts = r.get("timestamp", "")[:19]
+        table.add_row(repo, f"{score:.1f}", ts)
+    console.print(table)
+
+
+def _show_spotlight_feed(json_output: bool = False, db_path=None) -> None:
+    """Show spotlight feed from history DB."""
+    from agentkit_cli.history import HistoryDB
+    import json as _json
+    from rich.console import Console
+    from rich.table import Table
+
+    db = HistoryDB(db_path) if db_path else HistoryDB()
+    rows = db.get_history(tool="spotlight", limit=20)
+
+    if not rows:
+        if json_output:
+            print("[]")
+        else:
+            Console().print("[dim]No spotlight runs found.[/dim]")
+        return
+
+    if json_output:
+        out = []
+        for r in rows:
+            out.append({
+                "repo": r.get("project", "").removeprefix("spotlight:"),
+                "score": r.get("score", 0),
+                "timestamp": r.get("timestamp", ""),
+                "details": r.get("details", {}),
+            })
+        print(_json.dumps(out, indent=2))
+        return
+
+    console = Console()
+    table = Table(title="Spotlight Feed")
+    table.add_column("Repo")
+    table.add_column("Score", justify="right")
+    table.add_column("Date")
+    for r in rows:
+        repo = r.get("project", "").removeprefix("spotlight:")
+        score = r.get("score", 0)
+        ts = r.get("timestamp", "")[:19]
+        table.add_row(repo, f"{score:.1f}", ts)
+    console.print(table)
 
 
 @app.callback(invoke_without_command=True)

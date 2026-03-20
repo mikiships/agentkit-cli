@@ -842,6 +842,52 @@ def check_context_sync(root: Path) -> DoctorCheckResult:
     )
 
 
+def check_spotlight_github_access() -> DoctorCheckResult:
+    """Check that GitHub API is reachable for spotlight candidate selection."""
+    import json as _json
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/rate_limit",
+            headers={"Accept": "application/vnd.github+json"},
+        )
+        token = os.environ.get("GITHUB_TOKEN")
+        if token:
+            req.add_header("Authorization", f"Bearer {token}")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = _json.loads(resp.read())
+        remaining = data.get("rate", {}).get("remaining", 0)
+        if remaining < 10:
+            return DoctorCheckResult(
+                id="spotlight.github_api",
+                name="github_api_access",
+                status="warn",
+                summary=f"GitHub API reachable but rate limit low ({remaining} remaining).",
+                details="",
+                fix_hint="Set GITHUB_TOKEN for higher rate limits.",
+                category="spotlight",
+            )
+        return DoctorCheckResult(
+            id="spotlight.github_api",
+            name="github_api_access",
+            status="pass",
+            summary="GitHub API reachable.",
+            details=f"{remaining} requests remaining.",
+            fix_hint="",
+            category="spotlight",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="spotlight.github_api",
+            name="github_api_access",
+            status="fail",
+            summary=f"GitHub API unreachable: {exc}",
+            details="",
+            fix_hint="Check network connectivity or set GITHUB_TOKEN.",
+            category="spotlight",
+        )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -867,6 +913,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_webhook_config(project_root))
     checks.append(check_llmstxt_readiness(project_root))
     checks.append(check_context_sync(project_root))
+    checks.append(check_spotlight_github_access())
     return DoctorReport(root=str(project_root), checks=checks)
 
 
