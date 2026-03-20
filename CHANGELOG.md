@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.66.0] - 2026-03-20
+
+### Added
+- `agentkit user-team github:<org>`: new command — analyze a GitHub org's top contributors for agent-readiness and produce a ranked team scorecard
+- `TeamScorecardEngine` (`agentkit_cli/user_team.py`): fetches org contributors, scores each via `UserScorecardEngine`, and aggregates into team result with grade, top scorer, and distribution
+- `TeamScorecardHTMLRenderer` (`agentkit_cli/user_team_html.py`): dark-theme HTML report with contributor ranking table, grade distribution bars, top-scorer callout, and GitHub avatars
+- `--limit N` (default 10): max contributors to analyze
+- `--json`: emit structured `TeamScorecardResult` JSON
+- `--output FILE`: save HTML report to file
+- `--share`: publish HTML report to here.now
+- `--quiet`: suppress progress output for CI use
+
 ## [0.65.0] - 2026-03-19
 
 ### Added
