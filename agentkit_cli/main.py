@@ -64,6 +64,7 @@ from agentkit_cli.commands.user_duel_cmd import user_duel_command
 from agentkit_cli.commands.user_tournament_cmd import user_tournament_command
 from agentkit_cli.commands.user_improve_cmd import user_improve_command
 from agentkit_cli.commands.user_card_cmd import user_card_command
+from agentkit_cli.commands.user_team_cmd import user_team_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1298,6 +1299,30 @@ def user_tournament(
         quiet=quiet,
         output=output,
         limit=limit,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("user-team")
+def user_team(
+    target: str = typer.Argument(..., help="GitHub org: github:<org> or bare <org>"),
+    limit: int = typer.Option(10, "--limit", help="Max contributors to fetch and score"),
+    json_output: bool = typer.Option(False, "--json", help="Emit TeamScorecardResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress output"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(60, "--timeout", help="Per-user scorecard timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """🏢  Analyze a GitHub org's top contributors for agent-readiness."""
+    user_team_command(
+        target=target,
+        limit=limit,
+        json_output=json_output,
+        share=share,
+        quiet=quiet,
+        output=output,
         timeout=timeout,
         token=token,
     )
