@@ -69,6 +69,7 @@ from agentkit_cli.commands.user_team_cmd import user_team_command
 from agentkit_cli.commands.user_rank_cmd import user_rank_command
 from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
 from agentkit_cli.commands.topic_duel_cmd import topic_duel_command
+from agentkit_cli.commands.repo_duel_cmd import repo_duel_command
 from agentkit_cli.commands.topic_league_cmd import topic_league_command
 from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
 from agentkit_cli.commands.spotlight_cmd import spotlight_command
@@ -436,6 +437,7 @@ def history(
     campaigns: bool = typer.Option(False, "--campaigns", help="Show campaign-grouped summary"),
     campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Show all PRs from a specific campaign"),
     spotlights: bool = typer.Option(False, "--spotlights", help="Show only spotlight runs"),
+    duels: bool = typer.Option(False, "--duels", help="Show only repo-duel runs"),
 ) -> None:
     """Show agent quality score history and trends."""
     if spotlights:
@@ -453,6 +455,7 @@ def history(
         db_path=db_path,
         campaigns=campaigns,
         campaign_id=campaign_id,
+        duels=duels,
     )
 
 
@@ -1436,6 +1439,32 @@ def topic_duel(
         topic1=topic1,
         topic2=topic2,
         repos_per_topic=repos_per_topic,
+        json_output=json_output,
+        share=share,
+        quiet=quiet,
+        output=output,
+        timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("repo-duel")
+def repo_duel(
+    repo1: str = typer.Argument(..., help="First repo: github:owner/repo or https://..."),
+    repo2: str = typer.Argument(..., help="Second repo: github:owner/repo or https://..."),
+    deep: bool = typer.Option(False, "--deep", help="Add redteam resistance dimension"),
+    json_output: bool = typer.Option(False, "--json", help="Emit RepoDuelResult as JSON"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now, print URL"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress progress output"),
+    output: Optional[str] = typer.Option(None, "--output", help="Save HTML report to local path"),
+    timeout: int = typer.Option(120, "--timeout", help="Per-repo analysis timeout seconds"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub token", envvar="GITHUB_TOKEN"),
+) -> None:
+    """⚔️  Head-to-head agent-readiness comparison of two GitHub repos."""
+    repo_duel_command(
+        repo1=repo1,
+        repo2=repo2,
+        deep=deep,
         json_output=json_output,
         share=share,
         quiet=quiet,

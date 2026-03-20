@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.74.0] - 2026-03-20
+
+### Added
+- `agentkit repo-duel github:owner/repo1 github:owner/repo2` — head-to-head agent-readiness comparison of two GitHub repos
+- `RepoDuelEngine` with per-dimension winner computation (composite_score, context_coverage, test_coverage, lint_score, and optional redteam_resistance with `--deep`)
+- `RepoDuelResult` and `DimensionResult` dataclasses with `to_dict()` for JSON export
+- `RepoDuelHTMLRenderer` — dark-theme standalone HTML duel report (matches existing duel family style)
+- `--deep` flag adds redteam resistance dimension, `--share` uploads to here.now, `--json`, `--output`, `--quiet` flags
+- `agentkit history --duels` — filter history to show only repo-duel runs
+- `agentkit run --repo-duel` integration hook (pass `github:competitor/repo` to run a duel in pipeline)
+- README: `agentkit repo-duel` section with fastapi vs flask example
+
 ## [0.73.0] - 2026-03-20
 
 ### Added

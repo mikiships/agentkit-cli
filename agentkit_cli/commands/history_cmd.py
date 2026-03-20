@@ -58,10 +58,16 @@ def history_command(
     db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
     campaigns: bool = typer.Option(False, "--campaigns", help="Show campaign-grouped summary"),
     campaign_id: Optional[str] = typer.Option(None, "--campaign-id", help="Show all PRs from a specific campaign"),
+    duels: bool = typer.Option(False, "--duels", help="Show only repo-duel runs"),
 ) -> None:
     """Show agent quality history and trends."""
     db = HistoryDB(db_path) if db_path else HistoryDB()
     project_name = project or Path.cwd().name
+
+    # --duels: filter to repo_duel label
+    if duels:
+        _show_duels(db, json_output, limit)
+        return
 
     # --clear
     if clear:
@@ -241,5 +247,33 @@ def _show_campaign_detail(db: HistoryDB, campaign_id: str, json_output: bool) ->
             run["tool"],
             f"{run['score']:.1f}",
             (run["ts"] or "")[:16].replace("T", " "),
+        )
+    console.print(table)
+
+
+def _show_duels(db, json_output: bool, limit: int = 20) -> None:
+    """Show only repo-duel history runs."""
+    all_rows = db.get_history(tool="repo_duel", limit=limit)
+    rows = all_rows  # already filtered by tool
+
+    if json_output:
+        import json as _json
+        print(_json.dumps(rows, indent=2))
+        return
+
+    if not rows:
+        console.print("[dim]No repo-duel runs found.[/dim]")
+        return
+
+    table = Table(show_header=True, header_style="bold", title="⚔️  Repo Duel History")
+    table.add_column("Repos", style="cyan")
+    table.add_column("Score", justify="right")
+    table.add_column("When", style="dim")
+
+    for row in rows:
+        table.add_row(
+            row.get("project", "—"),
+            f"{row.get('score', 0):.1f}",
+            (row.get("ts") or "")[:16].replace("T", " "),
         )
     console.print(table)

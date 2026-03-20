@@ -17,15 +17,15 @@ REPO_ROOT = Path(__file__).parent.parent
 
 class TestVersionBump:
     def test_version_is_0_72_0(self):
-        assert __version__ == "0.73.0"
+        assert __version__ == "0.74.0"
 
     def test_pyproject_version_matches(self):
         pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-        assert 'version = "0.73.0"' in pyproject
+        assert 'version = "0.74.0"' in pyproject
 
     def test_changelog_has_0_72_0_entry(self):
         changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
-        assert "0.73.0" in changelog
+        assert "0.74.0" in changelog
         assert "spotlight" in changelog.lower()
 
 
