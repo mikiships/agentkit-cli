@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.80.0] - 2026-03-21
+
+### Added
+- **`agentkit spotlight-queue`** (D1): new command with subcommands `add`, `list`, `next`, `remove`, `clear`, `seed`, `mark-done`. Manages a rotation queue for the spotlight cron so it can run daily without manual `--target` input. Queue stored at `~/.local/share/agentkit/spotlight-queue.json`. `next` outputs plain `owner/repo` for scripting.
+- **`scripts/post-spotlight.sh` queue integration** (D2): when no `--target` is given, the script now calls `agentkit spotlight-queue next` to get the next repo automatically. After a successful post, `agentkit spotlight-queue mark-done` is called to update the last-spotlighted date.
+- **Auto-seed on first use** (D3): if `spotlight-queue.json` does not exist, it is automatically seeded with 10 default repos on first command invocation.
+- **`agentkit doctor` spotlight-queue check** (D4): new check warns when queue is empty or has fewer than 3 repos; shows queue size and next repo on pass.
+- **Version bump** 0.79.0 → 0.80.0.
+
 ## [0.79.0] - 2026-03-21
 
 ### Added

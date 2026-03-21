@@ -6,7 +6,7 @@ import pytest
 
 def test_version_is_0780():
     from agentkit_cli import __version__
-    assert __version__ == "0.79.0"
+    assert __version__ == "0.80.0"
 
 
 def test_existing_scorer_module_importable():

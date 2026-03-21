@@ -221,9 +221,11 @@ def test_run_doctor_summary_counts(tmp_path: Path, monkeypatch) -> None:
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_toolchain), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
-         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt:
+         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
         report = run_doctor(tmp_path)
 
     assert report.warn_count == 0
@@ -299,9 +301,11 @@ def test_doctor_cli_json_payload_uses_same_model(tmp_path: Path, monkeypatch) ->
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_toolchain), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
-         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt:
+         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
         result = runner.invoke(app, ["doctor", "--json"])
 
     assert result.exit_code == 0
@@ -705,9 +709,11 @@ def test_doctor_fail_on_warn_exits_0_when_all_pass(tmp_path: Path, monkeypatch) 
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_tc), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
-         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt:
+         patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
         result = runner.invoke(app, ["doctor", "--fail-on", "warn"])
 
     assert result.exit_code == 0

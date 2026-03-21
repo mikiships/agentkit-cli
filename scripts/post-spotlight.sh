@@ -14,11 +14,26 @@ DATE_SHORT="$(date -u +%Y-%m-%d)"
 
 # Parse flags
 DRY_RUN=0
+TARGET=""
 for arg in "$@"; do
     case "${arg}" in
         --dry-run) DRY_RUN=1 ;;
+        --target=*) TARGET="${arg#--target=}" ;;
+        --target) shift; TARGET="${1:-}" ;;
     esac
 done
+
+# If no --target, get from spotlight-queue
+if [ -z "${TARGET}" ]; then
+    TARGET="$(agentkit spotlight-queue next 2>/dev/null || true)"
+    if [ -z "${TARGET}" ]; then
+        echo "ERROR: No --target given and spotlight queue is empty or unavailable." >&2
+        exit 1
+    fi
+    USE_QUEUE=1
+else
+    USE_QUEUE=0
+fi
 
 # ── 1. Check frigatebird (skip in dry-run) ─────────────────────────────────
 if [ "${DRY_RUN}" -eq 0 ] && ! command -v frigatebird &>/dev/null; then
@@ -37,8 +52,8 @@ if [ "${DRY_RUN}" -eq 0 ] && ! command -v frigatebird &>/dev/null; then
 fi
 
 # ── 2. Run spotlight with --share --tweet-only ─────────────────────────────
-echo "Running agentkit spotlight --share --tweet-only..."
-TWEET_TEXT="$(agentkit spotlight --share --tweet-only 2>/dev/null || true)"
+echo "Running agentkit spotlight --share --tweet-only --target ${TARGET}..."
+TWEET_TEXT="$(agentkit spotlight --share --tweet-only --target "${TARGET}" 2>/dev/null || true)"
 TWEET_TEXT="${TWEET_TEXT// /}"  # trim
 TWEET_TEXT="$(echo "${TWEET_TEXT}" | tr -d '\r')"
 
@@ -109,6 +124,11 @@ printf '%s\n' "$(jq -nc \
 
 if [ "${STATUS}" = "error" ]; then
     exit 1
+fi
+
+# ── 7. Mark done in spotlight-queue (if we used the queue) ────────────────
+if [ "${USE_QUEUE}" -eq 1 ]; then
+    agentkit spotlight-queue mark-done "github:${TARGET}" 2>/dev/null || true
 fi
 
 echo "Done. Spotlight tweet posted successfully."

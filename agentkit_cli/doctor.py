@@ -888,6 +888,71 @@ def check_spotlight_github_access() -> DoctorCheckResult:
         )
 
 
+def check_spotlight_queue() -> DoctorCheckResult:
+    """Check spotlight queue health."""
+    import json as _json
+    queue_path = Path.home() / ".local" / "share" / "agentkit" / "spotlight-queue.json"
+    if not queue_path.exists():
+        return DoctorCheckResult(
+            id="spotlight.queue",
+            name="spotlight_queue",
+            status="warn",
+            summary="Spotlight queue file not found.",
+            details="Run `agentkit spotlight-queue seed` to populate.",
+            fix_hint="agentkit spotlight-queue seed",
+            category="spotlight",
+        )
+    try:
+        data = _json.loads(queue_path.read_text())
+    except Exception:
+        return DoctorCheckResult(
+            id="spotlight.queue",
+            name="spotlight_queue",
+            status="fail",
+            summary="Spotlight queue file is corrupt.",
+            details="",
+            fix_hint="agentkit spotlight-queue clear && agentkit spotlight-queue seed",
+            category="spotlight",
+        )
+    repos = data.get("repos", [])
+    count = len(repos)
+    if count == 0:
+        return DoctorCheckResult(
+            id="spotlight.queue",
+            name="spotlight_queue",
+            status="warn",
+            summary="Spotlight queue is empty.",
+            details="Run `agentkit spotlight-queue seed` to add default repos.",
+            fix_hint="agentkit spotlight-queue seed",
+            category="spotlight",
+        )
+    if count < 3:
+        next_repo = repos[0] if repos else "—"
+        return DoctorCheckResult(
+            id="spotlight.queue",
+            name="spotlight_queue",
+            status="warn",
+            summary=f"Spotlight queue has only {count} repo(s). Consider adding more.",
+            details=f"Next: {next_repo}",
+            fix_hint="agentkit spotlight-queue add github:owner/repo",
+            category="spotlight",
+        )
+    # Find next (never spotlighted first)
+    last = data.get("lastSpotlighted", {})
+    next_repo = next((r for r in repos if r not in last), None)
+    if next_repo is None:
+        next_repo = min(repos, key=lambda r: last.get(r, "0000-00-00"))
+    return DoctorCheckResult(
+        id="spotlight.queue",
+        name="spotlight_queue",
+        status="pass",
+        summary=f"Spotlight queue has {count} repos. Next: {next_repo}",
+        details="",
+        fix_hint="",
+        category="spotlight",
+    )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -914,6 +979,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_llmstxt_readiness(project_root))
     checks.append(check_context_sync(project_root))
     checks.append(check_spotlight_github_access())
+    checks.append(check_spotlight_queue())
     return DoctorReport(root=str(project_root), checks=checks)
 
 

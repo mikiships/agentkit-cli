@@ -499,6 +499,50 @@ Tweet-ready
 
 The result is also written to `~/.local/share/agentkit/daily-duel-latest.json` for consumption by automation systems (e.g., x-organic-posts cron).
 
+## Spotlight Queue
+
+`agentkit spotlight-queue` manages a rotation queue of repos for the spotlight cron, so `scripts/post-spotlight.sh` can fire daily without manual `--target` input.
+
+```bash
+# Seed with 10 default repos
+agentkit spotlight-queue seed
+
+# Add a repo
+agentkit spotlight-queue add github:owner/repo
+
+# See the full queue with last-spotlighted dates
+agentkit spotlight-queue list
+
+# Get the next repo to spotlight (plain text, for scripting)
+agentkit spotlight-queue next
+
+# Mark a repo as done (updates lastSpotlighted to today)
+agentkit spotlight-queue mark-done github:owner/repo
+
+# Remove a repo
+agentkit spotlight-queue remove github:owner/repo
+
+# Clear the queue
+agentkit spotlight-queue clear
+```
+
+The queue is stored at `~/.local/share/agentkit/spotlight-queue.json`. On first use, it auto-seeds with 10 popular repos if the file does not exist.
+
+**Rotation logic:** repos never spotlighted are returned first (in order added). Once all repos have been spotlighted, the one with the oldest `lastSpotlighted` date is returned next.
+
+`scripts/post-spotlight.sh` uses the queue automatically when no `--target` is given:
+
+```bash
+# Uses spotlight-queue next to pick target, marks done after success
+./scripts/post-spotlight.sh
+
+# Explicit target (bypasses queue)
+./scripts/post-spotlight.sh --target django/django
+
+# Dry-run (print tweet text only, no post)
+./scripts/post-spotlight.sh --dry-run
+```
+
 ## Daily Leaderboard
 
 `agentkit daily` is a content flywheel: run once/day, get a shareable ranked HTML report showing "Today's most AI-agent-ready repos."

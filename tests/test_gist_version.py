@@ -12,19 +12,19 @@ REPO_ROOT = Path(__file__).parent.parent
 class TestVersionBump:
     def test_version_is_0_73_0_in_init(self):
         from agentkit_cli import __version__
-        assert __version__ == "0.79.0"
+        assert __version__ == "0.80.0"
 
     def test_version_is_0_73_0_in_pyproject(self):
         pyproject = REPO_ROOT / "pyproject.toml"
         content = pyproject.read_text()
-        assert 'version = "0.79.0"' in content
+        assert 'version = "0.80.0"' in content
 
     def test_version_cli_output(self):
         from typer.testing import CliRunner
         from agentkit_cli.main import app
         runner = CliRunner()
         result = runner.invoke(app, ["--version"])
-        assert "0.79.0" in result.output
+        assert "0.80.0" in result.output
 
 
 class TestChangelog:

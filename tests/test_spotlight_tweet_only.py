@@ -273,4 +273,4 @@ class TestSpotlightCLITweetOnly:
 
     def test_version_is_079(self):
         result = runner.invoke(app, ["--version"])
-        assert "0.79.0" in result.output
+        assert "0.80.0" in result.output

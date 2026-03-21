@@ -435,4 +435,4 @@ def test_calendar_table_shows_narrative_column():
 
 def test_version_is_077():
     from agentkit_cli import __version__
-    assert __version__ == "0.79.0"
+    assert __version__ == "0.80.0"
