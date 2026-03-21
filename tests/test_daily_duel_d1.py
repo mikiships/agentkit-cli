@@ -54,8 +54,8 @@ def test_preset_pairs_count():
 
 def test_preset_pairs_structure():
     for item in PRESET_PAIRS:
-        assert len(item) == 3, f"Expected (repo1, repo2, category) but got {item}"
-        repo1, repo2, category = item
+        assert len(item) in (3, 4), f"Expected 3- or 4-tuple but got {item}"
+        repo1, repo2, category = item[0], item[1], item[2]
         assert "/" in repo1, f"repo1 missing slash: {repo1}"
         assert "/" in repo2, f"repo2 missing slash: {repo2}"
         assert len(category) > 0
@@ -71,7 +71,8 @@ def test_preset_pairs_categories():
 
 def test_preset_pairs_no_duplicates():
     seen = set()
-    for repo1, repo2, _ in PRESET_PAIRS:
+    for item in PRESET_PAIRS:
+        repo1, repo2 = item[0], item[1]
         key = frozenset([repo1, repo2])
         assert key not in seen, f"Duplicate pair: {repo1} vs {repo2}"
         seen.add(key)
@@ -105,7 +106,8 @@ def test_pick_pair_different_seeds_may_differ():
 def test_pick_pair_returns_preset_triple():
     engine = DailyDuelEngine()
     result = engine.pick_pair(seed="test-seed")
-    assert result in PRESET_PAIRS
+    # pick_pair returns 3-tuple; verify it matches the first 3 elements of some PRESET_PAIRS entry
+    assert any(result == (p[0], p[1], p[2]) for p in PRESET_PAIRS)
 
 
 def test_pick_pair_today_seed_is_isoformat():
@@ -190,7 +192,11 @@ def test_run_daily_duel_tweet_text_contains_repos():
     engine = DailyDuelEngine(_analyze_factory=_make_analyze_factory())
     with patch("agentkit_cli.daily_duel._write_latest_json"):
         result = engine.run_daily_duel(seed="2026-01-01")
-    assert result.repo1 in result.tweet_text or result.repo2 in result.tweet_text
+    # Tweet may use short repo names (without owner prefix)
+    repo1_short = result.repo1.split("/")[-1]
+    repo2_short = result.repo2.split("/")[-1]
+    assert (result.repo1 in result.tweet_text or repo1_short in result.tweet_text or
+            result.repo2 in result.tweet_text or repo2_short in result.tweet_text)
 
 
 def test_run_daily_duel_default_seed_is_today():

@@ -69,6 +69,16 @@ CATEGORY_INSIGHTS: dict[str, list[str]] = {
         "great devtools write specs agents and humans both appreciate",
         "top-tier devtools prove quality and agent-readiness go together",
     ],
+    "cli-tools": [
+        "the best CLI tools write docs agents can consume directly",
+        "top CLI libraries know agents parse their help output too",
+        "leading CLI frameworks make argument parsing transparent for agents",
+    ],
+    "legacy-vs-modern": [
+        "modern libs invest in agent-readiness; legacy ones lag behind",
+        "documentation debt is real — newer projects know it",
+        "the doc gap between old and new is widening fast",
+    ],
 }
 
 _DEFAULT_INSIGHTS = [
@@ -84,6 +94,66 @@ def _category_insight(category: str, seed: str) -> str:
     phrases = CATEGORY_INSIGHTS.get(category, _DEFAULT_INSIGHTS)
     digest = hashlib.sha256(seed.encode()).hexdigest()
     return phrases[int(digest, 16) % len(phrases)]
+
+
+# ---------------------------------------------------------------------------
+# Diff-tier helpers and tweet templates
+# ---------------------------------------------------------------------------
+
+def _diff_tier(score_diff: float) -> str:
+    """Classify score difference into 'large', 'medium', or 'small'."""
+    if score_diff > 30:
+        return "large"
+    elif score_diff >= 15:
+        return "medium"
+    else:
+        return "small"
+
+
+_LARGE_DIFF_TEMPLATES = [
+    (
+        "{winner} ({ws}/100) crushes {loser} ({ls}/100) in agent-readiness: "
+        "wins {ww}/{nd} dimensions. The doc gap between modern and legacy is real."
+    ),
+    (
+        "{winner} dominates {loser} {ws} vs {ls}/100 — a {diff}-point gap across {nd} "
+        "agent-readiness dimensions. This is what documentation debt looks like."
+    ),
+    (
+        "Agent-readiness gap: {winner} scores {ws}/100, {loser} scores {ls}/100. "
+        "{winner} wins {ww}/{nd} dimensions by {diff} points. Legacy libs fall behind."
+    ),
+    (
+        "{winner} ({ws}/100) vs {loser} ({ls}/100): {diff}-point gap, {ww}/{nd} "
+        "dimensions won. If you're handing a repo to an AI agent, pick the one "
+        "that documents itself."
+    ),
+]
+
+_MEDIUM_DIFF_TEMPLATES = [
+    (
+        "{winner} ({ws}/100) beats {loser} ({ls}/100) across {ww}/{nd} "
+        "agent-readiness dimensions. Which one would you hand to an AI agent?"
+    ),
+    (
+        "Agent-readiness: {winner} {ws}/100 vs {loser} {ls}/100 — a {diff}-point "
+        "gap. {winner} wins {ww}/{nd} dimensions. The difference is in the docs."
+    ),
+    (
+        "{winner} edges out {loser} by {diff} points ({ws} vs {ls}/100) across "
+        "{nd} agent-readiness dimensions. Clear winner, clear reason: documentation."
+    ),
+    (
+        "{winner} ({ws}/100) outpaces {loser} ({ls}/100) on {ww}/{nd} dimensions. "
+        "A {diff}-point gap that shows up the moment an agent tries to use these repos."
+    ),
+]
+
+
+def _pick_template(templates: list[str], seed: str) -> str:
+    """Deterministically pick a template from a list using a seed."""
+    digest = hashlib.sha256(seed.encode()).hexdigest()
+    return templates[int(digest, 16) % len(templates)]
 
 
 def _build_tweet_text(
@@ -115,8 +185,6 @@ def _build_tweet_text(
         loser_repo = repo2 if winner == "repo1" else repo1
         winner_score = repo1_score if winner == "repo1" else repo2_score
         loser_score = repo2_score if winner == "repo1" else repo1_score
-        winner_grade = repo1_grade if winner == "repo1" else repo2_grade
-        loser_grade = repo2_grade if winner == "repo1" else repo1_grade
         diff = int(score_diff)
         tweet_text = (
             f"{winner_repo} ({winner_score:.0f}/100) vs {loser_repo} ({loser_score:.0f}/100): "
@@ -125,17 +193,31 @@ def _build_tweet_text(
             f"across {n_dims} agent-readiness dimensions."
         )
     else:
-        # Clear winner case: current format
-        winner_name = (
-            repo1 if winner == "repo1"
-            else repo2 if winner == "repo2"
-            else "draw"
-        )
-        tweet_text = (
-            f"{repo1} vs {repo2} agent-readiness: "
-            f"{repo1} {repo1_score:.0f}/100 ({repo1_grade}), "
-            f"{repo2} {repo2_score:.0f}/100 ({repo2_grade}). "
-            f"Winner: {winner_name} on {winner_wins}/{n_dims} dimensions."
+        # Clear winner: use tier-appropriate template
+        winner_repo = repo1 if winner == "repo1" else repo2
+        loser_repo = repo2 if winner == "repo1" else repo1
+        winner_score = repo1_score if winner == "repo1" else repo2_score
+        loser_score = repo2_score if winner == "repo1" else repo1_score
+        diff = int(score_diff)
+        tier = _diff_tier(score_diff)
+
+        if tier == "large":
+            tmpl = _pick_template(_LARGE_DIFF_TEMPLATES, seed)
+        else:
+            tmpl = _pick_template(_MEDIUM_DIFF_TEMPLATES, seed)
+
+        # Short repo names for tweet brevity
+        winner_short = winner_repo.split("/")[-1]
+        loser_short = loser_repo.split("/")[-1]
+
+        tweet_text = tmpl.format(
+            winner=winner_short,
+            loser=loser_short,
+            ws=int(winner_score),
+            ls=int(loser_score),
+            ww=winner_wins,
+            nd=n_dims,
+            diff=diff,
         )
 
     if len(tweet_text) > 280:
@@ -146,41 +228,91 @@ def _build_tweet_text(
 
 # ---------------------------------------------------------------------------
 # Preset repo pairs
+# Each tuple: (repo1, repo2, category, narrative_type)
+# narrative_type: "asymmetric" | "balanced"
 # ---------------------------------------------------------------------------
 
-PRESET_PAIRS: list[Tuple[str, str, str]] = [
-    # (repo1, repo2, category)
-    # Web frameworks
-    ("tiangolo/fastapi", "pallets/flask", "web-frameworks"),
-    ("django/django", "tiangolo/fastapi", "web-frameworks"),
-    ("tiangolo/fastapi", "encode/starlette", "web-frameworks"),
-    ("expressjs/express", "fastify/fastify", "web-frameworks"),
-    # HTTP clients
-    ("encode/httpx", "psf/requests", "http-clients"),
-    ("urllib3/urllib3", "encode/httpx", "http-clients"),
-    # ML/AI
-    ("huggingface/transformers", "openai/openai-python", "ml-ai"),
-    ("langchain-ai/langchain", "microsoft/semantic-kernel", "ml-ai"),
-    ("pytorch/pytorch", "google/jax", "ml-ai"),
-    ("openai/openai-python", "anthropics/anthropic-sdk-python", "ml-ai"),
-    # Testing
-    ("pytest-dev/pytest", "robotframework/robotframework", "testing"),
-    ("pytest-dev/pytest", "HypothesisWorks/hypothesis", "testing"),
-    # Async/networking
-    ("python-trio/trio", "encode/uvicorn", "async-networking"),
-    ("aio-libs/aiohttp", "encode/uvicorn", "async-networking"),
-    # Databases
-    ("sqlalchemy/sqlalchemy", "mongodb/motor", "databases"),
-    ("tortoise/tortoise-orm", "sqlalchemy/sqlalchemy", "databases"),
-    # JS/TS frameworks
-    ("vercel/next.js", "remix-run/remix", "js-frameworks"),
-    ("facebook/react", "vuejs/vue", "js-frameworks"),
-    # DevTools
-    ("astral-sh/uv", "pypa/pip", "devtools"),
-    ("astral-sh/ruff", "PyCQA/flake8", "devtools"),
-    ("astral-sh/ruff", "psf/black", "devtools"),
-    ("pre-commit/pre-commit", "astral-sh/ruff", "devtools"),
+# Asymmetric pairs: one repo clearly has stronger agent-readiness docs
+ASYMMETRIC_PAIRS: list[Tuple[str, str, str, str]] = [
+    # Web frameworks: modern vs legacy
+    ("tiangolo/fastapi", "bottlepy/bottle", "web-frameworks", "asymmetric"),
+    ("tiangolo/fastapi", "cherrypy/cherrypy", "web-frameworks", "asymmetric"),
+    ("django/django", "webpy/webpy", "web-frameworks", "asymmetric"),
+    ("encode/starlette", "pallets/werkzeug", "web-frameworks", "asymmetric"),
+    # HTTP clients: modern vs stdlib
+    ("encode/httpx", "python/cpython", "http-clients", "asymmetric"),  # httpx vs urllib
+    ("psf/requests", "urllib3/urllib3", "http-clients", "asymmetric"),
+    # CLI tools: modern vs legacy
+    ("pallets/click", "python/cpython", "cli-tools", "asymmetric"),  # click vs argparse
+    ("tiangolo/typer", "pallets/click", "cli-tools", "asymmetric"),
+    # Linting/formatting: modern vs legacy
+    ("astral-sh/ruff", "PyCQA/pylint", "devtools", "asymmetric"),
+    ("astral-sh/ruff", "PyCQA/pycodestyle", "devtools", "asymmetric"),
+    ("psf/black", "PyCQA/autopep8", "devtools", "asymmetric"),
+    # Async/networking: modern vs legacy
+    ("encode/uvicorn", "tornadoweb/tornado", "async-networking", "asymmetric"),
+    ("encode/uvicorn", "cherrypy/cherrypy", "async-networking", "asymmetric"),
+    # Databases: modern async vs legacy
+    ("MagicStack/asyncpg", "psycopg/psycopg2", "databases", "asymmetric"),
+    ("aio-libs/aiopg", "psycopg/psycopg2", "databases", "asymmetric"),
+    ("sqlalchemy/sqlalchemy", "coleifer/peewee", "databases", "asymmetric"),
+    # Testing: modern vs legacy
+    ("pytest-dev/pytest", "nose-devs/nose", "testing", "asymmetric"),
+    ("HypothesisWorks/hypothesis", "nose-devs/nose", "testing", "asymmetric"),
+    # JS frameworks: modern vs legacy
+    ("facebook/react", "jashkenas/backbone", "js-frameworks", "asymmetric"),
+    ("vuejs/vue", "jashkenas/backbone", "js-frameworks", "asymmetric"),
+    ("vercel/next.js", "emberjs/ember.js", "js-frameworks", "asymmetric"),
+    # ML/AI: new SDKs vs legacy
+    ("openai/openai-python", "openai/openai-python", "ml-ai", "asymmetric"),  # placeholder — overridden below
+    ("anthropics/anthropic-sdk-python", "huggingface/transformers", "ml-ai", "asymmetric"),
+    # Package managers/build tools
+    ("astral-sh/uv", "pypa/setuptools", "devtools", "asymmetric"),
+    ("astral-sh/uv", "pypa/pip", "devtools", "asymmetric"),
 ]
+
+# Remove the placeholder duplicate
+ASYMMETRIC_PAIRS = [p for p in ASYMMETRIC_PAIRS if not (p[0] == "openai/openai-python" and p[1] == "openai/openai-python")]
+
+# Re-add a real asymmetric ML pair
+ASYMMETRIC_PAIRS.append(("openai/openai-python", "openai/tiktoken", "ml-ai", "asymmetric"))
+
+# Balanced pairs: both repos have strong agent-readiness docs
+BALANCED_PAIRS: list[Tuple[str, str, str, str]] = [
+    # Web frameworks
+    ("tiangolo/fastapi", "pallets/flask", "web-frameworks", "balanced"),
+    ("django/django", "tiangolo/fastapi", "web-frameworks", "balanced"),
+    ("tiangolo/fastapi", "encode/starlette", "web-frameworks", "balanced"),
+    ("expressjs/express", "fastify/fastify", "web-frameworks", "balanced"),
+    # HTTP clients
+    ("encode/httpx", "psf/requests", "http-clients", "balanced"),
+    ("urllib3/urllib3", "encode/httpx", "http-clients", "balanced"),
+    # ML/AI
+    ("huggingface/transformers", "openai/openai-python", "ml-ai", "balanced"),
+    ("langchain-ai/langchain", "microsoft/semantic-kernel", "ml-ai", "balanced"),
+    ("pytorch/pytorch", "google/jax", "ml-ai", "balanced"),
+    ("openai/openai-python", "anthropics/anthropic-sdk-python", "ml-ai", "balanced"),
+    # Testing
+    ("pytest-dev/pytest", "robotframework/robotframework", "testing", "balanced"),
+    ("pytest-dev/pytest", "HypothesisWorks/hypothesis", "testing", "balanced"),
+    # Async/networking
+    ("python-trio/trio", "encode/uvicorn", "async-networking", "balanced"),
+    ("aio-libs/aiohttp", "encode/uvicorn", "async-networking", "balanced"),
+    # Databases
+    ("sqlalchemy/sqlalchemy", "mongodb/motor", "databases", "balanced"),
+    ("tortoise/tortoise-orm", "sqlalchemy/sqlalchemy", "databases", "balanced"),
+    # JS/TS frameworks
+    ("vercel/next.js", "remix-run/remix", "js-frameworks", "balanced"),
+    ("facebook/react", "vuejs/vue", "js-frameworks", "balanced"),
+    # DevTools
+    ("astral-sh/ruff", "PyCQA/flake8", "devtools", "balanced"),
+    ("astral-sh/ruff", "psf/black", "devtools", "balanced"),
+    ("pre-commit/pre-commit", "astral-sh/ruff", "devtools", "balanced"),
+    ("astral-sh/uv", "conda/conda", "devtools", "balanced"),
+]
+
+# Combined list (maintains backward-compatible 3-tuple interface via property below)
+PRESET_PAIRS: list[Tuple[str, str, str, str]] = ASYMMETRIC_PAIRS + BALANCED_PAIRS
 
 
 # ---------------------------------------------------------------------------
@@ -193,12 +325,14 @@ class DailyDuelResult(RepoDuelResult):
     tweet_text: str = ""
     pair_category: str = ""
     seed: str = ""
+    narrative_type: str = ""
 
     def to_dict(self) -> dict:
         d = super().to_dict()
         d["tweet_text"] = self.tweet_text
         d["pair_category"] = self.pair_category
         d["seed"] = self.seed
+        d["narrative_type"] = self.narrative_type
         return d
 
 
@@ -224,7 +358,17 @@ class DailyDuelEngine:
 
         Default seed = today's date YYYY-MM-DD so same pair runs all day.
         Custom seed = any string for ad-hoc picks.
+
+        Returns a 3-tuple for backward compatibility; use pick_pair_full for 4-tuple.
         """
+        effective_seed = seed or date.today().isoformat()
+        digest = hashlib.sha256(effective_seed.encode()).hexdigest()
+        index = int(digest, 16) % len(PRESET_PAIRS)
+        r1, r2, cat, _nt = PRESET_PAIRS[index]
+        return (r1, r2, cat)
+
+    def pick_pair_full(self, seed: Optional[str] = None) -> Tuple[str, str, str, str]:
+        """Return the full 4-tuple (repo1, repo2, category, narrative_type)."""
         effective_seed = seed or date.today().isoformat()
         digest = hashlib.sha256(effective_seed.encode()).hexdigest()
         index = int(digest, 16) % len(PRESET_PAIRS)
@@ -233,7 +377,7 @@ class DailyDuelEngine:
     def run_daily_duel(self, seed: Optional[str] = None, deep: bool = False) -> DailyDuelResult:
         """Pick a pair and run a duel, returning a DailyDuelResult."""
         effective_seed = seed or date.today().isoformat()
-        repo1, repo2, category = self.pick_pair(seed)
+        repo1, repo2, category, narrative_type = self.pick_pair_full(seed)
 
         engine = RepoDuelEngine(
             token=self.token,
@@ -277,6 +421,7 @@ class DailyDuelEngine:
             tweet_text=tweet_text,
             pair_category=category,
             seed=effective_seed,
+            narrative_type=narrative_type,
         )
 
         # Write latest JSON atomically
@@ -291,12 +436,13 @@ class DailyDuelEngine:
         for i in range(days):
             d = start + timedelta(days=i)
             seed = d.isoformat()
-            repo1, repo2, category = self.pick_pair(seed)
+            repo1, repo2, category, narrative_type = self.pick_pair_full(seed)
             schedule.append({
                 "date": seed,
                 "repo1": repo1,
                 "repo2": repo2,
                 "category": category,
+                "narrative_type": narrative_type,
             })
         return schedule
 
