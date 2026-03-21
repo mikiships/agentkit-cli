@@ -1641,3 +1641,34 @@ Example tweet output:
 ```
 tiangolo/fastapi vs pallets/flask agent-readiness: tiangolo/fastapi 82/100 (B), pallets/flask 71/100 (B). Winner: tiangolo/fastapi on 3/4 dimensions.
 ```
+
+## Leaderboard Page
+
+Generate a public HTML leaderboard of top agent-ready GitHub repos by ecosystem:
+
+```bash
+# Generate leaderboard for all 5 ecosystems (python, typescript, rust, go, javascript)
+agentkit leaderboard-page
+
+# Specify ecosystems and limit
+agentkit leaderboard-page --ecosystems python,typescript,rust --limit 10
+
+# Write to docs/leaderboard.html for GitHub Pages
+agentkit leaderboard-page --pages
+
+# Output as JSON
+agentkit leaderboard-page --json
+
+# Generate embed badge for a repo
+agentkit leaderboard-page --embed github:owner/repo --embed-only
+```
+
+The generated HTML features:
+- Dark theme (#0d1117) with ecosystem tabs
+- Ranked table per ecosystem with scores, grades, and star counts
+- "Last updated" timestamp and "Powered by agentkit-cli" badge
+- SEO: `<title>`, `<meta description>`, og: tags, JSON-LD ItemList schema
+
+### Automated Weekly Updates
+
+The `.github/workflows/update-leaderboard.yml` workflow runs every Monday, regenerates `docs/leaderboard.html`, and commits it back to the repository for GitHub Pages hosting.

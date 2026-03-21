@@ -1,3 +1,12 @@
+# BUILD-REPORT: agentkit-cli v0.82.0
+
+**Date:** 2026-03-21
+**Feature:** `agentkit leaderboard-page` — Public HTML Leaderboard by Ecosystem
+
+See BUILD-REPORT-v0.82.0.md for full details.
+
+---
+
 # BUILD-REPORT: agentkit-cli v0.81.1
 
 **Date:** 2026-03-21

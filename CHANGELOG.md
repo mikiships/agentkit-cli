@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.82.0] - 2026-03-21
+
+### Added
+- **`agentkit leaderboard-page`** (D1): new command generates a public HTML leaderboard of top agent-ready GitHub repos by ecosystem (python, typescript, rust, go, javascript). Scores repos via `ExistingStateScorer`/heuristics, outputs dark-theme HTML with ecosystem tabs. Flags: `--output`, `--ecosystems`, `--limit`, `--share`, `--json`, `--pages`.
+- **GitHub Pages workflow** (D2): `.github/workflows/update-leaderboard.yml` — weekly schedule, runs `leaderboard-page --pages`, commits result to `docs/leaderboard.html`.
+- **SEO** (D3): generated HTML includes `<title>`, `<meta description>`, og: tags, JSON-LD ItemList schema.
+- **`--embed github:owner/repo`** (D4): outputs markdown badge snippet with shields.io rank+score badge + leaderboard link; `--embed-only` skips full page generation.
+- **Version bump** 0.81.1 → 0.82.0.
+
 ## [0.81.1] - 2026-03-21
 
 ### Fixed

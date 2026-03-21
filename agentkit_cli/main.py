@@ -76,6 +76,7 @@ from agentkit_cli.commands.spotlight_cmd import spotlight_command
 from agentkit_cli.commands.spotlight_queue_cmd import app as spotlight_queue_app
 from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
 from agentkit_cli.commands.hot_cmd import hot_command
+from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1780,6 +1781,32 @@ def hot(
         share=share,
         json_output=json_output,
         timeout=timeout,
+        token=token,
+    )
+
+
+@app.command("leaderboard-page")
+def leaderboard_page(
+    output: str = typer.Option("leaderboard.html", "--output", "-o", help="Output HTML file path"),
+    ecosystems: Optional[str] = typer.Option(None, "--ecosystems", help="CSV of ecosystems (default: all 5)"),
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of repos per ecosystem (max 25)"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML and print share URL"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of HTML"),
+    pages: bool = typer.Option(False, "--pages", help="Write to docs/leaderboard.html (GitHub Pages)"),
+    embed: Optional[str] = typer.Option(None, "--embed", help="Embed badge for a repo (e.g. github:owner/repo)"),
+    embed_only: bool = typer.Option(False, "--embed-only", help="Only output badge markdown, no HTML"),
+    token: Optional[str] = typer.Option(None, "--token", hidden=True),
+) -> None:
+    """🏆 Generate a public HTML leaderboard of top agent-ready GitHub repos by ecosystem."""
+    leaderboard_page_command(
+        output=output,
+        ecosystems=ecosystems,
+        limit=limit,
+        share=share,
+        json_output=json_output,
+        pages=pages,
+        embed=embed,
+        embed_only=embed_only,
         token=token,
     )
 

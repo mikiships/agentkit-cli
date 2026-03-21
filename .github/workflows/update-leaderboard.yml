@@ -1,0 +1,38 @@
+name: Update Leaderboard
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  update-leaderboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install agentkit-cli
+        run: pip install agentkit-cli
+
+      - name: Generate leaderboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p docs
+          agentkit leaderboard-page --pages --limit 10
+
+      - name: Commit and push leaderboard
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/leaderboard.html
+          git diff --cached --quiet || git commit -m "chore: update leaderboard [skip ci]"
+          git push
