@@ -1624,6 +1624,7 @@ def spotlight(
     output: Optional[str] = typer.Option(None, "--output", help="Write HTML report to file"),
     quiet: bool = typer.Option(False, "--quiet", help="Suppress terminal output"),
     no_history: bool = typer.Option(False, "--no-history", help="Don't record this run to history DB"),
+    tweet_only: bool = typer.Option(False, "--tweet-only", help="Output only tweet-ready text to stdout (≤280 chars). Combine with --share to include URL."),
 ) -> None:
     """🔦  Repo of the Day: pick a trending repo, deep-dive analyze, shareable report."""
     spotlight_command(
@@ -1636,6 +1637,7 @@ def spotlight(
         output=output,
         quiet=quiet,
         no_history=no_history,
+        tweet_only=tweet_only,
     )
 
 

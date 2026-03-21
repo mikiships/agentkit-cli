@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# post-daily-duel.sh — get tweet text from daily-duel and post via frigatebird
-# Logs result to ~/.local/share/agentkit/daily-duel-post-log.jsonl
+# post-spotlight.sh — run spotlight, upload HTML, post tweet via frigatebird
+# Logs result to ~/.local/share/agentkit/spotlight-post-log.jsonl
 #
 # Usage:
-#   ./post-daily-duel.sh           — plain tweet (no share URL)
-#   ./post-daily-duel.sh --share   — uploads HTML to here.now, tweet includes URL
+#   ./post-spotlight.sh             — upload + post tweet (live)
+#   ./post-spotlight.sh --dry-run   — print tweet text only, do NOT call frigatebird
 set -euo pipefail
 
 LOG_DIR="${HOME}/.local/share/agentkit"
-LOG_FILE="${LOG_DIR}/daily-duel-post-log.jsonl"
+LOG_FILE="${LOG_DIR}/spotlight-post-log.jsonl"
 DATE_NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 DATE_SHORT="$(date -u +%Y-%m-%d)"
 
 # Parse flags
-SHARE=0
+DRY_RUN=0
 for arg in "$@"; do
     case "${arg}" in
-        --share) SHARE=1 ;;
+        --dry-run) DRY_RUN=1 ;;
     esac
 done
 
-# ── 1. Check frigatebird is available ──────────────────────────────────────
-if ! command -v frigatebird &>/dev/null; then
+# ── 1. Check frigatebird (skip in dry-run) ─────────────────────────────────
+if [ "${DRY_RUN}" -eq 0 ] && ! command -v frigatebird &>/dev/null; then
     echo "ERROR: frigatebird not found in PATH. Install it before using this script." >&2
     mkdir -p "${LOG_DIR}"
     printf '%s\n' "$(jq -nc \
@@ -36,27 +36,17 @@ if ! command -v frigatebird &>/dev/null; then
     exit 1
 fi
 
-# ── 2. Get tweet text ──────────────────────────────────────────────────────
-SHARE_URL=""
-if [ "${SHARE}" -eq 1 ]; then
-    # --share: upload HTML + include URL in tweet text
-    TWEET_TEXT="$(agentkit daily-duel --share --tweet-only 2>/dev/null || true)"
-    # Extract share URL from tweet text (last token starting with https://)
-    SHARE_URL="$(echo "${TWEET_TEXT}" | grep -oE 'https://[^ ]+' | tail -1 || true)"
-    # If upload failed (no URL appended), fall back to plain tweet
-    if [ -z "${SHARE_URL}" ]; then
-        echo "WARNING: --share upload failed or returned no URL. Falling back to plain tweet." >&2
-        TWEET_TEXT="$(agentkit daily-duel --tweet-only 2>/dev/null || true)"
-    fi
-else
-    TWEET_TEXT="$(agentkit daily-duel --tweet-only 2>/dev/null || true)"
-fi
-
+# ── 2. Run spotlight with --share --tweet-only ─────────────────────────────
+echo "Running agentkit spotlight --share --tweet-only..."
+TWEET_TEXT="$(agentkit spotlight --share --tweet-only 2>/dev/null || true)"
 TWEET_TEXT="${TWEET_TEXT// /}"  # trim
 TWEET_TEXT="$(echo "${TWEET_TEXT}" | tr -d '\r')"
 
+# Extract share URL from tweet text (last token starting with https://)
+SHARE_URL="$(echo "${TWEET_TEXT}" | grep -oE 'https://[^ ]+' | tail -1 || true)"
+
 if [ -z "${TWEET_TEXT}" ]; then
-    echo "ERROR: agentkit daily-duel --tweet-only returned empty output." >&2
+    echo "ERROR: agentkit spotlight --share --tweet-only returned empty output." >&2
     mkdir -p "${LOG_DIR}"
     printf '%s\n' "$(jq -nc \
         --arg ts "${DATE_NOW}" \
@@ -87,7 +77,15 @@ if [ "${TWEET_LEN}" -gt 280 ]; then
     exit 1
 fi
 
-# ── 4. Post via frigatebird ────────────────────────────────────────────────
+# ── 4. Dry-run: print and exit ─────────────────────────────────────────────
+if [ "${DRY_RUN}" -eq 1 ]; then
+    echo "[dry-run] Would post tweet (${TWEET_LEN} chars):"
+    echo "${TWEET_TEXT}"
+    [ -n "${SHARE_URL}" ] && echo "[dry-run] Share URL: ${SHARE_URL}"
+    exit 0
+fi
+
+# ── 5. Post via frigatebird ────────────────────────────────────────────────
 echo "Posting tweet (${TWEET_LEN} chars)..."
 FRIGATEBIRD_OUTPUT="$(frigatebird tweet "${TWEET_TEXT}" 2>&1)" && FB_EXIT=0 || FB_EXIT=$?
 
@@ -97,7 +95,7 @@ if [ "${FB_EXIT}" -ne 0 ]; then
     echo "ERROR: frigatebird exited ${FB_EXIT}: ${FRIGATEBIRD_OUTPUT}" >&2
 fi
 
-# ── 5. Log result ──────────────────────────────────────────────────────────
+# ── 6. Log result ──────────────────────────────────────────────────────────
 mkdir -p "${LOG_DIR}"
 printf '%s\n' "$(jq -nc \
     --arg ts "${DATE_NOW}" \
@@ -113,5 +111,5 @@ if [ "${STATUS}" = "error" ]; then
     exit 1
 fi
 
-echo "Done. Tweet posted successfully."
+echo "Done. Spotlight tweet posted successfully."
 exit 0

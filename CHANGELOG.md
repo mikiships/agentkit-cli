@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.79.0] - 2026-03-21
+
+### Added
+- **`agentkit spotlight --tweet-only`** (D1): outputs a ≤280-char tweet-ready summary to stdout with no Rich formatting. Combines with `--share` to append the here.now URL. Mirrors the existing `daily-duel --tweet-only` pattern.
+- **`scripts/post-daily-duel.sh --share`** (D2): new `--share` flag runs `agentkit daily-duel --share --tweet-only`, posts tweet with here.now URL included. Falls back to plain tweet if upload fails. Log entries now include `share_url` field.
+- **`scripts/post-spotlight.sh`** (D3): new companion script to `post-daily-duel.sh`. Runs `agentkit spotlight --share --tweet-only`, posts via frigatebird, logs to `~/.local/share/agentkit/spotlight-post-log.jsonl`. Supports `--dry-run` flag (prints tweet text without posting).
+
 ## [0.78.0] - 2026-03-21
 
 ### Added

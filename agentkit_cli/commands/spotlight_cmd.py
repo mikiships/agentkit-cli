@@ -258,6 +258,33 @@ class SpotlightEngine:
 # CLI command function
 # ---------------------------------------------------------------------------
 
+def _build_spotlight_tweet(result: "SpotlightResult") -> str:
+    """Build tweet text for a spotlight result. ≤280 chars."""
+    score_str = f"{result.score:.0f}/100" if result.score is not None else "N/A"
+    # Pick first finding as key insight (strip tool prefix if present)
+    finding = ""
+    if result.top_findings:
+        raw = result.top_findings[0]
+        # Strip "[toolname] " prefix if present
+        if raw.startswith("[") and "] " in raw:
+            finding = raw.split("] ", 1)[1]
+        else:
+            finding = raw
+    # Base: "owner/repo scores N/100. <finding>."
+    base = f"{result.repo} scores {score_str}."
+    if finding:
+        candidate = f"{base} {finding}"
+        if not candidate.endswith("."):
+            candidate += "."
+    else:
+        candidate = base
+    # Enforce ≤280 (leave room for URL if share)
+    if len(candidate) > 280:
+        max_len = 277
+        candidate = candidate[:max_len] + "..."
+    return candidate
+
+
 def spotlight_command(
     target: Optional[str],
     topic: Optional[str],
@@ -268,6 +295,7 @@ def spotlight_command(
     output: Optional[str],
     quiet: bool,
     no_history: bool,
+    tweet_only: bool = False,
     db_path=None,
 ) -> None:
     """Select or analyze a repo spotlight, generate a report."""
@@ -283,7 +311,7 @@ def spotlight_command(
         else:
             repo = target
     else:
-        if not quiet:
+        if not quiet and not tweet_only:
             console.print("\n[bold]agentkit spotlight[/bold] — selecting today's repo…")
         candidate = engine.select_candidate(topic=topic, language=language)
         if not candidate:
@@ -292,7 +320,7 @@ def spotlight_command(
         repo = candidate["full_name"]
         repo_meta = candidate
 
-    if not quiet and not json_output:
+    if not quiet and not json_output and not tweet_only:
         console.print(f"\n[bold cyan]Spotlight:[/bold cyan] {repo}")
 
     # Run
@@ -321,6 +349,16 @@ def spotlight_command(
                 )
             except Exception:
                 pass
+
+    # Handle --tweet-only: output clean tweet text to stdout, nothing else
+    if tweet_only:
+        tweet_text = _build_spotlight_tweet(result)
+        if result.share_url:
+            candidate = f"{tweet_text} {result.share_url}"
+            if len(candidate) <= 280:
+                tweet_text = candidate
+        print(tweet_text)
+        return
 
     # Output
     if json_output:
