@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.81.0] - 2026-03-21
+
+### Added
+- **`agentkit hot`** (D1): new command fetches GitHub's daily trending repos, scores each via `ExistingStateScorer`, identifies the most surprising finding (top-trending with low score, or high-scoring top-repo), and outputs a tweet-ready insight. Supports `--language`, `--limit` (max 25), `--tweet-only`, `--share`, and `--json` flags.
+- **HTML report** (D2): `agentkit hot` generates a dark-theme HTML table with all scored repos, ranked by ExistingState score, with the most surprising finding highlighted.
+- **`scripts/post-hot.sh`** (D3): companion script to post-daily-duel.sh and post-spotlight.sh. Runs `agentkit hot --tweet-only`, posts via frigatebird, logs to `~/.local/share/agentkit/hot-post-log.jsonl`. Supports `--share` and `--dry-run` flags.
+- **`agentkit doctor` hot check** (D4): new `hot.trending_access` check verifies GitHub trending page is reachable; degrades gracefully (warns, not fails) when offline — hot uses fallback repo list.
+- **Version bump** 0.80.0 → 0.81.0.
+
 ## [0.80.0] - 2026-03-21
 
 ### Added

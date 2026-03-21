@@ -198,6 +198,7 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit sweep <targets>` — batch analyze multiple repos
 - `agentkit duel <repo1> <repo2>` — head-to-head agent-readiness comparison
 - `agentkit daily-duel` — 🗓️ zero-input daily repo duel (auto-selects contrasting pairs, generates tweet-ready text)
+- `agentkit hot` — 🔥 score GitHub's daily trending repos for agent-readiness, output the most surprising finding as a tweet
 - `agentkit topic <topic>` — rank top GitHub repos for a topic by agent-readiness (e.g. `python`, `llm`, `agents`)
 - `agentkit topic-duel <topic1> <topic2>` — head-to-head agent-readiness comparison of two GitHub topics (e.g. `fastapi` vs `django`)
 - `agentkit topic-league <topic1> <topic2> ... <topicN>` — multi-topic standings comparison for 2–10 GitHub topics (e.g. `python rust go typescript`)
@@ -498,6 +499,40 @@ Tweet-ready
 ```
 
 The result is also written to `~/.local/share/agentkit/daily-duel-latest.json` for consumption by automation systems (e.g., x-organic-posts cron).
+
+## Trending Repos
+
+`agentkit hot` fetches GitHub's daily trending repos, scores each for agent-readiness via `ExistingStateScorer`, and produces a tweet-ready observation about the most surprising finding.
+
+```bash
+# Score today's top 10 trending repos (all languages)
+agentkit hot
+
+# Filter by language
+agentkit hot --language python
+
+# Just the tweet text (for piping to frigatebird)
+agentkit hot --tweet-only
+
+# More repos
+agentkit hot --limit 20
+
+# Upload HTML report to here.now and include URL in tweet
+agentkit hot --share
+
+# Structured JSON output
+agentkit hot --json
+```
+
+The script `scripts/post-hot.sh` automates the full post pipeline:
+
+```bash
+./scripts/post-hot.sh            # plain tweet
+./scripts/post-hot.sh --share    # with here.now report URL
+./scripts/post-hot.sh --dry-run  # print tweet, don't post
+```
+
+Logs are written to `~/.local/share/agentkit/hot-post-log.jsonl`.
 
 ## Spotlight Queue
 

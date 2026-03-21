@@ -75,6 +75,7 @@ from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
 from agentkit_cli.commands.spotlight_cmd import spotlight_command
 from agentkit_cli.commands.spotlight_queue_cmd import app as spotlight_queue_app
 from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
+from agentkit_cli.commands.hot_cmd import hot_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1758,6 +1759,28 @@ def daily_duel(
         timeout=timeout,
         token=token,
         existing=existing,
+    )
+
+
+@app.command("hot")
+def hot(
+    language: Optional[str] = typer.Option(None, "--language", "-l", help="Filter trending by language (e.g. python, javascript)"),
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of trending repos to score (max 25)"),
+    tweet_only: bool = typer.Option(False, "--tweet-only", help="Print only the tweet text and exit"),
+    share: bool = typer.Option(False, "--share", help="Upload HTML report to here.now and include URL in tweet"),
+    json_output: bool = typer.Option(False, "--json", help="Print structured JSON output"),
+    timeout: int = typer.Option(60, "--timeout", hidden=True),
+    token: Optional[str] = typer.Option(None, "--token", hidden=True),
+) -> None:
+    """🔥 Hot: score GitHub trending repos for agent-readiness, output tweet-ready insight."""
+    hot_command(
+        language=language,
+        limit=limit,
+        tweet_only=tweet_only,
+        share=share,
+        json_output=json_output,
+        timeout=timeout,
+        token=token,
     )
 
 

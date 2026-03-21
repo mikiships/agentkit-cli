@@ -888,6 +888,47 @@ def check_spotlight_github_access() -> DoctorCheckResult:
         )
 
 
+def check_hot_trending_access() -> DoctorCheckResult:
+    """Check that GitHub trending page is reachable for `agentkit hot`."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            "https://github.com/trending",
+            headers={"User-Agent": "agentkit-cli/0.81.0"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            status = resp.status
+        if status == 200:
+            return DoctorCheckResult(
+                id="hot.trending_access",
+                name="hot_trending_access",
+                status="pass",
+                summary="GitHub trending page reachable.",
+                details="",
+                fix_hint="",
+                category="hot",
+            )
+        return DoctorCheckResult(
+            id="hot.trending_access",
+            name="hot_trending_access",
+            status="warn",
+            summary=f"GitHub trending returned HTTP {status}.",
+            details="agentkit hot will use fallback repo list.",
+            fix_hint="Check network connectivity.",
+            category="hot",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="hot.trending_access",
+            name="hot_trending_access",
+            status="warn",
+            summary=f"GitHub trending unreachable: {exc}",
+            details="agentkit hot will use fallback repo list.",
+            fix_hint="Check network connectivity.",
+            category="hot",
+        )
+
+
 def check_spotlight_queue() -> DoctorCheckResult:
     """Check spotlight queue health."""
     import json as _json
@@ -980,6 +1021,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_context_sync(project_root))
     checks.append(check_spotlight_github_access())
     checks.append(check_spotlight_queue())
+    checks.append(check_hot_trending_access())
     return DoctorReport(root=str(project_root), checks=checks)
 
 
