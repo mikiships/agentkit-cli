@@ -1672,3 +1672,33 @@ The generated HTML features:
 ### Automated Weekly Updates
 
 The `.github/workflows/update-leaderboard.yml` workflow runs every Monday, regenerates `docs/leaderboard.html`, and commits it back to the repository for GitHub Pages hosting.
+
+---
+
+## Static Site
+
+`agentkit site` generates a multi-page static site from your scored repos — SEO-optimized, dark-themed, and ready for GitHub Pages.
+
+```bash
+# Generate site in ./site directory
+agentkit site ./site
+
+# With specific topics and share URL
+agentkit site ./site --topics python,rust --share
+
+# Copy to docs/ for GitHub Pages deployment
+agentkit site ./site --deploy
+
+# JSON summary output
+agentkit site ./site --json --quiet
+```
+
+Generated pages:
+- **`index.html`** — hero section, quick stats, topic grid, recent scores table
+- **`topic/{name}.html`** — ranked repos per topic with score badges
+- **`repo/{owner}/{repo}.html`** — full score breakdown, history chart, GitHub link
+- **`sitemap.xml`** — all pages with lastmod dates for search engines
+
+Options: `--topics`, `--limit`, `--base-url`, `--share`, `--deploy`, `--json`, `--quiet`.
+
+Auto-update after runs: `agentkit run --site ./site` regenerates the index page.

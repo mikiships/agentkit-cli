@@ -11,11 +11,6 @@
 - [x] **D4: Integration into existing commands** — `agentkit run --site <dir>` regenerates index.html after run. `agentkit share` supports site directories via `--share` flag. 8 tests in `tests/test_site_integration.py`.
 - [x] **D5: Release artifacts** — Version bumped to 0.83.0 in `__init__.py` and `pyproject.toml`. CHANGELOG.md updated with v0.83.0 entry. BUILD-REPORT.md updated.
 
-## Prior Builds
-
-- v0.82.0: `agentkit leaderboard-page` — Public HTML leaderboard
-- v0.81.1: `agentkit hot` — Trending repos scoring
-
 ## Verified Test Count
 
 **4181 passed, 0 failed** (60 new tests added across 4 test files).

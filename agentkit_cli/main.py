@@ -77,6 +77,7 @@ from agentkit_cli.commands.spotlight_queue_cmd import app as spotlight_queue_app
 from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
 from agentkit_cli.commands.hot_cmd import hot_command
 from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
+from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -179,9 +180,10 @@ def run(
     run_topic_league: Optional[str] = typer.Option(None, "--topic-league", help="Run topic-league after pipeline (e.g. python rust go)"),
     run_ecosystem: Optional[str] = typer.Option(None, "--ecosystem", help="Run ecosystem scan after pipeline (preset: default, extended, or custom)"),
     run_gist: bool = typer.Option(False, "--gist", help="Publish run report as a GitHub Gist after completion"),
+    run_site: Optional[str] = typer.Option(None, "--site", help="Regenerate site index.html in this directory after run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site)
     if run_topic_repos:
         from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
         topic_rank_command(topic=run_topic_repos.strip())
@@ -1808,6 +1810,34 @@ def leaderboard_page(
         embed=embed,
         embed_only=embed_only,
         token=token,
+    )
+
+
+@app.command("site")
+def site(
+    output_dir: str = typer.Argument("site", help="Output directory for generated site"),
+    topics: str = typer.Option("python,typescript,rust,go", "--topics", help="Comma-separated topic list"),
+    limit: int = typer.Option(20, "--limit", help="Max repos per topic page"),
+    live: bool = typer.Option(False, "--live", help="Run fresh agentkit analyze before generating (not yet implemented)"),
+    share: bool = typer.Option(False, "--share", help="Upload index.html to here.now and print URL"),
+    deploy: bool = typer.Option(False, "--deploy", help="Copy generated site into docs/ for GitHub Pages"),
+    base_url: str = typer.Option("https://mikiships.github.io/agentkit-cli/", "--base-url", help="Canonical base URL for sitemap and meta tags"),
+    json_output: bool = typer.Option(False, "--json", help="Print summary JSON"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress Rich output, errors only"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override DB path (for testing)"),
+) -> None:
+    """Generate a multi-page static site from agentkit history data."""
+    site_command(
+        output_dir=output_dir,
+        topics=topics,
+        limit=limit,
+        live=live,
+        share=share,
+        deploy=deploy,
+        base_url=base_url,
+        json_output=json_output,
+        quiet=quiet,
+        db_path=db_path,
     )
 
 

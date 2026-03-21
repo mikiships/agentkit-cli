@@ -101,6 +101,7 @@ def run_command(
     user_rank_topic: Optional[str] = None,
     ecosystem: Optional[str] = None,
     gist: bool = False,
+    site_dir: Optional[str] = None,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -866,6 +867,22 @@ def run_command(
 
     if json_output:
         print(json.dumps(summary, indent=2))
+
+    # Optional: regenerate site index page after run
+    if site_dir:
+        try:
+            from agentkit_cli.site_engine import SiteEngine, SiteConfig
+            from pathlib import Path as _Path
+            _site_path = _Path(site_dir)
+            _site_engine = SiteEngine()
+            _index_page = _site_engine.generate_index()
+            _site_path.mkdir(parents=True, exist_ok=True)
+            (_site_path / "index.html").write_text(_index_page.html, encoding="utf-8")
+            if not ci and not json_output:
+                console.print(f"[green]✓ Site index updated:[/green] {_site_path / 'index.html'}")
+        except Exception as _site_exc:
+            if not ci:
+                console.print(f"[yellow]Warning: site update failed: {_site_exc}[/yellow]")
 
     # Final status
     if failed_count > 0:

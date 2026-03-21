@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.83.0] - 2026-03-21
+
+### Added
+- **`agentkit site`** (D1-D3): multi-page static site generator from history DB. Generates `index.html`, per-topic pages, per-repo detail pages, and `sitemap.xml` with dark theme, SEO meta tags, JSON-LD structured data.
+- **`SiteEngine`** (`agentkit_cli/site_engine.py`): core engine with `generate_site()`, `generate_index()`, `generate_topic_page()`, `generate_repo_page()`, `generate_sitemap()`.
+- **`agentkit run --site <dir>`** (D4): auto-regenerate site index after a run.
+- **`agentkit site --share`**: upload generated `index.html` to here.now and print URL.
+- **`agentkit site --deploy`**: copy generated site into `docs/` for GitHub Pages.
+
 ## [0.82.0] - 2026-03-21
 
 ### Added
