@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.81.1] - 2026-03-21
+
+### Fixed
+- `agentkit hot`: Fix `ExistingStateScorer` call — use `score_all()`/`composite_score()` instead of non-existent `.score()` method; all repos now score correctly instead of returning N/A.
+- `agentkit hot`: Filter sponsor/ad entries from GitHub trending HTML parse (skip owners `sponsors`, `orgs`, `topics`, `trending`).
+
 ## [0.81.0] - 2026-03-21
 
 ### Added

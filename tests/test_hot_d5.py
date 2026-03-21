@@ -8,19 +8,19 @@ import pytest
 ROOT = Path(__file__).parent.parent
 
 
-def test_version_is_0_81_0():
+def test_version_is_0_81_1():
     from agentkit_cli import __version__
-    assert __version__ == "0.81.0"
+    assert __version__ == "0.81.1"
 
 
-def test_pyproject_version_is_0_81_0():
+def test_pyproject_version_is_0_81_1():
     content = (ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.81.0"' in content
+    assert 'version = "0.81.1"' in content
 
 
-def test_changelog_has_0_81_0():
+def test_changelog_has_0_81_1():
     changelog = (ROOT / "CHANGELOG.md").read_text()
-    assert "0.81.0" in changelog
+    assert "0.81.1" in changelog
 
 
 def test_changelog_mentions_hot():
@@ -49,7 +49,7 @@ def test_build_report_mentions_hot():
 
 def test_build_report_has_version():
     content = (ROOT / "BUILD-REPORT.md").read_text()
-    assert "0.81.0" in content
+    assert "0.81.1" in content
 
 
 def test_post_hot_script_exists():

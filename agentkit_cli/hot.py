@@ -122,6 +122,10 @@ def _parse_trending_html(html: str, limit: int = 25) -> list[dict]:
         full_name = full_name.strip("/")
         if "/" not in full_name or full_name.count("/") > 1:
             continue
+        # Skip sponsor/ads entries
+        owner = full_name.split("/")[0].lower()
+        if owner in ("sponsors", "orgs", "topics", "trending"):
+            continue
 
         # Description
         desc_match = re.search(r'<p[^>]*class="[^"]*col-9[^"]*"[^>]*>(.*?)</p>', article, re.DOTALL)
@@ -174,17 +178,12 @@ def _score_repo(full_name: str, timeout: int = 60) -> tuple[Optional[float], Opt
             return None, None, {}
 
         scorer = ExistingStateScorer(Path(tmpdir))
-        score_result = scorer.score()
-        score = score_result.total_score if hasattr(score_result, "total_score") else None
-        grade = score_result.grade if hasattr(score_result, "grade") else None
+        score_dict = scorer.score_all()
+        score = score_dict.get("composite")
+        grade = _grade_from_score(score) if score is not None else None
 
-        # Try dimension details
-        details = {}
-        try:
-            if hasattr(score_result, "dimensions"):
-                details = {k: v for k, v in score_result.dimensions.items()}
-        except Exception:
-            pass
+        # Dimension details (exclude composite)
+        details = {k: v for k, v in score_dict.items() if k != "composite"}
 
         return score, grade, details
     except Exception:
