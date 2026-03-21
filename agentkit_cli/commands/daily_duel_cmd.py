@@ -183,7 +183,7 @@ def _run_explicit_pair(
 ) -> None:
     """Run a duel on explicit --pair repos (bypasses auto-pick)."""
     from agentkit_cli.repo_duel import RepoDuelEngine
-    from agentkit_cli.daily_duel import DailyDuelResult, _write_latest_json, _LATEST_JSON
+    from agentkit_cli.daily_duel import DailyDuelResult, _write_latest_json, _LATEST_JSON, _build_tweet_text
 
     effective_seed = seed or date.today().isoformat()
 
@@ -202,24 +202,24 @@ def _run_explicit_pair(
             console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=1)
 
-    winner_name = (
-        repo1 if base.winner == "repo1"
-        else repo2 if base.winner == "repo2"
-        else "draw"
-    )
     n_dims = len(base.dimension_results)
     winner_wins = sum(
         1 for d in base.dimension_results
         if d.winner == ("repo1" if base.winner == "repo1" else "repo2")
     )
-    tweet_text = (
-        f"{repo1} vs {repo2} agent-readiness: "
-        f"{repo1} {base.repo1_score:.0f}/100 ({base.repo1_grade}), "
-        f"{repo2} {base.repo2_score:.0f}/100 ({base.repo2_grade}). "
-        f"Winner: {winner_name} on {winner_wins}/{n_dims} dimensions."
+    tweet_text = _build_tweet_text(
+        repo1=repo1,
+        repo2=repo2,
+        repo1_score=base.repo1_score,
+        repo2_score=base.repo2_score,
+        repo1_grade=base.repo1_grade,
+        repo2_grade=base.repo2_grade,
+        winner=base.winner,
+        n_dims=n_dims,
+        winner_wins=winner_wins,
+        pair_category="custom",
+        seed=effective_seed,
     )
-    if len(tweet_text) > 280:
-        tweet_text = tweet_text[:277] + "..."
 
     result = DailyDuelResult(
         repo1=base.repo1,
