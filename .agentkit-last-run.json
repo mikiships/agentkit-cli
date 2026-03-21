@@ -1,6 +1,6 @@
 {
   "success": true,
-  "timestamp": "2026-03-21T01:04:06.196286+00:00",
+  "timestamp": "2026-03-21T05:28:28.420834+00:00",
   "project": "/Users/mordecai/repos/agentkit-cli",
   "steps": [
     {
@@ -40,19 +40,19 @@
         "step": "generate",
         "status": "skipped",
         "duration": 0.0,
-        "notes": "not installed \u2014 pip install agentmd"
+        "notes": "user skipped"
       },
       {
         "step": "lint-context",
         "status": "skipped",
         "duration": 0.0,
-        "notes": "not installed \u2014 pip install agentlint"
+        "notes": "user skipped"
       },
       {
         "step": "lint-diff",
         "status": "skipped",
         "duration": 0.0,
-        "notes": "not installed \u2014 pip install agentlint"
+        "notes": "user skipped"
       },
       {
         "step": "benchmark",
@@ -64,7 +64,7 @@
         "step": "reflect",
         "status": "skipped",
         "duration": 0.0,
-        "notes": "not installed \u2014 pip install agentreflect"
+        "notes": "user skipped"
       }
     ],
     "total": 5,

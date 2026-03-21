@@ -22,7 +22,7 @@ CATEGORY_INSIGHTS: dict[str, list[str]] = {
         "top web frameworks maintain excellent agent docs",
         "leading web frameworks set the bar for agent-readiness",
         "the best web frameworks write for humans and agents alike",
-        "in web-frameworks, quality rises to the top",
+        "quality rises to the top",
         "great web frameworks make life easy for agents and devs",
     ],
     "http-clients": [
