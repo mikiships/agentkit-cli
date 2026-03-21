@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.84.0] - 2026-03-21
+
+### Added
+- **`agentkit populate`** (D1): fetch top GitHub repos for configured topics via GitHub Topics API, score each with `agentkit analyze`, store results in history DB. Flags: `--topics`, `--limit`, `--force`, `--dry-run`, `--json`, `--quiet`.
+- **`agentkit site --live`** (D2): implemented (was "not yet implemented"). Calls `PopulateEngine.populate()` before generating the site — single command to score + generate.
+- **`agentkit site --deploy`** (D3): improved implementation — copies generated site to `docs/` (or `--deploy-dir`), runs `git add + commit + push`. New flags: `--repo-path`, `--deploy-dir`, `--commit-message`, `--no-push`.
+- **`agentkit run --populate`** (D4): after pipeline run, call populate for detected topics. Flags: `--populate-topics`, `--populate-limit`.
+- **`agentkit doctor` history check** (D4): warns if history DB has 0 entries, suggests `agentkit populate`.
+- **Version bump** 0.83.0 → 0.84.0.
+
 ## [0.83.0] - 2026-03-21
 
 ### Added

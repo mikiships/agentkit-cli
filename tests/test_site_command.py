@@ -148,3 +148,101 @@ def test_site_help(tmp_path):
     result = runner.invoke(app, ["site", "--help"])
     assert result.exit_code == 0
     assert "output-dir" in result.output or "site" in result.output.lower()
+
+
+# ---------------------------------------------------------------------------
+# v0.84.0 — --live and --deploy tests
+# ---------------------------------------------------------------------------
+
+def test_site_live_calls_populate(tmp_path):
+    """--live should invoke the populate step before generating."""
+    from agentkit_cli.commands.site_cmd import site_command
+    calls = []
+    def fake_populate(topics, limit):
+        calls.append((topics, limit))
+    out = tmp_path / "live_site"
+    db = _make_db(tmp_path)
+    engine = _make_engine(db)
+    site_command(output_dir=str(out), topics="python,rust", limit=5, live=True, quiet=True, _engine=engine, _populate_fn=fake_populate)
+    assert len(calls) == 1
+    assert "python" in calls[0][0]
+    assert calls[0][1] == 5
+
+
+def test_site_live_still_generates_site(tmp_path):
+    """--live should generate the site even if populate succeeds."""
+    from agentkit_cli.commands.site_cmd import site_command
+    out = tmp_path / "live_out"
+    db = _make_db(tmp_path)
+    engine = _make_engine(db)
+    summary = site_command(
+        output_dir=str(out), topics="python", live=True, quiet=True,
+        _engine=engine, _populate_fn=lambda t, l: None
+    )
+    assert summary["pages_generated"] >= 1
+    assert (out / "index.html").exists()
+
+
+def test_site_live_populate_failure_does_not_abort(tmp_path):
+    """--live should continue with site generation even if populate raises."""
+    from agentkit_cli.commands.site_cmd import site_command
+    def failing_populate(topics, limit):
+        raise RuntimeError("network failure")
+    out = tmp_path / "live_fail"
+    db = _make_db(tmp_path)
+    engine = _make_engine(db)
+    summary = site_command(
+        output_dir=str(out), topics="python", live=True, quiet=True,
+        _engine=engine, _populate_fn=failing_populate
+    )
+    assert summary["pages_generated"] >= 1
+
+
+def test_site_live_help_text_accurate():
+    """--live help should describe populate, not say 'not yet implemented'."""
+    from typer.testing import CliRunner
+    from agentkit_cli.main import app
+    runner = CliRunner()
+    result = runner.invoke(app, ["site", "--help"])
+    assert "not yet implemented" not in result.output
+
+
+def test_site_deploy_copies_files(tmp_path):
+    """--deploy should copy site files to docs/ directory."""
+    from agentkit_cli.commands.site_cmd import site_command
+    out = tmp_path / "site_out"
+    deploy_root = tmp_path / "repo"
+    deploy_root.mkdir()
+    db = _make_db(tmp_path)
+    engine = _make_engine(db)
+    summary = site_command(
+        output_dir=str(out), topics="python", quiet=True,
+        deploy=True, repo_path=deploy_root, deploy_dir="docs", no_push=True,
+        _engine=engine,
+    )
+    docs_dir = deploy_root / "docs"
+    assert docs_dir.exists()
+    assert (docs_dir / "index.html").exists()
+    assert summary["deploy"] is not None
+
+
+def test_site_deploy_no_push_skips_git_push(tmp_path):
+    """--no-push should not call git push."""
+    from agentkit_cli.commands.site_cmd import _run_deploy
+    import subprocess
+    out = tmp_path / "site"
+    out.mkdir()
+    (out / "index.html").write_text("<html></html>")
+    repo = tmp_path / "git_repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=str(repo), capture_output=True)
+    subprocess.run(["git", "commit", "--allow-empty", "-m", "init"], cwd=str(repo), capture_output=True)
+    result = _run_deploy(
+        output_path=out,
+        repo_path=repo,
+        deploy_dir="docs",
+        commit_message="test deploy",
+        no_push=True,
+        quiet=True,
+    )
+    assert result["pushed"] is False

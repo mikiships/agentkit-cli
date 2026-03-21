@@ -88,12 +88,13 @@ def test_site_sitemap_count_matches_pages(tmp_path):
 
 def test_version_is_083():
     from agentkit_cli import __version__
-    assert __version__ == "0.83.0"
+    assert __version__ == "0.84.0"
 
 
 def test_pyproject_version(tmp_path):
-    """pyproject.toml must also be 0.83.0."""
+    """pyproject.toml must match current version."""
     import subprocess
+    from agentkit_cli import __version__
     repo = Path(__file__).parent.parent
     result = subprocess.run(
         ["grep", "^version", "pyproject.toml"],
@@ -101,4 +102,4 @@ def test_pyproject_version(tmp_path):
         capture_output=True,
         text=True,
     )
-    assert "0.83.0" in result.stdout
+    assert __version__ in result.stdout

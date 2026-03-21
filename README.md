@@ -1702,3 +1702,28 @@ Generated pages:
 Options: `--topics`, `--limit`, `--base-url`, `--share`, `--deploy`, `--json`, `--quiet`.
 
 Auto-update after runs: `agentkit run --site ./site` regenerates the index page.
+
+## Populate & Deploy
+
+Seed the history DB with real scored data, then publish to GitHub Pages in one pipeline:
+
+```bash
+# Fetch and score top repos for default topics (python, typescript, rust, go)
+agentkit populate
+
+# Custom topics and limit
+agentkit populate --topics python,typescript --limit 20
+
+# Dry run — see what would be scored without scoring
+agentkit populate --dry-run
+
+# One-shot: populate then generate and deploy site
+agentkit populate && agentkit site --deploy
+
+# All-in-one: fetch fresh data AND generate site in one command
+agentkit site --live --topics python,rust --deploy
+```
+
+`agentkit populate` fetches top GitHub repos for each topic via the GitHub Topics API, scores each with `agentkit analyze`, and stores results in the history DB. The `--live` flag on `agentkit site` combines populate + generate into one command.
+
+`agentkit site --deploy` copies the generated site into `docs/` (or `--deploy-dir`), commits, and pushes to GitHub Pages.

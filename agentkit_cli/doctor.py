@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli import __version__
-from agentkit_cli.history import get_history
+from agentkit_cli.history import get_history, HistoryDB
 
 DoctorStatus = Literal["pass", "warn", "fail"]
 
@@ -994,6 +994,43 @@ def check_spotlight_queue() -> DoctorCheckResult:
     )
 
 
+def check_history_db_has_data() -> "DoctorCheckResult":
+    """Warn if history DB has zero entries — suggest agentkit populate."""
+    try:
+        db = HistoryDB()
+        projects = db.get_all_projects()
+        count = len(projects)
+        if count == 0:
+            return DoctorCheckResult(
+                id="history.data",
+                name="history_db_has_data",
+                status="warn",
+                summary="History DB has 0 entries. Run `agentkit populate` to seed it.",
+                details="Site generation and leaderboards require history data.",
+                fix_hint="agentkit populate",
+                category="history",
+            )
+        return DoctorCheckResult(
+            id="history.data",
+            name="history_db_has_data",
+            status="pass",
+            summary=f"History DB has {count} project(s).",
+            details="",
+            fix_hint="",
+            category="history",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="history.data",
+            name="history_db_has_data",
+            status="warn",
+            summary=f"Could not read history DB: {exc}",
+            details="",
+            fix_hint="agentkit populate",
+            category="history",
+        )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -1022,6 +1059,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_spotlight_github_access())
     checks.append(check_spotlight_queue())
     checks.append(check_hot_trending_access())
+    checks.append(check_history_db_has_data())
     return DoctorReport(root=str(project_root), checks=checks)
 
 

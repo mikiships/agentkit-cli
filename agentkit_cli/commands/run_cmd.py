@@ -16,6 +16,7 @@ from agentkit_cli.config import find_project_root, save_last_run
 from agentkit_cli.history import record_run
 from agentkit_cli.composite import CompositeScoreEngine
 from agentkit_cli.notifier import fire_notifications, resolve_notify_configs
+from agentkit_cli.populate_engine import PopulateEngine
 
 console = Console()
 
@@ -102,6 +103,9 @@ def run_command(
     ecosystem: Optional[str] = None,
     gist: bool = False,
     site_dir: Optional[str] = None,
+    populate: bool = False,
+    populate_topics: Optional[str] = None,
+    populate_limit: int = 10,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -867,6 +871,18 @@ def run_command(
 
     if json_output:
         print(json.dumps(summary, indent=2))
+
+    # Optional: populate topics after scoring current repo
+    if populate:
+        try:
+            _pop_topics = [t.strip() for t in (populate_topics or "python,typescript,rust,go").split(",") if t.strip()]
+            _pop_engine = PopulateEngine()
+            _pop_result = _pop_engine.populate(topics=_pop_topics, limit=populate_limit, quiet=ci)
+            summary["populate"] = _pop_result.to_dict()
+            if not ci and not json_output:
+                console.print(f"[green]✓ Populate:[/green] {_pop_result.total_scored} repos scored across {len(_pop_topics)} topic(s)")
+        except Exception as _pop_exc:
+            summary["populate"] = {"error": str(_pop_exc)}
 
     # Optional: regenerate site index page after run
     if site_dir:
