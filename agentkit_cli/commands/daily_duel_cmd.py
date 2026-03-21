@@ -27,6 +27,7 @@ def daily_duel_command(
     output: Optional[str] = None,
     pair: Optional[List[str]] = None,
     quiet: bool = False,
+    tweet_only: bool = False,
     calendar: bool = False,
     timeout: int = 120,
     token: Optional[str] = None,
@@ -65,6 +66,7 @@ def daily_duel_command(
             json_output=json_output,
             output=output,
             quiet=quiet,
+            tweet_only=tweet_only,
             token=resolved_token,
             timeout=timeout,
             _analyze_factory=_analyze_factory,
@@ -82,7 +84,7 @@ def daily_duel_command(
     effective_seed = seed or date.today().isoformat()
     repo1, repo2, category = engine.pick_pair(seed)
 
-    if not quiet and not json_output:
+    if not quiet and not json_output and not tweet_only:
         console.print(f"\n[bold]🗓️  Daily Duel[/bold] — [dim]{effective_seed}[/dim]")
         console.print(f"  [bold cyan]{repo1}[/bold cyan] vs [bold cyan]{repo2}[/bold cyan]  [yellow][{category}][/yellow]")
         console.print()
@@ -144,6 +146,10 @@ def daily_duel_command(
     except Exception:
         pass
 
+    if tweet_only:
+        print(result.tweet_text)
+        return
+
     if json_output:
         print(json.dumps(result.to_dict(), indent=2))
         return
@@ -176,6 +182,7 @@ def _run_explicit_pair(
     json_output: bool,
     output: Optional[str],
     quiet: bool,
+    tweet_only: bool,
     token: Optional[str],
     timeout: int,
     _analyze_factory,
@@ -278,6 +285,10 @@ def _run_explicit_pair(
         )
     except Exception:
         pass
+
+    if tweet_only:
+        print(result.tweet_text)
+        return
 
     if json_output:
         print(json.dumps(result.to_dict(), indent=2))
