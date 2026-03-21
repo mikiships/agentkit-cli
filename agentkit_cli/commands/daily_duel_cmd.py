@@ -49,8 +49,10 @@ def daily_duel_command(
         table.add_column("Repo 1", style="cyan")
         table.add_column("Repo 2", style="cyan")
         table.add_column("Category", style="yellow")
+        table.add_column("Narrative", style="magenta")
         for entry in schedule:
-            table.add_row(entry["date"], entry["repo1"], entry["repo2"], entry["category"])
+            narrative = entry.get("narrative_type", "balanced")
+            table.add_row(entry["date"], entry["repo1"], entry["repo2"], entry["category"], narrative)
         console.print(table)
         return
 

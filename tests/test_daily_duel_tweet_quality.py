@@ -197,8 +197,10 @@ def test_clear_winner_tweet_contains_winner_label():
         pair_category="devtools",
         seed="2026-03-21",
     )
-    assert "Winner:" in text
-    assert "astral-sh/ruff" in text
+    # v0.77.0: clear-winner copy uses narrative templates (no "Winner:" label)
+    assert len(text) <= 280
+    # short name should appear (tweet uses repo name without owner)
+    assert "ruff" in text
 
 
 def test_clear_winner_tweet_within_280():

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.77.0] - 2026-03-21
+
+### Added
+- **Asymmetric pairs**: 24 new asymmetric repo pairs in `PRESET_PAIRS` (legacy vs modern: bottle vs fastapi, pylint vs ruff, tornado vs uvicorn, psycopg2 vs asyncpg, backbone vs react, etc.) — guaranteeing clear winners with real score differentials
+- `ASYMMETRIC_PAIRS` and `BALANCED_PAIRS` sub-lists in `daily_duel.py`; `PRESET_PAIRS` is their union (42+ total pairs)
+- Each pair tuple gains a 4th element: `narrative_type` — `"asymmetric"` or `"balanced"`
+- `pick_pair_full()` method on `DailyDuelEngine` returning full 4-tuple
+- `_diff_tier()` helper: classifies score differences as `"large"` (>30), `"medium"` (15-30), or `"small"` (<15)
+- Large-diff tweet templates (4) — "crushes", "dominates", "doc gap" framing
+- Medium-diff tweet templates (4) — "beats", "edges out", "outpaces" framing
+- Both template sets are seeded-deterministic (same seed = same template)
+- `--calendar` output now shows **Narrative** column (asymmetric/balanced)
+- `DailyDuelResult.narrative_type` field included in JSON output
+- New categories: `"cli-tools"`, `"legacy-vs-modern"`
+
+### Changed
+- Clear-winner tweet copy (score diff > 5) now uses narrative templates instead of the dry "Winner: X on N/M dimensions" format
+- `_build_tweet_text` uses `_diff_tier` to route large/medium/small diffs to appropriate template sets
+- Short repo names (sans owner) used in tweet templates for brevity
+
 ## [0.76.0] - 2026-03-21
 
 ### Added
