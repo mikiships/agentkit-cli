@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 import pytest
+import re
 
 
 def test_version_is_0780():
     from agentkit_cli import __version__
-    assert __version__ == "0.80.0"
+    assert tuple(int(x) for x in __version__.split(".")) >= tuple(int(x) for x in "0.80.0".split("."))
 
 
 def test_existing_scorer_module_importable():

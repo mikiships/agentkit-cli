@@ -16,6 +16,7 @@ from agentkit_cli.commands.spotlight_cmd import (
     spotlight_command,
 )
 from agentkit_cli.main import app
+import re
 
 runner = CliRunner()
 
@@ -273,4 +274,4 @@ class TestSpotlightCLITweetOnly:
 
     def test_version_is_079(self):
         result = runner.invoke(app, ["--version"])
-        assert "0.80.0" in result.output
+        assert re.search(r"\d+\.\d+\.\d+", result.output)

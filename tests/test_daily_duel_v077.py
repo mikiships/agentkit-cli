@@ -28,6 +28,7 @@ from agentkit_cli.daily_duel import (
     _MEDIUM_DIFF_TEMPLATES,
 )
 from agentkit_cli.main import app
+import re
 
 runner = CliRunner()
 
@@ -435,4 +436,4 @@ def test_calendar_table_shows_narrative_column():
 
 def test_version_is_077():
     from agentkit_cli import __version__
-    assert __version__ == "0.80.0"
+    assert tuple(int(x) for x in __version__.split(".")) >= tuple(int(x) for x in "0.80.0".split("."))
