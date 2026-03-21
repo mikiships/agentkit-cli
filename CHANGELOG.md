@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.76.0] - 2026-03-21
+
+### Added
+- `CATEGORY_INSIGHTS` dict in `daily_duel.py` with 3-5 insight phrases per category (web-frameworks, http-clients, ml-ai, testing, async-networking, databases, js-frameworks, devtools)
+- `_build_tweet_text()` helper: generates personality-rich tweet text with three cases: draw (champion framing + category insight), near-draw (≤5 pts, margin-first), clear winner (existing format preserved)
+- `--tweet-only` flag on `agentkit daily-duel`: prints only tweet text to stdout and exits — designed for piping to `frigatebird tweet`
+- `scripts/post-daily-duel.sh`: shell wrapper that runs `daily-duel --tweet-only`, validates tweet length, posts via `frigatebird`, and logs JSON result to `~/.local/share/agentkit/daily-duel-post-log.jsonl`
+
+### Changed
+- Draw case tweet no longer says "Winner: draw on 0/4 dimensions" — replaced with category-contextual champion framing
+- Near-draw case (score diff ≤ 5) now leads with "extremely close" and the margin
+- `_run_explicit_pair` in `daily_duel_cmd.py` updated to use shared `_build_tweet_text()` logic
+
 ## [0.75.0] - 2026-03-20
 
 ### Added
