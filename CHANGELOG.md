@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.78.0] - 2026-03-21
+
+### Added
+- **ExistingStateScorer**: new `agentkit_cli/existing_scorer.py` — scores repos based on pre-existing documentation artifacts (agent context files, README quality, CONTRIBUTING, CHANGELOG, CI config, test coverage, type annotations) without running agentmd generation
+- **`--existing` flag** for `agentkit daily-duel` (default: `True`) and `agentkit duel` — skips agentmd generation step and uses ExistingStateScorer instead, fixing the circular scoring problem
+- **`analyze_existing()`** function in `analyze.py` — lightweight clone-and-score pipeline using ExistingStateScorer
+- `RepoDuelEngine(existing=True)` mode for direct ExistingStateScorer-based duels
+- `DailyDuelEngine` defaults `existing=True` — daily-duel now produces real score differences between repos
+
+### Fixed
+- **Circular scoring bug**: `daily-duel` previously always returned 100/100 draws because agentmd would generate a valid CLAUDE.md before scoring it. With `--existing` mode, only pre-existing docs artifacts are scored, producing real differentials.
+
 ## [0.77.0] - 2026-03-21
 
 ### Added

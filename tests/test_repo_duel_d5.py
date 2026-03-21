@@ -10,17 +10,17 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_is_0_74_0():
     from agentkit_cli import __version__
-    assert __version__ == "0.77.0"
+    assert __version__ == "0.78.0"
 
 
 def test_pyproject_version_is_0_74_0():
     content = (REPO_ROOT / "pyproject.toml").read_text()
-    assert 'version = "0.77.0"' in content
+    assert 'version = "0.78.0"' in content
 
 
 def test_changelog_has_0_74_0_entry():
     content = (REPO_ROOT / "CHANGELOG.md").read_text()
-    assert "0.77.0" in content
+    assert "0.78.0" in content
 
 
 def test_changelog_repo_duel_mentioned():

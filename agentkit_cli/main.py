@@ -1738,6 +1738,7 @@ def daily_duel(
     calendar: bool = typer.Option(False, "--calendar", help="Show 7-day schedule preview (no analysis)"),
     timeout: int = typer.Option(120, "--timeout", hidden=True),
     token: Optional[str] = typer.Option(None, "--token", hidden=True),
+    existing: bool = typer.Option(True, "--existing/--no-existing", help="Score existing repo state (no agentmd generation). Default: True."),
 ) -> None:
     """🗓️  Daily Duel: auto-selects contrasting repos, duels them, outputs tweet-ready text."""
     daily_duel_command(
@@ -1752,6 +1753,7 @@ def daily_duel(
         calendar=calendar,
         timeout=timeout,
         token=token,
+        existing=existing,
     )
 
 

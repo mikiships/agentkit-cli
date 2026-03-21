@@ -348,10 +348,13 @@ class DailyDuelEngine:
         token: Optional[str] = None,
         timeout: int = 120,
         _analyze_factory=None,
+        existing: bool = True,
     ) -> None:
         self.token = token
         self.timeout = timeout
         self._analyze_factory = _analyze_factory
+        # existing=True by default: skip agentmd generation, score what's already there
+        self.existing = existing
 
     def pick_pair(self, seed: Optional[str] = None) -> Tuple[str, str, str]:
         """Deterministically pick a (repo1, repo2, category) triple from presets.
@@ -383,6 +386,7 @@ class DailyDuelEngine:
             token=self.token,
             timeout=self.timeout,
             _analyze_factory=self._analyze_factory,
+            existing=self.existing,
         )
         base_result = engine.run_duel(repo1=repo1, repo2=repo2, deep=deep)
 

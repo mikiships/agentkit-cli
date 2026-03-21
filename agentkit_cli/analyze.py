@@ -313,3 +313,63 @@ def analyze_target(
             pass
 
     return result
+
+
+def analyze_existing(
+    target: str,
+    keep: bool = False,
+    timeout: int = 120,
+) -> "AnalyzeResult":
+    """Analyze a repo using ExistingStateScorer — no agentmd generation.
+
+    Clones the repo (if remote) and scores the existing documentation artifacts.
+    This avoids the circular scoring problem where agentmd generation always
+    produces a passing score.
+    """
+    from agentkit_cli.existing_scorer import ExistingStateScorer
+
+    url_or_path, repo_name = parse_target(target)
+    is_local = target.startswith((".", "/", "~"))
+    temp_dir: Optional[str] = None
+    work_dir: str
+
+    if is_local:
+        work_dir = url_or_path
+    else:
+        temp_dir = tempfile.mkdtemp(prefix="agentkit-existing-")
+        work_dir = temp_dir
+        try:
+            _clone(url_or_path, work_dir, timeout=timeout)
+        except RuntimeError:
+            if temp_dir and not keep:
+                shutil.rmtree(temp_dir, ignore_errors=True)
+            raise
+
+    try:
+        scorer = ExistingStateScorer(Path(work_dir))
+        scores = scorer.score_all()
+        composite = scores.pop("composite", 0.0)
+        grade = _compute_grade(composite)
+
+        tools_out: dict[str, dict] = {}
+        for dim, val in scores.items():
+            tools_out[dim] = {
+                "tool": dim,
+                "status": "pass" if val > 0 else "fail",
+                "score": val,
+                "finding": f"{dim}={val:.0f}/100",
+            }
+    finally:
+        if temp_dir and not keep:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            temp_dir = None
+
+    return AnalyzeResult(
+        target=target,
+        repo_name=repo_name,
+        composite_score=composite,
+        grade=grade,
+        tools=tools_out,
+        generated_context=False,
+        temp_dir=temp_dir if keep else None,
+    )

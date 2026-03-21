@@ -31,6 +31,7 @@ def daily_duel_command(
     calendar: bool = False,
     timeout: int = 120,
     token: Optional[str] = None,
+    existing: bool = True,
     _analyze_factory=None,
     _output_path: Optional[Path] = None,
 ) -> None:
@@ -80,6 +81,7 @@ def daily_duel_command(
         token=resolved_token,
         timeout=timeout,
         _analyze_factory=_analyze_factory,
+        existing=existing,
     )
 
     # Preview which pair we'll duel

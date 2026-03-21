@@ -97,15 +97,20 @@ class RepoDuelEngine:
         token: Optional[str] = None,
         timeout: int = 120,
         _analyze_factory=None,
+        existing: bool = False,
     ) -> None:
         self.token = token
         self.timeout = timeout
         # Test override: callable(target, timeout) -> AnalyzeResult
         self._analyze_factory = _analyze_factory
+        self.existing = existing
 
     def _analyze(self, target: str):
         if self._analyze_factory is not None:
             return self._analyze_factory(target, self.timeout)
+        if self.existing:
+            from agentkit_cli.analyze import analyze_existing
+            return analyze_existing(target, timeout=self.timeout)
         from agentkit_cli.analyze import analyze_target
         return analyze_target(target, timeout=self.timeout)
 
