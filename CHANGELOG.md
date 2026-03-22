@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.85.0] - 2026-03-22
+
+### Added
+- **`agentkit frameworks`** (D1-D3): new command that detects which frameworks a project uses (Next.js, FastAPI, Django, Rails, React, Vue, Nuxt, Flask, Laravel, Express) and checks if CLAUDE.md/AGENTS.md has framework-specific coverage sections. Flags: `--json`, `--quiet`, `--min-score`, `--context-file`, `--share`, `--generate`.
+- **`FrameworkDetector`** (`agentkit_cli/frameworks.py`): local file-only detection for 10+ frameworks using `package.json`, `requirements.txt`, `pyproject.toml`, `manage.py`, `Gemfile`, `composer.json`, and framework config files.
+- **`FrameworkChecker`** (`agentkit_cli/frameworks.py`): scores each detected framework's agent context coverage (0-100), weighted 80% required / 20% nice-to-have sections.
+- **`agentkit frameworks --generate`** (D3): auto-appends missing framework sections to CLAUDE.md/AGENTS.md. Idempotent (skips existing headings). Templates in `agentkit_cli/framework_templates.py` for all 10 frameworks.
+- **`agentkit doctor`** framework coverage check (D4): warns if a detected framework scores < 60 in agent context coverage. Fix hint: `agentkit frameworks --generate`.
+- **`agentkit run --frameworks`** (D4): runs framework coverage check after pipeline and includes results in JSON output.
+
 ## [0.84.1] - 2026-03-22
 - **fix:** Restore missing content in `docs/index.html`: pipeline stages, feature grid (6 tools), commands table, Daily Trending / Org Leaderboard / Developer Profile Card sections, nav links. Add `stat-card` class to `site_engine.py` stats items. All 15 previously-failing D4/D5/landing tests now pass.
 
