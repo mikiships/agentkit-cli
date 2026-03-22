@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>agentkit — Agent Quality Rankings</title>
-<meta name="description" content="Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.">
-<link rel="canonical" href="https://mikiships.github.io/agentkit-cli/">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Agent Quality Rankings", "description": "Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
+<title>Rust Repos — Agent Quality Rankings | agentkit</title>
+<meta name="description" content="Top rust GitHub repos ranked by AI agent-readiness score. Updated automatically.">
+<link rel="canonical" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Rust Repos \u2014 Agent Quality Rankings | agentkit", "description": "Top rust GitHub repos ranked by AI agent-readiness score. Updated automatically.", "url": "https://mikiships.github.io/agentkit-cli/topic/rust.html"}</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -377,127 +377,11 @@ footer a:hover { color: var(--text); }
   </nav>
 </header>
 
-        <div class="hero">
-          <div class="hero-badge">v0.86.0 &middot; 0 repos scored</div>
-          <h1>Benchmark AI Coding Agents<br>on <em>Your Codebase</em></h1>
-          <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
-          <div class="hero-actions">
-            <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">agentkit quickstart</a>
-            <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
-          </div>
-        </div>
-
-        <!-- Pipeline stages -->
-        <section class="pipeline-section">
-          <div class="container">
-            <div class="pipeline-stages">
-              <span class="pipeline-stage">MEASURE</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">GENERATE</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">GUARD</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">LEARN</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">BENCHMARK</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Stats bar -->
-        <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4350</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">86</div><div class="stat-label">Versions</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num">0</div><div class="stat-label">Repos Scored</div></div>
-        </div>
-
-        <!-- Feature grid -->
-        <section class="features-section">
-          <div class="container">
-            <h2 class="section-title">The Agent Quality Stack</h2>
-            <div class="feature-grid">
-              <div class="feature-card"><h3>coderace</h3><p>Benchmark agents on your own tasks. MEASURE quality.</p></div>
-              <div class="feature-card"><h3>agentmd</h3><p>Generate CLAUDE.md context files. GENERATE context.</p></div>
-              <div class="feature-card"><h3>agentlint</h3><p>Static analysis for agent docs. GUARD quality.</p></div>
-              <div class="feature-card"><h3>agentreflect</h3><p>Learn from agent session logs. LEARN patterns.</p></div>
-              <div class="feature-card"><h3>agentkit-mcp</h3><p>MCP server exposing the toolkit. CONNECT tools.</p></div>
-              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point. ORCHESTRATE everything.</p></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Quick-start code block -->
-        <section class="quickstart-section">
-          <div class="container">
-            <h2 class="section-title">Quick Start</h2>
-            <pre class="code-block"><code>pip install agentkit-cli
-agentkit quickstart</code></pre>
-          </div>
-        </section>
-
-        <!-- Commands table -->
-        <section class="commands-section">
-          <div class="container">
-            <h2 class="section-title">Commands</h2>
-            <table class="cmd-table">
-              <thead><tr><th>Command</th><th>Description</th></tr></thead>
-              <tbody>
-                <tr><td>agentkit run</td><td>Run the full quality pipeline</td></tr>
-                <tr><td>agentkit analyze github:owner/repo</td><td>Analyze any GitHub repo</td></tr>
-                <tr><td>agentkit score</td><td>Get composite quality score</td></tr>
-                <tr><td>agentkit report</td><td>Generate HTML quality report</td></tr>
-                <tr><td>agentkit doctor</td><td>Check toolkit health</td></tr>
-                <tr><td>agentkit hooks install</td><td>Install pre-commit quality hooks</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Daily Trending section -->
-        <section class="trending-section" id="daily-trending">
-          <div class="container">
-            <h2 class="section-title">Daily Trending</h2>
-            <p class="section-note">See which trending GitHub repos score highest for agent-readiness today.</p>
-            <a class="btn-gh" href="trending.html">View Daily Trending ↗</a>
-            <div class="feature-card pages-trending" style="margin-top:1rem">
-              <h3>Daily Trending Repos</h3>
-              <p>Track agent-readiness scores for today's trending repositories.</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- Org Leaderboard section -->
-        <section class="org-leaderboard-section" id="org-leaderboard">
-          <div class="container">
-            <h2 class="section-title">Org Leaderboard</h2>
-            <p class="section-note">Score all public repos in any GitHub org and rank them by agent-readiness.</p>
-            <a class="btn-gh" href="leaderboard.html">View Leaderboard ↗</a>
-          </div>
-        </section>
-
-        <!-- Developer Profile Card section -->
-        <section class="user-scorecard-section" id="user-scorecard">
-          <div class="container">
-            <h2 class="section-title">Developer Profile Card</h2>
-            <p class="section-note">Grade any developer's public repos for agent-readiness with a shareable profile card.</p>
-            <pre class="code-block"><code>agentkit user-scorecard github:USERNAME</code></pre>
-          </div>
-        </section>
-
-        <!-- Subscribe CTA -->
-        <section class="subscribe-section">
-          <div class="container">
-            <h2 class="section-title">Subscribe to Updates</h2>
-            <p>Watch the <a href="https://github.com/mikiships/agentkit-cli">GitHub repo</a> for new releases and features.</p>
-          </div>
-        </section>
-
-        <!-- Live Rankings -->
         <div class="container">
-          <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
-          <p style='color:var(--muted)'>No scored repos yet. Run <code>agentkit quickstart</code> to get started.</p>
+          <div class="breadcrumb"><a href="https://mikiships.github.io/agentkit-cli/">Home</a> / Rust</div>
+          <h2 class="section-title">Rust — Agent Quality Rankings</h2>
+          <p style="color:#8b949e;margin-bottom:1rem">Top 0 repos ranked by AI agent-readiness score.</p>
+          <p style='color:var(--muted)'>No repos found for this topic yet.</p>
         </div>
 <footer>
   <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-03-22 · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
