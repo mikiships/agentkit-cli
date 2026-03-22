@@ -60,6 +60,7 @@ from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
+from agentkit_cli.commands.weekly_cmd import weekly_command
 from agentkit_cli.commands.user_scorecard_cmd import user_scorecard_command
 from agentkit_cli.commands.user_badge_cmd import user_badge_command
 from agentkit_cli.commands.user_duel_cmd import user_duel_command
@@ -702,6 +703,30 @@ def daily(
         pages=pages,
         pages_repo=pages_repo,
         pages_path=pages_path,
+    )
+
+
+@app.command("weekly")
+def weekly(
+    days: int = typer.Option(7, "--days", help="Number of days to look back (default: 7)"),
+    project: Optional[list[str]] = typer.Option(None, "--project", "-p", help="Filter to specific projects (repeatable)"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON instead of table"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Save HTML report to file"),
+    quiet: bool = typer.Option(False, "--quiet", help="Suppress non-essential output (cron-friendly)"),
+    tweet_only: bool = typer.Option(False, "--tweet-only", help="Print only the tweet-ready summary and exit"),
+    share: bool = typer.Option(False, "--share", help="Publish HTML report and print URL"),
+    db_path: Optional[Path] = typer.Option(None, "--db", hidden=True, help="Override history DB path"),
+) -> None:
+    """Generate a 7-day agent quality digest across all tracked projects."""
+    weekly_command(
+        days=days,
+        projects=project or None,
+        json_output=json_output,
+        output=output,
+        quiet=quiet,
+        tweet_only=tweet_only,
+        share=share,
+        db_path=db_path,
     )
 
 
