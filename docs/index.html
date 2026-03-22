@@ -1,491 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>agentkit-cli — Benchmark AI Coding Agents on YOUR Repo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agentkit — Agent Quality Rankings</title>
+<meta name="description" content="Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.">
+<link rel="canonical" href="https://mikiships.github.io/agentkit-cli/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Agent Quality Rankings", "description": "Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
 <style>
-  :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --accent: #58a6ff;
-    --accent2: #3fb950;
-    --text: #c9d1d9;
-    --muted: #8b949e;
-    --code-bg: #1f2937;
-    --warn: #d29922;
-    --danger: #f85149;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-  }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
 
-  /* Nav */
-  nav {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0.75rem 2rem;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Courier New', Courier, monospace;
+    min-height: 100vh;
+    padding: 0;
+}
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+header {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .nav-brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); }
-  .nav-links a { margin-left: 1.5rem; color: var(--muted); font-size: 0.9rem; }
-  .nav-links a:hover { color: var(--text); }
-
-  /* Hero */
-  .hero {
+}
+header h1 { font-size: 1.2rem; color: #58a6ff; }
+header nav a { margin-left: 1rem; font-size: 0.9rem; color: #8b949e; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+.hero {
     text-align: center;
-    padding: 5rem 2rem 4rem;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .hero h1 {
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 800;
-    line-height: 1.15;
-    margin-bottom: 1.2rem;
-    background: linear-gradient(135deg, #58a6ff 0%, #3fb950 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .hero p {
-    font-size: 1.2rem;
-    color: var(--muted);
-    max-width: 640px;
-    margin: 0 auto 2.5rem;
-  }
-  .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-  .btn {
-    display: inline-block;
-    padding: 0.7rem 1.6rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: opacity 0.15s;
-  }
-  .btn:hover { opacity: 0.85; text-decoration: none; }
-  .btn-primary { background: var(--accent); color: #0d1117; }
-  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-
-  /* Stats bar */
-  .stats-bar {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 1.2rem 2rem;
-  }
-  .stats-inner {
-    max-width: 900px;
-    margin: 0 auto;
+    padding: 3rem 1rem 2rem;
+}
+.hero h2 { font-size: 2rem; color: #58a6ff; margin-bottom: 0.5rem; }
+.hero p { color: #8b949e; font-size: 1rem; }
+.stats {
     display: flex;
+    gap: 1.5rem;
     justify-content: center;
-    gap: 3rem;
     flex-wrap: wrap;
-  }
-  .stat {
-    text-align: center;
-  }
-  .stat-value {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--accent);
-  }
-  .stat-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  /* Pipeline */
-  .section {
-    padding: 4rem 2rem;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .section h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-  .section-sub {
-    color: var(--muted);
-    margin-bottom: 2.5rem;
-    font-size: 0.95rem;
-  }
-  .pipeline {
-    display: flex;
-    gap: 0;
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-  .pipe-step {
-    flex: 1;
-    min-width: 140px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+.stat-card {
+    background: #161b22;
+    border: 1px solid #30363d;
     border-radius: 8px;
-    padding: 1.2rem 1rem;
+    padding: 1rem 1.5rem;
     text-align: center;
-    position: relative;
-  }
-  .pipe-step + .pipe-step { margin-left: 0.5rem; }
-  .pipe-arrow {
-    display: flex;
-    align-items: center;
-    color: var(--muted);
-    font-size: 1.2rem;
-    padding: 0 0.2rem;
-  }
-  .pipe-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
-  .pipe-name { font-weight: 700; font-size: 0.85rem; color: var(--accent); letter-spacing: 0.05em; }
-  .pipe-desc { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
-
-  /* Features grid */
-  .features {
+    min-width: 130px;
+}
+.stat-card .value { font-size: 2rem; font-weight: bold; color: #58a6ff; }
+.stat-card .label { font-size: 0.8rem; color: #8b949e; margin-top: 0.25rem; }
+.topics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
-  }
-  .feature-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    margin: 2rem 0;
+}
+.topic-card {
+    background: #161b22;
+    border: 1px solid #30363d;
     border-radius: 8px;
-    padding: 1.4rem;
-  }
-  .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
-  .feature-card p { color: var(--muted); font-size: 0.88rem; }
-  .feature-tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 99px;
-    margin-bottom: 0.6rem;
-    letter-spacing: 0.04em;
-  }
-  .tag-measure { background: #1f3a5c; color: #58a6ff; }
-  .tag-generate { background: #1a3a2a; color: #3fb950; }
-  .tag-guard { background: #3a2020; color: #f85149; }
-  .tag-learn { background: #3a3020; color: #d29922; }
-  .tag-connect { background: #2a1f3a; color: #bc8cff; }
-  .tag-orchestrate { background: #1f2f3a; color: #79c0ff; }
-
-  /* Code block */
-  .code-block {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.4rem 1.6rem;
-    font-family: "SF Mono", "Fira Code", monospace;
-    font-size: 0.9rem;
-    overflow-x: auto;
-    line-height: 1.8;
-  }
-  .code-comment { color: var(--muted); }
-  .code-cmd { color: var(--accent2); }
-  .code-output { color: var(--text); }
-
-  /* Commands table */
-  .cmd-table { width: 100%; border-collapse: collapse; }
-  .cmd-table th {
-    text-align: left;
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .cmd-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
-  .cmd-table tr:last-child td { border-bottom: none; }
-  .cmd-table td:first-child { font-family: "SF Mono", monospace; color: var(--accent); }
-  .cmd-table td:last-child { color: var(--muted); }
-
-  /* Footer */
-  footer {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 2rem;
+    padding: 1.2rem;
     text-align: center;
-    color: var(--muted);
+}
+.topic-card h3 { color: #58a6ff; font-size: 1rem; margin-bottom: 0.5rem; }
+.topic-card p { color: #8b949e; font-size: 0.8rem; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+}
+th, td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #30363d;
+    text-align: left;
+}
+th { color: #8b949e; font-weight: normal; font-size: 0.8rem; }
+tr:hover { background: #161b22; }
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: bold;
     font-size: 0.85rem;
-  }
-  footer a { color: var(--accent); }
-  footer .footer-links { margin-bottom: 0.5rem; }
-  footer .footer-links a { margin: 0 0.75rem; }
+}
+.badge-A { background: #1a7f37; color: #fff; }
+.badge-B { background: #1c4fd6; color: #fff; }
+.badge-C { background: #9a6700; color: #fff; }
+.badge-D { background: #6e1c1c; color: #fff; }
+.badge-F { background: #6e1c1c; color: #fff; }
+.score-bar-wrap { background: #30363d; border-radius: 4px; height: 8px; width: 120px; display: inline-block; vertical-align: middle; }
+.score-bar { height: 8px; border-radius: 4px; background: #58a6ff; }
+footer {
+    border-top: 1px solid #30363d;
+    padding: 1rem 2rem;
+    text-align: center;
+    color: #8b949e;
+    font-size: 0.8rem;
+    margin-top: 3rem;
+}
+footer a { color: #58a6ff; }
+.breadcrumb { color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem; }
+h2.section-title { font-size: 1.2rem; color: #e6edf3; margin: 2rem 0 1rem; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem; }
+.history-chart { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+.history-chart canvas { width: 100%; max-height: 200px; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.detail-item { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem; }
+.detail-item .key { color: #8b949e; font-size: 0.75rem; }
+.detail-item .val { color: #58a6ff; font-weight: bold; font-size: 1.1rem; }
 
-  /* Divider */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-  }
-
-  @media (max-width: 600px) {
-    .pipeline { flex-direction: column; }
-    .pipe-step + .pipe-step { margin-left: 0; margin-top: 0.5rem; }
-    .pipe-arrow { display: none; }
-    .stats-inner { gap: 1.5rem; }
-  }
 </style>
 </head>
 <body>
+<header>
+  <h1><a href="https://mikiships.github.io/agentkit-cli/" style="color:#58a6ff;text-decoration:none;">🤖 agentkit</a></h1>
+  <nav>
+    <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
+    <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
+    <a href="https://github.com/mikiships/agentkit-cli" target="_blank">GitHub</a>
+  </nav>
+</header>
 
-<nav>
-  <span class="nav-brand">agentkit-cli</span>
-  <span class="nav-links">
-    <a href="https://github.com/mikiships/agentkit-cli">GitHub</a>
-    <a href="https://pypi.org/project/agentkit-cli/">PyPI</a>
-    <a href="#quickstart">Quickstart</a>
-    <a href="#commands">Commands</a>
-    <a href="leaderboard.html">Daily Leaderboard</a>
-    <a href="trending.html">Daily Trending</a>
-    <a href="#org-leaderboard">Org Leaderboard</a>
-  </span>
-</nav>
-
-<!-- Hero -->
-<section class="hero">
-  <h1>Benchmark AI Coding Agents on YOUR Repo</h1>
-  <p>The Agent Quality Toolkit — measure, generate, guard, and improve AI agent performance across your entire codebase in minutes.</p>
-  <div class="hero-cta">
-    <a class="btn btn-primary" href="#quickstart">Get Started</a>
-    <a class="btn btn-secondary" href="https://github.com/mikiships/agentkit-cli">View on GitHub</a>
-  </div>
-</section>
-
-<!-- Stats bar -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat">
-      <div class="stat-value" data-stat="tests">2097</div>
-      <div class="stat-label">Tests Passing</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" data-stat="packages">6</div>
-      <div class="stat-label">PyPI Packages</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" data-stat="versions">84</div>
-      <div class="stat-label">Versions Shipped</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" data-stat="install">pip install</div>
-      <div class="stat-label">No Config Required</div>
-    </div>
-  </div>
-</div>
-
-<!-- Pipeline -->
-<section class="section">
-  <h2>One Pipeline, Five Stages</h2>
-  <p class="section-sub">From raw codebase to actionable agent quality score — automated end to end.</p>
-
-  <div class="pipeline">
-    <div class="pipe-step">
-      <div class="pipe-icon">📏</div>
-      <div class="pipe-name">MEASURE</div>
-      <div class="pipe-desc">Benchmark agents on real tasks</div>
-    </div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step">
-      <div class="pipe-icon">⚙️</div>
-      <div class="pipe-name">GENERATE</div>
-      <div class="pipe-desc">Auto-create context files</div>
-    </div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step">
-      <div class="pipe-icon">🛡️</div>
-      <div class="pipe-name">GUARD</div>
-      <div class="pipe-desc">Static analysis on diffs</div>
-    </div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step">
-      <div class="pipe-icon">🧠</div>
-      <div class="pipe-name">LEARN</div>
-      <div class="pipe-desc">Turn failures into rules</div>
-    </div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step">
-      <div class="pipe-icon">🏆</div>
-      <div class="pipe-name">BENCHMARK</div>
-      <div class="pipe-desc">Compare Claude vs Codex</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- Features grid -->
-<section class="section">
-  <h2>Six Tools, One Install</h2>
-  <p class="section-sub">Everything you need to evaluate and improve AI agent quality.</p>
-
-  <div class="features">
-    <div class="feature-card">
-      <div class="feature-tag tag-measure">MEASURE</div>
-      <h3>coderace</h3>
-      <p>Benchmark AI agents on real coding tasks from your repository. Compare Claude vs Codex vs any agent side-by-side.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-generate">GENERATE</div>
-      <h3>agentmd</h3>
-      <p>Automatically generate AGENTS.md and CLAUDE.md context files that make any AI coding agent perform better on your codebase.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-guard">GUARD</div>
-      <h3>agentlint</h3>
-      <p>Static analysis for AI diffs and context files. Catch hallucinated imports, broken references, and anti-patterns before they land.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-learn">LEARN</div>
-      <h3>agentreflect</h3>
-      <p>Turn agent failures into reusable rules. Distill lessons from bad diffs into your AGENTS.md automatically.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-connect">CONNECT</div>
-      <h3>agentkit-mcp</h3>
-      <p>Model Context Protocol server exposing all toolkit tools. Drop agentkit into any MCP-compatible agent workflow.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-orchestrate">ORCHESTRATE</div>
-      <h3>agentkit-cli</h3>
-      <p>The umbrella CLI that ties it all together. One command to run the full pipeline, score your repo, and generate reports.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-learn">LEARN</div>
-      <h3>Daily Leaderboard</h3>
-      <p>Daily ranking of the most agent-ready trending GitHub repos. Run <code>agentkit daily --pages</code> to publish a permanent leaderboard to GitHub Pages.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-learn">TRENDING</div>
-      <h3>Daily Trending</h3>
-      <p>AI-ready repos today — trending GitHub repos scored for agent-readiness and published to a permanent, SEO-crawlable leaderboard. Run <code>agentkit pages-trending</code> to publish your own.
-      <br><a href="trending.html" style="color:var(--accent)">Subscribe to daily AI-ready repos →</a></p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-tag tag-learn">PROFILE</div>
-      <h3>Developer Profile Card</h3>
-      <p>Generate a shareable agent-readiness profile card for any GitHub user. Scores all public repos and ranks them with an A–D grade. Run <code>agentkit user-scorecard github:&lt;user&gt; --share</code> to publish an instant link.</p>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- Quickstart -->
-<section class="section" id="quickstart">
-  <h2>Quickstart</h2>
-  <p class="section-sub">Quality score in under 60 seconds — no configuration required.</p>
-
-  <div class="code-block">
-    <span class="code-comment"># Install the toolkit</span><br>
-    <span class="code-cmd">pip install agentkit-cli</span><br>
-    <br>
-    <span class="code-comment"># Run quickstart — checks toolchain, scores your repo, shares a scorecard</span><br>
-    <span class="code-cmd">agentkit quickstart</span><br>
-    <br>
-    <span class="code-output">🚀 agentkit quickstart</span><br>
-    <span class="code-output">   Your fastest path to an agent quality score.</span><br>
-    <br>
-    <span class="code-output">Checking toolchain readiness…</span><br>
-    <span class="code-output">  ✓ 4 tools ready</span><br>
-    <span class="code-output">Running fast analysis (agentlint + agentmd)…</span><br>
-    <br>
-    <span class="code-output">┌─ my-project ──────────────────────────────┐</span><br>
-    <span class="code-output">│  Score: 78/100  Grade: B  (12.4s)          │</span><br>
-    <span class="code-output">│  Top Findings:                             │</span><br>
-    <span class="code-output">│    • [agentlint] 3 context issues found    │</span><br>
-    <span class="code-output">│    • [agentmd] Documentation score: 82     │</span><br>
-    <span class="code-output">└────────────────────────────────────────────┘</span><br>
-    <br>
-    <span class="code-output">Score card: https://here.now/abc123</span><br>
-    <br>
-    <span class="code-comment"># Full analysis</span><br>
-    <span class="code-cmd">agentkit run .</span>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- Commands table -->
-<section class="section" id="commands">
-  <h2>Command Reference</h2>
-  <p class="section-sub">All major commands at a glance.</p>
-
-  <table class="cmd-table">
-    <thead>
-      <tr>
-        <th>Command</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>agentkit quickstart</td>
-        <td>Fastest path to a composite quality score — start here</td>
-      </tr>
-      <tr>
-        <td>agentkit run .</td>
-        <td>Full pipeline analysis on the current directory</td>
-      </tr>
-      <tr>
-        <td>agentkit analyze github:owner/repo</td>
-        <td>Analyze any public GitHub repository</td>
-      </tr>
-      <tr>
-        <td>agentkit benchmark</td>
-        <td>Compare Claude vs Codex on your codebase tasks</td>
-      </tr>
-      <tr>
-        <td>agentkit score</td>
-        <td>Compute and display composite score</td>
-      </tr>
-      <tr>
-        <td>agentkit gate --min-score 70</td>
-        <td>Fail CI if score falls below threshold</td>
-      </tr>
-      <tr>
-        <td>agentkit demo --record</td>
-        <td>Print VHS tape commands for terminal recording</td>
-      </tr>
-      <tr>
-        <td>agentkit org github:vercel</td>
-        <td>Score every public repo in a GitHub org</td>
-      </tr>
-      <tr>
-        <td>agentkit doctor</td>
-        <td>Check toolchain health and configuration</td>
-      </tr>
-      <tr>
-        <td>agentkit init</td>
-        <td>Initialize agentkit in the current project</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
+        <div class="hero">
+          <h2>Agent Quality Rankings</h2>
+          <p>SEO-optimized rankings of GitHub repos by AI agent-readiness score.</p>
+          
+        <div class="stats">
+          <div class="stat-card"><div class="value">0</div><div class="label">Repos Scored</div></div>
+          <div class="stat-card"><div class="value">0</div><div class="label">Top Score</div></div>
+          <div class="stat-card"><div class="value">4</div><div class="label">Topics</div></div>
+          <div class="stat-card"><div class="value">—</div><div class="label">Last Run</div></div>
+        </div>
+        </div>
+        <div class="container">
+          <h2 class="section-title">Browse by Topic</h2>
+          <div class="topics-grid"><a class="topic-card" href="https://mikiships.github.io/agentkit-cli/topic/python.html" style="text-decoration:none;"><h3>Python</h3><p>View rankings</p></a><a class="topic-card" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html" style="text-decoration:none;"><h3>Typescript</h3><p>View rankings</p></a><a class="topic-card" href="https://mikiships.github.io/agentkit-cli/topic/rust.html" style="text-decoration:none;"><h3>Rust</h3><p>View rankings</p></a><a class="topic-card" href="https://mikiships.github.io/agentkit-cli/topic/go.html" style="text-decoration:none;"><h3>Go</h3><p>View rankings</p></a></div>
+          <p style='color:#8b949e'>No scored repos yet. Run <code>agentkit analyze</code> to get started.</p>
+        </div>
 <footer>
-  <div class="footer-links">
-    <a href="https://github.com/mikiships/agentkit-cli">GitHub</a>
-    <a href="https://pypi.org/project/agentkit-cli/">PyPI</a>
-    <a href="https://github.com/mikiships/agentkit-cli/blob/main/CHANGELOG.md">Changelog</a>
-    <a href="https://github.com/mikiships/agentkit-cli/issues">Issues</a>
-  </div>
-  <div>agentkit-cli — Agent Quality Toolkit &copy; 2026</div>
+  <p>Generated by <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-03-22</p>
 </footer>
-
 </body>
 </html>
