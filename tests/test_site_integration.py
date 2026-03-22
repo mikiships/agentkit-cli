@@ -88,7 +88,7 @@ def test_site_sitemap_count_matches_pages(tmp_path):
 
 def test_version_is_083():
     from agentkit_cli import __version__
-    assert __version__.startswith("0.84.")
+    assert __version__.startswith("0.85.")
 
 
 def test_pyproject_version(tmp_path):

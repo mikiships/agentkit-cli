@@ -11,7 +11,7 @@ REPO_ROOT = Path(__file__).parent.parent
 class TestVersionBump:
     def test_init_version_is_084(self):
         from agentkit_cli import __version__
-        assert __version__.startswith("0.84.")
+        assert __version__.startswith("0.85.")
 
     def test_pyproject_version_is_084(self):
         from agentkit_cli import __version__
