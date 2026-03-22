@@ -417,6 +417,7 @@ _NAV = """<header>
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="{base_url}">Home</a>
+    <a href="{base_url}leaderboard.html">Daily Leaderboard</a>
     {topic_links}
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
@@ -594,9 +595,9 @@ class SiteEngine:
         </div>
 
         <div class="stats-strip">
-          <div class="stat-item"><div class="stat-num">{total_repos}</div><div class="stat-label">Repos</div></div>
-          <div class="stat-item"><div class="stat-num">{top_score:.0f}</div><div class="stat-label">Top Score</div></div>
-          <div class="stat-item"><div class="stat-num">{len(self.config.topics)}</div><div class="stat-label">Ecosystems</div></div>
+          <div class="stat-item stat-card"><div class="stat-num">{total_repos}</div><div class="stat-label">Repos</div></div>
+          <div class="stat-item stat-card"><div class="stat-num">{top_score:.0f}</div><div class="stat-label">Top Score</div></div>
+          <div class="stat-item stat-card"><div class="stat-num">{len(self.config.topics)}</div><div class="stat-label">Ecosystems</div></div>
         </div>
 
         <div class="container">

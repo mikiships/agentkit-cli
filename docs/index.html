@@ -362,6 +362,69 @@ footer a:hover { color: var(--text); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Pipeline ── */
+.pipeline-stages {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 2.5rem;
+}
+.stage {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(63,185,80,0.3);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+}
+.stage-arrow { color: var(--muted); font-size: 0.85rem; }
+
+/* ── Feature grid ── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 1.5rem 0 2.5rem;
+}
+.feature-card {
+  background: var(--surface);
+  padding: 1.25rem;
+  transition: background 0.15s;
+}
+.feature-card:hover { background: var(--surface2); }
+.feature-card h3 {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--blue);
+  margin-bottom: 0.3rem;
+}
+.feature-card p { font-size: 0.78rem; color: var(--muted); }
+
+/* ── Commands table ── */
+.cmd-table { margin: 1.5rem 0 2.5rem; }
+.cmd-table td:first-child { font-family: var(--mono); font-size: 0.82rem; color: var(--blue); }
+
+/* ── Section cards ── */
+.pages-trending, .org-leaderboard, .user-scorecard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+.pages-trending p, .org-leaderboard p, .user-scorecard p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin: 0.5rem 0;
+}
+
 </style>
 </head>
 <body>
@@ -369,6 +432,9 @@ footer a:hover { color: var(--text); }
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
+    <a href="https://mikiships.github.io/agentkit-cli/leaderboard.html">Daily Leaderboard</a>
+    <a href="trending.html">Daily Trending</a>
+    <a href="org-leaderboard.html">Org Leaderboard</a>
     <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
@@ -376,18 +442,28 @@ footer a:hover { color: var(--text); }
 
         <div class="hero">
           <div class="hero-badge">v0.84 &middot; 100 repos scored</div>
-          <h1>Is your repo ready<br>for <em>AI agents</em>?</h1>
+          <h1>Benchmark AI Coding Agents<br>on your <em>own codebase</em></h1>
           <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
+          <div class="pipeline-stages">
+            <span class="stage">MEASURE</span><span class="stage-arrow">→</span>
+            <span class="stage">GENERATE</span><span class="stage-arrow">→</span>
+            <span class="stage">GUARD</span><span class="stage-arrow">→</span>
+            <span class="stage">LEARN</span><span class="stage-arrow">→</span>
+            <span class="stage">BENCHMARK</span>
+          </div>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
+            <div class="install-block" style="margin-top:0.5rem;font-size:0.85rem;opacity:0.8"><span class="prompt">$</span> agentkit quickstart</div>
+            <div class="install-block" style="margin-top:0.5rem;font-size:0.85rem;opacity:0.8"><span class="prompt">$</span> agentkit daily --pages &nbsp;<span style="color:var(--muted);"># update this leaderboard</span></div>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
           </div>
         </div>
 
         <div class="stats-strip">
-          <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">Repos</div></div>
-          <div class="stat-item"><div class="stat-num">80</div><div class="stat-label">Top Score</div></div>
-          <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Ecosystems</div></div>
+          <div class="stat-item" data-stat="repos"><div class="stat-num">100</div><div class="stat-label">Repos</div></div>
+          <div class="stat-item" data-stat="top-score"><div class="stat-num">80</div><div class="stat-label">Top Score</div></div>
+          <div class="stat-item" data-stat="ecosystems"><div class="stat-num">4</div><div class="stat-label">Ecosystems</div></div>
+          <div class="stat-item" data-stat="tests"><div class="stat-num">4211</div><div class="stat-label">Tests</div></div>
         </div>
 
         <div class="container">
@@ -401,6 +477,66 @@ footer a:hover { color: var(--text); }
           <thead><tr><th>Repository</th><th>Score</th><th>Grade</th></tr></thead>
           <tbody><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/prefecthq--prefect.html">prefecthq/prefect</a></td><td><div class="score-cell"><span class="score-val">80</span><span class="score-bar-wrap"><span class="score-bar" data-pct="80"></span></span></div></td><td><span class="badge badge-B">B</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/apache--airflow.html">apache/airflow</a></td><td><div class="score-cell"><span class="score-val">72</span><span class="score-bar-wrap"><span class="score-bar" data-pct="72"></span></span></div></td><td><span class="badge badge-B">B</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/grafana--grafana.html">grafana/grafana</a></td><td><div class="score-cell"><span class="score-val">70</span><span class="score-bar-wrap"><span class="score-bar" data-pct="70"></span></span></div></td><td><span class="badge badge-B">B</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/dbt-labs--dbt-core.html">dbt-labs/dbt-core</a></td><td><div class="score-cell"><span class="score-val">67</span><span class="score-bar-wrap"><span class="score-bar" data-pct="67"></span></span></div></td><td><span class="badge badge-B">B</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/agno-agi--agno.html">agno-agi/agno</a></td><td><div class="score-cell"><span class="score-val">62</span><span class="score-bar-wrap"><span class="score-bar" data-pct="62"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/labstack--echo.html">labstack/echo</a></td><td><div class="score-cell"><span class="score-val">55</span><span class="score-bar-wrap"><span class="score-bar" data-pct="55"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/ansible--ansible.html">ansible/ansible</a></td><td><div class="score-cell"><span class="score-val">55</span><span class="score-bar-wrap"><span class="score-bar" data-pct="55"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/unslothai--unsloth.html">unslothai/unsloth</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/microsoft--autogen.html">microsoft/autogen</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/stanfordnlp--dspy.html">stanfordnlp/dspy</a></td><td><div class="score-cell"><span class="score-val">48</span><span class="score-bar-wrap"><span class="score-bar" data-pct="48"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/great-expectations--great_expectations.html">great-expectations/great_expectations</a></td><td><div class="score-cell"><span class="score-val">45</span><span class="score-bar-wrap"><span class="score-bar" data-pct="45"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/jesseduffield--lazygit.html">jesseduffield/lazygit</a></td><td><div class="score-cell"><span class="score-val">45</span><span class="score-bar-wrap"><span class="score-bar" data-pct="45"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/golangci--golangci-lint.html">golangci/golangci-lint</a></td><td><div class="score-cell"><span class="score-val">45</span><span class="score-bar-wrap"><span class="score-bar" data-pct="45"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/rust-lang--cargo.html">rust-lang/cargo</a></td><td><div class="score-cell"><span class="score-val">45</span><span class="score-bar-wrap"><span class="score-bar" data-pct="45"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/grpc--grpc-go.html">grpc/grpc-go</a></td><td><div class="score-cell"><span class="score-val">40</span><span class="score-bar-wrap"><span class="score-bar" data-pct="40"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/google--wire.html">google/wire</a></td><td><div class="score-cell"><span class="score-val">35</span><span class="score-bar-wrap"><span class="score-bar" data-pct="35"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/hyperium--hyper.html">hyperium/hyper</a></td><td><div class="score-cell"><span class="score-val">35</span><span class="score-bar-wrap"><span class="score-bar" data-pct="35"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/gofiber--fiber.html">gofiber/fiber</a></td><td><div class="score-cell"><span class="score-val">30</span><span class="score-bar-wrap"><span class="score-bar" data-pct="30"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/go-gorm--gorm.html">go-gorm/gorm</a></td><td><div class="score-cell"><span class="score-val">20</span><span class="score-bar-wrap"><span class="score-bar" data-pct="20"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/logfire-org--logfire.html">logfire-org/logfire</a></td><td><div class="score-cell"><span class="score-val">0</span><span class="score-bar-wrap"><span class="score-bar" data-pct="0"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr></tbody>
         </table>
+
+        <!-- Feature grid: 6 tools -->
+        <div class="section-header" style="margin-top:3rem;">
+          <h2 class="section-title">The Full Toolkit</h2>
+        </div>
+        <div class="feature-grid">
+          <div class="feature-card"><h3>coderace</h3><p>Benchmark AI agents against your own tasks. MEASURE quality.</p></div>
+          <div class="feature-card"><h3>agentmd</h3><p>Auto-generate CLAUDE.md / AGENTS.md. GENERATE context files.</p></div>
+          <div class="feature-card"><h3>agentlint</h3><p>Static analysis for agent context files. GUARD freshness.</p></div>
+          <div class="feature-card"><h3>agentreflect</h3><p>Learn from agent run history. LEARN and improve.</p></div>
+          <div class="feature-card"><h3>agentkit-mcp</h3><p>MCP server exposing all tools to Claude Code.</p></div>
+          <div class="feature-card"><h3>agentkit-cli</h3><p>One CLI to orchestrate the full pipeline.</p></div>
+        </div>
+
+        <!-- Commands table -->
+        <div class="section-header" style="margin-top:2rem;">
+          <h2 class="section-title">Key Commands</h2>
+        </div>
+        <table class="cmd-table">
+          <thead><tr><th>Command</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>agentkit run</td><td>Run full quality pipeline on your repo</td></tr>
+            <tr><td>agentkit analyze github:owner/repo</td><td>Score any public GitHub repo instantly</td></tr>
+            <tr><td>agentkit quickstart</td><td>Zero-config first-run experience</td></tr>
+            <tr><td>agentkit daily --pages</td><td>Update the daily leaderboard on GitHub Pages</td></tr>
+            <tr><td>agentkit trending --pages-trending</td><td>Publish trending repos scorecard</td></tr>
+            <tr><td>agentkit org github:owner</td><td>Score all public repos in a GitHub org</td></tr>
+            <tr><td>agentkit user-scorecard github:user</td><td>Developer Profile Card: grade any developer's repos</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Daily Trending section -->
+        <div class="section-header" style="margin-top:2rem;">
+          <h2 class="section-title">Daily Trending</h2>
+        </div>
+        <div class="pages-trending">
+          <p>See which trending GitHub repos are most AI-agent-ready today.</p>
+          <p>Run <code>agentkit trending --pages-trending</code> to update. Subscribe to stay current.</p>
+          <p><a href="trending.html">View trending leaderboard →</a></p>
+        </div>
+
+        <!-- Org Leaderboard section -->
+        <div class="section-header" style="margin-top:2rem;">
+          <h2 class="section-title">Org Leaderboard</h2>
+        </div>
+        <div class="org-leaderboard">
+          <p>Rank all public repos in any GitHub org by agent-readiness score.</p>
+          <p>Run <code>agentkit org github:owner --pages-org</code> to publish your org's leaderboard.</p>
+          <p><a href="org-leaderboard.html">View org leaderboards →</a></p>
+        </div>
+
+        <!-- Developer Profile Card section -->
+        <div class="section-header" style="margin-top:2rem;">
+          <h2 class="section-title">Developer Profile Card</h2>
+        </div>
+        <div class="user-scorecard">
+          <p>Grade any developer's public repos for agent-readiness. Avatar, grade badge, ranked repo list.</p>
+          <p>Run <code>agentkit user-scorecard github:username</code> to generate a shareable profile card.</p>
+        </div>
+
         </div>
 <footer>
   <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-03-22 · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
