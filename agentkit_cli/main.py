@@ -26,6 +26,7 @@ from agentkit_cli.commands.score_cmd import score_command
 from agentkit_cli.commands.share_cmd import share_command
 from agentkit_cli.commands.gist_cmd import gist_command
 from agentkit_cli.commands.analyze_cmd import analyze_command
+from agentkit_cli.commands.frameworks_cmd import frameworks_command
 from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
@@ -481,6 +482,28 @@ def leaderboard(
 ) -> None:
     """Show a ranked leaderboard of agent runs grouped by --label tags."""
     leaderboard_command(by=by, project=project, last=last, since=since, json_output=json_output, db_path=db_path)
+
+
+@app.command("frameworks")
+def frameworks(
+    path: Path = typer.Argument(Path("."), help="Project directory to analyze (default: .)"),
+    context_file: Optional[Path] = typer.Option(None, "--context-file", help="Explicit path to CLAUDE.md/AGENTS.md"),
+    min_score: int = typer.Option(60, "--min-score", help="Highlight frameworks scoring below N (default: 60)"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+    quiet: bool = typer.Option(False, "--quiet", help="Summary line only"),
+    share: bool = typer.Option(False, "--share", help="Upload report to here.now and print URL"),
+    generate: bool = typer.Option(False, "--generate", help="Auto-add missing framework sections to context file"),
+) -> None:
+    """Detect frameworks and check if agent context file covers them."""
+    frameworks_command(
+        path=path,
+        context_file=context_file,
+        min_score=min_score,
+        json_output=json_output,
+        quiet=quiet,
+        share=share,
+        generate=generate,
+    )
 
 
 @app.command("analyze")
