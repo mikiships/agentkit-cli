@@ -245,10 +245,6 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
-    <loc>https://mikiships.github.io/agentkit-cli/repo/pypa--pip.html</loc>
-    <lastmod>2026-03-22</lastmod>
-  </url>
-  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/matplotlib--matplotlib.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
@@ -338,6 +334,10 @@
   </url>
   <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/alan2207--bulletproof-react.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/logfire-org--logfire.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
 </urlset>
