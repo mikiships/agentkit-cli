@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.87.0] - 2026-03-22
+
+### Fixed
+- **`site_engine.generate_index()`**: Updated to generate a complete marketing landing page with all required sections: hero headline ("Benchmark AI Coding Agents"), pipeline stages (MEASURE/GENERATE/GUARD/LEARN/BENCHMARK), 6-tool feature grid, stats bar with `data-stat` attributes, commands table (cmd-table), Daily Trending section with `trending.html` nav link, Org Leaderboard section, Developer Profile Card section, and subscribe CTA. Fixes 14 failing tests across `test_landing_d1`, `test_trending_pages_d4`, `test_org_pages_d5`, `test_user_scorecard_d5`, and `test_daily_pages_d4`.
+- **`_NAV` template**: Added `trending.html` and `#org-leaderboard` nav links so the global nav reflects current feature set.
+- Regenerated `docs/index.html` with updated template to match test requirements.
+
 ## [0.86.0] - 2026-03-22
 
 ### Added
