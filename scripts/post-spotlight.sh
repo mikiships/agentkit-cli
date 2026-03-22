@@ -54,7 +54,8 @@ fi
 # ── 2. Run spotlight with --share --tweet-only ─────────────────────────────
 echo "Running agentkit spotlight --share --tweet-only --target ${TARGET}..."
 TWEET_TEXT="$(agentkit spotlight --share --tweet-only --target "${TARGET}" 2>/dev/null || true)"
-TWEET_TEXT="${TWEET_TEXT// /}"  # trim
+TWEET_TEXT="${TWEET_TEXT#"${TWEET_TEXT%%[![:space:]]*}"}"  # ltrim
+TWEET_TEXT="${TWEET_TEXT%"${TWEET_TEXT##*[![:space:]]}"}"  # rtrim
 TWEET_TEXT="$(echo "${TWEET_TEXT}" | tr -d '\r')"
 
 # Extract share URL from tweet text (last token starting with https://)

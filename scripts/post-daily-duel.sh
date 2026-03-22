@@ -52,7 +52,8 @@ else
     TWEET_TEXT="$(agentkit daily-duel --tweet-only 2>/dev/null || true)"
 fi
 
-TWEET_TEXT="${TWEET_TEXT// /}"  # trim
+TWEET_TEXT="${TWEET_TEXT#"${TWEET_TEXT%%[![:space:]]*}"}"  # ltrim
+TWEET_TEXT="${TWEET_TEXT%"${TWEET_TEXT##*[![:space:]]}"}"  # rtrim
 TWEET_TEXT="$(echo "${TWEET_TEXT}" | tr -d '\r')"
 
 if [ -z "${TWEET_TEXT}" ]; then

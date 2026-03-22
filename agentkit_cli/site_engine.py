@@ -262,9 +262,9 @@ class SiteEngine:
             owner, repo = parts
             rp = self.generate_repo_page(owner, repo)
             pages.append(rp)
-            repo_dir = output_dir / "repo" / owner
+            repo_dir = output_dir / "repo"
             repo_dir.mkdir(parents=True, exist_ok=True)
-            (repo_dir / f"{repo}.html").write_text(rp.html, encoding="utf-8")
+            (repo_dir / f"{_safe_name(entry.repo)}.html").write_text(rp.html, encoding="utf-8")
 
         # Sitemap
         sitemap = self.generate_sitemap(pages)
@@ -296,7 +296,7 @@ class SiteEngine:
 
         rows_html = "".join(
             f"<tr>"
-            f'<td><a href="{self.config.base_url}repo/{r.repo}.html">{r.repo}</a></td>'
+            f'<td><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
             f"<td>{r.score:.0f}</td>"
             f'<td><span class="badge badge-{r.grade}">{r.grade}</span></td>'
             f"<td>{r.last_run[:10]}</td>"
@@ -345,7 +345,7 @@ class SiteEngine:
         rows_html = "".join(
             f"<tr>"
             f"<td>{i+1}</td>"
-            f'<td><a href="{self.config.base_url}repo/{r.repo}.html">{r.repo}</a></td>'
+            f'<td><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
             f"<td>{r.score:.0f} "
             f'<span class="score-bar-wrap"><span class="score-bar" style="width:{min(100,r.score):.0f}%"></span></span></td>'
             f'<td><span class="badge badge-{r.grade}">{r.grade}</span></td>'
@@ -418,11 +418,11 @@ class SiteEngine:
               </svg>
             </div>"""
 
-        canonical = f"{self.config.base_url}repo/{full_name}.html"
+        canonical = f"{self.config.base_url}repo/{_safe_name(full_name)}.html"
         badge_cls = f"badge-{grade}"
         body = f"""
         <div class="container">
-          <div class="breadcrumb"><a href="{self.config.base_url}">Home</a> / <a href="{self.config.base_url}repo/{owner}/">{owner}</a> / {repo}</div>
+          <div class="breadcrumb"><a href="{self.config.base_url}">Home</a> / {full_name}</div>
           <h2 class="section-title">{full_name}</h2>
           <div class="stats" style="justify-content:flex-start">
             <div class="stat-card"><div class="value">{score:.0f}</div><div class="label">Score</div></div>
@@ -452,7 +452,7 @@ class SiteEngine:
             "applicationCategory": "DeveloperApplication",
         })
         html = self._render_page(body, meta, json_ld)
-        return SitePage(path=f"repo/{full_name}.html", html=html, meta=meta)
+        return SitePage(path=f"repo/{_safe_name(full_name)}.html", html=html, meta=meta)
 
     def generate_sitemap(self, pages: Optional[List[SitePage]] = None) -> str:
         """Generate sitemap.xml for all pages."""
@@ -544,6 +544,16 @@ class SiteEngine:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def _safe_name(s: str) -> str:
+    """Sanitize a string for use as a filesystem path segment.
+
+    Replaces characters that are invalid or problematic on common filesystems:
+      ':' -> '-'  (colons, e.g. from 'github:owner')
+      '/' -> '--' (slashes inside identifiers, not path separators)
+    """
+    return s.replace(":", "-").replace("/", "--")
 
 
 def _make_sparkline(scores: List[float]) -> str:
