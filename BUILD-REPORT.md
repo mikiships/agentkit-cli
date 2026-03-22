@@ -3,7 +3,8 @@
 ## agentkit-cli v0.85.0 — `agentkit frameworks`
 
 **Date:** 2026-03-22  
-**Status:** BUILT (tests green, not pushed/published)
+**Status:** SHIPPED  
+**Total tests:** 4299 passing (73 new for v0.85.0)
 
 ---
 
