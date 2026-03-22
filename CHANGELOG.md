@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.90.0] - 2026-03-22
+
+### Added
+- **`agentkit api`**: Local FastAPI REST server exposing the analysis pipeline as HTTP endpoints. 8 endpoints: `/` (health), `/analyze/{owner}/{repo}`, `/score/{owner}/{repo}`, `/badge/{owner}/{repo}` (shields.io-compatible), `/trending`, `/history/{owner}/{repo}`, `/leaderboard`, and `/ui` (dark-theme HTML status page).
+- **`agentkit_cli/api_server.py`**: FastAPI app with CORS enabled, DB-backed endpoints using existing `HistoryDB`, `/analyze` endpoint triggers subprocess on stale/missing cache, shields.io badge with color coding (brightgreen/yellow/orange/red).
+- **`agentkit api --share`**: Optional ngrok tunnel for public sharing.
+- **`agentkit doctor` api category**: Checks if the local API server is reachable at `http://127.0.0.1:8742`. Reports WARN (non-fatal) when not running.
+- **`agentkit run --api-cache`**: Best-effort API cache warm-up after pipeline runs.
+- **`docs/api.md`**: Full REST API documentation with curl examples and badge embed snippets.
+- **`[api]` optional extras**: `pip install agentkit-cli[api]` installs fastapi, uvicorn, httpx.
+- 57 new tests (D1: 29, D2: 11, D3: 8, D4: 9).
+
+## [0.89.0] - 2026-03-22
+
+### Added
+- **`agentkit weekly`**: 7-day quality digest across all tracked projects. Shows per-project score changes (start/end/delta), top improvements, regressions, common findings, and recommended actions. Supports `--json`, `--output`, `--share`, `--tweet-only`, `--days`, and `--project` flags.
+- **`WeeklyReportEngine`** (`agentkit_cli/weekly_engine.py`): Pure-Python engine reading the shared SQLite history DB. Computes deltas, trends, common findings, and tweet-ready summaries.
+- **`render_weekly_html`** (`agentkit_cli/weekly_html.py`): Dark-theme GitHub-style HTML renderer for weekly reports.
+- **`scripts/post-weekly.sh`**: Automation-friendly wrapper for cron use. Supports `--tweet-only`, `--share`, `--days`, and `--output`. Does NOT call frigatebird. Logs to `~/.local/share/agentkit/weekly-post-log.jsonl`.
+- **docs/weekly.md**: Full documentation for the weekly command and post-weekly.sh.
+- 49 new tests (D1: 22, D2: 11, D3: 16).
+
 ## [0.88.0] - 2026-03-22
 
 ### Fixed
