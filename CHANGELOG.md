@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.88.0] - 2026-03-22
+
+### Fixed
+- **`github_api._fetch_page`**: Fixed silent data loss for GitHub Search API responses. The function previously returned `[]` for any non-list response, but GitHub's search endpoint returns `{"items": [...], "total_count": N}`. Commands that rely on topic search — `agentkit populate`, `agentkit topic`, `agentkit topic-rank`, `agentkit topic-duel`, `agentkit topic-league`, `agentkit ecosystem`, `agentkit trending`, `agentkit user-rank`, `agentkit search` — all returned 0 repos silently. Fixed by extracting `data["items"]` when the response is a dict with an `items` key.
+- Added 5 regression tests in `tests/test_github_api_fix.py`.
+
+### Added
+- **`agentkit frameworks`** (included in v0.87.0 source, now officially documented): detect which frameworks a project uses and check if the agent context file covers them. Supports Next.js, FastAPI, Django, Rails, Express, and 10+ other frameworks. `--generate` adds missing framework-specific sections automatically. 67 tests.
+
 ## [0.87.0] - 2026-03-22
 
 ### Fixed

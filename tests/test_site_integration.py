@@ -88,7 +88,9 @@ def test_site_sitemap_count_matches_pages(tmp_path):
 
 def test_version_is_083():
     from agentkit_cli import __version__
-    assert __version__.startswith("0.85.")
+    # Accept any version >= 0.83.0 (forward-compatible)
+    major, minor, patch = [int(x) for x in __version__.split(".")]
+    assert (major, minor) >= (0, 83), f"Expected version >= 0.83.0, got {__version__}"
 
 
 def test_pyproject_version(tmp_path):

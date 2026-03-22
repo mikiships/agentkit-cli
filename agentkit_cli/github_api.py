@@ -55,7 +55,15 @@ def _fetch_page(url: str, token: Optional[str] = None) -> tuple[list[dict], dict
                         url_part = part.split(";")[0].strip()
                         next_url = url_part.strip("<>")
                         break
-            return data if isinstance(data, list) else [], resp_headers, next_url
+            # Handle both list responses (e.g. /repos/:owner/:repo/forks)
+            # and search API responses (dict with {"items": [...], "total_count": N})
+            if isinstance(data, list):
+                items = data
+            elif isinstance(data, dict) and "items" in data:
+                items = data["items"]
+            else:
+                items = []
+            return items, resp_headers, next_url
     except urllib_error.HTTPError as e:
         if e.code == 404:
             raise ValueError(f"Owner not found: {url}")
