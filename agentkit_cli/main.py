@@ -5,6 +5,7 @@ import typer
 from typing import List, Optional
 from pathlib import Path
 
+from agentkit_cli.commands.api_cmd import api_command
 from agentkit_cli.commands.quickstart_cmd import quickstart_command
 from agentkit_cli.commands.init_cmd import init_command
 from agentkit_cli.commands.run_cmd import run_command
@@ -190,9 +191,10 @@ def run(
     run_populate_topics: Optional[str] = typer.Option(None, "--populate-topics", help="Topics for --populate (default: python,typescript,rust,go)"),
     run_populate_limit: int = typer.Option(10, "--populate-limit", help="Max repos per topic for --populate"),
     run_frameworks: bool = typer.Option(False, "--frameworks", help="Run frameworks check after pipeline and include result in output"),
+    api_cache: bool = typer.Option(False, "--api-cache", help="Warm API cache after run (best-effort)"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
     if run_topic_repos:
         from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
         topic_rank_command(topic=run_topic_repos.strip())
@@ -1924,6 +1926,17 @@ def site(
         commit_message=commit_message,
         no_push=no_push,
     )
+
+
+@app.command("api")
+def api(
+    host: str = typer.Option("127.0.0.1", "--host", help="Bind host"),
+    port: int = typer.Option(8742, "--port", help="Bind port"),
+    reload: bool = typer.Option(False, "--reload", help="Enable auto-reload"),
+    share: bool = typer.Option(False, "--share", help="Start ngrok tunnel"),
+) -> None:
+    """Start the local REST API server."""
+    api_command(host=host, port=port, reload=reload, share=share)
 
 
 @app.callback(invoke_without_command=True)
