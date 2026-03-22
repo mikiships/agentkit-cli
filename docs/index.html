@@ -395,6 +395,24 @@ footer a:hover { color: var(--text); }
           <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
           <p style='color:var(--muted)'>No scored repos yet. Run <code>agentkit quickstart</code> to get started.</p>
         </div>
+
+        <div class="container" style="margin-top: 3rem;">
+          <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Features</h2>
+          <div class="topics-grid">
+            <div class="topic-block">
+              <h3>Developer Profile Card</h3>
+              <p>Score any GitHub developer's public repos for agent-readiness. <code>agentkit user-scorecard github:&lt;user&gt;</code></p>
+            </div>
+            <div class="topic-block">
+              <h3>Repo Analysis</h3>
+              <p>Score a repository instantly. Lint, context files, tests, and more. <code>agentkit analyze github:owner/repo</code></p>
+            </div>
+            <div class="topic-block">
+              <h3>Comparative Scoring</h3>
+              <p>Compare agent-readiness across repos, developers, or topics. <code>agentkit duel</code>, <code>agentkit tournament</code></p>
+            </div>
+          </div>
+        </div>
 <footer>
   <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-03-22 · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
 </footer>
