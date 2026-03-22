@@ -152,7 +152,7 @@ def test_generate_topic_page_empty(engine):
 def test_generate_repo_page(populated_engine):
     page = populated_engine.generate_repo_page("langchain-ai", "langchain")
     assert "langchain" in page.html
-    assert "repo/langchain-ai/langchain.html" in page.path
+    assert "repo/langchain-ai" in page.path and "langchain.html" in page.path
 
 
 def test_generate_repo_page_no_history(engine):

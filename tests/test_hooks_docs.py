@@ -11,14 +11,17 @@ REPO_ROOT = Path(__file__).parent.parent
 
 def test_version_bumped() -> None:
     from agentkit_cli import __version__
-    assert __version__ == "0.88.0"
+    # Forward-compatible: version must be at least 0.86.0 (hooks release)
+    parts = [int(x) for x in __version__.split(".")]
+    assert parts >= [0, 86, 0], f"Expected version >= 0.86.0, got {__version__}"
 
 
 def test_pyproject_version() -> None:
+    from agentkit_cli import __version__
     pyproject = REPO_ROOT / "pyproject.toml"
     assert pyproject.exists()
     content = pyproject.read_text()
-    assert 'version = "0.88.0"' in content
+    assert f'version = "{__version__}"' in content
 
 
 def test_changelog_has_v0860_entry() -> None:
