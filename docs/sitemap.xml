@@ -25,6 +25,30 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/biomejs--biome.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/astral-sh--uv.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/openai--openai-python.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/Textualize--rich.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/prisma--prisma.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/anthropics--anthropic-sdk-python.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/encode--httpx.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
@@ -33,7 +57,19 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/tiangolo--typer.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/tiangolo--sqlmodel.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/fastapi--fastapi.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/langchain-ai--langchain.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
@@ -41,11 +77,55 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/httpie--httpie.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/casey--just.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/sharkdp--fd.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/python-poetry--poetry.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/gin-gonic--gin.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/sharkdp--bat.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/pydantic--pydantic.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/vuejs--vue.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/withastro--astro.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/celery--celery.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/ajeetdsouza--zoxide.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/expressjs--express.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/scrapy--scrapy.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
@@ -61,6 +141,22 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/hashicorp--terraform.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/spf13--cobra.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/trpc--trpc.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/pypa--pip.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/tokio-rs--tokio.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
@@ -73,7 +169,31 @@
     <lastmod>2026-03-22</lastmod>
   </url>
   <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/kubernetes--kubernetes.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/nestjs--nest.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
     <loc>https://mikiships.github.io/agentkit-cli/repo/django--django.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/docker--compose.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/more-itertools--more-itertools.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/charmbracelet--bubbletea.html</loc>
+    <lastmod>2026-03-22</lastmod>
+  </url>
+  <url>
+    <loc>https://mikiships.github.io/agentkit-cli/repo/shadcn-ui--ui.html</loc>
     <lastmod>2026-03-22</lastmod>
   </url>
 </urlset>
