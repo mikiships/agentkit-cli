@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.84.1] - 2026-03-22
+- **fix:** Restore missing content in `docs/index.html`: pipeline stages, feature grid (6 tools), commands table, Daily Trending / Org Leaderboard / Developer Profile Card sections, nav links. Add `stat-card` class to `site_engine.py` stats items. All 15 previously-failing D4/D5/landing tests now pass.
+
 ## [0.84.0] - 2026-03-21
 
 ### Added
