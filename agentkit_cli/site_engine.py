@@ -59,123 +59,402 @@ class SiteResult:
 # ---------------------------------------------------------------------------
 
 _CSS = """
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080b0f;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --accent: #3fb950;
+  --accent-dim: rgba(63,185,80,0.12);
+  --blue: #58a6ff;
+  --blue-dim: rgba(88,166,255,0.10);
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+}
+
 body {
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: 'Courier New', Courier, monospace;
-    min-height: 100vh;
-    padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
-a { color: #58a6ff; text-decoration: none; }
-a:hover { text-decoration: underline; }
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { color: var(--accent); }
+
+/* ── Nav ── */
 header {
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    padding: 1rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,11,15,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-header h1 { font-size: 1.2rem; color: #58a6ff; }
-header nav a { margin-left: 1rem; font-size: 0.9rem; color: #8b949e; }
-.container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.nav-brand span { color: var(--muted); font-weight: 400; }
+header nav { display: flex; align-items: center; gap: 1.5rem; }
+header nav a {
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+header nav a:hover { color: var(--text); }
+.nav-cta {
+  font-size: 0.8rem !important;
+  color: var(--accent) !important;
+  border: 1px solid rgba(63,185,80,0.4);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.15s !important;
+}
+.nav-cta:hover { background: var(--accent-dim) !important; }
+
+/* ── Hero ── */
 .hero {
-    text-align: center;
-    padding: 3rem 1rem 2rem;
+  padding: 7rem 2rem 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
-.hero h2 { font-size: 2rem; color: #58a6ff; margin-bottom: 0.5rem; }
-.hero p { color: #8b949e; font-size: 1rem; }
-.stats {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 1.5rem 0;
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(63,185,80,0.07) 0%, transparent 70%);
+  pointer-events: none;
 }
-.stat-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 1rem 1.5rem;
-    text-align: center;
-    min-width: 130px;
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(63,185,80,0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.1s forwards;
 }
-.stat-card .value { font-size: 2rem; font-weight: bold; color: #58a6ff; }
-.stat-card .label { font-size: 0.8rem; color: #8b949e; margin-top: 0.25rem; }
-.topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.2s forwards;
 }
-.topic-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 1.2rem;
-    text-align: center;
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
 }
-.topic-card h3 { color: #58a6ff; font-size: 1rem; margin-bottom: 0.5rem; }
-.topic-card p { color: #8b949e; font-size: 0.8rem; }
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 480px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.3s forwards;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.4s forwards;
+}
+.install-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.install-block .prompt { color: var(--accent); }
+.btn-gh {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-gh:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── Stats strip ── */
+.stats-strip {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.stat-item {
+  flex: 1;
+  max-width: 200px;
+  padding: 1.75rem 1rem;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--mono);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── Container ── */
+.container { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+/* ── Section titles ── */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+h2.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.section-note { font-size: 0.8rem; color: var(--muted); }
+
+/* ── Ecosystem pills ── */
+.ecosystem-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.pill {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.pill:hover, .pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* ── Table ── */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
-    font-size: 0.9rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
 }
-th, td {
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid #30363d;
-    text-align: left;
+thead tr { border-bottom: 1px solid var(--border); }
+th {
+  padding: 0.5rem 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
 }
-th { color: #8b949e; font-weight: normal; font-size: 0.8rem; }
-tr:hover { background: #161b22; }
+td {
+  padding: 0.75rem 0.75rem;
+  border-bottom: 1px solid rgba(33,38,45,0.6);
+  vertical-align: middle;
+}
+tbody tr {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: background 0.15s;
+}
+tbody tr.visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.3s ease, transform 0.3s ease, background 0.15s;
+}
+tbody tr:hover { background: var(--surface2); }
+.repo-name { font-family: var(--mono); font-size: 0.85rem; font-weight: 500; }
+.repo-name a { color: var(--text); }
+.repo-name a:hover { color: var(--accent); }
+
+/* ── Score bar ── */
+.score-cell { display: flex; align-items: center; gap: 0.6rem; }
+.score-val { font-family: var(--mono); font-size: 0.85rem; min-width: 2.2rem; }
+.score-bar-wrap {
+  flex: 1; max-width: 80px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.score-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  width: 0;
+  transition: width 0.6s ease;
+}
+
+/* ── Grade badge ── */
 .badge {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 0.85rem;
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.78rem;
 }
-.badge-A { background: #1a7f37; color: #fff; }
-.badge-B { background: #1c4fd6; color: #fff; }
-.badge-C { background: #9a6700; color: #fff; }
-.badge-D { background: #6e1c1c; color: #fff; }
-.badge-F { background: #6e1c1c; color: #fff; }
-.score-bar-wrap { background: #30363d; border-radius: 4px; height: 8px; width: 120px; display: inline-block; vertical-align: middle; }
-.score-bar { height: 8px; border-radius: 4px; background: #58a6ff; }
+.badge-A { background: rgba(26,127,55,0.25); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+.badge-B { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+.badge-C { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+.badge-D { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
+.badge-F { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
+
+/* ── Topic page cards (cardless: sections instead) ── */
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+.topic-block {
+  background: var(--surface);
+  padding: 1.5rem;
+  transition: background 0.15s;
+}
+.topic-block:hover { background: var(--surface2); }
+.topic-block h3 {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+.topic-block p { font-size: 0.8rem; color: var(--muted); }
+
+/* ── Repo detail ── */
+.breadcrumb { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem; }
+.breadcrumb a { color: var(--muted); }
+.breadcrumb a:hover { color: var(--text); }
+.repo-hero { margin-bottom: 2.5rem; }
+.repo-hero h2 { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.25rem 0;
+}
+.detail-item { background: var(--surface); padding: 1rem; }
+.detail-item .key { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.detail-item .val { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; color: var(--accent); }
+.history-chart { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+
+/* ── Footer ── */
 footer {
-    border-top: 1px solid #30363d;
-    padding: 1rem 2rem;
-    text-align: center;
-    color: #8b949e;
-    font-size: 0.8rem;
-    margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
-footer a { color: #58a6ff; }
-.breadcrumb { color: #8b949e; font-size: 0.85rem; margin-bottom: 1rem; }
-h2.section-title { font-size: 1.2rem; color: #e6edf3; margin: 2rem 0 1rem; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem; }
-.history-chart { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-.history-chart canvas { width: 100%; max-height: 200px; }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
-.detail-item { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.75rem; }
-.detail-item .key { color: #8b949e; font-size: 0.75rem; }
-.detail-item .val { color: #58a6ff; font-weight: bold; font-size: 1.1rem; }
+footer a { color: var(--muted); }
+footer a:hover { color: var(--text); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 """
 
 _NAV = """<header>
-  <h1><a href="{base_url}" style="color:#58a6ff;text-decoration:none;">🤖 agentkit</a></h1>
+  <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="{base_url}">Home</a>
     {topic_links}
-    <a href="https://github.com/mikiships/agentkit-cli" target="_blank">GitHub</a>
+    <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
 </header>"""
 
 _FOOTER = """<footer>
-  <p>Generated by <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · {ts}</p>
+  <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · {ts} · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
 </footer>"""
+
+_SCROLL_JS = """<script>
+// Stagger table rows in on scroll
+(function() {
+  var rows = document.querySelectorAll('tbody tr');
+  if (!rows.length) return;
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        var delay = Array.from(rows).indexOf(e.target) * 40;
+        setTimeout(function() { e.target.classList.add('visible'); }, delay);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  rows.forEach(function(r) { io.observe(r); });
+
+  // Animate score bars
+  var bars = document.querySelectorAll('.score-bar[data-pct]');
+  var bioS = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.style.width = e.target.getAttribute('data-pct') + '%';
+        bioS.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  bars.forEach(function(b) { bioS.observe(b); });
+})();
+</script>"""
 
 _PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -194,6 +473,7 @@ _PAGE_TEMPLATE = """<!DOCTYPE html>
 {nav}
 {body}
 {footer}
+{scroll_js}
 </body>
 </html>"""
 
@@ -277,48 +557,50 @@ class SiteEngine:
         all_repos = self._get_all_repos(limit=self.config.limit)
         total_repos = self._count_unique_repos()
         top_score = max((r.score for r in all_repos), default=0.0)
-        latest_ts = max((r.last_run for r in all_repos), default="")
-
-        stats_html = f"""
-        <div class="stats">
-          <div class="stat-card"><div class="value">{total_repos}</div><div class="label">Repos Scored</div></div>
-          <div class="stat-card"><div class="value">{top_score:.0f}</div><div class="label">Top Score</div></div>
-          <div class="stat-card"><div class="value">{len(self.config.topics)}</div><div class="label">Topics</div></div>
-          <div class="stat-card"><div class="value">{latest_ts[:10] or "—"}</div><div class="label">Last Run</div></div>
-        </div>"""
-
-        topics_html = '<div class="topics-grid">' + "".join(
-            f'<a class="topic-card" href="{self.config.base_url}topic/{t}.html" style="text-decoration:none;">'
-            f'<h3>{t.capitalize()}</h3>'
-            f'<p>View rankings</p></a>'
-            for t in self.config.topics
-        ) + '</div>'
-
         rows_html = "".join(
             f"<tr>"
-            f'<td><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
-            f"<td>{r.score:.0f}</td>"
+            f'<td class="repo-name"><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
+            f'<td><div class="score-cell"><span class="score-val">{r.score:.0f}</span>'
+            f'<span class="score-bar-wrap"><span class="score-bar" data-pct="{min(100,r.score):.0f}"></span></span></div></td>'
             f'<td><span class="badge badge-{r.grade}">{r.grade}</span></td>'
-            f"<td>{r.last_run[:10]}</td>"
             f"</tr>"
             for r in all_repos[:20]
         )
 
-        table_html = f"""<h2 class="section-title">Recent Scores</h2>
+        table_html = f"""
+        <div class="section-header">
+          <h2 class="section-title">Rankings</h2>
+          <span class="section-note">{total_repos} repos scored</span>
+        </div>
         <table>
-          <thead><tr><th>Repository</th><th>Score</th><th>Grade</th><th>Last Run</th></tr></thead>
+          <thead><tr><th>Repository</th><th>Score</th><th>Grade</th></tr></thead>
           <tbody>{rows_html}</tbody>
-        </table>""" if all_repos else "<p style='color:#8b949e'>No scored repos yet. Run <code>agentkit analyze</code> to get started.</p>"
+        </table>""" if all_repos else "<p style='color:var(--muted)'>No scored repos yet. Run <code>agentkit quickstart</code> to get started.</p>"
+
+        topics_pills = "".join(
+            f'<a class="pill" href="{self.config.base_url}topic/{t}.html">{t.capitalize()}</a>'
+            for t in self.config.topics
+        )
 
         body = f"""
         <div class="hero">
-          <h2>Agent Quality Rankings</h2>
-          <p>SEO-optimized rankings of GitHub repos by AI agent-readiness score.</p>
-          {stats_html}
+          <div class="hero-badge">v0.84 &middot; {total_repos} repos scored</div>
+          <h1>Is your repo ready<br>for <em>AI agents</em>?</h1>
+          <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
+          <div class="hero-actions">
+            <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
+            <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
+          </div>
         </div>
+
+        <div class="stats-strip">
+          <div class="stat-item"><div class="stat-num">{total_repos}</div><div class="stat-label">Repos</div></div>
+          <div class="stat-item"><div class="stat-num">{top_score:.0f}</div><div class="stat-label">Top Score</div></div>
+          <div class="stat-item"><div class="stat-num">{len(self.config.topics)}</div><div class="stat-label">Ecosystems</div></div>
+        </div>
+
         <div class="container">
-          <h2 class="section-title">Browse by Topic</h2>
-          {topics_html}
+          <div class="ecosystem-pills">{topics_pills}</div>
           {table_html}
         </div>"""
 
@@ -345,19 +627,18 @@ class SiteEngine:
         rows_html = "".join(
             f"<tr>"
             f"<td>{i+1}</td>"
-            f'<td><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
-            f"<td>{r.score:.0f} "
-            f'<span class="score-bar-wrap"><span class="score-bar" style="width:{min(100,r.score):.0f}%"></span></span></td>'
+            f'<td class="repo-name"><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
+            f'<td><div class="score-cell"><span class="score-val">{r.score:.0f}</span>'
+            f'<span class="score-bar-wrap"><span class="score-bar" data-pct="{min(100,r.score):.0f}"></span></span></div></td>'
             f'<td><span class="badge badge-{r.grade}">{r.grade}</span></td>'
-            f"<td>{r.last_run[:10]}</td>"
             f"</tr>"
             for i, r in enumerate(repos)
         )
 
         table_html = f"""<table>
-          <thead><tr><th>#</th><th>Repository</th><th>Score</th><th>Grade</th><th>Last Run</th></tr></thead>
+          <thead><tr><th>#</th><th>Repository</th><th>Score</th><th>Grade</th></tr></thead>
           <tbody>{rows_html}</tbody>
-        </table>""" if repos else "<p style='color:#8b949e'>No repos found for this topic yet.</p>"
+        </table>""" if repos else "<p style='color:var(--muted)'>No repos found for this topic yet.</p>"
 
         canonical = f"{self.config.base_url}topic/{topic}.html"
         body = f"""
@@ -538,6 +819,7 @@ class SiteEngine:
             nav=nav,
             body=body,
             footer=footer,
+            scroll_js=_SCROLL_JS,
         )
 
 
