@@ -1,52 +1,51 @@
-# Progress Log: agentkit-cli v0.86.0 hooks
+# Progress Log — v0.90.0 API Server
 
-## Final Summary
+**Date:** 2026-03-22
 
-All deliverables complete. Full test suite passing.
+## Final Results
 
-### D1: HookEngine core (`agentkit_cli/hooks.py`) ✓
-- `HookEngine` class with `install(path, mode, min_score, fail_on_drop)`, `uninstall(path, mode)`, `status(path)`, `check(path)`
-- `mode`: `"git"` (native .git/hooks/pre-commit), `"precommit"` (.pre-commit-config.yaml), `"both"` (default)
-- Git hook: writes executable shell script with agentkit comment header, idempotent (won't clobber foreign hooks)
-- Pre-commit: adds/updates `.pre-commit-config.yaml` without clobbering existing repos
-- `status()` returns `{git_installed, precommit_installed, min_score, last_check}`
-- Committed: `29a14a3`
+All 5 deliverables complete. Full test suite: **4475 passed, 0 failed**.
 
-### D2: `agentkit hooks` CLI (`agentkit_cli/commands/hooks_cmd.py`) ✓
-- `hooks install [--path] [--min-score] [--mode] [--dry-run]`
-- `hooks status [--path] [--json]`
-- `hooks uninstall [--path] [--mode]`
-- `hooks run [--path] [--json]`
-- Registered in `agentkit_cli/main.py` as `app.add_typer(hooks_app, name="hooks")`
-- Committed: `29a14a3`, re-applied: `ab5db00`
+Baseline: 4418 tests. New tests: 57. Total: 4475 ✅ (target was ≥4459).
 
-### D3: doctor + setup-ci integration ✓
-- `check_hooks_installed()` in `agentkit_cli/doctor.py` — warns when no hooks installed
-- `_VALID_CATEGORIES` in `doctor_cmd.py` updated to include `"hooks"`
-- `run_doctor()` registers `check_hooks_installed(project_root)`
-- `setup_ci_cmd.py` Next Steps panel now includes: `agentkit hooks install`
-- Committed: `ab5db00`
+## Deliverables
 
-### D4: run + report integration ✓
-- `run_cmd.py`: tip shown when no hooks installed after successful pipeline
-- `report_cmd.py`: `_hooks_section()` function + `build_html(root=)` parameter
-- HTML report includes Hooks section with git/pre-commit install status
-- Committed: `ab5db00`
+### D1 ✅ FastAPI REST Server (`agentkit_cli/api_server.py`)
+- 8 endpoints: `/` (health), `/analyze/{owner}/{repo}`, `/score/{owner}/{repo}`, `/badge/{owner}/{repo}`, `/trending`, `/history/{owner}/{repo}`, `/leaderboard`, `/ui`
+- CORS middleware enabled
+- Reads from `HistoryDB`, triggers subprocess for stale/missing analyze cache
+- shields.io badge with brightgreen/yellow/orange/red color coding
+- 29 tests in `tests/test_api_server_d1.py` and `tests/test_api_server_d4.py`
 
-### D5: docs, version bump, BUILD-REPORT ✓
-- `__version__` = "0.86.0"
-- `pyproject.toml` version = "0.86.0"
-- `CHANGELOG.md` has v0.86.0 entry
-- `README.md` has `agentkit hooks` in commands table and quick-start
-- Committed: `ab5db00`
+### D2 ✅ CLI Command (`agentkit_cli/commands/api_cmd.py`)
+- `agentkit api --host --port --reload --share`
+- Graceful `ImportError` if fastapi/uvicorn not installed
+- Registered in `agentkit_cli/main.py`
+- Startup message with usage examples
+- 11 tests in `tests/test_api_server_d2.py`
 
-## Test Results
-- New tests: 65 (test_hooks_engine: 22, test_hooks_cmd: 13, test_hooks_integration: 8, test_hooks_doctor: 8, test_hooks_run_report: 9, test_hooks_docs: 9)
-- All 65 new tests pass
-- Full suite: 4338 passing, 26 pre-existing failures (verified baseline)
-- No regressions introduced
+### D3 ✅ Doctor check + run --api-cache
+- `check_api_reachable()` in `agentkit_cli/doctor.py` — category "api", non-fatal WARN
+- `agentkit run --api-cache` flag added to both `run_cmd.py` and `main.py`
+- 8 tests in `tests/test_api_server_d3.py`
+- Fixed 3 pre-existing doctor tests that expected zero warns (patched check_api_reachable)
+
+### D4 ✅ Dark-theme `/ui` HTML status page
+- Included in `api_server.py` — dark GitHub-style theme (#0d1117 background)
+- Shows version, uptime, repo count, recent analyses, badge embed snippet, quick links
+- 9 tests in `tests/test_api_server_d4.py`
+
+### D5 ✅ Docs, version bump, reports
+- `docs/api.md` — full API docs with curl examples
+- `pyproject.toml` — version 0.90.0, `[api]` optional extras added
+- `agentkit_cli/__init__.py` — version 0.90.0
+- `CHANGELOG.md` — [0.90.0] entry
+- `BUILD-REPORT.md` — updated header
+- `BUILD-REPORT-v0.90.0.md` — versioned copy
 
 ## Commits
-1. `29a14a3` - feat: agentkit hooks v0.86.0 — pre-commit quality gate hooks
-2. `ab5db00` - fix: re-apply all D3-D5 changes lost in git stash
-3. `749c64f` - fix: update existing doctor tests to mock check_hooks_installed
+1. `feat(d1,d4): add FastAPI api_server.py with 8 endpoints incl /ui dark-theme page`
+2. `feat(d2): add agentkit api CLI command with --host/--port/--reload/--share`
+3. `feat(d3): add doctor api check + agentkit run --api-cache flag`
+4. `feat(d5): version bump 0.90.0, docs/api.md, CHANGELOG, BUILD-REPORT-v0.90.0`
+5. `fix(tests): patch check_api_reachable in doctor tests that expect zero warns`
