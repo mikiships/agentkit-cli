@@ -107,6 +107,7 @@ def run_command(
     populate_topics: Optional[str] = None,
     populate_limit: int = 10,
     frameworks: bool = False,
+    api_cache: bool = typer.Option(False, "--api-cache", help="Warm API cache after run (best-effort)"),
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -947,3 +948,17 @@ def run_command(
                         console.print("[dim]Tip: Run [bold]agentkit hooks install[/bold] to enforce quality on every commit.[/dim]")
                 except Exception:
                     pass
+        # --api-cache: warm the API cache (best-effort, non-blocking)
+        if api_cache and _composite_score is not None:
+            try:
+                import urllib.request as _ur
+                import json as _json
+                _payload = _json.dumps({"repo": root.name, "score": _composite_score}).encode()
+                _req = _ur.Request(
+                    "http://127.0.0.1:8742/",
+                    data=None,
+                    headers={"Content-Type": "application/json"},
+                )
+                _ur.urlopen(_req, timeout=2)
+            except Exception:
+                pass

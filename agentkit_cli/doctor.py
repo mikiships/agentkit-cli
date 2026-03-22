@@ -1129,6 +1129,35 @@ def check_hooks_installed(root: Path) -> "DoctorCheckResult":
         )
 
 
+def check_api_reachable(host: str = "127.0.0.1", port: int = 8742) -> DoctorCheckResult:
+    """Check if the agentkit API server is reachable at the default address."""
+    import urllib.request
+    url = f"http://{host}:{port}/"
+    try:
+        with urllib.request.urlopen(url, timeout=1) as resp:
+            if resp.status == 200:
+                return DoctorCheckResult(
+                    id="api.reachable",
+                    name="API server reachable",
+                    status="pass",
+                    summary=f"agentkit API is responding at {url}",
+                    details="",
+                    fix_hint="",
+                    category="api",
+                )
+    except Exception:
+        pass
+    return DoctorCheckResult(
+        id="api.reachable",
+        name="API server reachable",
+        status="warn",
+        summary=f"agentkit API not running at {url}",
+        details="The local REST API server is not reachable (non-fatal).",
+        fix_hint="Run: agentkit api",
+        category="api",
+    )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -1160,6 +1189,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_history_db_has_data())
     checks.append(check_framework_coverage(project_root))
     checks.append(check_hooks_installed(project_root))
+    checks.append(check_api_reachable())
     return DoctorReport(root=str(project_root), checks=checks)
 
 
