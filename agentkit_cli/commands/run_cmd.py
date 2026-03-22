@@ -106,6 +106,7 @@ def run_command(
     populate: bool = False,
     populate_topics: Optional[str] = None,
     populate_limit: int = 10,
+    frameworks: bool = False,
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
@@ -899,6 +900,31 @@ def run_command(
         except Exception as _site_exc:
             if not ci:
                 console.print(f"[yellow]Warning: site update failed: {_site_exc}[/yellow]")
+
+    # Optional: frameworks check after pipeline
+    if frameworks:
+        try:
+            from agentkit_cli.frameworks import FrameworkDetector, FrameworkChecker
+            _fw_root = path or find_project_root()
+            _fw_detector = FrameworkDetector()
+            _fw_checker = FrameworkChecker()
+            _fw_list = _fw_detector.detect(_fw_root)
+            _fw_ctx = _fw_checker.find_context_file(_fw_root)
+            _fw_coverages = _fw_checker.check_all(_fw_list, root=_fw_root, context_file=_fw_ctx)
+            _fw_below = [cov.framework for cov in _fw_coverages if cov.score < 60]
+            summary["frameworks"] = {
+                "detected": [fw.name for fw in _fw_list],
+                "below_threshold": _fw_below,
+                "coverages": [{"framework": cov.framework, "score": cov.score} for cov in _fw_coverages],
+            }
+            if not ci and not json_output:
+                _fw_names = ", ".join(fw.name for fw in _fw_list) or "none"
+                console.print(f"\n[bold]Frameworks:[/bold] {_fw_names}")
+                if _fw_below:
+                    console.print(f"  [yellow]Below threshold:[/yellow] {', '.join(_fw_below)}")
+                    console.print("  Run [bold]agentkit frameworks --generate[/bold] to add missing sections.")
+        except Exception as _fw_exc:
+            summary["frameworks"] = {"error": str(_fw_exc)}
 
     # Final status
     if failed_count > 0:

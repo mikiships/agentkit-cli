@@ -1031,6 +1031,59 @@ def check_history_db_has_data() -> "DoctorCheckResult":
         )
 
 
+def check_framework_coverage(root: Path) -> "DoctorCheckResult":
+    """Check if detected frameworks have agent context coverage."""
+    try:
+        from agentkit_cli.frameworks import FrameworkDetector, FrameworkChecker
+        detector = FrameworkDetector()
+        checker = FrameworkChecker()
+        frameworks = detector.detect(root)
+        if not frameworks:
+            return DoctorCheckResult(
+                id="context.framework_coverage",
+                name="framework_coverage",
+                status="pass",
+                summary="No frameworks detected.",
+                details="",
+                fix_hint="",
+                category="context",
+            )
+        ctx_file = checker.find_context_file(root)
+        coverages = checker.check_all(frameworks, root=root, context_file=ctx_file)
+        low = [cov for cov in coverages if cov.score < 60]
+        if low:
+            names = ", ".join(cov.framework for cov in low)
+            return DoctorCheckResult(
+                id="context.framework_coverage",
+                name="framework_coverage",
+                status="warn",
+                summary=f"Framework detected but missing agent context: {names}.",
+                details=f"Run `agentkit frameworks --generate` to fix.",
+                fix_hint="agentkit frameworks --generate",
+                category="context",
+            )
+        names = ", ".join(fw.name for fw in frameworks)
+        return DoctorCheckResult(
+            id="context.framework_coverage",
+            name="framework_coverage",
+            status="pass",
+            summary=f"Framework coverage OK for: {names}.",
+            details="",
+            fix_hint="",
+            category="context",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="context.framework_coverage",
+            name="framework_coverage",
+            status="warn",
+            summary=f"Framework coverage check failed: {exc}",
+            details="",
+            fix_hint="agentkit frameworks",
+            category="context",
+        )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -1060,6 +1113,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_spotlight_queue())
     checks.append(check_hot_trending_access())
     checks.append(check_history_db_has_data())
+    checks.append(check_framework_coverage(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 
