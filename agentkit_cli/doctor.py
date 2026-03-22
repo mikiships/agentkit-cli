@@ -1084,6 +1084,51 @@ def check_framework_coverage(root: Path) -> "DoctorCheckResult":
         )
 
 
+def check_hooks_installed(root: Path) -> "DoctorCheckResult":
+    """Check if agentkit quality gate hooks are installed."""
+    try:
+        from agentkit_cli.hooks import HookEngine
+        engine = HookEngine()
+        st = engine.status(root)
+        git_ok = st.get("git_installed", False)
+        pc_ok = st.get("precommit_installed", False)
+
+        if git_ok or pc_ok:
+            installed = []
+            if git_ok:
+                installed.append("git")
+            if pc_ok:
+                installed.append("pre-commit")
+            return DoctorCheckResult(
+                id="hooks.installed",
+                name="hooks_installed",
+                status="pass",
+                summary=f"Quality gate hooks installed: {', '.join(installed)}.",
+                details="",
+                fix_hint="",
+                category="hooks",
+            )
+        return DoctorCheckResult(
+            id="hooks.installed",
+            name="hooks_installed",
+            status="warn",
+            summary="No agentkit quality gate hooks installed.",
+            details="Run `agentkit hooks install` to add quality gates.",
+            fix_hint="agentkit hooks install",
+            category="hooks",
+        )
+    except Exception as exc:
+        return DoctorCheckResult(
+            id="hooks.installed",
+            name="hooks_installed",
+            status="warn",
+            summary=f"Hook check failed: {exc}",
+            details="",
+            fix_hint="agentkit hooks install",
+            category="hooks",
+        )
+
+
 def run_doctor(root: Path | None = None) -> DoctorReport:
     """Run the core doctor checks for the given path."""
     project_root = (root or Path.cwd()).resolve()
@@ -1114,6 +1159,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     checks.append(check_hot_trending_access())
     checks.append(check_history_db_has_data())
     checks.append(check_framework_coverage(project_root))
+    checks.append(check_hooks_installed(project_root))
     return DoctorReport(root=str(project_root), checks=checks)
 
 

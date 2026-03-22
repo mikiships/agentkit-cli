@@ -17,6 +17,7 @@ pip install agentkit-cli
 pip install agentkit-cli
 agentkit quickstart    # 🚀 fastest path to a score — start here
 agentkit frameworks    # detect which frameworks your project uses and check agent context coverage
+agentkit hooks install # install pre-commit quality gate hooks
 ```
 
 `agentkit quickstart` checks your toolchain, runs a fast composite score (agentlint + agentmd), prints a beautiful Rich summary, and optionally publishes a shareable score card — all in under 60 seconds.
@@ -222,6 +223,8 @@ agentkit run --migrate       # generate missing formats before analysis
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
 - `agentkit search [query]` — discover GitHub repos missing CLAUDE.md / AGENTS.md
 - `agentkit frameworks [PATH]` — detect frameworks (Next.js, FastAPI, Django, etc.) and check if your CLAUDE.md/AGENTS.md has framework-specific coverage. Use `--generate` to auto-add missing sections.
+- `agentkit hooks install [--path] [--min-score] [--mode git|precommit|both] [--dry-run]` — install pre-commit quality gate hooks.
+- `agentkit hooks status/uninstall/run` — manage installed hooks.
 
 ## Search: Discover Repos Missing Context Files
 

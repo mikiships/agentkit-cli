@@ -938,3 +938,12 @@ def run_command(
             active_console.print(f"\nPipeline complete. {passed_count} passed, {skipped_count} skipped.\n")
         else:
             console.print(f"\n[green]Pipeline complete.[/green] {passed_count} passed, {skipped_count} skipped.\n")
+            # Hooks tip: show once if hooks not installed
+            if not json_output:
+                try:
+                    from agentkit_cli.hooks import HookEngine as _HookEngine
+                    _hook_st = _HookEngine().status(root)
+                    if not _hook_st.get("git_installed") and not _hook_st.get("precommit_installed"):
+                        console.print("[dim]Tip: Run [bold]agentkit hooks install[/bold] to enforce quality on every commit.[/dim]")
+                except Exception:
+                    pass

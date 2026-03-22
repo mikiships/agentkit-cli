@@ -241,6 +241,7 @@ def setup_ci_command(
         "  1. [bold]git add .github/workflows/agentkit-quality.yml .agentkit-baseline.json README.md[/bold]",
         "  2. [bold]git commit -m 'ci: add agentkit quality workflow'[/bold]",
         "  3. Push to GitHub — CI will run on every push and PR.",
+        "  4. (Optional) Add local quality gates: [bold]agentkit hooks install[/bold]",
     ]
 
     console.print(Panel("\n".join(lines), border_style="green"))

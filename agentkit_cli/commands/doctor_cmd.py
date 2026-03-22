@@ -9,7 +9,7 @@ import typer
 
 from agentkit_cli.doctor import DoctorReport, render_human_report, run_doctor
 
-_VALID_CATEGORIES = {"repo", "toolchain", "context", "publish"}
+_VALID_CATEGORIES = {"repo", "toolchain", "context", "publish", "hooks"}
 _VALID_FAIL_ON = {"warn", "fail"}
 
 

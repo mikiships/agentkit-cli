@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.86.0] - 2026-03-22
+
+### Added
+- **`agentkit hooks`** (D1-D4): new command group for managing pre-commit quality gate hooks.
+- **`HookEngine`** (`agentkit_cli/hooks.py`): core engine with `install`, `uninstall`, `status`, and `check` methods.
+- **`agentkit hooks install/status/uninstall/run`**: CLI surface for managing hooks.
+- **`agentkit doctor` hooks category**: new `hooks.installed` check; `--category hooks` filter supported.
+- **`agentkit setup-ci`**: hooks install suggestion in Next Steps.
+- **`agentkit run`**: tip shown when hooks not installed.
+- **`agentkit report` HTML**: "Hooks" section showing installation status.
+
 ## [0.85.0] - 2026-03-22
 
 ### Added
