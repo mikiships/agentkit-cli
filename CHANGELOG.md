@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.92.0] - 2026-03-22
+
+### Added
+- **`agentkit weekly-digest` command**: generates a curated "State of AI Agent Readiness" report from local history.
+- **`WeeklyDigestEngine`** (`agentkit_cli/weekly_digest_engine.py`): assembles `DigestReport` from HistoryDB with graceful empty-state handling and placeholder repos.
+- **`WeeklyDigestRenderer`** (`agentkit_cli/renderers/weekly_digest_renderer.py`): dark-theme HTML and Markdown renderers.
+- **CLI flags**: `--share` (publish to here.now), `--output FILE`, `--json`, `--quiet`, `--since DAYS`, `--cron` (quiet+share, URL to stdout).
+- **README**: added `## Weekly Digest` section with example usage.
+
 ## [0.91.0] - 2026-03-22
 
 ### Added

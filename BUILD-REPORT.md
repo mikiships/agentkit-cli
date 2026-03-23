@@ -1,5 +1,27 @@
 # BUILD-REPORT.md
 
+## agentkit-cli v0.92.0 — Weekly Digest Command
+
+**Date:** 2026-03-22
+**Status:** BUILT
+
+### What shipped
+- `agentkit weekly-digest` command with `--share`, `--output`, `--json`, `--quiet`, `--since`, `--cron` flags
+- `WeeklyDigestEngine` — assembles `DigestReport` from HistoryDB, graceful empty-state with placeholder repos
+- `WeeklyDigestRenderer` — dark-theme HTML + Markdown renderers
+- README `## Weekly Digest` section with example usage
+- CHANGELOG entry for v0.92.0
+- Version bumped to 0.92.0 in `__init__.py` and `pyproject.toml`
+
+### Test counts
+- D1 (engine): 19 tests
+- D2 (renderer): 14 tests
+- D3 (CLI): 11 tests
+- D4 (README/integration): 7 tests
+- D5 (version/docs): 5 tests
+
+---
+
 ## agentkit-cli v0.91.0 — Interactive /ui Page
 
 **Date:** 2026-03-22

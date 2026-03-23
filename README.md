@@ -203,6 +203,35 @@ agentkit llmstxt --sync-from agents-md
 agentkit run --migrate       # generate missing formats before analysis
 ```
 
+## Weekly Digest
+
+Generate a curated "State of AI Agent Readiness" report from your local analysis history.
+
+```bash
+# Print summary table to terminal
+agentkit weekly-digest
+
+# Output as JSON
+agentkit weekly-digest --json
+
+# Save HTML report to file
+agentkit weekly-digest --output digest.html
+
+# Publish to here.now and print URL
+agentkit weekly-digest --share
+
+# Use 30-day lookback window
+agentkit weekly-digest --since 30
+
+# Cron mode: quiet, always shares, prints URL only
+agentkit weekly-digest --cron
+```
+
+The digest report includes:
+- Top repositories by score with grade badges
+- Week stats: total analyses, average score, top scorer
+- Dark-theme HTML suitable for sharing
+
 ## Commands
 
 - `agentkit quickstart` — 🚀 fastest path to a score (start here)

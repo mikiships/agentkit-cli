@@ -78,6 +78,7 @@ from agentkit_cli.commands.ecosystem_cmd import ecosystem_command
 from agentkit_cli.commands.spotlight_cmd import spotlight_command
 from agentkit_cli.commands.spotlight_queue_cmd import app as spotlight_queue_app
 from agentkit_cli.commands.hooks_cmd import hooks_app
+from agentkit_cli.commands.weekly_digest_cmd import app as weekly_digest_app
 from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
 from agentkit_cli.commands.hot_cmd import hot_command
 from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
@@ -99,6 +100,7 @@ app.add_typer(webhook_app, name="webhook")
 app.add_typer(checks_app, name="checks")
 app.add_typer(spotlight_queue_app, name="spotlight-queue")
 app.add_typer(hooks_app, name="hooks")
+app.add_typer(weekly_digest_app, name="weekly-digest")
 
 
 @app.command("timeline")
