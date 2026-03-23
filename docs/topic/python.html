@@ -418,6 +418,43 @@ footer a:hover { color: var(--text); }
   }, { threshold: 0.1 });
   bars.forEach(function(b) { bioS.observe(b); });
 })();
+
+// Dynamic leaderboard data from data.json
+function gradeClass(g) { return 'grade-' + (g || 'c').toLowerCase(); }
+function renderRecentlyScored(data) {
+  var el = document.getElementById('recently-scored-list');
+  if (!el) return;
+  var top = data.repos ? data.repos.slice(0, 5) : [];
+  var html = '<ul class="repo-list">';
+  top.forEach(function(r) {
+    var src = r.source || 'ecosystem';
+    var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+    var srcClass = 'source-' + srcLabel;
+    html += '<li class="repo-item">'
+      + '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener" class="repo-name">' + (r.name || '') + '</a>'
+      + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+      + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+      + '<span class="score-val">' + (r.score || 0) + '</span>'
+      + '<span class="grade ' + gradeClass(r.grade) + '">' + (r.grade || '') + '</span>'
+      + '</li>';
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+  // Update repos-scored stat
+  var statEl = document.getElementById('repos-scored-stat');
+  if (statEl && data.stats && data.stats.total) { statEl.textContent = data.stats.total; }
+  // Update community-scored stat
+  var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+  var commEl = document.getElementById('community-scored-stat');
+  if (commEl) { commEl.textContent = communityCount; }
+}
+fetch('/agentkit-cli/data.json')
+  .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+  .then(renderRecentlyScored)
+  .catch(function() {
+    var el = document.getElementById('recently-scored-list');
+    if (el) el.innerHTML = '<p style="color:var(--muted)">Score data unavailable.</p>';
+  });
 </script>
 </body>
 </html>
