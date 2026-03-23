@@ -83,6 +83,7 @@ from agentkit_cli.commands.weekly_digest_cmd import app as weekly_digest_app
 from agentkit_cli.commands.daily_duel_cmd import daily_duel_command
 from agentkit_cli.commands.hot_cmd import hot_command
 from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
+from agentkit_cli.commands.pages_refresh import pages_refresh_command
 from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
 from agentkit_cli.serve import DEFAULT_PORT
@@ -919,6 +920,22 @@ def pages_trending(
         quiet=quiet,
         share=share,
         json_output=json_output,
+        token=token,
+    )
+
+
+@app.command("pages-refresh")
+def pages_refresh(
+    ecosystems: Optional[str] = typer.Option(None, "--ecosystems", help="Comma-separated ecosystems (default: python,typescript,rust,go)"),
+    limit: int = typer.Option(5, "--limit", help="Repos per ecosystem (default: 5, max 25)"),
+    docs_dir: Optional[Path] = typer.Option(None, "--docs-dir", help="Docs directory (default: docs/)"),
+    token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN)"),
+) -> None:
+    """Refresh GitHub Pages leaderboard: score ecosystems, write docs/data.json + docs/leaderboard.html, update docs/index.html."""
+    pages_refresh_command(
+        ecosystems=ecosystems,
+        limit=limit,
+        docs_dir=docs_dir,
         token=token,
     )
 
