@@ -32,6 +32,7 @@ from agentkit_cli.commands.sweep_cmd import sweep_command
 from agentkit_cli.commands.gate_cmd import gate_command
 from agentkit_cli.commands.setup_ci_cmd import setup_ci_command
 from agentkit_cli.commands.release_check_cmd import release_check_command
+from agentkit_cli.commands.changelog_cmd import changelog_command
 from agentkit_cli.commands.notify_cmd import notify_app
 from agentkit_cli.commands.config_cmd import config_app
 from agentkit_cli.commands.profile_cmd import profile_app
@@ -634,6 +635,32 @@ def setup_ci(
     )
 
 
+@app.command("changelog")
+def changelog(
+    since: Optional[str] = typer.Option(None, "--since", help="Git ref or tag baseline (default: last tag)"),
+    version: Optional[str] = typer.Option(None, "--version", help="Version string for header (e.g. v0.93.0)"),
+    fmt: str = typer.Option("markdown", "--format", help="Output format: markdown|release|json"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write to file instead of stdout"),
+    score_delta: bool = typer.Option(True, "--score-delta/--no-score-delta", help="Include quality score delta from history DB"),
+    no_chore: bool = typer.Option(False, "--no-chore", help="Exclude chore/test/ci commits"),
+    project: Optional[str] = typer.Option(None, "--project", help="Project path for score delta lookup"),
+    github_release: bool = typer.Option(False, "--github-release", help="Alias for --format release"),
+    create_release: bool = typer.Option(False, "--create-release", help="Create a GitHub release using gh CLI (requires --version)"),
+) -> None:
+    """Generate an AI-friendly changelog from git commits + quality score deltas."""
+    changelog_command(
+        since=since,
+        version=version,
+        fmt=fmt,
+        output=output,
+        score_delta=score_delta,
+        no_chore=no_chore,
+        project=project,
+        github_release=github_release,
+        create_release=create_release,
+    )
+
+
 @app.command("release-check")
 def release_check(
     path: Optional[Path] = typer.Argument(None, help="Project directory (default: cwd)"),
@@ -642,6 +669,7 @@ def release_check(
     registry: str = typer.Option("auto", "--registry", help="Registry to check: pypi|npm|auto"),
     skip_tests: bool = typer.Option(False, "--skip-tests", help="Skip the pytest/npm test step"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON for CI integration"),
+    changelog: bool = typer.Option(False, "--changelog", help="Generate and append a changelog preview to the output"),
 ) -> None:
     """Verify the 4-part release surface: tests, git push, tag, and registry."""
     release_check_command(
@@ -651,6 +679,7 @@ def release_check(
         registry=registry,
         skip_tests=skip_tests,
         json_output=json_output,
+        changelog=changelog,
     )
 
 
