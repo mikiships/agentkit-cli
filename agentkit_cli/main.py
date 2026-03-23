@@ -196,9 +196,17 @@ def run(
     run_populate_limit: int = typer.Option(10, "--populate-limit", help="Max repos per topic for --populate"),
     run_frameworks: bool = typer.Option(False, "--frameworks", help="Run frameworks check after pipeline and include result in output"),
     api_cache: bool = typer.Option(False, "--api-cache", help="Warm API cache after run (best-effort)"),
+    run_pages: bool = typer.Option(False, "--pages", help="Add result to leaderboard (docs/data.json) after run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
     run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
+    if run_pages:
+        try:
+            from agentkit_cli.pages_sync_engine import SyncEngine
+            SyncEngine().sync(push=False)
+            typer.echo("✓ Added to leaderboard: https://mikiships.github.io/agentkit-cli/")
+        except Exception as _pe:
+            typer.echo(f"Warning: pages sync failed — {_pe}")
     if run_topic_repos:
         from agentkit_cli.commands.topic_rank_cmd import topic_rank_command
         topic_rank_command(topic=run_topic_repos.strip())
@@ -528,6 +536,7 @@ def analyze(
     share: bool = typer.Option(False, "--share", help="Upload a score card to here.now after analysis and print the URL"),
     record_findings: bool = typer.Option(False, "--record-findings", help="Store agentlint findings in history DB for insights"),
     analyze_gist: bool = typer.Option(False, "--gist", help="Publish analyze output as a GitHub Gist"),
+    analyze_pages: bool = typer.Option(False, "--pages", help="Add result to leaderboard (docs/data.json) after analysis"),
 ) -> None:
     """Analyze any GitHub repo (or local path) for agent quality. Zero setup required."""
     analyze_command(
@@ -541,6 +550,7 @@ def analyze(
         share=share,
         record_findings=record_findings,
         gist=analyze_gist,
+        pages=analyze_pages,
     )
 
 
@@ -922,6 +932,33 @@ def pages_trending(
         json_output=json_output,
         token=token,
     )
+
+
+@app.command("pages-sync")
+def pages_sync(
+    push: bool = typer.Option(True, "--push/--no-push", help="Commit and push docs/data.json to git (default: push)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be synced without writing"),
+    json_output: bool = typer.Option(False, "--json", help="Output sync summary as JSON"),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Only sync top N repos by score (default: all)"),
+    docs_dir: Optional[Path] = typer.Option(None, "--docs-dir", help="Docs directory (default: docs/)"),
+) -> None:
+    """Sync local history DB results to docs/data.json and push to GitHub."""
+    from agentkit_cli.commands.pages_sync import pages_sync_command
+    from agentkit_cli.pages_sync_engine import SyncEngine
+    engine = SyncEngine(docs_dir=docs_dir)
+    pages_sync_command(push=push, dry_run=dry_run, json_output=json_output, limit=limit, _engine=engine)
+
+
+@app.command("pages-add")
+def pages_add(
+    target: str = typer.Argument(..., help="GitHub repo to add: github:owner/repo"),
+    push: bool = typer.Option(True, "--push/--no-push", help="Commit and push after adding (default: push)"),
+    share: bool = typer.Option(False, "--share", help="Publish a scorecard and include URL in data.json"),
+    docs_dir: Optional[Path] = typer.Option(None, "--docs-dir", help="Docs directory (default: docs/)"),
+) -> None:
+    """Analyze a single repo and add it to the leaderboard."""
+    from agentkit_cli.commands.pages_add import pages_add_command
+    pages_add_command(target=target, push=push, share=share, docs_dir=docs_dir)
 
 
 @app.command("pages-refresh")

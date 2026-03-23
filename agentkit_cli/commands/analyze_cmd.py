@@ -40,6 +40,7 @@ def analyze_command(
     share: bool = False,
     record_findings: bool = False,
     gist: bool = False,
+    pages: bool = False,
 ) -> None:
     """Analyze a GitHub repo or local path for agent quality."""
     # Validate target early
@@ -161,3 +162,16 @@ def analyze_command(
             console.print(f"[yellow]Warning: gist publish failed — {_e}[/yellow]")
 
     console.print(f"[dim]{sep}[/dim]\n")
+
+    # --pages: add this result to the local leaderboard
+    if pages:
+        try:
+            from agentkit_cli.pages_sync_engine import SyncEngine
+            from agentkit_cli.history import HistoryDB
+            engine = SyncEngine()
+            engine.sync(push=False)
+            console.print(
+                "[green]✓[/green] Added to leaderboard: https://mikiships.github.io/agentkit-cli/"
+            )
+        except Exception as _pages_err:
+            console.print(f"[yellow]Warning: pages sync failed — {_pages_err}[/yellow]")
