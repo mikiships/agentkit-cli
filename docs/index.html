@@ -382,7 +382,7 @@ footer a:hover { color: var(--text); }
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v0.95.1 &middot; 0 repos scored</div>
+          <div class="hero-badge">v0.95.1 &middot; 6 repos scored</div>
           <h1>Benchmark AI Coding Agents<br>on <em>Your Codebase</em></h1>
           <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
           <div class="hero-actions">
@@ -414,7 +414,7 @@ footer a:hover { color: var(--text); }
           <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4350</div><div class="stat-label">Tests</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">86</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">0</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">6</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
 
@@ -501,12 +501,10 @@ agentkit quickstart</code></pre>
         </section>
 
         <!-- Recently Scored (populated dynamically from data.json) -->
-        <section class="recently-scored-section" id="recently-scored">
-          <div class="container">
-            <h2 class="section-title">Recently Scored</h2>
-            <div id="recently-scored-list" class="recently-scored-list">
-              <p style="color:var(--muted)">Loading...</p>
-            </div>
+                <section class="recently-scored-section" id="recently-scored">
+          <h2 class="section-title">Recently Scored Repos</h2>
+          <div id="recently-scored-list" class="recently-scored-list">
+            <p class="loading-msg">Loading…</p>
           </div>
         </section>
 
