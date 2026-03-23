@@ -1,0 +1,37 @@
+name: Daily Pages Refresh
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install agentkit-cli
+        run: pip install agentkit-cli
+
+      - name: Run pages-refresh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: agentkit pages-refresh
+
+      - name: Commit docs changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data.json docs/leaderboard.html docs/index.html
+          git diff --staged --quiet || git commit -m "chore: daily pages refresh [skip ci]"
+          git push
