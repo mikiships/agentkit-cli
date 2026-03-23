@@ -9,15 +9,15 @@ REPO_ROOT = Path(__file__).parent.parent
 class TestVersionBump:
     def test_version_is_0_92_0(self):
         import agentkit_cli
-        assert agentkit_cli.__version__ == "0.92.0"
+        assert agentkit_cli.__version__ == "0.93.0"
 
     def test_pyproject_version(self):
         pyproject = (REPO_ROOT / "pyproject.toml").read_text()
-        assert 'version = "0.92.0"' in pyproject
+        assert 'version = "0.93.0"' in pyproject
 
     def test_changelog_entry(self):
         changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
-        assert "0.92.0" in changelog
+        assert "0.93.0" in changelog
 
     def test_changelog_weekly_digest_mentioned(self):
         changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
@@ -25,4 +25,4 @@ class TestVersionBump:
 
     def test_build_report_has_v0_92_0(self):
         build_report = (REPO_ROOT / "BUILD-REPORT.md").read_text()
-        assert "0.92.0" in build_report
+        assert "0.93.0" in build_report

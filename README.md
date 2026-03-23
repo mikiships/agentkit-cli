@@ -203,6 +203,37 @@ agentkit llmstxt --sync-from agents-md
 agentkit run --migrate       # generate missing formats before analysis
 ```
 
+## Changelog Generation
+
+Generate an AI-friendly changelog from git commits and quality score deltas.
+
+```bash
+# Default: markdown changelog since last tag
+agentkit changelog
+
+# Include version header
+agentkit changelog --version v0.93.0
+
+# GitHub release body (strips chore/test commits, adds pip install)
+agentkit changelog --format release --version v0.93.0
+
+# JSON output for CI integration
+agentkit changelog --format json
+
+# Write to file
+agentkit changelog --output CHANGELOG_PREVIEW.md
+
+# Use as part of release-check workflow
+agentkit release-check --changelog
+
+# Create GitHub release (requires gh CLI)
+agentkit changelog --format release --version v0.93.0 --create-release
+```
+
+The changelog groups commits by [conventional commit](https://www.conventionalcommits.org/) prefixes (`feat`, `fix`, `docs`, etc.) and includes quality score delta when history is available.
+
+When `GITHUB_STEP_SUMMARY` is set (GitHub Actions), `--format release` automatically appends the changelog to the job summary.
+
 ## Weekly Digest
 
 Generate a curated "State of AI Agent Readiness" report from your local analysis history.

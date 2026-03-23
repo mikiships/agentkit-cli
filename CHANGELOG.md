@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.93.0] - 2026-03-23
+
+### Added
+- **`agentkit changelog` command**: generates an AI-produced changelog from git commits + quality score deltas, formatted for GitHub releases and PR descriptions.
+- **`ChangelogEngine`** (`agentkit_cli/changelog_engine.py`): parses git log (`from_git`), reads score history (`from_history`), and renders markdown or GitHub release body.
+- **Conventional-commit grouping**: groups commits by `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, etc.
+- **Score delta line**: includes `before → after (+delta)` quality score summary when history DB is available.
+- **`--format` options**: `markdown` (default), `release` (GitHub release body with pip install), `json`.
+- **`GITHUB_STEP_SUMMARY` support**: when env var is set and `--format release` is used, appends changelog to GitHub step summary.
+- **`--create-release`**: creates a GitHub release via `gh release create` (only when `--version` is set and flag is explicitly passed).
+- **`agentkit release-check --changelog`**: appends changelog preview to release-check output; adds `changelog_preview` key to `--json` output.
+- **README**: added `## Changelog Generation` section with usage examples.
+
 ## [0.92.0] - 2026-03-22
 
 ### Added
