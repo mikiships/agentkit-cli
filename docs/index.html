@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>agentkit — Agent Quality Rankings</title>
 <meta name="description" content="Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.">
-<link rel="canonical" href="https://mysite.example.com/">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Agent Quality Rankings", "description": "Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.", "url": "https://mysite.example.com/"}</script>
+<link rel="canonical" href="https://mikiships.github.io/agentkit-cli/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Agent Quality Rankings", "description": "Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -368,17 +368,17 @@ footer a:hover { color: var(--text); }
 <header>
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
-    <a href="https://mysite.example.com/">Home</a>
-    <a href="https://mysite.example.com/leaderboard.html">Daily Leaderboard</a>
-    <a href="https://mysite.example.com/trending.html">Daily Trending</a>
-    <a href="https://mysite.example.com/#org-leaderboard">Org Leaderboard</a>
-    <a href="https://mysite.example.com/topic/python.html">Python</a>
+    <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
+    <a href="https://mikiships.github.io/agentkit-cli/leaderboard.html">Daily Leaderboard</a>
+    <a href="https://mikiships.github.io/agentkit-cli/trending.html">Daily Trending</a>
+    <a href="https://mikiships.github.io/agentkit-cli/#org-leaderboard">Org Leaderboard</a>
+    <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v0.93.0 &middot; 10 repos scored</div>
+          <div class="hero-badge">v0.94.0 &middot; 0 repos scored</div>
           <h1>Benchmark AI Coding Agents<br>on <em>Your Codebase</em></h1>
           <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
           <div class="hero-actions">
@@ -407,21 +407,11 @@ footer a:hover { color: var(--text); }
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4648</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">93</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4350</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">86</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">10</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num">0</div><div class="stat-label">Repos Scored</div></div>
         </div>
-
-        <!-- Recently Scored Repos (populated by data.json fetch) -->
-        <section class="recently-scored-section" id="recently-scored">
-          <div class="container">
-            <h2 class="section-title">Recently Scored Repos</h2>
-            <div id="recently-scored-list" class="recently-scored-list">
-              <p class="loading-msg" style="color:var(--muted)">Loading scored repos…</p>
-            </div>
-          </div>
-        </section>
 
         <!-- Feature grid -->
         <section class="features-section">
@@ -507,7 +497,7 @@ agentkit quickstart</code></pre>
 
         <!-- Live Rankings -->
         <div class="container">
-          <div class="ecosystem-pills"><a class="pill" href="https://mysite.example.com/topic/python.html">Python</a></div>
+          <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
           <p style='color:var(--muted)'>No scored repos yet. Run <code>agentkit quickstart</code> to get started.</p>
         </div>
 <footer>
@@ -540,51 +530,6 @@ agentkit quickstart</code></pre>
     });
   }, { threshold: 0.1 });
   bars.forEach(function(b) { bioS.observe(b); });
-})();
-</script>
-<script>
-(function() {
-  function gradeClass(g) {
-    return {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d','F':'grade-f'}[g] || '';
-  }
-  function renderRecentlyScored(data) {
-    var el = document.getElementById('recently-scored-list');
-    if (!el) return;
-    if (!data || !data.repos || !data.repos.length) {
-      el.innerHTML = '<p style="color:var(--muted)">No data available.</p>';
-      return;
-    }
-    var top = data.repos.slice(0, 5);
-    var html = '<ul style="list-style:none;padding:0;margin:0">';
-    top.forEach(function(r) {
-      html += '<li style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">'
-        + '<a href="' + r.url + '" target="_blank" rel="noopener" style="color:var(--blue);flex:1">' + r.name + '</a>'
-        + '<span style="font-size:0.75rem;color:var(--muted);background:var(--surface2);padding:0.2rem 0.5rem;border-radius:4px">' + (r.ecosystem || '') + '</span>'
-        + '<span style="font-family:var(--mono);font-size:0.9rem">' + r.score + '</span>'
-        + '<span class="grade ' + gradeClass(r.grade) + '" style="font-weight:600">' + r.grade + '</span>'
-        + '</li>';
-    });
-    html += '</ul>';
-    if (data.generated_at) {
-      html += '<p style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem">Updated: ' + data.generated_at.slice(0,10) + '</p>';
-    }
-    el.innerHTML = html;
-    // Update repos-scored stat
-    if (data.stats && data.stats.total) {
-      var statEl = document.getElementById('repos-scored-stat');
-      if (statEl) statEl.textContent = data.stats.total;
-      // Also update hero badge
-      var badge = document.querySelector('.hero-badge');
-      if (badge) badge.innerHTML = badge.innerHTML.replace(/\d+ repos scored/, data.stats.total + ' repos scored');
-    }
-  }
-  fetch('/agentkit-cli/data.json')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
-    .then(renderRecentlyScored)
-    .catch(function() {
-      var el = document.getElementById('recently-scored-list');
-      if (el) el.innerHTML = '<p style="color:var(--muted)">Score data unavailable.</p>';
-    });
 })();
 </script>
 </body>
