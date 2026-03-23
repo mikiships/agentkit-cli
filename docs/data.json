@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-23T21:07:50.463762+00:00",
+  "generated_at": "2026-03-23T21:19:33.190927+00:00",
   "repos": [
     {
       "name": "huggingface/transformers",
@@ -18,11 +18,43 @@
       "source": "ecosystem"
     },
     {
+      "name": "prisma/prisma",
+      "url": "https://github.com/prisma/prisma",
+      "score": 64.8,
+      "grade": "C",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
       "name": "encode/httpx",
       "url": "https://github.com/encode/httpx",
       "score": 63.0,
       "grade": "C",
       "ecosystem": "python",
+      "source": "ecosystem"
+    },
+    {
+      "name": "vercel/next.js",
+      "url": "https://github.com/vercel/next.js",
+      "score": 62.3,
+      "grade": "C",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "colinhacks/zod",
+      "url": "https://github.com/colinhacks/zod",
+      "score": 62.3,
+      "grade": "C",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "microsoft/vscode",
+      "url": "https://github.com/microsoft/vscode",
+      "score": 60.3,
+      "grade": "C",
+      "ecosystem": "typescript",
       "source": "ecosystem"
     },
     {
@@ -66,98 +98,10 @@
       "source": "ecosystem"
     },
     {
-      "name": "pallets/flask",
-      "url": "https://github.com/pallets/flask",
-      "score": 35.5,
-      "grade": "D",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "django/django",
-      "url": "https://github.com/django/django",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "prisma/prisma",
-      "url": "https://github.com/prisma/prisma",
-      "score": 64.8,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "vercel/next.js",
-      "url": "https://github.com/vercel/next.js",
-      "score": 62.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "colinhacks/zod",
-      "url": "https://github.com/colinhacks/zod",
-      "score": 62.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "microsoft/vscode",
-      "url": "https://github.com/microsoft/vscode",
-      "score": 60.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
       "name": "supabase/supabase",
       "url": "https://github.com/supabase/supabase",
       "score": 50.0,
       "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "trpc/trpc",
-      "url": "https://github.com/trpc/trpc",
-      "score": 40.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "nestjs/nest",
-      "url": "https://github.com/nestjs/nest",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tailwindlabs/tailwindcss",
-      "url": "https://github.com/tailwindlabs/tailwindcss",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tanstack/query",
-      "url": "https://github.com/tanstack/query",
-      "score": 32.5,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "vitejs/vite",
-      "url": "https://github.com/vitejs/vite",
-      "score": 30.0,
-      "grade": "D",
       "ecosystem": "typescript",
       "source": "ecosystem"
     },
@@ -194,6 +138,14 @@
       "source": "ecosystem"
     },
     {
+      "name": "trpc/trpc",
+      "url": "https://github.com/trpc/trpc",
+      "score": 40.0,
+      "grade": "D",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
       "name": "tokio-rs/tokio",
       "url": "https://github.com/tokio-rs/tokio",
       "score": 40.0,
@@ -210,6 +162,38 @@
       "source": "ecosystem"
     },
     {
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask",
+      "score": 35.5,
+      "grade": "D",
+      "ecosystem": "python",
+      "source": "ecosystem"
+    },
+    {
+      "name": "django/django",
+      "url": "https://github.com/django/django",
+      "score": 35.0,
+      "grade": "D",
+      "ecosystem": "python",
+      "source": "ecosystem"
+    },
+    {
+      "name": "nestjs/nest",
+      "url": "https://github.com/nestjs/nest",
+      "score": 35.0,
+      "grade": "D",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "tailwindlabs/tailwindcss",
+      "url": "https://github.com/tailwindlabs/tailwindcss",
+      "score": 35.0,
+      "grade": "D",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
       "name": "serde-rs/serde",
       "url": "https://github.com/serde-rs/serde",
       "score": 35.0,
@@ -223,6 +207,22 @@
       "score": 35.0,
       "grade": "D",
       "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "tanstack/query",
+      "url": "https://github.com/tanstack/query",
+      "score": 32.5,
+      "grade": "D",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "vitejs/vite",
+      "url": "https://github.com/vitejs/vite",
+      "score": 30.0,
+      "grade": "D",
+      "ecosystem": "typescript",
       "source": "ecosystem"
     },
     {
