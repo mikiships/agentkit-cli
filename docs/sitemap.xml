@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mikiships.github.io/agentkit-cliindex.html</loc>
+    <loc>https://mikiships.github.io/agentkit-cli/index.html</loc>
     <lastmod>2026-03-23</lastmod>
   </url>
   <url>
-    <loc>https://mikiships.github.io/agentkit-clitopic/python.html</loc>
+    <loc>https://mikiships.github.io/agentkit-cli/topic/python.html</loc>
     <lastmod>2026-03-23</lastmod>
   </url>
   <url>
-    <loc>https://mikiships.github.io/agentkit-clitopic/typescript.html</loc>
+    <loc>https://mikiships.github.io/agentkit-cli/topic/typescript.html</loc>
     <lastmod>2026-03-23</lastmod>
   </url>
   <url>
-    <loc>https://mikiships.github.io/agentkit-clitopic/rust.html</loc>
+    <loc>https://mikiships.github.io/agentkit-cli/topic/rust.html</loc>
     <lastmod>2026-03-23</lastmod>
   </url>
   <url>
-    <loc>https://mikiships.github.io/agentkit-clirepo/github-a--repo1__vs__github-b--repo2.html</loc>
-    <lastmod>2026-03-23</lastmod>
-  </url>
-  <url>
-    <loc>https://mikiships.github.io/agentkit-clirepo/a--b__vs__c--d.html</loc>
-    <lastmod>2026-03-23</lastmod>
-  </url>
-  <url>
-    <loc>https://mikiships.github.io/agentkit-clirepo/org--repo1__vs__org--repo2.html</loc>
+    <loc>https://mikiships.github.io/agentkit-cli/topic/go.html</loc>
     <lastmod>2026-03-23</lastmod>
   </url>
 </urlset>
