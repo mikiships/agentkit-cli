@@ -89,6 +89,13 @@ def update_index_html(index_path: Path, data: dict) -> bool:
         html,
     )
 
+    # Ensure repos-scored-stat id is present on the Repos Scored stat
+    html = re.sub(
+        r'<div class="stat-num"(?! id="repos-scored-stat")([^>]*>)(\d+)(</div><div class="stat-label">Repos Scored</div>)',
+        rf'<div class="stat-num" id="repos-scored-stat"\1\2\3',
+        html,
+    )
+
     # Inject/replace Recently Scored Repos section and fetch script
     recently_section = _recently_scored_section()
     fetch_script = _fetch_script()

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.94.1] - 2026-03-23
+
+### Fixed
+- `agentkit pages-refresh`: inject `recently-scored` section and fetch script into `docs/index.html` correctly on repeated runs; add `id="repos-scored-stat"` to the Repos Scored stat element for reliable JS targeting
+- `BUILD-REPORT.md`: include verified full test count
+
 ## [0.94.0] - 2026-03-23
 
 ### Added

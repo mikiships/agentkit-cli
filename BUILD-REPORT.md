@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v0.94.0 GitHub Pages Live Leaderboard
+# BUILD-REPORT.md — agentkit-cli v0.94.1 GitHub Pages Live Leaderboard (patch fixes)
 
 Date: 2026-03-23
 Builder: subagent (openclaw)
@@ -6,7 +6,7 @@ Contract: all-day-build-contract-agentkit-cli-v0.94.0-pages-live.md
 
 ## Summary
 
-All 5 deliverables shipped. 52 new tests, all passing.
+All 5 deliverables shipped. 52 new tests added. Full suite: 4700 tests passing.
 
 ## Deliverables
 
