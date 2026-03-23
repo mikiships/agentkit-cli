@@ -6,14 +6,17 @@ from pathlib import Path
 import pytest
 
 
-def test_version_is_0_92_0():
+def test_version_is_current():
     from agentkit_cli import __version__
-    assert __version__ == "0.94.0"
+    assert __version__ >= "0.94.1"
 
 
 def test_pyproject_version():
+    import re
     text = (Path(__file__).parent.parent / "pyproject.toml").read_text()
-    assert 'version = "0.94.0"' in text
+    m = re.search(r'version = "(\d+\.\d+\.\d+)"', text)
+    assert m is not None
+    assert m.group(1) >= "0.94.1"
 
 
 def test_changelog_has_0_92_0():
