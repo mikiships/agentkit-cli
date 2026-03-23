@@ -71,6 +71,7 @@ def release_check_command(
     registry: str = "auto",
     skip_tests: bool = False,
     json_output: bool = False,
+    changelog: bool = False,
 ) -> None:
     """Verify the 4-part release surface for a Python or npm package."""
     from agentkit_cli.release_check import Registry
@@ -87,9 +88,22 @@ def release_check_command(
         skip_tests=skip_tests,
     )
 
+    changelog_content: Optional[str] = None
+    if changelog:
+        from agentkit_cli.changelog_engine import ChangelogEngine
+        commits = ChangelogEngine.from_git(since=None, path=str(root))
+        delta = ChangelogEngine.from_history(project=None, since_days=7)
+        changelog_content = ChangelogEngine.render_markdown(commits, delta, version=result.version)
+
     if json_output:
-        typer.echo(json.dumps(result.as_dict(), indent=2))
+        d = result.as_dict()
+        if changelog_content is not None:
+            d["changelog_preview"] = changelog_content
+        typer.echo(json.dumps(d, indent=2))
     else:
         _render_table(result)
+        if changelog_content is not None:
+            console.print("\n[bold]Changelog Preview:[/bold]")
+            console.print(changelog_content)
 
     raise typer.Exit(code=0 if result.passed else 1)
