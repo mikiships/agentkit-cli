@@ -8,12 +8,12 @@ import pytest
 
 def test_version_is_0_92_0():
     from agentkit_cli import __version__
-    assert __version__ == "0.93.0"
+    assert __version__ == "0.94.0"
 
 
 def test_pyproject_version():
     text = (Path(__file__).parent.parent / "pyproject.toml").read_text()
-    assert 'version = "0.93.0"' in text
+    assert 'version = "0.94.0"' in text
 
 
 def test_changelog_has_0_92_0():

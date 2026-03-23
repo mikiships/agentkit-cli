@@ -90,9 +90,9 @@ def test_render_release_excludes_chore():
 
 
 def test_render_release_includes_pip_install():
-    out = ChangelogEngine.render_release([], None, "v0.93.0")
+    out = ChangelogEngine.render_release([], None, "v0.94.0")
     assert "pip install" in out
-    assert "0.93.0" in out
+    assert "0.94.0" in out
 
 
 def test_render_release_no_version_no_pip():
