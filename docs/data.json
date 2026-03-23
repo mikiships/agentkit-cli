@@ -1,73 +1,9 @@
 {
-  "generated_at": "2026-03-23T21:19:33.190927+00:00",
+  "generated_at": "2026-03-23T21:41:13.539760+00:00",
   "repos": [
-    {
-      "name": "huggingface/transformers",
-      "url": "https://github.com/huggingface/transformers",
-      "score": 79.8,
-      "grade": "B",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "openai/openai-python",
-      "url": "https://github.com/openai/openai-python",
-      "score": 70.0,
-      "grade": "B",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "prisma/prisma",
-      "url": "https://github.com/prisma/prisma",
-      "score": 64.8,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "encode/httpx",
-      "url": "https://github.com/encode/httpx",
-      "score": 63.0,
-      "grade": "C",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "vercel/next.js",
-      "url": "https://github.com/vercel/next.js",
-      "score": 62.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "colinhacks/zod",
-      "url": "https://github.com/colinhacks/zod",
-      "score": 62.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "microsoft/vscode",
-      "url": "https://github.com/microsoft/vscode",
-      "score": 60.3,
-      "grade": "C",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
     {
       "name": "fastapi/fastapi",
       "url": "https://github.com/fastapi/fastapi",
-      "score": 60.0,
-      "grade": "C",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tiangolo/sqlmodel",
-      "url": "https://github.com/tiangolo/sqlmodel",
       "score": 60.0,
       "grade": "C",
       "ecosystem": "python",
@@ -82,169 +18,25 @@
       "source": "ecosystem"
     },
     {
-      "name": "psf/requests",
-      "url": "https://github.com/psf/requests",
-      "score": 56.0,
-      "grade": "C",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "pydantic/pydantic",
-      "url": "https://github.com/pydantic/pydantic",
-      "score": 52.5,
-      "grade": "C",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "supabase/supabase",
-      "url": "https://github.com/supabase/supabase",
-      "score": 50.0,
+      "name": "vercel/next.js",
+      "url": "https://github.com/vercel/next.js",
+      "score": 62.3,
       "grade": "C",
       "ecosystem": "typescript",
       "source": "ecosystem"
     },
     {
-      "name": "diesel-rs/diesel",
-      "url": "https://github.com/diesel-rs/diesel",
-      "score": 50.0,
+      "name": "microsoft/vscode",
+      "url": "https://github.com/microsoft/vscode",
+      "score": 60.3,
       "grade": "C",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "rust-lang/rust",
-      "url": "https://github.com/rust-lang/rust",
-      "score": 45.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "clap-rs/clap",
-      "url": "https://github.com/clap-rs/clap",
-      "score": 45.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "BurntSushi/ripgrep",
-      "url": "https://github.com/BurntSushi/ripgrep",
-      "score": 42.5,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "trpc/trpc",
-      "url": "https://github.com/trpc/trpc",
-      "score": 40.0,
-      "grade": "D",
       "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tokio-rs/tokio",
-      "url": "https://github.com/tokio-rs/tokio",
-      "score": 40.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "rayon-rs/rayon",
-      "url": "https://github.com/rayon-rs/rayon",
-      "score": 40.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "pallets/flask",
-      "url": "https://github.com/pallets/flask",
-      "score": 35.5,
-      "grade": "D",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "django/django",
-      "url": "https://github.com/django/django",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "nestjs/nest",
-      "url": "https://github.com/nestjs/nest",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tailwindlabs/tailwindcss",
-      "url": "https://github.com/tailwindlabs/tailwindcss",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "serde-rs/serde",
-      "url": "https://github.com/serde-rs/serde",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "hyperium/hyper",
-      "url": "https://github.com/hyperium/hyper",
-      "score": 35.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "tanstack/query",
-      "url": "https://github.com/tanstack/query",
-      "score": 32.5,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "vitejs/vite",
-      "url": "https://github.com/vitejs/vite",
-      "score": 30.0,
-      "grade": "D",
-      "ecosystem": "typescript",
-      "source": "ecosystem"
-    },
-    {
-      "name": "actix/actix-web",
-      "url": "https://github.com/actix/actix-web",
-      "score": 30.0,
-      "grade": "D",
-      "ecosystem": "rust",
-      "source": "ecosystem"
-    },
-    {
-      "name": "ogham/exa",
-      "url": "https://github.com/ogham/exa",
-      "score": 27.5,
-      "grade": "D",
-      "ecosystem": "rust",
       "source": "ecosystem"
     }
   ],
   "stats": {
-    "total": 30,
-    "median": 45.0,
-    "top_score": 79.8
+    "total": 4,
+    "median": 60.1,
+    "top_score": 62.3
   }
 }
