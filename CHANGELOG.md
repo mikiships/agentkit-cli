@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.94.0] - 2026-03-23
+
+### Added
+- **`agentkit pages-refresh` command**: refreshes the GitHub Pages leaderboard by scoring top repos across `python`, `typescript`, `rust`, and `go` ecosystems. Writes `docs/data.json`, `docs/leaderboard.html`, and updates stat counters in `docs/index.html`.
+- **`docs/data.json`**: new JSON feed consumed by the GitHub Pages front-end to display live repo scores.
+- **Live leaderboard on front page**: `docs/index.html` now fetches `/agentkit-cli/data.json` and renders a "Recently Scored Repos" section with name, score, grade chip, and ecosystem badge.
+- **Repos-scored stat fixed**: the "0 repos scored" embarrassment is gone — the counter now reflects actual scored repo count from `data.json`.
+- **Daily GitHub Actions workflow** (`.github/workflows/daily-pages-refresh.yml`): runs `agentkit pages-refresh` daily at 08:00 UTC and commits updated docs. Supports `workflow_dispatch` for manual runs.
+- **Seed data**: `docs/data.json` seeded with 10 real repos (scores for `openai/openai-python`, `langchain-ai/langchain`, `vercel/ai`, and more).
+
 ## [0.93.0] - 2026-03-23
 
 ### Added

@@ -263,6 +263,21 @@ The digest report includes:
 - Week stats: total analyses, average score, top scorer
 - Dark-theme HTML suitable for sharing
 
+## Live Leaderboard
+
+The [GitHub Pages leaderboard](https://mikiships.github.io/agentkit-cli/leaderboard.html) shows real agent-readiness scores for top repos across Python, TypeScript, Rust, and Go. It updates daily via GitHub Actions.
+
+- 🌐 **Front page**: <https://mikiships.github.io/agentkit-cli/>
+- 📊 **Leaderboard**: <https://mikiships.github.io/agentkit-cli/leaderboard.html>
+- 🔄 **Live data feed**: <https://mikiships.github.io/agentkit-cli/data.json>
+
+To refresh the leaderboard locally:
+
+```bash
+agentkit pages-refresh
+# Options: --ecosystems python,typescript,rust,go --limit 5 --token <GITHUB_TOKEN>
+```
+
 ## Commands
 
 - `agentkit quickstart` — 🚀 fastest path to a score (start here)

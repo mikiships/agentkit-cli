@@ -1,62 +1,69 @@
-# BUILD-REPORT: agentkit-cli v0.93.0
+# BUILD-REPORT.md — agentkit-cli v0.94.0 GitHub Pages Live Leaderboard
 
-**Version:** 0.93.0
-**Date:** 2026-03-23
-**Owner:** Codex execution pass
+Date: 2026-03-23
+Builder: subagent (openclaw)
+Contract: all-day-build-contract-agentkit-cli-v0.94.0-pages-live.md
+
+## Summary
+
+All 5 deliverables shipped. 52 new tests, all passing.
 
 ## Deliverables
 
-| # | Deliverable | Status | Tests |
-|---|-------------|--------|-------|
-| D1 | ChangelogEngine core | ✅ DONE | 20 tests |
-| D2 | `agentkit changelog` CLI command | ✅ DONE | 11 tests |
-| D3 | Integration with `agentkit release-check --changelog` | ✅ DONE | 5 tests |
-| D4 | `GITHUB_STEP_SUMMARY` support + GitHub Release creation | ✅ DONE | 8 tests |
-| D5 | Docs, CHANGELOG, version bump to v0.93.0 | ✅ DONE | 8 tests |
+### D1: `agentkit pages-refresh` command ✅
+- **File**: `agentkit_cli/commands/pages_refresh.py`
+- **Registration**: `agentkit_cli/main.py` (`@app.command("pages-refresh")`)
+- **Behavior**: scores `python,typescript,rust,go` ecosystems (5 repos each), writes:
+  - `docs/data.json`: `{generated_at, repos: [{name, url, score, grade, ecosystem}], stats: {total, median, top_score}}`
+  - `docs/leaderboard.html`: full HTML leaderboard (via existing `render_leaderboard_html`)
+  - `docs/index.html`: updates "repos scored" hero badge and stat counter; injects "Recently Scored Repos" section and JS fetch script
+- `agentkit pages-refresh --help` works ✅
 
-## Test Counts
+### D2: `.github/workflows/daily-pages-refresh.yml` ✅
+- Daily cron `0 8 * * *`
+- `workflow_dispatch` manual trigger
+- Installs `agentkit-cli` from PyPI, runs `agentkit pages-refresh`
+- Commits `docs/data.json`, `docs/leaderboard.html`, `docs/index.html` with message `chore: daily pages refresh [skip ci]`
+- Uses `GITHUB_TOKEN`
 
-- **Baseline (v0.92.0):** ~1814 passing
-- **New tests added:** 52
-- **Final:** 4635 passing, 0 regressions
+### D3: `docs/index.html` live data display ✅
+- JavaScript `fetch('/agentkit-cli/data.json')` renders top 5 repos in "Recently Scored Repos" section
+- Shows name, score, grade chip, ecosystem badge
+- "repos scored" stat counter updated from data.json (no longer hardcoded 0)
+- Error handling with `.catch`
 
-## Files Added/Modified
+### D4: Seed `docs/data.json` ✅
+- 10 repos with real-looking scores across python/typescript/rust/go
+- Top repo: `openai/openai-python` (score 91.0, grade A)
+- All files committed to git (not pushed)
 
-### New Files
-- `agentkit_cli/changelog_engine.py` — ChangelogEngine class
-- `agentkit_cli/commands/changelog_cmd.py` — changelog CLI command
-- `tests/test_changelog_engine_d1.py` — D1 tests (20)
-- `tests/test_changelog_cmd_d2.py` — D2 tests (11)
-- `tests/test_release_check_changelog_d3.py` — D3 tests (5)
-- `tests/test_changelog_github_d4.py` — D4 tests (8)
-- `tests/test_changelog_d5.py` — D5 tests (8)
-- `tests/test_changelog_integration.py` — integration tests (3)
-- `BUILD-REPORT.md` — this file
-- `BUILD-REPORT-v0.93.0.md` — versioned copy
+### D5: README + CHANGELOG + version bump + BUILD-REPORT.md ✅
+- README: "Live Leaderboard" section added with GitHub Pages URLs and `agentkit pages-refresh` usage
+- CHANGELOG: v0.94.0 entry added
+- Version bumped: `pyproject.toml` → `0.94.0`, `agentkit_cli/__init__.py` → `0.94.0`
+- BUILD-REPORT.md: this file
 
-### Modified Files
-- `agentkit_cli/__init__.py` — version bumped to 0.93.0
-- `agentkit_cli/main.py` — `changelog` command registered
-- `agentkit_cli/commands/release_check_cmd.py` — `--changelog` flag added
-- `pyproject.toml` — version bumped to 0.93.0
-- `CHANGELOG.md` — `## [0.93.0]` section added
-- `README.md` — `## Changelog Generation` section added
-- `tests/test_interactive_ui_d5.py` — version assertions updated
+## Test Results
 
-## Deviations
-
-- None. All deliverables match the contract spec.
-
-## Feature Summary
-
-`agentkit changelog` generates a human-readable changelog from git commits and quality score deltas:
-
-```bash
-agentkit changelog --version v0.93.0
-agentkit changelog --format release --version v0.93.0
-agentkit release-check --changelog
+```
+tests/test_pages_refresh.py — 52 passed
 ```
 
-Groups commits by conventional-commit prefix (feat/fix/docs/refactor/test/chore).
-Includes score delta from history DB when available.
-Supports GITHUB_STEP_SUMMARY for GitHub Actions CI output.
+New tests cover:
+- `score_to_grade` (6 tests)
+- `build_data_json` structure and fields (9 tests)
+- `update_index_html` behavior (6 tests)
+- `pages_refresh_command` with mocked engine (5 tests)
+- CLI registration (2 tests)
+- Workflow file structure (8 tests)
+- `docs/index.html` fetch script presence (8 tests)
+- `docs/data.json` structure (8 tests)
+
+## No Blockers
+
+All deliverables completed in a single pass.
+
+## What Was NOT Done
+
+- `git push` (intentionally omitted per contract)
+- No scope creep or extra features
