@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.95.0] - 2026-03-23
+
+### Added
+- `agentkit pages-sync` — reads all local history DB results and syncs them to `docs/data.json`, with optional `--push` to commit and push to GitHub. Supports `--dry-run`, `--json`, `--limit`.
+- `--pages` flag on `agentkit analyze` — after a successful analysis, adds the result to the local leaderboard (docs/data.json) without pushing.
+- `--pages` flag on `agentkit run` — same as analyze, adds run result to leaderboard.
+- `agentkit pages-add github:owner/repo` — analyze a single repo and immediately add it to the leaderboard (+ optional `--push` to publish, `--share` to generate a scorecard URL).
+- `source` field in `docs/data.json` — entries now carry `"source": "ecosystem" | "community" | "manual"`, enabling differentiation of organically-added vs ecosystem-scanned repos.
+- Source badges in `docs/index.html` — leaderboard renders colored source chips (ecosystem vs community).
+- "Community Scored: N" stat counter in `docs/index.html` — shows how many repos were added via community use.
+
+### Changed
+- `agentkit pages-refresh` now sets `source="ecosystem"` on all ecosystem-scanned repo entries.
+
 ## [0.94.1] - 2026-03-23
 
 ### Fixed

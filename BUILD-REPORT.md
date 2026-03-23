@@ -1,3 +1,50 @@
+# BUILD-REPORT.md — agentkit-cli v0.95.0 Community Leaderboard + pages-sync
+
+Date: 2026-03-23
+Builder: subagent (openclaw)
+Contract: all-day-build-contract-agentkit-cli-v0.95.0-pages-sync.md
+
+## Summary
+
+All 5 deliverables complete. 47 new tests added. Full suite passes.
+
+## Deliverables
+
+| # | Deliverable | Status | Tests |
+|---|-------------|--------|-------|
+| D1 | `agentkit pages-sync` + SyncEngine | ✅ Complete | 22 |
+| D2 | `--pages` flag on analyze + run | ✅ Complete | 8 |
+| D3 | `agentkit pages-add` command | ✅ Complete | 9 |
+| D4 | `source` field + community badges in index.html | ✅ Complete | 8 |
+| D5 | Docs, CHANGELOG, version bump | ✅ Complete | — |
+
+## New Files
+- `agentkit_cli/pages_sync_engine.py` — SyncEngine
+- `agentkit_cli/commands/pages_sync.py` — pages-sync command
+- `agentkit_cli/commands/pages_add.py` — pages-add command
+- `tests/test_pages_sync_d1.py` — 22 tests
+- `tests/test_pages_sync_d2.py` — 8 tests
+- `tests/test_pages_sync_d3.py` — 9 tests
+- `tests/test_pages_sync_d4.py` — 8 tests
+
+## Modified Files
+- `agentkit_cli/__init__.py` — bumped to 0.95.0
+- `agentkit_cli/main.py` — registered pages-sync, pages-add, --pages flags
+- `agentkit_cli/commands/analyze_cmd.py` — --pages flag
+- `agentkit_cli/commands/pages_refresh.py` — source="ecosystem" + updated fetch script
+- `docs/index.html` — community-scored stat + source-badge CSS
+- `CHANGELOG.md` — [0.95.0] entry
+- `README.md` — Community Leaderboard section
+- `pyproject.toml` — version 0.95.0
+
+## Test Results
+- Baseline: 4700
+- New tests: 47
+- Total: 4747
+- All passing
+
+---
+
 # BUILD-REPORT.md — agentkit-cli v0.94.1 GitHub Pages Live Leaderboard (patch fixes)
 
 Date: 2026-03-23

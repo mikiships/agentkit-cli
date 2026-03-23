@@ -1822,3 +1822,53 @@ agentkit site --live --topics python,rust --deploy
 `agentkit populate` fetches top GitHub repos for each topic via the GitHub Topics API, scores each with `agentkit analyze`, and stores results in the history DB. The `--live` flag on `agentkit site` combines populate + generate into one command.
 
 `agentkit site --deploy` copies the generated site into `docs/` (or `--deploy-dir`), commits, and pushes to GitHub Pages.
+
+## Community Leaderboard
+
+The [GitHub Pages leaderboard](https://mikiships.github.io/agentkit-cli/) is an ever-growing catalog of agent-readiness scores, seeded by community use.
+
+### Add a repo to the leaderboard
+
+```bash
+# Analyze a single repo and add it immediately
+agentkit pages-add github:owner/repo
+
+# With a shareable scorecard URL
+agentkit pages-add github:owner/repo --share
+
+# Without pushing to GitHub (local only)
+agentkit pages-add github:owner/repo --no-push
+```
+
+### Sync your local history to the leaderboard
+
+```bash
+# Sync all local analyze results to docs/data.json + push
+agentkit pages-sync
+
+# Preview without writing
+agentkit pages-sync --dry-run
+
+# Sync top 20 by score
+agentkit pages-sync --limit 20
+
+# Sync locally only (don't push)
+agentkit pages-sync --no-push
+```
+
+### Auto-sync after analyze
+
+```bash
+agentkit analyze github:owner/repo --pages
+```
+
+After a successful analysis, the result is added to `docs/data.json` automatically. Run `agentkit pages-sync` to batch-push all pending additions.
+
+### Source tagging
+
+Entries in the leaderboard carry a `source` field:
+- `ecosystem` — scored by `agentkit pages-refresh` (automated ecosystem scan)
+- `community` — added by `agentkit analyze --pages` or `agentkit pages-add`
+- `manual` — manually added
+
+The leaderboard displays source badges and a "Community Scored" counter so community contributions are visible.
