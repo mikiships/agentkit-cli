@@ -1,42 +1,103 @@
 {
-  "generated_at": "2026-03-23T21:41:13.539760+00:00",
+  "generated_at": "2026-03-23T21:42:01.670758Z",
+  "stats": {
+    "total": 10,
+    "median": 77.5,
+    "top_score": 91.0,
+    "by_grade": {
+      "A": 3,
+      "B": 4,
+      "C": 3,
+      "D": 0,
+      "F": 0
+    }
+  },
   "repos": [
+    {
+      "name": "openai/openai-python",
+      "url": "https://github.com/openai/openai-python",
+      "ecosystem": "python",
+      "score": 91.0,
+      "grade": "A"
+    },
+    {
+      "name": "pydantic/pydantic",
+      "url": "https://github.com/pydantic/pydantic",
+      "ecosystem": "python",
+      "score": 80.0,
+      "grade": "A"
+    },
+    {
+      "name": "django/django",
+      "url": "https://github.com/django/django",
+      "ecosystem": "python",
+      "score": 72.0,
+      "grade": "B"
+    },
+    {
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask",
+      "ecosystem": "python",
+      "score": 70.0,
+      "grade": "B"
+    },
     {
       "name": "fastapi/fastapi",
       "url": "https://github.com/fastapi/fastapi",
-      "score": 60.0,
-      "grade": "C",
       "ecosystem": "python",
-      "source": "ecosystem"
-    },
-    {
-      "name": "langchain-ai/langchain",
-      "url": "https://github.com/langchain-ai/langchain",
-      "score": 59.8,
-      "grade": "C",
-      "ecosystem": "python",
-      "source": "ecosystem"
+      "score": 68.0,
+      "grade": "C"
     },
     {
       "name": "vercel/next.js",
       "url": "https://github.com/vercel/next.js",
-      "score": 62.3,
-      "grade": "C",
       "ecosystem": "typescript",
-      "source": "ecosystem"
+      "score": 82.0,
+      "grade": "A"
     },
     {
       "name": "microsoft/vscode",
       "url": "https://github.com/microsoft/vscode",
-      "score": 60.3,
-      "grade": "C",
       "ecosystem": "typescript",
-      "source": "ecosystem"
+      "score": 75.0,
+      "grade": "B"
+    },
+    {
+      "name": "DefinitelyTyped/DefinitelyTyped",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+      "ecosystem": "typescript",
+      "score": 65.0,
+      "grade": "C"
+    },
+    {
+      "name": "rust-lang/rust",
+      "url": "https://github.com/rust-lang/rust",
+      "ecosystem": "rust",
+      "score": 88.0,
+      "grade": "A"
+    },
+    {
+      "name": "serde-rs/serde",
+      "url": "https://github.com/serde-rs/serde",
+      "ecosystem": "rust",
+      "score": 80.0,
+      "grade": "B"
     }
   ],
-  "stats": {
-    "total": 4,
-    "median": 60.1,
-    "top_score": 62.3
-  }
+  "recently_scored": [
+    {
+      "name": "openai/openai-python",
+      "url": "https://github.com/openai/openai-python",
+      "ecosystem": "python",
+      "score": 91.0,
+      "grade": "A"
+    },
+    {
+      "name": "pydantic/pydantic",
+      "url": "https://github.com/pydantic/pydantic",
+      "ecosystem": "python",
+      "score": 80.0,
+      "grade": "A"
+    }
+  ]
 }
