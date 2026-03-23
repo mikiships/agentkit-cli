@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Python Repos — Agent Quality Rankings | agentkit</title>
 <meta name="description" content="Top python GitHub repos ranked by AI agent-readiness score. Updated automatically.">
-<link rel="canonical" href="https://mikiships.github.io/agentkit-cli/topic/python.html">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Python Repos \u2014 Agent Quality Rankings | agentkit", "description": "Top python GitHub repos ranked by AI agent-readiness score. Updated automatically.", "url": "https://mikiships.github.io/agentkit-cli/topic/python.html"}</script>
+<link rel="canonical" href="https://mysite.example.com/topic/python.html">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Python Repos \u2014 Agent Quality Rankings | agentkit", "description": "Top python GitHub repos ranked by AI agent-readiness score. Updated automatically.", "url": "https://mysite.example.com/topic/python.html"}</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -372,17 +372,17 @@ footer a:hover { color: var(--text); }
 <header>
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
-    <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
-    <a href="https://mikiships.github.io/agentkit-cli/leaderboard.html">Daily Leaderboard</a>
-    <a href="https://mikiships.github.io/agentkit-cli/trending.html">Daily Trending</a>
-    <a href="https://mikiships.github.io/agentkit-cli/#org-leaderboard">Org Leaderboard</a>
-    <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a>
+    <a href="https://mysite.example.com/">Home</a>
+    <a href="https://mysite.example.com/leaderboard.html">Daily Leaderboard</a>
+    <a href="https://mysite.example.com/trending.html">Daily Trending</a>
+    <a href="https://mysite.example.com/#org-leaderboard">Org Leaderboard</a>
+    <a href="https://mysite.example.com/topic/python.html">Python</a>
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
 </header>
 
         <div class="container">
-          <div class="breadcrumb"><a href="https://mikiships.github.io/agentkit-cli/">Home</a> / Python</div>
+          <div class="breadcrumb"><a href="https://mysite.example.com/">Home</a> / Python</div>
           <h2 class="section-title">Python — Agent Quality Rankings</h2>
           <p style="color:#8b949e;margin-bottom:1rem">Top 0 repos ranked by AI agent-readiness score.</p>
           <p style='color:var(--muted)'>No repos found for this topic yet.</p>
@@ -418,6 +418,43 @@ footer a:hover { color: var(--text); }
   }, { threshold: 0.1 });
   bars.forEach(function(b) { bioS.observe(b); });
 })();
+
+// Dynamic leaderboard data from data.json
+function gradeClass(g) { return 'grade-' + (g || 'c').toLowerCase(); }
+function renderRecentlyScored(data) {
+  var el = document.getElementById('recently-scored-list');
+  if (!el) return;
+  var top = data.repos ? data.repos.slice(0, 5) : [];
+  var html = '<ul class="repo-list">';
+  top.forEach(function(r) {
+    var src = r.source || 'ecosystem';
+    var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+    var srcClass = 'source-' + srcLabel;
+    html += '<li class="repo-item">'
+      + '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener" class="repo-name">' + (r.name || '') + '</a>'
+      + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+      + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+      + '<span class="score-val">' + (r.score || 0) + '</span>'
+      + '<span class="grade ' + gradeClass(r.grade) + '">' + (r.grade || '') + '</span>'
+      + '</li>';
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+  // Update repos-scored stat
+  var statEl = document.getElementById('repos-scored-stat');
+  if (statEl && data.stats && data.stats.total) { statEl.textContent = data.stats.total; }
+  // Update community-scored stat
+  var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+  var commEl = document.getElementById('community-scored-stat');
+  if (commEl) { commEl.textContent = communityCount; }
+}
+fetch('/agentkit-cli/data.json')
+  .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+  .then(renderRecentlyScored)
+  .catch(function() {
+    var el = document.getElementById('recently-scored-list');
+    if (el) el.innerHTML = '<p style="color:var(--muted)">Score data unavailable.</p>';
+  });
 </script>
 </body>
 </html>
