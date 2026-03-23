@@ -14,7 +14,7 @@ Server starts at `http://127.0.0.1:8742` by default.
 ## Options
 
 ```
-agentkit api [--host HOST] [--port PORT] [--reload] [--share]
+agentkit api [--host HOST] [--port PORT] [--reload] [--share] [--interactive]
 ```
 
 | Option | Default | Description |
@@ -23,6 +23,7 @@ agentkit api [--host HOST] [--port PORT] [--reload] [--share]
 | `--port` | `8742` | Bind port |
 | `--reload` | `false` | Enable uvicorn auto-reload (dev mode) |
 | `--share` | `false` | Start ngrok tunnel and print public URL |
+| `--interactive` | `false` | Confirm the /ui form is enabled (always on) |
 
 ## Endpoints
 
@@ -121,14 +122,56 @@ Response:
 curl "http://localhost:8742/leaderboard?limit=20"
 ```
 
-### `GET /ui` — Dark-Theme Status Page
+### `POST /analyze` — Analyze a Repo (Interactive)
+
+Submit a repo for analysis. Supports concurrent limiting (max 5) and caching (results < 1h old returned from cache).
+
+```bash
+curl -X POST http://localhost:8742/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"repo": "github:psf/requests"}'
+```
+
+Response:
+```json
+{
+  "repo": "psf/requests",
+  "score": 72.5,
+  "grade": "C",
+  "tool_results": {},
+  "share_url": null,
+  "elapsed_seconds": 45.2,
+  "cached": false
+}
+```
+
+Also available as GET: `GET /analyze?repo=github:psf/requests`
+
+### `GET /recent` — Recent Analyses
+
+```bash
+curl "http://localhost:8742/recent?limit=10"
+```
+
+Response:
+```json
+{
+  "analyses": [
+    {"repo": "psf/requests", "score": 72.5, "grade": "C", "last_analyzed": "2026-03-22T20:00:00+00:00"}
+  ],
+  "total": 1
+}
+```
+
+### `GET /ui` — Interactive Status Page
 
 Open `http://localhost:8742/ui` in a browser to see:
-- Server version and uptime
-- Total repos in DB
-- Recent analyses (last 5 runs)
+- Interactive GitHub repo analysis form
+- Loading spinner during analysis
+- Results panel with score, grade, and tool breakdown
+- Recent analyses panel (auto-refreshes every 30s)
 - Badge embed snippet
-- Links to trending/leaderboard JSON
+- Links to trending/leaderboard/recent JSON
 
 ## Doctor Check
 
