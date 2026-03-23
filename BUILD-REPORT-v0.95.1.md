@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v0.95.1 Community Leaderboard + pages-sync
+# BUILD-REPORT.md — agentkit-cli v0.95.1 Bug Fix: index.html restore after SIGTERM
 
 Date: 2026-03-23
 Builder: subagent (openclaw)

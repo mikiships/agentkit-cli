@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.95.1] - 2026-03-23
+
+### Fixed
+- `agentkit pages-refresh`: restore `docs/index.html` dynamic sections (fetch script, `renderRecentlyScored`, source-badge CSS, community-scored-stat) after SIGTERM interrupted a prior run left the file in a stripped state.
+
 ## [0.95.0] - 2026-03-23
 
 ### Added
@@ -1363,3 +1368,10 @@ Initial release.
 ## [0.36.1] - 2026-03-16
 ### Fixed
 - `agentkit org`: Top Finding column now shows human-readable text instead of raw JSON for agentmd findings
+
+## v0.95.1 (2026-03-23)
+
+### Bug Fixes
+- **site_engine**: Added `source-badge` CSS, `repos-scored-stat`/`community-scored-stat` IDs, and `recently-scored` section to base template — `agentkit site --deploy` now generates the same rich index.html as `agentkit pages-refresh`
+- **site_engine**: Added dynamic `data.json` fetch script to `_SCROLL_JS` template — leaderboard updates in real-time from community scores
+- Fixed 4 failing tests: `test_has_fetch_script`, `test_index_html_has_source_badge_css`, `test_index_html_has_community_scored_stat`, `test_index_html_has_repos_scored_stat_id`
