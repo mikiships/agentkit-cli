@@ -299,6 +299,21 @@ tbody tr:hover { background: var(--surface2); }
 .badge-D { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
 .badge-F { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
 
+/* ── Source badges ── */
+.source-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  margin-left: 0.3rem;
+}
+.source-ecosystem { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+.source-community { background: rgba(63,185,80,0.15); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+.source-manual { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+
 /* ── Topic page cards (cardless: sections instead) ── */
 .topics-grid {
   display: grid;
@@ -410,7 +425,8 @@ footer a:hover { color: var(--text); }
           <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4700</div><div class="stat-label">Tests</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">94</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num">0</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">0</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
 
         <!-- Feature grid -->

@@ -49,6 +49,7 @@ def build_data_json(result, ecosystems_order: Optional[List[str]] = None) -> dic
                 "score": round(entry.score, 1),
                 "grade": entry.grade or score_to_grade(entry.score),
                 "ecosystem": entry.ecosystem or eco.ecosystem,
+                "source": "ecosystem",
             })
 
     scores = [r["score"] for r in repos]
@@ -154,9 +155,13 @@ def _fetch_script() -> str:
     var top = data.repos.slice(0, 5);
     var html = '<ul class="repo-list">';
     top.forEach(function(r) {
+      var src = r.source || 'ecosystem';
+      var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+      var srcClass = 'source-' + srcLabel;
       html += '<li class="repo-item">'
         + '<a href="' + r.url + '" target="_blank" rel="noopener" class="repo-name">' + r.name + '</a>'
         + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+        + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
         + '<span class="score-val">' + r.score + '</span>'
         + '<span class="grade ' + gradeClass(r.grade) + '">' + r.grade + '</span>'
         + '</li>';
@@ -167,10 +172,14 @@ def _fetch_script() -> str:
     }
     el.innerHTML = html;
     // Update repos-scored stat
-    var statEl = document.querySelector('.stat-num');
+    var statEl = document.getElementById('repos-scored-stat') || document.querySelector('.stat-num');
     if (statEl && data.stats && data.stats.total) {
       statEl.textContent = data.stats.total;
     }
+    // Update community-scored stat
+    var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+    var commEl = document.getElementById('community-scored-stat');
+    if (commEl) { commEl.textContent = communityCount; }
     // Update hero badge
     var badge = document.querySelector('.hero-badge');
     if (badge && data.stats && data.stats.total) {
