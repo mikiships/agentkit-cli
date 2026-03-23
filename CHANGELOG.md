@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.91.0] - 2026-03-22
+
+### Added
+- **Interactive `/ui` page**: GitHub repo analysis form with loading spinner, results panel (score/grade/tool breakdown), error handling, and dark-theme styling. Vanilla JS, no frameworks.
+- **`POST /analyze`**: Submit `{"repo": "owner/repo"}` for analysis. 120s timeout, max 5 concurrent analyses (in-memory semaphore), DB cache (results < 1h old returned as cached). Returns `{score, grade, tool_results, share_url, elapsed_seconds, cached}`.
+- **`GET /analyze?repo=`**: Query-param variant of POST /analyze.
+- **`GET /recent?limit=10`**: Recent analyses endpoint returning deduplicated latest results from history DB.
+- **Recent analyses panel** in /ui with 30s auto-refresh polling.
+- **`agentkit api --interactive`** flag: confirms the /ui form is enabled (always on, for documentation UX).
+- **README**: "Interactive Demo" section documenting `agentkit api --share` for public demos.
+- **`agentkit quickstart`** output: added `agentkit api --share` as a next-step suggestion.
+- **`agentkit demo`** output: added shareable demo URL hint.
+- **`docs/api.md`**: updated with POST /analyze, GET /recent, and interactive /ui documentation.
+- 40 new tests across D1-D5.
+
 ## [0.90.0] - 2026-03-22
 
 ### Added

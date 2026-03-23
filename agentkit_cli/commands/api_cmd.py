@@ -17,6 +17,7 @@ def api_command(
     port: int = typer.Option(8742, "--port", help="Bind port"),
     reload: bool = typer.Option(False, "--reload", help="Enable auto-reload (dev mode)"),
     share: bool = typer.Option(False, "--share", help="Start ngrok tunnel and print public URL"),
+    interactive: bool = typer.Option(False, "--interactive", help="Confirm the interactive /ui form is enabled (always on)"),
 ) -> None:
     """Start the agentkit local REST API server."""
     try:
@@ -33,7 +34,9 @@ def api_command(
     console.print(f"[bold green]agentkit API[/bold green] starting at [cyan]{base_url}[/cyan]")
     console.print(f"  Badge URL example:  {base_url}/badge/owner/repo")
     console.print(f"  Trending:           {base_url}/trending")
-    console.print(f"  Status page:        {base_url}/ui")
+    console.print(f"  Interactive UI:     {base_url}/ui")
+    if interactive:
+        console.print("[green]Interactive mode:[/green] /ui form is enabled (this is always on)")
 
     if share:
         if shutil.which("ngrok"):

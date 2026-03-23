@@ -1934,9 +1934,10 @@ def api(
     port: int = typer.Option(8742, "--port", help="Bind port"),
     reload: bool = typer.Option(False, "--reload", help="Enable auto-reload"),
     share: bool = typer.Option(False, "--share", help="Start ngrok tunnel"),
+    interactive: bool = typer.Option(False, "--interactive", help="Confirm the interactive /ui form is enabled (always on)"),
 ) -> None:
     """Start the local REST API server."""
-    api_command(host=host, port=port, reload=reload, share=share)
+    api_command(host=host, port=port, reload=reload, share=share, interactive=interactive)
 
 
 @app.callback(invoke_without_command=True)

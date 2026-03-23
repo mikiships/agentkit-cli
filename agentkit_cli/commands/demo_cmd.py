@@ -340,6 +340,7 @@ def demo_command(
         # Footer hint
         console.print()
         console.print("[dim]Run [bold]agentkit init && agentkit run[/bold] to set up for your full project[/dim]")
+        console.print("[dim]Want a shareable demo URL? Run: [bold]agentkit api --share[/bold][/dim]")
         console.print()
 
     # --- JSON output ---

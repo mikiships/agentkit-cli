@@ -45,6 +45,21 @@ vhs demo.tape             # renders demo.gif
 
 The tape records the full quickstart → run → benchmark flow.
 
+## Interactive Demo
+
+Start a local API server with an interactive web UI for analyzing GitHub repos:
+
+```bash
+pip install agentkit-cli[api]
+agentkit api                # local server at http://localhost:8742/ui
+agentkit api --share        # public URL via ngrok — share with anyone
+agentkit api --interactive  # confirms the /ui form is enabled (always on)
+```
+
+Visit `/ui` in your browser to submit any public GitHub repo and get a live agent-readiness score. The interactive form supports `owner/repo`, `github:owner/repo`, and full GitHub URLs.
+
+The `--share` flag starts an ngrok tunnel so anyone can try your agentkit instance without installing anything — perfect for demos, Show HN posts, and team evaluations.
+
 ## Configuration
 
 agentkit uses `.agentkit.toml` for project-level configuration.
