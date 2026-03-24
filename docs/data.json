@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-03-23T23:17:50.675549+00:00",
+  "generated_at": "2026-03-24T08:45:02.622501+00:00",
   "repos": [
     {
-      "name": "fastapi/fastapi",
-      "url": "https://github.com/fastapi/fastapi",
-      "score": 60.0,
+      "name": "langchain-ai/langchain",
+      "url": "https://github.com/langchain-ai/langchain",
+      "score": 50.0,
       "grade": "C",
       "ecosystem": "python",
       "source": "ecosystem"
     },
     {
-      "name": "langchain-ai/langchain",
-      "url": "https://github.com/langchain-ai/langchain",
-      "score": 59.8,
+      "name": "fastapi/fastapi",
+      "url": "https://github.com/fastapi/fastapi",
+      "score": 50.0,
       "grade": "C",
       "ecosystem": "python",
       "source": "ecosystem"
@@ -20,15 +20,31 @@
     {
       "name": "django/django",
       "url": "https://github.com/django/django",
-      "score": 35.0,
-      "grade": "D",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "python",
+      "source": "ecosystem"
+    },
+    {
+      "name": "psf/requests",
+      "url": "https://github.com/psf/requests",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "python",
+      "source": "ecosystem"
+    },
+    {
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask",
+      "score": 50.0,
+      "grade": "C",
       "ecosystem": "python",
       "source": "ecosystem"
     },
     {
       "name": "vercel/next.js",
       "url": "https://github.com/vercel/next.js",
-      "score": 62.3,
+      "score": 50.0,
       "grade": "C",
       "ecosystem": "typescript",
       "source": "ecosystem"
@@ -36,7 +52,7 @@
     {
       "name": "microsoft/vscode",
       "url": "https://github.com/microsoft/vscode",
-      "score": 50.4,
+      "score": 50.0,
       "grade": "C",
       "ecosystem": "typescript",
       "source": "ecosystem"
@@ -44,15 +60,111 @@
     {
       "name": "nestjs/nest",
       "url": "https://github.com/nestjs/nest",
-      "score": 35.0,
-      "grade": "D",
+      "score": 50.0,
+      "grade": "C",
       "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "supabase/supabase",
+      "url": "https://github.com/supabase/supabase",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "trpc/trpc",
+      "url": "https://github.com/trpc/trpc",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "typescript",
+      "source": "ecosystem"
+    },
+    {
+      "name": "rust-lang/rust",
+      "url": "https://github.com/rust-lang/rust",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "tokio-rs/tokio",
+      "url": "https://github.com/tokio-rs/tokio",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "actix/actix-web",
+      "url": "https://github.com/actix/actix-web",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "hyperium/hyper",
+      "url": "https://github.com/hyperium/hyper",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "serde-rs/serde",
+      "url": "https://github.com/serde-rs/serde",
+      "score": 45.0,
+      "grade": "D",
+      "ecosystem": "rust",
+      "source": "ecosystem"
+    },
+    {
+      "name": "golang/go",
+      "url": "https://github.com/golang/go",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "go",
+      "source": "ecosystem"
+    },
+    {
+      "name": "gin-gonic/gin",
+      "url": "https://github.com/gin-gonic/gin",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "go",
+      "source": "ecosystem"
+    },
+    {
+      "name": "gofiber/fiber",
+      "url": "https://github.com/gofiber/fiber",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "go",
+      "source": "ecosystem"
+    },
+    {
+      "name": "spf13/cobra",
+      "url": "https://github.com/spf13/cobra",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "go",
+      "source": "ecosystem"
+    },
+    {
+      "name": "kubernetes/kubernetes",
+      "url": "https://github.com/kubernetes/kubernetes",
+      "score": 50.0,
+      "grade": "C",
+      "ecosystem": "go",
       "source": "ecosystem"
     }
   ],
   "stats": {
-    "total": 6,
-    "median": 55.1,
-    "top_score": 62.3
+    "total": 20,
+    "median": 50.0,
+    "top_score": 50.0
   }
 }
