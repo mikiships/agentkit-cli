@@ -9,7 +9,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from agentkit_cli.release_check import ReleaseCheckResult, run_release_check
+from agentkit_cli.release_check import ReleaseCheckResult, run_release_check, write_step_summary
 
 console = Console()
 
@@ -30,7 +30,7 @@ _VERDICT_STYLES = {
 
 def _render_table(result: ReleaseCheckResult) -> None:
     console.print()
-    console.print(f"[bold]agentkit release-check[/bold] — {result.path}")
+    console.print(f"[bold]agentkit release-check[/bold]: {result.path}")
     if result.package:
         console.print(f"[bold]Package:[/bold] {result.package}  [bold]Version:[/bold] {result.version}  [bold]Registry:[/bold] {result.registry}")
     console.print()
@@ -73,8 +73,6 @@ def release_check_command(
     json_output: bool = False,
     changelog: bool = False,
 ) -> None:
-    """Verify the 4-part release surface for a Python or npm package."""
-    from agentkit_cli.release_check import Registry
     if registry not in ("pypi", "npm", "auto"):
         typer.echo(f"Invalid --registry '{registry}'. Must be: pypi, npm, auto", err=True)
         raise typer.Exit(code=2)
@@ -95,13 +93,17 @@ def release_check_command(
         delta = ChangelogEngine.from_history(project=None, since_days=7)
         changelog_content = ChangelogEngine.render_markdown(commits, delta, version=result.version)
 
+    write_step_summary(result)
+
     if json_output:
-        d = result.as_dict()
+        data = result.as_dict()
         if changelog_content is not None:
-            d["changelog_preview"] = changelog_content
-        typer.echo(json.dumps(d, indent=2))
+            data["changelog_preview"] = changelog_content
+        typer.echo(json.dumps(data, indent=2))
     else:
         _render_table(result)
+        console.print("[bold]Markdown summary:[/bold]")
+        console.print(result.to_markdown())
         if changelog_content is not None:
             console.print("\n[bold]Changelog Preview:[/bold]")
             console.print(changelog_content)
