@@ -400,3 +400,67 @@ D2 continuation state:
 - no D2 code fix was needed in this pass
 - D2 remains complete and validated
 - existing D2 commit: `cdfa3cf`
+
+## 2026-04-17 D3 continuation reverification
+
+Started from the existing worktree and re-checked the D3-only file set before touching code.
+
+What I found:
+- `agentkit_cli/main.py` still forwards `--release-check` into `run_command()`.
+- `agentkit_cli/commands/run_cmd.py` still runs release-check after the normal pipeline, records `summary["release_check"]`, appends a `release-check` step entry, refreshes final counts, and exits non-zero when the release verdict is not `SHIPPED`.
+- `tests/test_run_command.py` and `tests/test_main.py` still cover flag forwarding, JSON and human output surface behavior, and non-zero exit behavior.
+- `git log -- agentkit_cli/main.py agentkit_cli/commands/run_cmd.py tests/test_run_command.py tests/test_main.py` still shows the scoped D3 commit as `49fced0` (`Finish D3 run release-check hardening`).
+
+Focused tests run in this continuation pass:
+- `uv run --group dev python -m pytest tests/test_run_command.py tests/test_main.py -q`
+- result: 10 passed in 5.22s
+
+D3 continuation state:
+- no D3 code fix was needed in this pass
+- D3 remains complete and validated
+- existing D3 commit: `49fced0`
+
+## 2026-04-17 D4 continuation reverification
+
+Started from the current worktree and revalidated the D4-only export path instead of widening scope.
+
+What I verified:
+- `ReleaseCheckResult.to_markdown()` remains the single deterministic export artifact for CI and GitHub summaries.
+- The export still includes the top-level verdict plus one row per release surface with status, detail, and hint.
+- `write_step_summary()` still writes the same deterministic markdown artifact to `GITHUB_STEP_SUMMARY` or an explicit path, with a trailing newline that is easy to snapshot in tests.
+- `agentkit_cli/commands/release_check_cmd.py` still reuses that same artifact for both human output and JSON embedding via `result.as_dict()["markdown"]`.
+- `git log -- agentkit_cli/release_check.py agentkit_cli/commands/release_check_cmd.py tests/test_release_check.py` still shows the scoped D4 commit as `b8cf8eb` (`Finish D4 release-check export hardening`).
+
+Focused tests run in this continuation pass:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: 24 passed in 0.30s
+
+D4 continuation state:
+- no D4 code or test fix was needed in this pass
+- D4 remains complete and validated
+- existing D4 commit: `b8cf8eb`
+- next step: leave D4 untouched and continue only with later release-check follow-up work if needed
+
+## 2026-04-17 D5 final continuation summary
+
+Fresh repo-wide validation completed again from the current tree.
+
+Full-suite command run:
+- `uv run --group dev python -m pytest -q`
+- result: `4717 passed, 1 warning` in `392.18s`
+
+D5 final state:
+- README already documents `agentkit release-check` and `agentkit run --release-check`
+- CHANGELOG already contains the `0.96.0` release-check hardening entry
+- `BUILD-REPORT.md` and `BUILD-REPORT-v0.96.0.md` already record the D5 handoff and release state
+- version alignment remains `0.96.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
+- scoped D5 commit already exists as `c9a34d8` (`Finish D5 release-check docs and validation`)
+
+Final contract state from this continuation:
+- D1 commit: `a7c6fa3`
+- D2 commit: `cdfa3cf`
+- D3 commit: `49fced0`
+- D4 commit: `b8cf8eb`
+- D5 commit: `c9a34d8`
+- local release-check hardening contract complete through D5
+- no publish, push, or tag performed in this pass
