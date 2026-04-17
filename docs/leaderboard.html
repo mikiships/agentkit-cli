@@ -38,6 +38,20 @@
     {
       "@type": "ListItem",
       "position": 3,
+      "name": "psf/requests",
+      "url": "https://github.com/psf/requests",
+      "description": "HTTP for Humans"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "pallets/flask",
+      "url": "https://github.com/pallets/flask",
+      "description": "WSGI framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
       "name": "django/django",
       "url": "https://github.com/django/django",
       "description": "Web framework"
@@ -59,9 +73,93 @@
     {
       "@type": "ListItem",
       "position": 3,
+      "name": "supabase/supabase",
+      "url": "https://github.com/supabase/supabase",
+      "description": "Firebase alternative"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "trpc/trpc",
+      "url": "https://github.com/trpc/trpc",
+      "description": "End-to-end typesafe APIs"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
       "name": "nestjs/nest",
       "url": "https://github.com/nestjs/nest",
       "description": "Node.js framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "rust-lang/rust",
+      "url": "https://github.com/rust-lang/rust",
+      "description": "Rust language"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "tokio-rs/tokio",
+      "url": "https://github.com/tokio-rs/tokio",
+      "description": "Async runtime"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "serde-rs/serde",
+      "url": "https://github.com/serde-rs/serde",
+      "description": "Serialization framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "hyperium/hyper",
+      "url": "https://github.com/hyperium/hyper",
+      "description": "HTTP library"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "actix/actix-web",
+      "url": "https://github.com/actix/actix-web",
+      "description": "Web framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "gin-gonic/gin",
+      "url": "https://github.com/gin-gonic/gin",
+      "description": "HTTP web framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "spf13/cobra",
+      "url": "https://github.com/spf13/cobra",
+      "description": "CLI library"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "kubernetes/kubernetes",
+      "url": "https://github.com/kubernetes/kubernetes",
+      "description": "Container orchestration"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "gofiber/fiber",
+      "url": "https://github.com/gofiber/fiber",
+      "description": "Web framework"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "golang/go",
+      "url": "https://github.com/golang/go",
+      "description": "Go language"
     }
   ]
 }
@@ -106,6 +204,8 @@
   <div class="tabs">
     <button class="tab-btn" onclick="showTab('python')" id="btn-python">Python</button>
 <button class="tab-btn" onclick="showTab('typescript')" id="btn-typescript">Typescript</button>
+<button class="tab-btn" onclick="showTab('rust')" id="btn-rust">Rust</button>
+<button class="tab-btn" onclick="showTab('go')" id="btn-go">Go</button>
   </div>
   
 <div class="tab-panel" id="panel-python">
@@ -114,7 +214,9 @@
     <thead><tr><th>#</th><th>Repository</th><th>Description</th><th>Score</th><th>Grade</th><th>Stars</th></tr></thead>
     <tbody><tr><td>1</td><td><a href="https://github.com/fastapi/fastapi" target="_blank">fastapi/fastapi</a></td><td>Fast web framework</td><td><span class="score">60</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 75,000</td></tr>
 <tr><td>2</td><td><a href="https://github.com/langchain-ai/langchain" target="_blank">langchain-ai/langchain</a></td><td>LLM app framework</td><td><span class="score">60</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 90,000</td></tr>
-<tr><td>3</td><td><a href="https://github.com/django/django" target="_blank">django/django</a></td><td>Web framework</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 78,000</td></tr>
+<tr><td>3</td><td><a href="https://github.com/psf/requests" target="_blank">psf/requests</a></td><td>HTTP for Humans</td><td><span class="score">54</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 51,000</td></tr>
+<tr><td>4</td><td><a href="https://github.com/pallets/flask" target="_blank">pallets/flask</a></td><td>WSGI framework</td><td><span class="score">36</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 67,000</td></tr>
+<tr><td>5</td><td><a href="https://github.com/django/django" target="_blank">django/django</a></td><td>Web framework</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 78,000</td></tr>
 </tbody>
   </table>
 </div>
@@ -125,13 +227,41 @@
     <thead><tr><th>#</th><th>Repository</th><th>Description</th><th>Score</th><th>Grade</th><th>Stars</th></tr></thead>
     <tbody><tr><td>1</td><td><a href="https://github.com/vercel/next.js" target="_blank">vercel/next.js</a></td><td>React framework</td><td><span class="score">62</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 120,000</td></tr>
 <tr><td>2</td><td><a href="https://github.com/microsoft/vscode" target="_blank">microsoft/vscode</a></td><td>Code editor</td><td><span class="score">50</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 160,000</td></tr>
-<tr><td>3</td><td><a href="https://github.com/nestjs/nest" target="_blank">nestjs/nest</a></td><td>Node.js framework</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 65,000</td></tr>
+<tr><td>3</td><td><a href="https://github.com/supabase/supabase" target="_blank">supabase/supabase</a></td><td>Firebase alternative</td><td><span class="score">50</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 70,000</td></tr>
+<tr><td>4</td><td><a href="https://github.com/trpc/trpc" target="_blank">trpc/trpc</a></td><td>End-to-end typesafe APIs</td><td><span class="score">40</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 34,000</td></tr>
+<tr><td>5</td><td><a href="https://github.com/nestjs/nest" target="_blank">nestjs/nest</a></td><td>Node.js framework</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 65,000</td></tr>
+</tbody>
+  </table>
+</div>
+
+<div class="tab-panel" id="panel-rust">
+  <h2>Rust — Top Agent-Ready Repos</h2>
+  <table>
+    <thead><tr><th>#</th><th>Repository</th><th>Description</th><th>Score</th><th>Grade</th><th>Stars</th></tr></thead>
+    <tbody><tr><td>1</td><td><a href="https://github.com/rust-lang/rust" target="_blank">rust-lang/rust</a></td><td>Rust language</td><td><span class="score">45</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 95,000</td></tr>
+<tr><td>2</td><td><a href="https://github.com/tokio-rs/tokio" target="_blank">tokio-rs/tokio</a></td><td>Async runtime</td><td><span class="score">40</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 26,000</td></tr>
+<tr><td>3</td><td><a href="https://github.com/serde-rs/serde" target="_blank">serde-rs/serde</a></td><td>Serialization framework</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 9,000</td></tr>
+<tr><td>4</td><td><a href="https://github.com/hyperium/hyper" target="_blank">hyperium/hyper</a></td><td>HTTP library</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 14,000</td></tr>
+<tr><td>5</td><td><a href="https://github.com/actix/actix-web" target="_blank">actix/actix-web</a></td><td>Web framework</td><td><span class="score">30</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 21,000</td></tr>
+</tbody>
+  </table>
+</div>
+
+<div class="tab-panel" id="panel-go">
+  <h2>Go — Top Agent-Ready Repos</h2>
+  <table>
+    <thead><tr><th>#</th><th>Repository</th><th>Description</th><th>Score</th><th>Grade</th><th>Stars</th></tr></thead>
+    <tbody><tr><td>1</td><td><a href="https://github.com/gin-gonic/gin" target="_blank">gin-gonic/gin</a></td><td>HTTP web framework</td><td><span class="score">55</span></td><td><span class="grade grade-c">C</span></td><td>⭐ 77,000</td></tr>
+<tr><td>2</td><td><a href="https://github.com/spf13/cobra" target="_blank">spf13/cobra</a></td><td>CLI library</td><td><span class="score">40</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 36,000</td></tr>
+<tr><td>3</td><td><a href="https://github.com/kubernetes/kubernetes" target="_blank">kubernetes/kubernetes</a></td><td>Container orchestration</td><td><span class="score">35</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 108,000</td></tr>
+<tr><td>4</td><td><a href="https://github.com/gofiber/fiber" target="_blank">gofiber/fiber</a></td><td>Web framework</td><td><span class="score">30</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 33,000</td></tr>
+<tr><td>5</td><td><a href="https://github.com/golang/go" target="_blank">golang/go</a></td><td>Go language</td><td><span class="score">22</span></td><td><span class="grade grade-d">D</span></td><td>⭐ 120,000</td></tr>
 </tbody>
   </table>
 </div>
 
   <footer>
-    <span>Last updated: 2026-03-23T23:17:50Z</span>
+    <span>Last updated: 2026-04-17T17:42:48Z</span>
     <span class="badge">Powered by <a href="https://github.com/agentkit-dev/agentkit-cli">agentkit-cli</a></span>
   </footer>
   <script>
