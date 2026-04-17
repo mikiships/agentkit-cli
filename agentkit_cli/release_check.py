@@ -288,6 +288,27 @@ def check_git_push(path: Path) -> CheckResult:
         return CheckResult("git_push", "error", str(exc))
 
 
+def _parse_remote_tag_sha(output: str, tag: str) -> Optional[str]:
+    target_ref = f"refs/tags/{tag}"
+    peeled_ref = f"{target_ref}^{{}}"
+    fallback_sha: Optional[str] = None
+
+    for line in output.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        parts = stripped.split()
+        if len(parts) < 2:
+            continue
+        sha, ref = parts[0], parts[1]
+        if ref == peeled_ref:
+            return sha
+        if ref == target_ref:
+            fallback_sha = sha
+
+    return fallback_sha
+
+
 def check_git_tag(path: Path, version: str) -> CheckResult:
     tag = f"v{version}"
     try:
@@ -296,7 +317,7 @@ def check_git_tag(path: Path, version: str) -> CheckResult:
             return CheckResult("git_tag", "error", "git rev-parse HEAD failed", "Run inside a git repository.")
         head_sha = head.stdout.strip()
 
-        local_tag = _run_git(path, ["rev-parse", tag])
+        local_tag = _run_git(path, ["rev-parse", f"{tag}^{{}}"])
         if local_tag.returncode != 0:
             return CheckResult(
                 "git_tag",
@@ -329,7 +350,14 @@ def check_git_tag(path: Path, version: str) -> CheckResult:
                 f"Run `git push origin {tag}` before releasing.",
             )
 
-        remote_sha = remote_tag.stdout.strip().split()[0]
+        remote_sha = _parse_remote_tag_sha(remote_tag.stdout, tag)
+        if not remote_sha:
+            return CheckResult(
+                "git_tag",
+                "fail",
+                f"Remote origin returned no usable ref for tag {tag}.",
+                f"Run `git ls-remote --tags origin {tag}` and verify the remote tag before releasing.",
+            )
         if remote_sha != head_sha:
             return CheckResult(
                 "git_tag",

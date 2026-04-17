@@ -189,3 +189,61 @@ D1 completion state:
 - recovered file set is now validated by focused tests
 - D1 is ready to commit from the main session
 - remaining deliverables stay open and out of scope for this checkpoint
+
+## 2026-04-16 D2 inspection-driven patch (pending validation)
+
+The approved async pytest attempt did not actually execute: the gateway rejected `uv run --group dev python -m pytest tests/test_release_check.py tests/test_run_command.py tests/test_main.py -q` with an allowlist-miss, so I am not counting D2 as validated.
+
+Concrete progress made anyway:
+- inspected D2 by code review and found the main remaining bug in `check_git_tag()`: annotated tags could be misread because the code compared the raw tag-object SHA instead of the peeled commit SHA
+- patched `agentkit_cli/release_check.py` so local tags resolve with `git rev-parse vX.Y.Z^{}` and remote tags prefer the peeled `refs/tags/vX.Y.Z^{}` ref when present
+- expanded `tests/test_release_check.py` to cover local tag mismatch, remote tag mismatch, and annotated-tag success behavior
+
+Current D2 state:
+- code and tests are tightened by inspection
+- D2 still needs a real focused pytest run before it can be marked complete honestly
+
+## 2026-04-16 D2 subagent follow-up (tests/commit still blocked here)
+
+Additional D2-focused test coverage added by inspection:
+- `check_git_push()` dirty-worktree, detached-HEAD, and missing-upstream cases now assert the user-facing guidance text, not just the failure status
+- added explicit coverage for an upstream ref that is configured but not available locally, to ensure the `git fetch --prune` guidance stays intact
+- `check_git_tag()` remote-missing case now asserts the push hint, and there is now explicit coverage for an unusable remote `ls-remote` response that lacks the requested tag ref
+
+What I could not complete in this subagent:
+- `exec` remains denied here, so I could not run the focused D2 pytest target or create the required D2 commit
+
+Recommended next validating command once approvals are available in a pytest-capable session:
+- `pytest tests/test_release_check.py -q`
+
+D2 status from this subagent at stop:
+- implementation and focused tests appear aligned by inspection
+- validation run and D2 commit are still blocked in this session
+
+## 2026-04-16 heartbeat D3 consistency patch (inspection-driven)
+
+Applied another low-risk `run --release-check` consistency pass by inspection:
+- notification verdicts now use the post-release-check failure count instead of the pre-release-check pipeline count
+- webhook payload `passed` / `failed` totals now reflect the final release-check-adjusted result
+- GitHub Checks conclusion now follows the final release-check-adjusted failure count, so a release-check failure cannot be reported upstream as a success
+- added a focused regression test in `tests/test_run_command.py` asserting JSON output marks a non-`SHIPPED` release-check as `success: false`, `failed: 1`, and includes the `release-check` step
+
+Still not validated from this session:
+- focused pytest execution remains blocked here, so this D3 patch is inspection-driven until the next approval-capable test pass
+
+## 2026-04-17 D2 validation and completion
+
+Focused D2 validation completed in a pytest-capable environment.
+
+What D2 now covers:
+- `check_git_push()` rejects dirty worktrees, detached HEAD, missing upstream, and missing local upstream refs with explicit recovery guidance
+- `check_git_tag()` resolves local tags with `^{}` so annotated tags are compared by peeled commit, not tag-object SHA
+- remote tag verification is separate from local tag verification and prefers the peeled remote ref when present, with a dedicated failure for unusable `ls-remote` output
+
+Focused tests run:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: 23 passed, 1 warning (`collect_ignore_glob` unknown config option)
+
+D2 completion state:
+- D2 implementation is now validated
+- next required action is the scoped D2 commit touching only `agentkit_cli/release_check.py`, `tests/test_release_check.py`, and this progress log
