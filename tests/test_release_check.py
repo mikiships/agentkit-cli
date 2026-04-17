@@ -74,6 +74,7 @@ class TestCheckGitPush:
 
         assert result.status == "fail"
         assert "dirty" in result.detail.lower()
+        assert "commit or stash" in result.hint.lower()
 
     def test_fail_when_detached_head(self, tmp_path):
         def run_mock(cmd, **kwargs):
@@ -89,6 +90,7 @@ class TestCheckGitPush:
 
         assert result.status == "fail"
         assert "detached" in result.detail.lower()
+        assert "check out the release branch" in result.hint.lower()
 
     def test_fail_when_upstream_missing(self, tmp_path):
         def run_mock(cmd, **kwargs):
@@ -108,18 +110,60 @@ class TestCheckGitPush:
 
         assert result.status == "fail"
         assert "no upstream" in result.detail.lower()
+        assert "--set-upstream" in result.hint
+
+    def test_fail_when_upstream_ref_not_available_locally(self, tmp_path):
+        def run_mock(cmd, **kwargs):
+            key = " ".join(cmd)
+            if "git rev-parse HEAD" in key:
+                return _make_completed(0, "abc123\n")
+            if "git rev-parse --abbrev-ref HEAD" in key:
+                return _make_completed(0, "main\n")
+            if "git status --porcelain" in key:
+                return _make_completed(0, "")
+            if key == "git rev-parse --abbrev-ref --symbolic-full-name @{upstream}":
+                return _make_completed(0, "origin/main\n")
+            if key == "git rev-parse origin/main":
+                return _make_completed(1, "", "fatal: ambiguous argument 'origin/main'")
+            raise AssertionError(key)
+
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
+            result = check_git_push(tmp_path)
+
+        assert result.status == "fail"
+        assert "not available locally" in result.detail.lower()
+        assert "git fetch --prune" in result.hint
 
 
 class TestCheckGitTag:
-    def test_pass_when_local_and_remote_tag_match_head(self, tmp_path):
+    def test_pass_when_lightweight_local_and_remote_tag_match_head(self, tmp_path):
         def run_mock(cmd, **kwargs):
             key = " ".join(cmd)
             if key == "git rev-parse HEAD":
                 return _make_completed(0, "abc123456789\n")
-            if key == "git rev-parse v1.2.3":
+            if key == "git rev-parse v1.2.3^{}":
                 return _make_completed(0, "abc123456789\n")
             if key == "git ls-remote --tags origin v1.2.3":
                 return _make_completed(0, "abc123456789\trefs/tags/v1.2.3\n")
+            raise AssertionError(key)
+
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
+            result = check_git_tag(tmp_path, "1.2.3")
+
+        assert result.status == "pass"
+
+    def test_pass_when_annotated_remote_tag_peels_to_head(self, tmp_path):
+        def run_mock(cmd, **kwargs):
+            key = " ".join(cmd)
+            if key == "git rev-parse HEAD":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git rev-parse v1.2.3^{}":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git ls-remote --tags origin v1.2.3":
+                return _make_completed(
+                    0,
+                    "deadbeefdeadbeef\trefs/tags/v1.2.3\nabc123456789\trefs/tags/v1.2.3^{}\n",
+                )
             raise AssertionError(key)
 
         with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
@@ -132,7 +176,7 @@ class TestCheckGitTag:
             key = " ".join(cmd)
             if key == "git rev-parse HEAD":
                 return _make_completed(0, "abc123456789\n")
-            if key == "git rev-parse v1.2.3":
+            if key == "git rev-parse v1.2.3^{}":
                 return _make_completed(1, "", "unknown revision")
             raise AssertionError(key)
 
@@ -142,12 +186,27 @@ class TestCheckGitTag:
         assert result.status == "fail"
         assert "does not exist" in result.detail
 
+    def test_fail_when_local_tag_points_away_from_head(self, tmp_path):
+        def run_mock(cmd, **kwargs):
+            key = " ".join(cmd)
+            if key == "git rev-parse HEAD":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git rev-parse v1.2.3^{}":
+                return _make_completed(0, "def987654321\n")
+            raise AssertionError(key)
+
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
+            result = check_git_tag(tmp_path, "1.2.3")
+
+        assert result.status == "fail"
+        assert "but HEAD is" in result.detail
+
     def test_fail_when_remote_tag_missing(self, tmp_path):
         def run_mock(cmd, **kwargs):
             key = " ".join(cmd)
             if key == "git rev-parse HEAD":
                 return _make_completed(0, "abc123456789\n")
-            if key == "git rev-parse v1.2.3":
+            if key == "git rev-parse v1.2.3^{}":
                 return _make_completed(0, "abc123456789\n")
             if key == "git ls-remote --tags origin v1.2.3":
                 return _make_completed(0, "")
@@ -158,6 +217,41 @@ class TestCheckGitTag:
 
         assert result.status == "fail"
         assert "remote origin is missing" in result.detail
+        assert "git push origin v1.2.3" in result.hint
+
+    def test_fail_when_remote_tag_has_no_usable_ref(self, tmp_path):
+        def run_mock(cmd, **kwargs):
+            key = " ".join(cmd)
+            if key == "git rev-parse HEAD":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git rev-parse v1.2.3^{}":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git ls-remote --tags origin v1.2.3":
+                return _make_completed(0, "abc123456789\trefs/tags/other-tag\n")
+            raise AssertionError(key)
+
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
+            result = check_git_tag(tmp_path, "1.2.3")
+
+        assert result.status == "fail"
+        assert "no usable ref" in result.detail.lower()
+
+    def test_fail_when_remote_tag_points_away_from_head(self, tmp_path):
+        def run_mock(cmd, **kwargs):
+            key = " ".join(cmd)
+            if key == "git rev-parse HEAD":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git rev-parse v1.2.3^{}":
+                return _make_completed(0, "abc123456789\n")
+            if key == "git ls-remote --tags origin v1.2.3":
+                return _make_completed(0, "def987654321\trefs/tags/v1.2.3\n")
+            raise AssertionError(key)
+
+        with patch("agentkit_cli.release_check.subprocess.run", side_effect=run_mock):
+            result = check_git_tag(tmp_path, "1.2.3")
+
+        assert result.status == "fail"
+        assert "Remote tag v1.2.3 points to def98765" in result.detail
 
 
 class TestRegistryChecks:
