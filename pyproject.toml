@@ -55,4 +55,7 @@ norecursedirs = ["tests/fixtures"]
 dev = [
     "pyyaml>=6.0.3",
     "pytest>=8.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "httpx>=0.24.0",
 ]
