@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.96.0] - 2026-04-17
+
+### Added
+- `agentkit release-check` now hardens the full shipped-release surface with explicit `tests`, `smoke_tests`, `git_push`, `git_tag`, and `registry` checks, plus deterministic markdown summary output for CI and GitHub step summaries.
+- `agentkit run --release-check` now appends release verification to the normal pipeline and includes the embedded release-check payload in JSON output.
+
+### Changed
+- Git branch and upstream validation now fail clearly on dirty worktrees, detached HEAD, missing upstream configuration, and missing local upstream refs.
+- Local and remote tag verification now compare the release tag against `HEAD` correctly, including annotated tags via peeled refs.
+- Release-check verdict propagation now updates final pipeline counts, saved last-run state, webhook payloads, and GitHub Checks conclusions consistently.
+
+### Docs
+- README, BUILD-REPORT, and release-hardening progress log updated for the v0.96.0 release-check handoff.
+
 ## [0.95.1] - 2026-03-23
 
 ### Fixed

@@ -203,6 +203,24 @@ Current D2 state:
 - code and tests are tightened by inspection
 - D2 still needs a real focused pytest run before it can be marked complete honestly
 
+## 2026-04-17 heartbeat validation pass
+
+Focused validation now runs cleanly in the repo's uv-managed dev environment.
+
+Command run:
+- `uv run --group dev python -m pytest tests/test_release_check.py tests/test_run_command.py tests/test_main.py -q`
+
+Result:
+- 34 passed, 1 warning (`PytestConfigWarning: Unknown config option: collect_ignore_glob`)
+
+What this changes:
+- the earlier blocker is no longer "pytest unavailable" when using the project environment
+- the current focused release-check / run-command / main-command test target is green from the main session
+
+What remains:
+- D2/D3/D4 still need explicit deliverable review + commits, not just a green focused test target
+- D5 docs/build-report/full-suite work is still open
+
 ## 2026-04-16 D2 subagent follow-up (tests/commit still blocked here)
 
 Additional D2-focused test coverage added by inspection:
@@ -283,3 +301,102 @@ Focused tests run:
 D4 completion state:
 - D4 scoped implementation is validated
 - next required action is the scoped D4 commit touching `tests/test_release_check.py` and this progress log
+
+## 2026-04-17 D5 docs + full-suite handoff
+
+D5 resumed from the main session after the earlier gateway interruption during the full-suite run.
+
+Scoped D5 changes now in place:
+- version aligned to `0.96.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
+- README and CHANGELOG updated for `release-check` hardening
+- `BUILD-REPORT.md` refreshed for `v0.96.0`
+- `BUILD-REPORT-v0.96.0.md` restored as the required versioned copy
+
+Full-suite validation run:
+- `uv run --group dev python -m pytest -q`
+- result: 4706 passed, 11 failed, 2 warnings in 675.20s
+
+Failure triage:
+- 9 failures were stale BUILD-REPORT/versioned-copy expectations caused by D5 not being finished yet; those are now addressed by the refreshed report and versioned copy
+- 2 failures remain outside this release-check scope:
+  - `tests/test_pages_refresh.py::TestDataJson::test_has_8_plus_repos`
+  - `tests/test_watch.py::TestChangeHandler::test_debounce_resets_on_rapid_changes`
+
+D5 state from this pass:
+- docs/version/build-report handoff is updated
+- contract completion is still blocked by unrelated full-suite failures, so the build is `BUILT`, not `RELEASE-READY` or `SHIPPED`
+
+## 2026-04-17 D2 continuation verification
+
+Started from the existing worktree and verified the D2 file set before changing anything.
+
+What I found:
+- `agentkit_cli/release_check.py` already contains the D2 hardening paths for branch detection, detached-HEAD failure, dirty-worktree failure, upstream lookup, local tag-at-HEAD verification, and separate remote tag verification.
+- `tests/test_release_check.py` already covers the D2 cases, including detached HEAD, missing upstream, missing local upstream ref, local tag mismatch, remote tag missing, unusable remote tag output, and annotated remote tag peeling.
+- `git log -- agentkit_cli/release_check.py tests/test_release_check.py` shows D2 was already committed earlier as `cdfa3cf` (`Finish D2 release-check git surface hardening`).
+
+Focused tests run in this continuation pass:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: 24 passed in 1.76s
+
+D2 continuation state:
+- no D2 code fix was needed in this pass
+- D2 remains complete and validated
+- existing D2 commit: `cdfa3cf`
+
+## 2026-04-17 D3 continuation verification
+
+Started from the existing worktree and verified the D3 file set before changing anything.
+
+What I found:
+- `agentkit_cli/main.py` already forwards `--release-check` into `run_command()`.
+- `agentkit_cli/commands/run_cmd.py` already runs release-check after the normal pipeline, records the result in `summary["release_check"]`, adds a `release-check` step entry, refreshes saved/JSON counts, and exits non-zero when the release verdict is not `SHIPPED`.
+- `tests/test_run_command.py` and `tests/test_main.py` already cover flag forwarding, JSON surface, and non-zero exit behavior.
+- `git log -- agentkit_cli/main.py agentkit_cli/commands/run_cmd.py tests/test_run_command.py tests/test_main.py` shows D3 was already committed earlier as `49fced0` (`Finish D3 run release-check hardening`).
+
+Focused tests run in this continuation pass:
+- `uv run --group dev python -m pytest tests/test_run_command.py tests/test_main.py -q`
+- result: 10 passed in 5.86s
+
+D3 continuation state:
+- no D3 code fix was needed in this pass
+- D3 remains complete and validated
+- existing D3 commit: `49fced0`
+
+## 2026-04-17 D5 full-suite completion
+
+Follow-up validation after the earlier two unrelated red tests:
+- targeted rerun:
+  - `uv run --group dev python -m pytest tests/test_pages_refresh.py::TestDataJson::test_has_8_plus_repos tests/test_watch.py::TestChangeHandler::test_debounce_resets_on_rapid_changes -q`
+  - result: `2 passed`
+- repo-wide validation:
+  - `uv run --group dev python -m pytest -q`
+  - result: `4717 passed, 1 warning` in `387.77s`
+
+What this changes:
+- the previously named unrelated blockers no longer reproduce in the current tree
+- D5 is now complete from the local validation standpoint
+- the release-check hardening contract is locally complete through D5
+
+Release-state note:
+- this is still a local build checkpoint only, not a shipped release
+- this pass did not push, tag, or publish
+- unrelated working-tree churn outside the scoped D5 files still exists in the repo
+
+## 2026-04-17 D2 continuation reverification
+
+Started from the existing worktree and re-checked the D2-only file set before touching code.
+
+What I found:
+- `agentkit_cli/release_check.py` still contains the D2 git-surface hardening for branch detection, dirty-worktree failure, detached-HEAD failure, upstream lookup, local tag-at-HEAD verification, and separate remote tag verification.
+- `tests/test_release_check.py` still covers the D2 cases, including missing upstream, missing local upstream ref, detached HEAD, local tag mismatch, remote tag missing, unusable remote tag output, and annotated-tag peeling.
+- `git log -- agentkit_cli/release_check.py tests/test_release_check.py` still shows the scoped D2 commit as `cdfa3cf` (`Finish D2 release-check git surface hardening`).
+
+Focused tests run in this continuation pass:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: 24 passed in 1.24s
+
+D2 continuation state:
+- no D2 code fix was needed in this pass
+- D2 remains complete and validated
+- existing D2 commit: `cdfa3cf`

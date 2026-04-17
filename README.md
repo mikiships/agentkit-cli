@@ -1064,7 +1064,7 @@ What it does:
 
 ## Release Check
 
-`agentkit release-check` verifies the 4-part release surface to confirm a package is truly shipped, not just locally complete:
+`agentkit release-check` verifies the 5-part release surface so a green local run is not mistaken for a shipped release:
 
 ```
 agentkit release-check [PATH] [OPTIONS]
@@ -1075,32 +1075,43 @@ Options:
   --registry          pypi|npm|auto (default: auto-detected)
   --skip-tests        Skip the pytest/npm test step for quick checks
   --json              Output structured JSON for CI integration
+  --changelog         Append changelog preview to the report
 ```
+
+Checks covered:
+- `tests`
+- `smoke_tests`
+- `git_push` (clean worktree, attached HEAD, upstream configured, branch pushed)
+- `git_tag` (local tag points at `HEAD`, remote tag exists and matches)
+- `registry` (target version is live on PyPI or npm)
 
 Example output:
 
 ```
-agentkit release-check — /your/project
+agentkit release-check: /your/project
 
-┌────────────┬────────┬─────────────────────────────────┐
-│ Check      │ Status │ Detail                          │
-├────────────┼────────┼─────────────────────────────────┤
-│ tests      │ ✓ PASS │ 42 passed in 1.23s              │
-│ git_push   │ ✓ PASS │ Local HEAD abc12345 matches rem │
-│ git_tag    │ ✓ PASS │ Tag v1.0.0 found on remote.     │
-│ registry   │ ✓ PASS │ PyPI: mypkg==1.0.0 is live.    │
-└────────────┴────────┴─────────────────────────────────┘
+┌─────────────┬────────┬────────────────────────────────────┐
+│ Check       │ Status │ Detail                             │
+├─────────────┼────────┼────────────────────────────────────┤
+│ tests       │ ✓ PASS │ 42 passed in 1.23s                 │
+│ smoke_tests │ ✓ PASS │ 3 smoke tests passed               │
+│ git_push    │ ✓ PASS │ main matches origin/main at abc123 │
+│ git_tag     │ ✓ PASS │ Tag v1.0.0 points to HEAD locally  │
+│ registry    │ ✓ PASS │ PyPI: mypkg==1.0.0 is live         │
+└─────────────┴────────┴────────────────────────────────────┘
 
 Verdict: SHIPPED
 ```
 
-Verdict levels:
-- **SHIPPED** — all 4 surfaces confirmed (exit 0)
-- **RELEASE-READY** — tests + git confirmed, registry not yet live (exit 1)
-- **BUILT** — tests pass locally, not yet pushed (exit 1)
-- **UNKNOWN** — tests failing (exit 1)
+Structured output now includes the overall verdict, per-surface statuses, and deterministic markdown summary content for CI step summaries.
 
-Integrate with `agentkit gate --release-check` or `agentkit run --release-check` to add release verification to your pipeline.
+Verdict levels:
+- **SHIPPED** — all release surfaces confirmed (exit 0)
+- **RELEASE-READY** — code/tests/git are ready, but the package is not fully live yet (exit 1)
+- **BUILT** — local validation passed, but release surfaces are still incomplete (exit 1)
+- **UNKNOWN** — validation did not establish release state (exit 1)
+
+Use `agentkit run --release-check` to append the same release verification after the normal pipeline and propagate the verdict into human output, JSON output, saved last-run state, and CI notifications.
 
 ## Architecture
 
