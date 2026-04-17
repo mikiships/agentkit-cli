@@ -606,7 +606,7 @@ def run_command(
 
     # Fire notifications (never affect exit code)
     try:
-        _notify_verdict = "FAIL" if failed_count > 0 else "PASS"
+        _notify_verdict = "FAIL" if final_failed_count > 0 else "PASS"
         _notify_score = _composite_score if "_composite_score" in dir() else 0.0
         _notify_findings = [r["step"] for r in results if r.get("status") in ("fail", "error")]
         _notify_configs = resolve_notify_configs(
@@ -728,8 +728,8 @@ def run_command(
                 _payload = _json.dumps({
                     "event": "run_complete",
                     "project": cwd_str,
-                    "passed": passed_count,
-                    "failed": failed_count,
+                    "passed": final_passed_count,
+                    "failed": final_failed_count,
                     "score": _composite_score if "_composite_score" in dir() else None,
                 }).encode("utf-8")
                 _req = _urllib_req.Request(
@@ -777,7 +777,7 @@ def run_command(
             except Exception:
                 pass
             _checks_output = format_check_output(_checks_result)
-            _checks_conclusion = "success" if failed_count == 0 else "failure"
+            _checks_conclusion = "success" if final_failed_count == 0 else "failure"
             _checks_client.update_check_run(
                 _check_run_id,
                 status="completed",

@@ -247,3 +247,21 @@ Focused tests run:
 D2 completion state:
 - D2 implementation is now validated
 - next required action is the scoped D2 commit touching only `agentkit_cli/release_check.py`, `tests/test_release_check.py`, and this progress log
+
+## 2026-04-17 D3 validation and completion
+
+Focused D3 validation completed in a pytest-capable environment.
+
+What D3 now covers:
+- `agentkit run --release-check` forwards the CLI flag into `run_command()`
+- the post-pipeline release-check step is reflected in JSON output, including the embedded `release_check` payload and a `release-check` step entry
+- release-check failures now propagate to the final failure surface consistently, including notifications, webhook payload counts, and GitHub Checks conclusion
+- a non-`SHIPPED` release-check verdict causes `run_command()` to exit non-zero, matching release-surface failure behavior
+
+Focused tests run:
+- `uv run --group dev python -m pytest tests/test_run_command.py tests/test_main.py -q`
+- result: 10 passed, 1 warning (`collect_ignore_glob` unknown config option)
+
+D3 completion state:
+- D3 scoped implementation is validated
+- next required action is the scoped D3 commit touching `agentkit_cli/commands/run_cmd.py`, `tests/test_run_command.py`, and this progress log
