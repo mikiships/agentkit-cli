@@ -302,11 +302,40 @@ class TestMetadataAndReport:
         data = result.as_dict()
         assert data["markdown"].startswith("# agentkit release-check")
 
+    def test_release_result_markdown_is_deterministic_and_escaped(self):
+        result = ReleaseCheckResult(
+            verdict="SHIPPED",
+            package="agentkit-cli",
+            version="0.96.0",
+            registry="pypi",
+            path="/tmp/repo",
+            checks=[
+                CheckResult("smoke_tests", "pass", "2 passed", ""),
+                CheckResult("registry", "fail", "expected a|b\nnext", "publish | verify"),
+            ],
+        )
+
+        assert result.to_markdown() == "\n".join([
+            "# agentkit release-check",
+            "",
+            "- Verdict: **SHIPPED**",
+            "- Path: `/tmp/repo`",
+            "- Package: `agentkit-cli`",
+            "- Version: `0.96.0`",
+            "- Registry: `pypi`",
+            "",
+            "| Surface | Status | Detail | Hint |",
+            "|---|---|---|---|",
+            "| smoke_tests | pass | 2 passed |  |",
+            "| registry | fail | expected a\\|b<br>next | publish \\| verify |",
+        ])
+
     def test_write_step_summary(self, tmp_path):
         result = ReleaseCheckResult(path=str(tmp_path), checks=[CheckResult("git_push", "pass", "ok")])
         out = tmp_path / "summary.md"
         write_step_summary(result, out)
         assert out.exists()
+        assert out.read_text().endswith("\n")
         assert "agentkit release-check" in out.read_text()
 
 

@@ -265,3 +265,21 @@ Focused tests run:
 D3 completion state:
 - D3 scoped implementation is validated
 - next required action is the scoped D3 commit touching `agentkit_cli/commands/run_cmd.py`, `tests/test_run_command.py`, and this progress log
+
+## 2026-04-17 D4 validation and completion
+
+Focused D4 validation completed in a pytest-capable environment.
+
+What D4 now covers:
+- deterministic markdown export remains the single release-check artifact for CI and GitHub step summaries via `ReleaseCheckResult.to_markdown()` and `write_step_summary()`
+- the export includes the overall verdict plus one row per release surface
+- markdown table cells are escaped deterministically for pipes and newlines, keeping snapshot assertions stable
+- the summary writer preserves a newline-terminated artifact for file-based export
+
+Focused tests run:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: 24 passed, 1 warning (`collect_ignore_glob` unknown config option)
+
+D4 completion state:
+- D4 scoped implementation is validated
+- next required action is the scoped D4 commit touching `tests/test_release_check.py` and this progress log
