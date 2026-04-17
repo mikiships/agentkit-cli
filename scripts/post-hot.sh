@@ -42,14 +42,14 @@ fi
 # ── 2. Get tweet text ──────────────────────────────────────────────────────
 SHARE_URL=""
 if [ "${SHARE}" -eq 1 ]; then
-    TWEET_TEXT="$(agentkit hot --share --tweet-only 2>/dev/null || true)"
+    TWEET_TEXT="$(agentkit hot --limit 5 --share --tweet-only 2>/dev/null || true)"
     SHARE_URL="$(echo "${TWEET_TEXT}" | grep -oE 'https://[^ ]+' | tail -1 || true)"
     if [ -z "${SHARE_URL}" ]; then
         echo "WARNING: --share upload failed or returned no URL. Falling back to plain tweet." >&2
-        TWEET_TEXT="$(agentkit hot --tweet-only 2>/dev/null || true)"
+        TWEET_TEXT="$(agentkit hot --limit 5 --tweet-only 2>/dev/null || true)"
     fi
 else
-    TWEET_TEXT="$(agentkit hot --tweet-only 2>/dev/null || true)"
+    TWEET_TEXT="$(agentkit hot --limit 5 --tweet-only 2>/dev/null || true)"
 fi
 
 if [ -z "${TWEET_TEXT}" ]; then
