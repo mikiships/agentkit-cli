@@ -30,4 +30,16 @@
 
 **Tests:** `pytest -q tests/test_optimize_d3.py` -> 2 passed
 
-**Next:** D4 bounded integration through `agentkit improve`
+---
+
+## D4: report/run integration — COMPLETE
+
+**Built:**
+- `agentkit_cli/improve_engine.py` — optional `optimize_context` step writes optimized context during improve
+- `agentkit_cli/commands/improve.py` — added `--optimize-context`
+- `agentkit_cli/commands/run_cmd.py` and `agentkit_cli/main.py` — added `--improve-optimize-context` pass-through for `agentkit run --improve`
+- `tests/test_optimize_d4.py` — end-to-end bounded improve integration coverage
+
+**Tests:** `pytest -q tests/test_optimize_d4.py` -> 2 passed
+
+**Next:** D5 docs, changelog, build report, version bump, full suite
