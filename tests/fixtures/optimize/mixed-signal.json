@@ -1,0 +1,6 @@
+{
+  "preserved_sections": ["Overview", "Setup", "Project Constraints"],
+  "removable_sections": [],
+  "must_not_contain": [],
+  "should_shrink": true
+}

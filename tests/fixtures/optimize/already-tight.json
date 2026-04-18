@@ -1,0 +1,6 @@
+{
+  "preserved_sections": ["Project", "Commands", "Safety"],
+  "removable_sections": [],
+  "must_not_contain": [],
+  "should_shrink": false
+}
