@@ -151,3 +151,30 @@
 **Tests:** `uv run pytest -q tests/test_optimize_realworld.py tests/test_optimize_d4.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 99 passed
 
 **Next:** D4 release handoff hygiene
+
+---
+
+## D1: pages/docs source-of-truth diagnosis — COMPLETE
+
+**Built:**
+- No source changes were required in this worktree. `agentkit_cli/commands/pages_refresh.py` already contains the fetch/render hooks, source-badge rendering, community stat updates, and `/agentkit-cli/data.json` path expected by the pages tests.
+- `docs/index.html` already includes the matching recently-scored section, `repos-scored-stat`, `community-scored-stat`, source-badge CSS, fetch script, and error handling surface expected by the stale-pages blocker report.
+
+**Tests:** `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py` -> `60 passed in 0.96s`
+
+**Next:** D2 validation sweep for the repaired pages surface
+
+---
+
+## D2: validation sweep — BLOCKED
+
+**What passed:**
+- `uv run pytest -q tests/test_optimize_smoke.py tests/test_optimize_d2_hardening.py tests/test_optimize_realworld.py tests/test_optimize_d4.py` -> `24 passed in 0.45s`
+- `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py` -> `60 passed in 0.96s`
+
+**Blocker found during full-suite gate:**
+- `uv run pytest -q` -> `2 failed, 4757 passed, 1 warning in 376.91s (0:06:16)`
+- unrelated failure class 1: `tests/test_optimize_d3.py::test_text_renderer_is_reviewable` still expects the older verdict text `Changes available`, but the renderer now emits `Meaningful rewrite available`
+- unrelated failure class 2: `tests/test_watch.py::TestChangeHandler::test_last_file_recorded` flaked to `IndexError: list index out of range`, indicating the debounced watch test did not fire within the asserted timing window
+
+**Next:** stop under contract and hand off a precise blocker report instead of widening scope beyond the pages/docs unblock plus held-back v0.97.2 handoff
