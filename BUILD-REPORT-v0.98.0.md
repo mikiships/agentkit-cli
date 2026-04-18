@@ -31,7 +31,7 @@ The feature pass itself stayed code-only. Release execution happened afterward f
 - local version metadata bumped to `0.98.0`
 - final full-suite validation is green after restoring the tracked `docs/index.html` pages surface and keeping generated site output in sync
 - release execution reran `uv run pytest -q` and finished at `4764 passed, 1 warning in 129.73s (0:02:09)`
-- GitHub push confirmed: branch `release/v0.98.0` is on `origin` at `63324f6ab2fdb928c9479bdd227a96368afead72`
+- GitHub push confirmed: the shipped release commit `63324f6ab2fdb928c9479bdd227a96368afead72` was pushed during release execution
 - tag confirmed: `v0.98.0` is on `origin` and points to `63324f6ab2fdb928c9479bdd227a96368afead72`
 - registry live confirmed: `https://pypi.org/project/agentkit-cli/0.98.0/` and `https://pypi.org/pypi/agentkit-cli/0.98.0/json` both returned `200` after publish
 - publish path note: `uv publish` failed in this environment because trusted publishing / credentials were unavailable there, so the actual upload used the existing local `.pypirc` via `twine upload`
