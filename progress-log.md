@@ -245,3 +245,32 @@
 **Tests:** `uv run pytest -q tests/test_optimize_d4.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 92 passed
 
 **Next:** D5 docs, reports, versioning, and final validation
+
+---
+
+## v0.98.0 pages unblock: stopped on contract blocker
+
+I read the unblock contract, blocker report, the three failing test files, `docs/index.html`, the current build reports, and the existing progress log before making changes. The repo-local inspection showed that `agentkit_cli/commands/pages_refresh.py` already has the fetch/render helpers, source-badge logic, community stat update, and `/agentkit-cli/data.json` path that the pages tests expect, but the checked-in `docs/index.html` still does not contain the tracked `recently-scored`, `repos-scored-stat`, `community-scored-stat`, `source-badge`, or fetch-script surface.
+
+I could not proceed to the required D1 validation gate because the mandated `uv run` test command failed three times in a row before `pytest` started. The first attempt failed because `uv` tried to initialize its cache under `/Users/mordecai/.cache/uv`, which is outside the writable sandbox. The second attempt moved the cache into `.uv-cache` in the repo, but the Homebrew `uv` binary then panicked in `system-configuration` with an `Attempted to create a NULL object` error. The third attempt repeated the command with both `HOME=$PWD` and `UV_CACHE_DIR=$PWD/.uv-cache`, and the same pre-test panic reproduced.
+
+Per the contract stop condition, I stopped at that point and wrote `blocker-report-v0.98.0-pages-unblock.md`. No deliverable was completed, no contract commit was made, and the repo still needs the actual `docs/index.html` repair plus the build-report/test-count finalization once the required `uv run` path is usable again.
+
+
+---
+
+## D5: docs, reports, versioning, and final validation — COMPLETE
+
+**Built:**
+- `README.md` — documented repo-level `agentkit optimize --all`, `--check`, repo-wide `--apply`, and sweep safety caveats
+- `CHANGELOG.md` — added the concise `0.98.0` optimize sweep release entry
+- `pyproject.toml`, `agentkit_cli/__init__.py`, `uv.lock` — bumped version metadata to `0.98.0`
+- `BUILD-REPORT.md` and `BUILD-REPORT-v0.98.0.md` — recorded focused validation, the final full-suite result, and local release readiness
+- `agentkit_cli/site_engine.py`, `agentkit_cli/commands/site_cmd.py`, `docs/index.html` — kept generated site output aligned with the tracked pages-refresh surface so the full suite stays green
+
+**Tests:**
+- `uv run pytest -q tests/test_optimize_d1.py tests/test_optimize_d2.py tests/test_optimize_d3.py tests/test_optimize_d4.py tests/test_optimize_realworld.py tests/test_optimize_d2_hardening.py tests/test_optimize_smoke.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 126 passed in 8.10s
+- `uv run pytest -q tests/test_site_command.py tests/test_pages_refresh.py tests/test_pages_sync_d4.py` -> 79 passed in 0.69s
+- `uv run pytest -q` -> 4764 passed, 1 warning in 148.32s (0:02:28)
+
+**Done:** local v0.98.0 release candidate is green and ready for the D5 commit.

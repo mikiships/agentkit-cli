@@ -181,35 +181,42 @@ agentkit report --llmstxt
 
 ## `agentkit optimize` — Trim stale, risky, bloated context files
 
-`agentkit optimize` reviews an existing `CLAUDE.md` or `AGENTS.md`, detects repeated or risky instructions, renders a deterministic diff, and can optionally apply the tightened rewrite in place.
+`agentkit optimize` can now review one context file or sweep an entire repo for nested `CLAUDE.md` and `AGENTS.md` surfaces, render a deterministic aggregate review, and optionally apply the safe rewrites in place.
 
 ```bash
-# Safe dry-run review for the current repo
+# Safe dry-run review for the nearest root context file
 agentkit optimize
+
+# Sweep every nested CLAUDE.md / AGENTS.md in the repo
+agentkit optimize --all
+
+# CI-friendly check mode, exits non-zero if meaningful rewrites exist
+agentkit optimize --all --check
 
 # Review a specific file as markdown
 agentkit optimize --file AGENTS.md --format markdown
 
-# Apply the optimized rewrite in place
-agentkit optimize --apply
+# Apply repo-wide optimized rewrites in place
+agentkit optimize --all --apply
 
-# Emit machine-readable JSON
-agentkit optimize --json
+# Emit machine-readable JSON for CI or follow-on tooling
+agentkit optimize --all --json
 
-# Fold optimize into an existing improve workflow
+# Fold optimize sweep into an existing improve workflow
 agentkit improve --optimize-context
 agentkit run --improve --improve-optimize-context
 ```
 
 Behavior notes:
+- repo sweep discovery is deterministic and includes nested `CLAUDE.md` and `AGENTS.md` files
+- aggregate output reports per-file verdicts, protected-section signals, concise deltas, and repo totals
 - protected sections like project identity, autonomy, user-critical requests, and safety boundaries are preserved and called out in review output
-- already-tight files now return a clear no-op verdict, and `--apply` skips rewriting when the optimized candidate is effectively unchanged
-- a second optimize pass should be idempotent or near-idempotent on the shipped real-world fixtures
-- CLI smoke coverage now verifies dry-run verdicts, one-shot `--apply` behavior, and second-pass safe no-op behavior on realistic files
+- already-tight files return a clear safe no-op verdict, and `--apply` skips rewriting those files
+- `--check` exits non-zero only when at least one file has a meaningful rewrite available
 
 Caveats:
 - local-first only, no LLM required
-- only targets `CLAUDE.md` and `AGENTS.md`
+- optimize only targets `CLAUDE.md` and `AGENTS.md`
 - dry-run is the default, so nothing is overwritten unless `--apply` is set
 
 ## `agentkit migrate` — Convert Between AI Agent Context Formats

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.98.0] - 2026-04-18
+
+### Added
+- `agentkit optimize --all` repo sweep mode for deterministic discovery of nested `CLAUDE.md` and `AGENTS.md` files, aggregate per-file review data, and machine-readable repo summaries.
+- `agentkit optimize --check` CI-friendly exit behavior that fails only when at least one context file has a meaningful rewrite available.
+
+### Changed
+- optimize review rendering now supports aggregate text and markdown summaries with per-file verdicts, protected-section signals, warning summaries, and repo totals.
+- `agentkit improve --optimize-context` now uses repo sweep semantics so broader workflows can safely optimize multiple context files in one pass.
+
+### Docs
+- README, BUILD-REPORT, BUILD-REPORT-v0.98.0, and progress log updated for the v0.98.0 optimize sweep release.
+
 ## [0.97.2] - 2026-04-18
 
 ### Changed
