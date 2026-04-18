@@ -8,7 +8,7 @@ Contract: all-day-build-contract-agentkit-cli-v0.98.0-optimize-sweep.md
 
 Completed the repo-level `agentkit optimize` sweep release. The CLI now discovers nested `CLAUDE.md` and `AGENTS.md` files, renders aggregate repo reviews, supports repo-wide safe apply and CI-friendly `--check`, and carries the new sweep semantics into improve workflows.
 
-This pass does not push, tag, or publish.
+The feature pass itself stayed code-only. Release execution happened afterward from the clean RC worktree.
 
 ## Deliverables
 
@@ -26,8 +26,13 @@ This pass does not push, tag, or publish.
 - `uv run pytest -q tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> `84 passed in 7.35s`
 - `uv run pytest -q` -> `4764 passed, 1 warning in 148.32s (0:02:28)`
 
-## Release Readiness
+## Release Proof
 
 - local version metadata bumped to `0.98.0`
 - final full-suite validation is green after restoring the tracked `docs/index.html` pages surface and keeping generated site output in sync
-- status: RELEASE-READY locally, not pushed/tagged/published
+- release execution reran `uv run pytest -q` and finished at `4764 passed, 1 warning in 129.73s (0:02:09)`
+- GitHub push confirmed: branch `release/v0.98.0` is on `origin` at `63324f6ab2fdb928c9479bdd227a96368afead72`
+- tag confirmed: `v0.98.0` is on `origin` and points to `63324f6ab2fdb928c9479bdd227a96368afead72`
+- registry live confirmed: `https://pypi.org/project/agentkit-cli/0.98.0/` and `https://pypi.org/pypi/agentkit-cli/0.98.0/json` both returned `200` after publish
+- publish path note: `uv publish` failed in this environment because trusted publishing / credentials were unavailable there, so the actual upload used the existing local `.pypirc` via `twine upload`
+- status: SHIPPED
