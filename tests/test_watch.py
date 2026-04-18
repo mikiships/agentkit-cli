@@ -67,7 +67,12 @@ class TestChangeHandler:
         handler, calls = self._make_handler(debounce=0.05)
         handler.on_modified("/tmp/test/first.py")
         handler.on_modified("/tmp/test/second.py")
-        time.sleep(0.15)
+
+        deadline = time.time() + 0.5
+        while not calls and time.time() < deadline:
+            time.sleep(0.01)
+
+        assert calls, "debounced callback never fired within the expected window"
         assert calls[0] == "/tmp/test/second.py"
 
     def test_extension_filter_allows_md(self):
