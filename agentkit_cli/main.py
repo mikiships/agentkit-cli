@@ -1197,13 +1197,15 @@ def improve(
 def optimize(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory (default: cwd)"),
     file: Optional[Path] = typer.Option(None, "--file", help="Explicit CLAUDE.md or AGENTS.md target"),
+    all_files: bool = typer.Option(False, "--all", help="Discover and optimize all CLAUDE.md and AGENTS.md files under the repo"),
+    check: bool = typer.Option(False, "--check", help="Exit non-zero when meaningful rewrites are available"),
     apply: bool = typer.Option(False, "--apply", help="Overwrite the targeted context file"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write review or optimized content to file"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
     fmt: str = typer.Option("text", "--format", help="Review format: text or markdown"),
 ) -> None:
-    """Optimize an existing CLAUDE.md or AGENTS.md file."""
-    optimize_command(path=path, file=file, apply=apply, output=output, json_output=json_output, fmt=fmt)
+    """Optimize one context file or sweep repo context files."""
+    optimize_command(path=path, file=file, all_files=all_files, check=check, apply=apply, output=output, json_output=json_output, fmt=fmt)
 
 
 @app.command("migrate")
