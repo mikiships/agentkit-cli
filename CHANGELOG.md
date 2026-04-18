@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.97.2] - 2026-04-18
+
+### Changed
+- Added CLI-level smoke coverage for `agentkit optimize` dry-run and `--apply` flows on realistic context files, including second-pass safe no-op behavior.
+- Restored the tracked GitHub Pages front-page hooks and stat ids required by `pages-refresh` and `pages-sync` validation, so optimize release gating no longer trips over a stale `docs/index.html` surface.
+- Aligned optimize review rendering tests with the shipped `Meaningful rewrite available` verdict wording and hardened the watch debounce regression test against timing flakes.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.2 optimize smoke-and-guardrails follow-up.
+
 ## [0.97.1] - 2026-04-18
 
 ### Changed

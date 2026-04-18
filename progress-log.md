@@ -179,3 +179,19 @@
 - `uv run pytest -q` -> `4759 passed, 1 warning in 369.84s (0:06:09)`
 
 **Next:** D3 release handoff hygiene
+
+---
+
+## D3: release handoff hygiene — COMPLETE
+
+**Built:**
+- `README.md` — documented the CLI smoke coverage claim for dry-run, one-shot apply, and second-pass safe no-op behavior
+- `CHANGELOG.md` — added the `0.97.2` optimize smoke-and-guardrails follow-up entry
+- `BUILD-REPORT.md` and `BUILD-REPORT-v0.97.2.md` — recorded the smoke/guardrail follow-up, unblock details, and final validation state
+- `pyproject.toml` and `agentkit_cli/__init__.py` — bumped version from `0.97.1` to `0.97.2`
+
+**Tests:**
+- `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py tests/test_optimize_d3.py tests/test_watch.py tests/test_optimize_smoke.py tests/test_optimize_d2_hardening.py tests/test_optimize_realworld.py tests/test_optimize_d4.py` -> `104 passed in 2.27s`
+- `uv run pytest -q` -> `4759 passed, 1 warning in 369.84s (0:06:09)`
+
+**Next:** contract complete
