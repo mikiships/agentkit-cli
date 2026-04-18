@@ -208,20 +208,26 @@ class ImproveEngine:
         # Step 4 — optional context optimization
         if optimize_context:
             try:
-                optimize_result = OptimizeEngine(root).optimize()
-                if optimize_result.no_op or optimize_result.optimized_text == optimize_result.original_text:
-                    actions_skipped.append(f"context optimization ({optimize_result.verdict.lower()}, already tight)")
+                optimizer = OptimizeEngine(root)
+                sweep_result = optimizer.optimize_sweep()
+                if sweep_result.summary.total_files == 0:
+                    actions_skipped.append("context optimization (no CLAUDE.md or AGENTS.md found)")
+                elif sweep_result.summary.rewritable_files == 0:
+                    actions_skipped.append("context optimization (safe no-op, already tight)")
                 elif dry_run:
                     actions_skipped.append(
-                        f"context optimization (dry-run, would save {abs(optimize_result.token_delta)} tokens)"
+                        f"context optimization (dry-run, would save {abs(sweep_result.summary.total_token_delta)} tokens across {sweep_result.summary.rewritable_files} files)"
                     )
                 else:
-                    Path(optimize_result.source_file).write_text(optimize_result.optimized_text, encoding="utf-8")
+                    applied_files = 0
+                    for optimize_result in sweep_result.results:
+                        if optimize_result.no_op or optimize_result.optimized_text == optimize_result.original_text:
+                            continue
+                        Path(optimize_result.source_file).write_text(optimize_result.optimized_text, encoding="utf-8")
+                        applied_files += 1
                     actions_taken.append(
-                        f"Optimized {Path(optimize_result.source_file).name} ({optimize_result.line_delta:+d} lines, {optimize_result.token_delta:+d} tokens)"
+                        f"Optimized {applied_files} context file(s) ({sweep_result.summary.total_line_delta:+d} lines, {sweep_result.summary.total_token_delta:+d} tokens)"
                     )
-            except FileNotFoundError:
-                actions_skipped.append("context optimization (no CLAUDE.md or AGENTS.md found)")
             except Exception as exc:
                 actions_skipped.append(f"context optimization failed ({exc})")
 

@@ -233,3 +233,15 @@
 **Tests:** `uv run pytest -q tests/test_optimize_d3.py` -> 4 passed
 
 **Next:** D4 pipeline integration and safety polish
+
+---
+
+## D4: pipeline integration and safety polish — COMPLETE
+
+**Built:**
+- `agentkit_cli/improve_engine.py` — switched optimize integration to repo sweep semantics, bounded no-context/no-op handling, and safe multi-file writes
+- `tests/test_optimize_d4.py` — updated integration coverage for sweep-based improve behavior, failure surfacing, and honest safe no-op reporting
+
+**Tests:** `uv run pytest -q tests/test_optimize_d4.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 92 passed
+
+**Next:** D5 docs, reports, versioning, and final validation
