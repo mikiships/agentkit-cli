@@ -54,5 +54,20 @@
 
 **Tests:** focused optimize suite green, full suite completed as `4735 passed, 1 warning` in `394.21s`
 
+## D1: real-world fixture pack and failure mapping — COMPLETE
+
+**Built:**
+- `tests/fixtures/optimize/` — added four realistic fixture pairs for bloated rules, already-tight context, risky instructions, and mixed-signal context files
+- `tests/test_optimize_realworld.py` — fixture-driven coverage for preserved sections, removable content expectations, and second-pass idempotence checks
+
+**Failure map observed before hardening:**
+- legacy-note sections often shrink but still keep their headings when only stale body lines are removed
+- autonomy/project-critical sections are not always classified as protected high-signal content
+- low-signal scratchpad sections can survive as trimmed remnants instead of disappearing cleanly
+
+**Tests:** `pytest -q tests/test_optimize_realworld.py` -> 8 passed
+
+---
+
 ## Next
-- Commit D5 handoff files
+- D2 protected-section and no-op hardening

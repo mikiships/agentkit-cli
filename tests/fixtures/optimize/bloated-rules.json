@@ -1,0 +1,6 @@
+{
+  "preserved_sections": ["Project Identity", "Safety Boundaries"],
+  "removable_sections": [],
+  "must_not_contain": ["Reviewed in 2023.", "Reviewed in 2022.", "Reviewed in 2021.", "Reviewed in 2020."],
+  "should_shrink": true
+}
