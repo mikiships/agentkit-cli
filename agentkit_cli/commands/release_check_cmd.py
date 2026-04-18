@@ -9,7 +9,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from agentkit_cli.release_check import ReleaseCheckResult, run_release_check, write_step_summary
+from agentkit_cli.release_check import Registry, ReleaseCheckResult, run_release_check, write_step_summary
 
 console = Console()
 
@@ -68,7 +68,7 @@ def release_check_command(
     path: Optional[Path] = None,
     version: Optional[str] = None,
     package: Optional[str] = None,
-    registry: str = "auto",
+    registry: Registry = "auto",
     skip_tests: bool = False,
     json_output: bool = False,
     changelog: bool = False,
@@ -82,7 +82,7 @@ def release_check_command(
         path=root,
         package=package,
         version=version,
-        registry=registry,  # type: ignore[arg-type]
+        registry=registry,
         skip_tests=skip_tests,
     )
 

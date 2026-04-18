@@ -1,4 +1,4 @@
-"""release_check.py, release-surface verification engine for agentkit-cli."""
+"""release_check.py, Python-oriented release-surface verification engine for agentkit-cli."""
 from __future__ import annotations
 
 import json
@@ -109,6 +109,17 @@ def _extract_summary(output: str) -> str:
     return _shorten(output)
 
 
+def _python_test_support_result(name: str, registry: Registry) -> Optional[CheckResult]:
+    if registry != "pypi":
+        return CheckResult(
+            name=name,
+            status="fail",
+            detail="Automated test execution is currently implemented only for Python/pytest projects.",
+            hint="Run release-check on a Python project, use --skip-tests for a partial check, or add project-specific validation outside release-check.",
+        )
+    return None
+
+
 def check_tests(path: Path) -> CheckResult:
     try:
         result = subprocess.run(
@@ -116,7 +127,7 @@ def check_tests(path: Path) -> CheckResult:
             cwd=str(path),
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=600,
         )
         passed = result.returncode == 0
         output = (result.stdout + result.stderr).strip()
@@ -129,7 +140,7 @@ def check_tests(path: Path) -> CheckResult:
     except FileNotFoundError:
         return CheckResult("tests", "error", "pytest not found", "Install pytest: pip install pytest")
     except subprocess.TimeoutExpired:
-        return CheckResult("tests", "error", "pytest timed out after 300s", "Tests are taking too long. Run manually to diagnose.")
+        return CheckResult("tests", "error", "pytest timed out after 600s", "Tests are taking too long. Run manually to diagnose.")
     except Exception as exc:
         return CheckResult("tests", "error", str(exc), "Could not run tests. Check Python environment.")
 
@@ -511,11 +522,14 @@ def run_release_check(
     pkg, ver, reg = resolve_metadata(root, package, version, registry)
     result = ReleaseCheckResult(package=pkg, version=ver, registry=reg, path=str(root))
 
-    result.checks.append(check_smoke_tests(root))
     if skip_tests:
+        result.checks.append(CheckResult("smoke_tests", "skip", "Skipped via --skip-tests."))
         result.checks.append(CheckResult("tests", "skip", "Skipped via --skip-tests."))
     else:
-        result.checks.append(check_tests(root))
+        smoke_support = _python_test_support_result("smoke_tests", reg)
+        tests_support = _python_test_support_result("tests", reg)
+        result.checks.append(smoke_support or check_smoke_tests(root))
+        result.checks.append(tests_support or check_tests(root))
 
     result.checks.append(check_git_push(root))
 

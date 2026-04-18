@@ -673,11 +673,11 @@ def release_check(
     version: Optional[str] = typer.Option(None, "--version", help="Version to check (default: from pyproject.toml/package.json)"),
     package: Optional[str] = typer.Option(None, "--package", help="Package name (default: from pyproject.toml/package.json)"),
     registry: str = typer.Option("auto", "--registry", help="Registry to check: pypi|npm|auto"),
-    skip_tests: bool = typer.Option(False, "--skip-tests", help="Skip the pytest/npm test step"),
+    skip_tests: bool = typer.Option(False, "--skip-tests", help="Skip Python smoke and full pytest execution"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON for CI integration"),
     changelog: bool = typer.Option(False, "--changelog", help="Generate and append a changelog preview to the output"),
 ) -> None:
-    """Verify the release surface: smoke tests, tests, git push, tag, and registry."""
+    """Verify the release surface for Python/pytest projects: smoke tests, full tests, git push, tag, and registry."""
     release_check_command(
         path=path,
         version=version,

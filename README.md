@@ -1064,7 +1064,7 @@ What it does:
 
 ## Release Check
 
-`agentkit release-check` verifies the 5-part release surface so a green local run is not mistaken for a shipped release:
+`agentkit release-check` verifies the 5-part release surface for Python/pytest projects so a green local run is not mistaken for a shipped release:
 
 ```
 agentkit release-check [PATH] [OPTIONS]
@@ -1073,17 +1073,21 @@ Options:
   --version VERSION   Version to verify (default: from pyproject.toml/package.json)
   --package NAME      Package name (default: from pyproject.toml/package.json)
   --registry          pypi|npm|auto (default: auto-detected)
-  --skip-tests        Skip the pytest/npm test step for quick checks
+  --skip-tests        Skip Python smoke and full pytest execution for quick checks
   --json              Output structured JSON for CI integration
   --changelog         Append changelog preview to the report
 ```
 
 Checks covered:
-- `tests`
-- `smoke_tests`
+- `tests` (Python projects, via `python3 -m pytest -q --tb=no`)
+- `smoke_tests` (Python projects, via `python3 -m pytest -m smoke -q --tb=no`)
 - `git_push` (clean worktree, attached HEAD, upstream configured, branch pushed)
 - `git_tag` (local tag points at `HEAD`, remote tag exists and matches)
 - `registry` (target version is live on PyPI or npm)
+
+Current scope note:
+- automated `tests` and `smoke_tests` execution is implemented only for Python/pytest projects today
+- npm package detection is used for metadata and registry checks, not npm test runner execution
 
 Example output:
 

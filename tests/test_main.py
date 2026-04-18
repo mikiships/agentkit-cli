@@ -50,3 +50,10 @@ def test_run_release_check_flag_is_forwarded(tmp_path):
         result = runner.invoke(app, ["run", "--path", str(tmp_path), "--release-check"])
     assert result.exit_code == 0
     assert mock_run.call_args.kwargs["release_check"] is True
+
+
+def test_release_check_help_mentions_python_pytest_scope():
+    result = runner.invoke(app, ["release-check", "--help"])
+    assert result.exit_code == 0
+    assert "python/pytest projects" in result.output.lower()
+    assert "skip python smoke and full pytest execution" in result.output.lower()

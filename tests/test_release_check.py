@@ -13,6 +13,7 @@ from agentkit_cli.release_check import (
     ReleaseCheckResult,
     _detect_registry,
     _parse_pyproject_manual,
+    _python_test_support_result,
     check_git_push,
     check_git_tag,
     check_registry_npm,
@@ -278,6 +279,15 @@ class TestRegistryChecks:
 
 
 class TestMetadataAndReport:
+    def test_python_test_support_result_for_npm_projects(self):
+        result = _python_test_support_result("tests", "npm")
+        assert result is not None
+        assert result.status == "fail"
+        assert "python/pytest" in result.detail.lower()
+
+    def test_python_test_support_result_for_python_projects(self):
+        assert _python_test_support_result("tests", "pypi") is None
+
     def test_detect_registry(self, tmp_path):
         (tmp_path / "package.json").write_text('{"name": "pkg", "version": "1.0.0"}')
         assert _detect_registry(tmp_path) == "npm"
@@ -360,6 +370,39 @@ class TestRunReleaseCheck:
             result = run_release_check(path=tmp_path)
         assert result.verdict == "UNKNOWN"
 
+    def test_skip_tests_skips_smoke_and_full_test_checks(self, tmp_path):
+        (tmp_path / "pyproject.toml").write_text('[project]\nname = "agentkit-cli"\nversion = "0.96.0"\n')
+        with patch("agentkit_cli.release_check.check_smoke_tests") as mock_smoke, \
+             patch("agentkit_cli.release_check.check_tests") as mock_tests, \
+             patch("agentkit_cli.release_check.check_git_push", return_value=CheckResult("git_push", "pass", "ok")), \
+             patch("agentkit_cli.release_check.check_git_tag", return_value=CheckResult("git_tag", "pass", "ok")), \
+             patch("agentkit_cli.release_check.check_registry_pypi", return_value=CheckResult("registry", "fail", "missing")):
+            result = run_release_check(path=tmp_path, skip_tests=True)
+
+        mock_smoke.assert_not_called()
+        mock_tests.assert_not_called()
+        checks = {check.name: check for check in result.checks}
+        assert checks["smoke_tests"].status == "skip"
+        assert checks["tests"].status == "skip"
+        assert result.verdict == "RELEASE-READY"
+
+    def test_npm_projects_fail_test_surfaces_honestly_without_running_pytest(self, tmp_path):
+        (tmp_path / "package.json").write_text('{"name": "agentkit-cli", "version": "0.96.0"}')
+        with patch("agentkit_cli.release_check.check_smoke_tests") as mock_smoke, \
+             patch("agentkit_cli.release_check.check_tests") as mock_tests, \
+             patch("agentkit_cli.release_check.check_git_push", return_value=CheckResult("git_push", "pass", "ok")), \
+             patch("agentkit_cli.release_check.check_git_tag", return_value=CheckResult("git_tag", "pass", "ok")), \
+             patch("agentkit_cli.release_check.check_registry_npm", return_value=CheckResult("registry", "pass", "ok")):
+            result = run_release_check(path=tmp_path)
+
+        mock_smoke.assert_not_called()
+        mock_tests.assert_not_called()
+        checks = {check.name: check for check in result.checks}
+        assert checks["smoke_tests"].status == "fail"
+        assert checks["tests"].status == "fail"
+        assert "python/pytest" in checks["tests"].detail.lower()
+        assert result.verdict == "UNKNOWN"
+
 
 class TestCLI:
     def test_release_check_json_output_contains_markdown(self, tmp_path):
@@ -382,3 +425,5 @@ class TestCLI:
         result = runner.invoke(app, ["release-check", "--help"])
         assert result.exit_code == 0
         assert "release" in result.output.lower()
+        assert "python/pytest projects" in result.output.lower()
+        assert "skip python smoke and full pytest execution" in result.output.lower()

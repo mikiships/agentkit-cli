@@ -464,3 +464,122 @@ Final contract state from this continuation:
 - D5 commit: `c9a34d8`
 - local release-check hardening contract complete through D5
 - no publish, push, or tag performed in this pass
+
+## 2026-04-17 release-check hardening audit follow-up
+
+Current state by inspection:
+- `agentkit_cli/release_check.py` implements smoke-tests, full tests, git push, git tag, registry, metadata detection, verdict synthesis, and markdown export.
+- `agentkit_cli/commands/release_check_cmd.py` wires the CLI, JSON output, markdown summary emission, and optional changelog preview.
+- `agentkit_cli/main.py` exposes both `agentkit release-check` and `agentkit run --release-check`.
+- `agentkit_cli/commands/run_cmd.py` integrates release-check as a post-pipeline gate and carries the release-check payload into the saved/JSON summary.
+- The focused tests currently cover git edge cases, export shape, JSON surface, and `run --release-check` exit behavior.
+
+Likely breakpoints, in priority order:
+1. npm projects are still routed through Python-only test execution. `check_smoke_tests()` and `check_tests()` always run `python3 -m pytest ...` even when registry/package detection resolves to npm, so `release-check` can misreport or hard-fail on valid JS/TS packages.
+2. `--skip-tests` does not actually skip all test surfaces. `run_release_check()` always runs `check_smoke_tests()` first, then only skips the `tests` surface, so the CLI flag and help text over-promise.
+3. Runtime/help wording still implies generic release-surface support, but the actual test runner logic is Python-specific. This is a plumbing mismatch more than a code crash, but it will confuse users and CI expectations.
+4. `release_check_command()` accepts `registry` as a plain string and relies on the earlier manual guard plus `type: ignore`; behavior is fine for the validated values, but this remains a brittle interface edge if the command is reused directly outside Typer parsing.
+
+Ordered must-fix list:
+1. Decide the intended cross-ecosystem contract for tests: either add npm-aware test/smoke execution or explicitly scope release-check to Python projects in code and help text.
+2. Make `--skip-tests` skip both `smoke_tests` and `tests`, or rename the flag/help so the behavior is honest.
+3. Align CLI help, docstrings, and any README/changelog mentions with the actual supported project types and skip semantics.
+4. Add focused tests for the chosen npm/scoping behavior and for `--skip-tests` covering both test surfaces.
+
+Nice-to-have cleanup:
+- tighten the `registry` parameter typing at the command boundary so the helper no longer needs `type: ignore[arg-type]`
+- add one focused CLI test for the invalid-registry path to pin the current exit-2 behavior
+
+Focused test sequence for the next pass:
+1. `uv run --group dev python -m pytest tests/test_release_check.py -q`
+2. `uv run --group dev python -m pytest tests/test_run_command.py tests/test_main.py -q`
+3. After the test-surface fix, add and run a focused regression target covering npm-or-scoped behavior plus `--skip-tests` semantics.
+4. If those stay green, run `uv run --group dev python -m pytest -q` before calling the hardening fully revalidated.
+
+Release-readiness criteria for the next pass:
+- release-check behavior matches its CLI/help contract
+- focused tests cover the new semantics
+- full suite stays green after the release-check hardening adjustments
+
+## 2026-04-17 follow-up: --skip-tests semantics corrected
+
+Applied the smaller honesty fix from the follow-up audit.
+
+What changed:
+- `run_release_check(..., skip_tests=True)` now skips both `smoke_tests` and `tests` instead of only skipping the full-test surface.
+- CLI help in `agentkit_cli/main.py` now says `--skip-tests` skips smoke and full test execution.
+- README wording now matches the actual behavior.
+- focused regression coverage now asserts both test surfaces are skipped and that `agentkit release-check --help` includes the updated wording.
+
+Files touched:
+- `agentkit_cli/release_check.py`
+- `agentkit_cli/main.py`
+- `tests/test_release_check.py`
+- `README.md`
+
+Focused validation run:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: `25 passed`
+
+Follow-up state after this patch:
+- the `--skip-tests` semantics gap is closed
+- the remaining honesty gap is broader project-type support: test execution/help still reads more generic than the current Python-only `python3 -m pytest ...` implementation
+- next pass should decide whether to scope wording to Python projects or add npm-aware test execution
+
+## 2026-04-17 follow-up: project-type honesty tightened to current Python scope
+
+Applied the smaller bounded follow-up instead of broadening behavior.
+
+What changed:
+- `run_release_check()` now fails the `smoke_tests` and `tests` surfaces explicitly for npm-detected projects instead of trying to run `python3 -m pytest ...` and pretending cross-ecosystem support exists.
+- release-check module text, CLI help, and README wording now scope automated test execution to Python/pytest projects.
+- added focused regression coverage for the new honesty behavior and the updated help text.
+
+Files touched:
+- `agentkit_cli/release_check.py`
+- `agentkit_cli/main.py`
+- `README.md`
+- `tests/test_release_check.py`
+- `tests/test_main.py`
+
+Validation run:
+- `uv run --group dev python -m pytest tests/test_release_check.py tests/test_main.py -q`
+- result: `36 passed`
+- broader follow-up validation: `uv run --group dev python -m pytest tests/test_release_check.py tests/test_run_command.py tests/test_main.py -q`
+- result: `39 passed`
+
+Remaining gap after this pass:
+- npm metadata/registry detection is supported, but automated npm test/smoke runner support is still intentionally not implemented in `release-check`
+- expanding to ecosystem-specific test execution can be a later feature, but the current CLI/help/runtime contract is now honest about today's Python-oriented behavior
+
+## 2026-04-17 follow-up validation sweep: scoped patch rechecked
+
+Validated the current working-tree follow-up patch directly instead of rebuilding it.
+
+Scoped file set confirmed for this follow-up:
+- `agentkit_cli/release_check.py`
+- `agentkit_cli/commands/release_check_cmd.py`
+- `agentkit_cli/main.py`
+- `README.md`
+- `tests/test_release_check.py`
+- `tests/test_main.py`
+- `progress-log-release-check-hardening.md`
+
+What was confirmed:
+- `--skip-tests` now skips both `smoke_tests` and `tests`.
+- npm-detected projects now fail those automated test surfaces honestly with Python-only guidance instead of attempting generic pytest execution.
+- CLI/help/README wording now matches the Python/pytest-only automated test contract.
+- `release_check_command()` command-boundary typing was tightened from plain `str` to `Registry`, removing the local `type: ignore` without widening behavior.
+
+Focused validation run:
+- `uv run --group dev python -m pytest tests/test_release_check.py -q`
+- result: `28 passed`
+- `uv run --group dev python -m pytest tests/test_main.py -q`
+- result: `8 passed`
+- `uv run --group dev python -m pytest tests/test_release_check.py tests/test_run_command.py tests/test_main.py -q`
+- result: `39 passed`
+
+Scoped handoff state:
+- follow-up patch is commit-ready for the bounded release-check honesty work
+- no update was made to `BUILD-REPORT.md` or `RELEASE-NEXT-STEP-v0.96.0.md` because this pass tightened behavior honesty and typing only; it did not change the broader release notes surface
+- intentionally out of scope: real npm test runner support or broader multi-ecosystem automated test execution inside `release-check`
