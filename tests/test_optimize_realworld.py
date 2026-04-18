@@ -47,6 +47,7 @@ def test_realworld_optimize_fixtures(mock_redteam, mock_adapter, tmp_path: Path,
         assert heading in result.removed_bloat or heading not in result.optimized_text
     for line in expected["must_not_contain"]:
         assert line not in result.optimized_text
+    assert result.no_op is expected["should_be_noop"]
     if expected["should_shrink"]:
         assert result.optimized_stats.lines < result.original_stats.lines
     else:
@@ -68,6 +69,9 @@ def test_realworld_optimize_is_idempotent_on_second_pass(mock_redteam, mock_adap
     target.write_text(first.optimized_text, encoding="utf-8")
     second = engine.optimize(file=target)
 
+    _, expected = _load_fixture(fixture_name)
+
     assert second.optimized_stats.lines <= first.optimized_stats.lines
-    assert abs(second.line_delta) <= 1
-    assert abs(second.token_delta) <= 4
+    assert abs(second.line_delta) <= expected["second_pass_max_line_delta"]
+    assert abs(second.token_delta) <= expected["second_pass_max_token_delta"]
+    assert second.no_op is True

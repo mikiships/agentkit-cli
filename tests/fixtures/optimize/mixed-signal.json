@@ -1,6 +1,9 @@
 {
   "preserved_sections": ["Overview", "Setup", "Project Constraints"],
-  "removable_sections": [],
-  "must_not_contain": [],
-  "should_shrink": true
+  "removable_sections": ["Scratchpad"],
+  "must_not_contain": ["Temporary thought: maybe rewrite everything."],
+  "should_shrink": true,
+  "should_be_noop": false,
+  "second_pass_max_line_delta": 0,
+  "second_pass_max_token_delta": 0
 }

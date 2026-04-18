@@ -1,6 +1,9 @@
 {
-  "preserved_sections": ["Project Identity", "Safety Boundaries"],
-  "removable_sections": [],
+  "preserved_sections": ["Project Identity", "Workflow Rules", "Safety Boundaries"],
+  "removable_sections": ["Legacy Notes"],
   "must_not_contain": ["Reviewed in 2023.", "Reviewed in 2022.", "Reviewed in 2021.", "Reviewed in 2020."],
-  "should_shrink": true
+  "should_shrink": true,
+  "should_be_noop": false,
+  "second_pass_max_line_delta": 0,
+  "second_pass_max_token_delta": 0
 }

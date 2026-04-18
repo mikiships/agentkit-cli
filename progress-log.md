@@ -58,14 +58,15 @@
 
 **Built:**
 - `tests/fixtures/optimize/` — added four realistic fixture pairs for bloated rules, already-tight context, risky instructions, and mixed-signal context files
-- `tests/test_optimize_realworld.py` — fixture-driven coverage for preserved sections, removable content expectations, and second-pass idempotence checks
+- `tests/test_optimize_realworld.py` — fixture-driven coverage for preserved sections, explicit removable section expectations, no-op expectations, and second-pass idempotence thresholds
 
 **Failure map observed before hardening:**
-- legacy-note sections often shrink but still keep their headings when only stale body lines are removed
-- autonomy/project-critical sections are not always classified as protected high-signal content
-- low-signal scratchpad sections can survive as trimmed remnants instead of disappearing cleanly
+- legacy-note cleanup removed stale lines but did not consistently prove the whole section heading could disappear
+- risky-request cleanup could leave behind empty `Requests` or `Scratchpad` shells instead of removing the section entirely
+- autonomy and workflow-critical guidance survived first pass, but second-pass behavior was not pinned tightly enough to catch churn
+- already-tight files lacked an explicit real-world no-op fixture, so reviewable "leave it alone" behavior was under-specified
 
-**Tests:** `pytest -q tests/test_optimize_realworld.py` -> 8 passed
+**Tests:** `pytest -q tests/test_optimize_realworld.py tests/test_optimize_d1.py` -> 12 passed
 
 ---
 
