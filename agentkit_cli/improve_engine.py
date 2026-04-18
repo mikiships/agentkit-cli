@@ -210,7 +210,7 @@ class ImproveEngine:
             try:
                 optimize_result = OptimizeEngine(root).optimize()
                 if optimize_result.no_op or optimize_result.optimized_text == optimize_result.original_text:
-                    actions_skipped.append("context optimization (already tight)")
+                    actions_skipped.append(f"context optimization ({optimize_result.verdict.lower()}, already tight)")
                 elif dry_run:
                     actions_skipped.append(
                         f"context optimization (dry-run, would save {abs(optimize_result.token_delta)} tokens)"

@@ -28,6 +28,7 @@ def _load_fixture(name: str) -> tuple[str, dict]:
         ("already-tight", "CLAUDE.md"),
         ("risky-instructions", "AGENTS.md"),
         ("mixed-signal", "CLAUDE.md"),
+        ("repo-handbook", "AGENTS.md"),
     ],
 )
 @patch("agentkit_cli.optimize.get_adapter")
@@ -53,7 +54,7 @@ def test_realworld_optimize_fixtures(mock_redteam, mock_adapter, tmp_path: Path,
         assert abs(result.line_delta) <= 1
 
 
-@pytest.mark.parametrize("fixture_name", ["bloated-rules", "already-tight", "risky-instructions", "mixed-signal"])
+@pytest.mark.parametrize("fixture_name", ["bloated-rules", "already-tight", "risky-instructions", "mixed-signal", "repo-handbook"])
 @patch("agentkit_cli.optimize.get_adapter")
 @patch("agentkit_cli.optimize.RedTeamScorer")
 def test_realworld_optimize_is_idempotent_on_second_pass(mock_redteam, mock_adapter, tmp_path: Path, fixture_name: str):
