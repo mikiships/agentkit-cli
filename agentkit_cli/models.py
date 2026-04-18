@@ -59,6 +59,10 @@ class OptimizeResult:
     def token_delta(self) -> int:
         return self.optimized_stats.estimated_tokens - self.original_stats.estimated_tokens
 
+    @property
+    def verdict(self) -> str:
+        return "Safe no-op" if self.no_op else "Meaningful rewrite available"
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "source_file": self.source_file,
@@ -68,6 +72,7 @@ class OptimizeResult:
             "optimized_stats": self.optimized_stats.to_dict(),
             "line_delta": self.line_delta,
             "token_delta": self.token_delta,
+            "verdict": self.verdict,
             "findings": [item.to_dict() for item in self.findings],
             "actions": [item.to_dict() for item in self.actions],
             "preserved_sections": list(self.preserved_sections),
