@@ -9,4 +9,15 @@
 
 **Tests:** `pytest -q tests/test_optimize_d1.py` -> 4 passed
 
-**Next:** D2 CLI command and apply flow
+---
+
+## D2: CLI command and apply flow — COMPLETE
+
+**Built:**
+- `agentkit_cli/commands/optimize_cmd.py` — dry-run optimize command with `--file`, `--apply`, `--output`, `--json`, `--format`
+- `agentkit_cli/main.py` — wired `agentkit optimize`
+- `tests/test_optimize_d2.py` — help, JSON, apply, and explicit file targeting coverage
+
+**Tests:** `pytest -q tests/test_optimize_d2.py` -> 5 passed
+
+**Next:** D3 reviewable diff/report output
