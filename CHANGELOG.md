@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.97.1] - 2026-04-18
+
+### Changed
+- Hardened `agentkit optimize` with real-world fixture coverage, stronger protected-section preservation for identity/autonomy/user-critical content, and deterministic no-op detection for already-tight context files.
+- `agentkit optimize` review output now highlights protected sections, reports a clear no-op verdict, truncates very large diffs more safely, and skips `--apply` rewrites when the optimized candidate is effectively unchanged.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` now surface optimize failures as bounded workflow messages instead of corrupting the broader improvement pass.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.1 optimize hardening follow-up.
+
 ## [0.97.0] - 2026-04-17
 
 ### Added

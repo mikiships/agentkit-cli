@@ -102,5 +102,19 @@
 
 ---
 
+## D5: docs, changelog, build report, version prep — COMPLETE
+
+**Built:**
+- `README.md` — documented hardening behavior notes including protected-section preservation, no-op verdicts, and idempotent second-pass expectations
+- `CHANGELOG.md` — added `0.97.1` optimize hardening release entry
+- `BUILD-REPORT.md` and `BUILD-REPORT-v0.97.1.md` — recorded deliverables, test count, focused validation, and final full-suite result
+- `agentkit_cli/__init__.py` and `pyproject.toml` — bumped version from `0.97.0` to `0.97.1`
+
+**Tests:**
+- `pytest -q tests/test_optimize_d1.py tests/test_optimize_d2.py tests/test_optimize_d3.py tests/test_optimize_d4.py tests/test_optimize_realworld.py tests/test_optimize_d2_hardening.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> `112 passed in 8.48s`
+- `pytest -q` -> `4750 passed, 1 warning in 393.37s (0:06:33)`
+
+---
+
 ## Next
-- D5 docs, changelog, build report, version prep
+- Contract complete

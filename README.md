@@ -201,6 +201,11 @@ agentkit improve --optimize-context
 agentkit run --improve --improve-optimize-context
 ```
 
+Behavior notes:
+- protected sections like project identity, autonomy, user-critical requests, and safety boundaries are preserved and called out in review output
+- already-tight files now return a clear no-op verdict, and `--apply` skips rewriting when the optimized candidate is effectively unchanged
+- a second optimize pass should be idempotent or near-idempotent on the shipped real-world fixtures
+
 Caveats:
 - local-first only, no LLM required
 - only targets `CLAUDE.md` and `AGENTS.md`
