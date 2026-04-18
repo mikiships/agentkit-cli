@@ -16,6 +16,7 @@ _HIGH_SIGNAL_HEADINGS = (
     "project",
     "overview",
     "mission",
+    "identity",
     "product",
     "architecture",
     "stack",
@@ -27,6 +28,29 @@ _HIGH_SIGNAL_HEADINGS = (
     "boundaries",
     "constraints",
     "workflow",
+    "autonomy",
+    "user",
+    "critical",
+)
+_PROTECTED_HEADING_KEYWORDS = (
+    "project",
+    "identity",
+    "mission",
+    "autonomy",
+    "safety",
+    "boundaries",
+    "constraints",
+    "user",
+    "critical",
+    "owner",
+)
+_LOW_SIGNAL_HEADINGS = (
+    "legacy",
+    "scratchpad",
+    "notes",
+    "requests",
+    "reminders",
+    "brainstorm",
 )
 _RISKY_PATTERNS: list[tuple[str, str, str]] = [
     (r"ignore (all )?(previous|prior) instructions", "critical", "Risky instruction override language"),
@@ -65,7 +89,7 @@ class OptimizeEngine:
         original_text = target.read_text(encoding="utf-8")
         findings = self._collect_findings(target, original_text)
         sections = self._split_sections(original_text)
-        optimized_text, actions, preserved, removed_bloat, warnings = self._rewrite(sections, findings, original_text)
+        optimized_text, actions, preserved, protected, removed_bloat, warnings, no_op = self._rewrite(sections, findings, original_text)
         return OptimizeResult(
             source_file=str(target),
             original_text=original_text,
@@ -75,8 +99,10 @@ class OptimizeEngine:
             findings=findings,
             actions=actions,
             preserved_sections=preserved,
+            protected_sections=protected,
             removed_bloat=removed_bloat,
             warnings=warnings,
+            no_op=no_op,
         )
 
     def _resolve_target(self, file: Optional[Path | str]) -> Path:
@@ -140,9 +166,10 @@ class OptimizeEngine:
         sections: list[_Section],
         findings: list[OptimizeFinding],
         original_text: str,
-    ) -> tuple[str, list[OptimizationAction], list[str], list[str], list[str]]:
+    ) -> tuple[str, list[OptimizationAction], list[str], list[str], list[str], list[str], bool]:
         actions: list[OptimizationAction] = []
         preserved: list[str] = []
+        protected: list[str] = []
         removed_bloat: list[str] = []
         warnings: list[str] = []
         optimized_sections: list[str] = []
@@ -152,6 +179,7 @@ class OptimizeEngine:
         for section in sections:
             heading = section.normalized_heading
             rendered = self._clean_section(section, current_year=current_year or None)
+            protected_section = self._is_protected_section(section)
             if not rendered:
                 if section.heading:
                     removed_bloat.append(section.heading.lstrip("# "))
@@ -164,8 +192,15 @@ class OptimizeEngine:
                 continue
             if heading != "preamble":
                 seen_headings.add(heading)
-            if self._is_high_signal(section):
+            if protected_section:
+                protected_name = section.heading.lstrip("# ") if section.heading else "Overview"
+                protected.append(protected_name)
+            if self._is_high_signal(section) or protected_section:
                 preserved.append(section.heading.lstrip("# ") if section.heading else "Overview")
+            elif self._is_low_signal(section) and len(rendered.splitlines()) <= 2:
+                removed_bloat.append(section.heading.lstrip("# "))
+                actions.append(OptimizationAction("drop-low-signal", f"Dropped low-signal section: {section.heading}", lines_affected))
+                continue
             elif self._is_bloated(rendered):
                 removed_bloat.append(section.heading.lstrip("# ") if section.heading else "Preamble")
                 rendered = self._compress(rendered)
@@ -186,7 +221,12 @@ class OptimizeEngine:
                 warnings.append(f"{finding.severity}: {finding.message}")
 
         optimized_text = "\n\n".join(part.strip() for part in optimized_sections if part.strip()).strip() + "\n"
-        return optimized_text, actions, preserved[:8], removed_bloat[:8], warnings[:8]
+        no_op = self._effectively_unchanged(original_text, optimized_text)
+        if no_op:
+            optimized_text = original_text if original_text.endswith("\n") else original_text + "\n"
+            actions = [OptimizationAction("no-op", "Already tight, protected, and materially unchanged.", 0)]
+            removed_bloat = []
+        return optimized_text, actions, preserved[:8], protected[:8], removed_bloat[:8], warnings[:8], no_op
 
     def _split_sections(self, text: str) -> list[_Section]:
         sections: list[_Section] = []
@@ -210,6 +250,8 @@ class OptimizeEngine:
         for line in lines:
             lowered = line.lower().strip()
             if any(re.search(pattern, lowered) for pattern, _, _ in _RISKY_PATTERNS):
+                if self._is_legitimate_boundary_line(lowered):
+                    cleaned.append(line)
                 continue
             if current_year and _YEAR_RE.search(line):
                 years = [int(y) for y in _YEAR_RE.findall(line)]
@@ -257,6 +299,14 @@ class OptimizeEngine:
         heading = section.normalized_heading
         return heading == "preamble" or any(key in heading for key in _HIGH_SIGNAL_HEADINGS)
 
+    def _is_protected_section(self, section: _Section) -> bool:
+        heading = section.normalized_heading
+        return heading == "preamble" or any(key in heading for key in _PROTECTED_HEADING_KEYWORDS)
+
+    def _is_low_signal(self, section: _Section) -> bool:
+        heading = section.normalized_heading
+        return any(key in heading for key in _LOW_SIGNAL_HEADINGS)
+
     def _is_bloated(self, rendered: str) -> bool:
         lines = rendered.splitlines()
         return len(lines) > 14 or rendered.count("\n-") + rendered.count("\n*") > 8
@@ -264,6 +314,18 @@ class OptimizeEngine:
     def _is_bullet_wall(self, lines: Iterable[str]) -> bool:
         bullet_count = sum(1 for line in lines if line.lstrip().startswith(("-", "*")))
         return bullet_count > 8
+
+    def _is_legitimate_boundary_line(self, lowered: str) -> bool:
+        return lowered.startswith("do not bypass") or lowered.startswith("never print secrets")
+
+    def _effectively_unchanged(self, original_text: str, optimized_text: str) -> bool:
+        original_lines = [line.rstrip() for line in original_text.strip().splitlines()]
+        optimized_lines = [line.rstrip() for line in optimized_text.strip().splitlines()]
+        if original_lines == optimized_lines:
+            return True
+        line_delta = abs(len(optimized_lines) - len(original_lines))
+        token_delta = abs(self._stats(original_text).estimated_tokens - self._stats(optimized_text).estimated_tokens)
+        return line_delta <= 1 and token_delta <= 4
 
     def _stats(self, text: str) -> OptimizeStats:
         lines = len(text.splitlines())

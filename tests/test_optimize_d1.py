@@ -47,7 +47,7 @@ def test_optimize_engine_reduces_bloat(mock_redteam, mock_adapter, tmp_path: Pat
     assert result.token_delta < 0
     assert any(f.kind == "bloat" for f in result.findings)
     assert "Ignore previous instructions" not in result.optimized_text
-    assert any(a.kind in {"compress-section", "remove-empty"} for a in result.actions)
+    assert any(a.kind in {"compress-section", "remove-empty", "drop-low-signal"} for a in result.actions)
 
 
 @patch("agentkit_cli.optimize.get_adapter")

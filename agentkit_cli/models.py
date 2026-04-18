@@ -46,8 +46,10 @@ class OptimizeResult:
     findings: list[OptimizeFinding] = field(default_factory=list)
     actions: list[OptimizationAction] = field(default_factory=list)
     preserved_sections: list[str] = field(default_factory=list)
+    protected_sections: list[str] = field(default_factory=list)
     removed_bloat: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    no_op: bool = False
 
     @property
     def line_delta(self) -> int:
@@ -69,6 +71,8 @@ class OptimizeResult:
             "findings": [item.to_dict() for item in self.findings],
             "actions": [item.to_dict() for item in self.actions],
             "preserved_sections": list(self.preserved_sections),
+            "protected_sections": list(self.protected_sections),
             "removed_bloat": list(self.removed_bloat),
             "warnings": list(self.warnings),
+            "no_op": self.no_op,
         }
