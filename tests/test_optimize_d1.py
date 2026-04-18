@@ -79,6 +79,27 @@ def test_optimize_engine_preserves_tight_file(mock_redteam, mock_adapter, tmp_pa
     assert "Do not bypass approvals." in result.optimized_text
 
 
+@patch("agentkit_cli.optimize.get_adapter")
+@patch("agentkit_cli.optimize.RedTeamScorer")
+def test_optimize_sweep_discovers_nested_context_files(mock_redteam, mock_adapter, tmp_path: Path):
+    (tmp_path / "CLAUDE.md").write_text("# Root\n", encoding="utf-8")
+    (tmp_path / "packages" / "a").mkdir(parents=True)
+    (tmp_path / "packages" / "a" / "AGENTS.md").write_text("# Package A\n", encoding="utf-8")
+    (tmp_path / "packages" / "b").mkdir(parents=True)
+    (tmp_path / "packages" / "b" / "CLAUDE.md").write_text("# Package B\n", encoding="utf-8")
+    mock_adapter.return_value.agentlint_check_context.return_value = None
+    mock_redteam.return_value.score_resistance.return_value.findings = []
+
+    result = OptimizeEngine(tmp_path).optimize_sweep()
+
+    assert [Path(item.source_file).relative_to(tmp_path).as_posix() for item in result.results] == [
+        "CLAUDE.md",
+        "packages/a/AGENTS.md",
+        "packages/b/CLAUDE.md",
+    ]
+    assert result.summary.total_files == 3
+
+
 def test_optimize_engine_missing_context_file_raises(tmp_path: Path):
     engine = OptimizeEngine(tmp_path)
     try:
@@ -87,3 +108,16 @@ def test_optimize_engine_missing_context_file_raises(tmp_path: Path):
         assert "No context file found" in str(exc)
     else:
         raise AssertionError("expected FileNotFoundError")
+
+
+@patch("agentkit_cli.optimize.get_adapter")
+@patch("agentkit_cli.optimize.RedTeamScorer")
+def test_optimize_sweep_handles_no_context_edge_case(mock_redteam, mock_adapter, tmp_path: Path):
+    mock_adapter.return_value.agentlint_check_context.return_value = None
+    mock_redteam.return_value.score_resistance.return_value.findings = []
+
+    result = OptimizeEngine(tmp_path).optimize_sweep()
+
+    assert result.summary.total_files == 0
+    assert result.verdict == "No context files found"
+    assert result.results == []

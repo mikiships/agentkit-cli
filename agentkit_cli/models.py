@@ -76,3 +76,41 @@ class OptimizeResult:
             "warnings": list(self.warnings),
             "no_op": self.no_op,
         }
+
+
+@dataclass
+class OptimizeSweepSummary:
+    total_files: int
+    rewritable_files: int
+    noop_files: int
+    applied_files: int = 0
+    total_line_delta: int = 0
+    total_token_delta: int = 0
+    protected_signal_files: int = 0
+    warnings_count: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class OptimizeSweepResult:
+    root: str
+    results: list[OptimizeResult] = field(default_factory=list)
+    summary: OptimizeSweepSummary = field(default_factory=lambda: OptimizeSweepSummary(total_files=0, rewritable_files=0, noop_files=0))
+
+    @property
+    def verdict(self) -> str:
+        if self.summary.total_files == 0:
+            return "No context files found"
+        if self.summary.rewritable_files == 0:
+            return "Repo sweep is already tight"
+        return "Repo sweep found meaningful rewrites"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "root": self.root,
+            "verdict": self.verdict,
+            "summary": self.summary.to_dict(),
+            "results": [item.to_dict() for item in self.results],
+        }

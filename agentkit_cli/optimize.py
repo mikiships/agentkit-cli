@@ -6,7 +6,14 @@ from pathlib import Path
 import re
 from typing import Iterable, Optional
 
-from agentkit_cli.models import OptimizeFinding, OptimizeResult, OptimizeStats, OptimizationAction
+from agentkit_cli.models import (
+    OptimizeFinding,
+    OptimizeResult,
+    OptimizeStats,
+    OptimizationAction,
+    OptimizeSweepResult,
+    OptimizeSweepSummary,
+)
 from agentkit_cli.redteam_scorer import RedTeamScorer
 from agentkit_cli.suggest_engine import parse_agentlint_check_context
 from agentkit_cli.tools import get_adapter
@@ -87,6 +94,44 @@ class OptimizeEngine:
 
     def optimize(self, file: Optional[Path | str] = None) -> OptimizeResult:
         target = self._resolve_target(file)
+        return self._optimize_target(target)
+
+    def discover_context_files(self) -> list[Path]:
+        files: list[Path] = []
+        seen: set[Path] = set()
+        for name in _CONTEXT_FILE_NAMES:
+            for candidate in self.root.rglob(name):
+                resolved = candidate.resolve()
+                if resolved in seen or not candidate.is_file():
+                    continue
+                seen.add(resolved)
+                files.append(resolved)
+        return sorted(files, key=lambda path: (len(path.relative_to(self.root).parts), path.relative_to(self.root).as_posix(), _CONTEXT_FILE_NAMES.index(path.name)))
+
+    def optimize_sweep(self) -> OptimizeSweepResult:
+        targets = self.discover_context_files()
+        if not targets:
+            return OptimizeSweepResult(
+                root=str(self.root),
+                results=[],
+                summary=OptimizeSweepSummary(total_files=0, rewritable_files=0, noop_files=0),
+            )
+        results = [self._optimize_target(target) for target in targets]
+        return OptimizeSweepResult(
+            root=str(self.root),
+            results=results,
+            summary=OptimizeSweepSummary(
+                total_files=len(results),
+                rewritable_files=sum(1 for item in results if not item.no_op),
+                noop_files=sum(1 for item in results if item.no_op),
+                total_line_delta=sum(item.line_delta for item in results),
+                total_token_delta=sum(item.token_delta for item in results),
+                protected_signal_files=sum(1 for item in results if item.protected_sections),
+                warnings_count=sum(len(item.warnings) for item in results),
+            ),
+        )
+
+    def _optimize_target(self, target: Path) -> OptimizeResult:
         original_text = target.read_text(encoding="utf-8")
         findings = self._collect_findings(target, original_text)
         sections = self._split_sections(original_text)
