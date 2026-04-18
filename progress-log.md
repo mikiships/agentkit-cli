@@ -208,3 +208,16 @@
 **Tests:** `uv run pytest -q tests/test_optimize_d1.py` -> 6 passed
 
 **Next:** D2 CLI sweep and check workflow
+
+---
+
+## D2: CLI sweep and check workflow — COMPLETE
+
+**Built:**
+- `agentkit_cli/commands/optimize_cmd.py` — added `--all` repo sweep mode, deterministic `--check`, and repo-wide safe apply handling with per-file apply counts
+- `agentkit_cli/main.py` — exposed the new sweep/check flags on the public CLI surface
+- `tests/test_optimize_d2.py` — added CLI coverage for help text, sweep check exit codes, and repo-wide apply behavior
+
+**Tests:** `uv run pytest -q tests/test_optimize_d2.py` -> 8 passed
+
+**Next:** D3 aggregated review rendering
