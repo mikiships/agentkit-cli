@@ -22,8 +22,10 @@ def _result(path: Path) -> OptimizeResult:
         findings=[OptimizeFinding(kind="bloat", severity="medium", message="Repeated lines")],
         actions=[OptimizationAction(kind="compress-section", description="Compressed workflow", lines_affected=5)],
         preserved_sections=["Project"],
+        protected_sections=["Project"],
         removed_bloat=["Workflow"],
         warnings=["medium: Repeated lines"],
+        no_op=False,
     )
 
 
@@ -62,6 +64,30 @@ def test_optimize_apply_overwrites_file(mock_engine, tmp_path: Path):
     result = runner.invoke(app, ["optimize", "--path", str(tmp_path), "--apply"])
     assert result.exit_code == 0
     assert target.read_text(encoding="utf-8") == "# Project\n\nNew\n"
+
+
+@patch("agentkit_cli.commands.optimize_cmd.OptimizeEngine")
+def test_optimize_apply_skips_noop_rewrite(mock_engine, tmp_path: Path):
+    target = tmp_path / "CLAUDE.md"
+    original = "# Project\n\nStable\n"
+    target.write_text(original, encoding="utf-8")
+    noop_result = OptimizeResult(
+        source_file=str(target),
+        original_text=original,
+        optimized_text=original,
+        original_stats=OptimizeStats(lines=3, estimated_tokens=3),
+        optimized_stats=OptimizeStats(lines=3, estimated_tokens=3),
+        preserved_sections=["Project"],
+        protected_sections=["Project"],
+        no_op=True,
+    )
+    mock_engine.return_value.optimize.return_value = noop_result
+
+    result = runner.invoke(app, ["optimize", "--path", str(tmp_path), "--apply"])
+
+    assert result.exit_code == 0
+    assert "No rewrite needed" in result.output
+    assert target.read_text(encoding="utf-8") == original
 
 
 @patch("agentkit_cli.commands.optimize_cmd.OptimizeEngine")
