@@ -28,6 +28,7 @@ _HIGH_SIGNAL_HEADINGS = (
     "boundaries",
     "constraints",
     "workflow",
+    "release",
     "autonomy",
     "user",
     "critical",
@@ -174,10 +175,12 @@ class OptimizeEngine:
         warnings: list[str] = []
         optimized_sections: list[str] = []
         seen_headings: set[str] = set()
+        changed_sections: list[tuple[str, bool]] = []
         current_year = max([int(y) for y in _YEAR_RE.findall(original_text)] or [0])
 
         for section in sections:
             heading = section.normalized_heading
+            original_rendered = section.rendered()
             rendered = self._clean_section(section, current_year=current_year or None)
             protected_section = self._is_protected_section(section)
             if not rendered:
@@ -207,6 +210,8 @@ class OptimizeEngine:
                 actions.append(OptimizationAction("compress-section", f"Compressed bloated section: {section.heading or 'preamble'}", lines_affected))
             elif len(rendered.splitlines()) < len(section.rendered().splitlines()):
                 actions.append(OptimizationAction("compress-section", f"Trimmed repetitive lines in: {section.heading or 'preamble'}", lines_affected))
+            if self._meaningfully_changed(original_rendered, rendered):
+                changed_sections.append((section.heading.lstrip("# ") if section.heading else "Overview", protected_section))
             optimized_sections.append(rendered)
 
         if not any("safety" in name.lower() or "boundar" in name.lower() for name in preserved):
@@ -221,10 +226,12 @@ class OptimizeEngine:
                 warnings.append(f"{finding.severity}: {finding.message}")
 
         optimized_text = "\n\n".join(part.strip() for part in optimized_sections if part.strip()).strip() + "\n"
-        no_op = self._effectively_unchanged(original_text, optimized_text)
+        protected_only_churn = bool(changed_sections) and all(is_protected for _, is_protected in changed_sections) and not removed_bloat
+        no_op = protected_only_churn or self._effectively_unchanged(original_text, optimized_text)
         if no_op:
             optimized_text = original_text if original_text.endswith("\n") else original_text + "\n"
-            actions = [OptimizationAction("no-op", "Already tight, protected, and materially unchanged.", 0)]
+            reason = "Protected sections were already safe; skipped destructive churn." if protected_only_churn else "Already tight, protected, and materially unchanged."
+            actions = [OptimizationAction("no-op", reason, 0)]
             removed_bloat = []
         return optimized_text, actions, preserved[:8], protected[:8], removed_bloat[:8], warnings[:8], no_op
 
@@ -323,9 +330,18 @@ class OptimizeEngine:
         optimized_lines = [line.rstrip() for line in optimized_text.strip().splitlines()]
         if original_lines == optimized_lines:
             return True
+        if self._normalized_text(original_text) == self._normalized_text(optimized_text):
+            return True
         line_delta = abs(len(optimized_lines) - len(original_lines))
         token_delta = abs(self._stats(original_text).estimated_tokens - self._stats(optimized_text).estimated_tokens)
         return line_delta <= 1 and token_delta <= 4
+
+    def _meaningfully_changed(self, original_text: str, optimized_text: str) -> bool:
+        return self._normalized_text(original_text) != self._normalized_text(optimized_text)
+
+    def _normalized_text(self, text: str) -> str:
+        lines = [re.sub(r"\s+", " ", line).strip() for line in text.splitlines()]
+        return "\n".join(line for line in lines if line).strip()
 
     def _stats(self, text: str) -> OptimizeStats:
         lines = len(text.splitlines())

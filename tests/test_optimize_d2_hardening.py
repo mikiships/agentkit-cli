@@ -3,7 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
+from typer.testing import CliRunner
+
+from agentkit_cli.main import app
 from agentkit_cli.optimize import OptimizeEngine
+
+runner = CliRunner()
 
 
 class _FakeReport:
@@ -106,3 +111,51 @@ Never print secrets.
     assert result.optimized_text == original
     assert result.actions[0].kind == "no-op"
     assert result.line_delta == 0
+    assert result.verdict == "Safe no-op"
+
+
+@patch("agentkit_cli.optimize.get_adapter")
+@patch("agentkit_cli.optimize.RedTeamScorer")
+def test_optimize_protected_only_cleanup_short_circuits_apply(mock_redteam, mock_adapter, tmp_path: Path):
+    path = tmp_path / "CLAUDE.md"
+    original = """# Project Identity
+Ship deterministic repo tooling.
+
+## Safety Boundaries
+Do not bypass approvals.
+Do not bypass approvals.
+Never print secrets.
+"""
+    path.write_text(original, encoding="utf-8")
+    mock_adapter.return_value.agentlint_check_context.return_value = None
+    mock_redteam.return_value.score_resistance.return_value = _FakeReport()
+
+    result = OptimizeEngine(tmp_path).optimize()
+
+    assert result.no_op is True
+    assert result.optimized_text == original
+    assert result.actions[0].description == "Protected sections were already safe; skipped destructive churn."
+
+
+@patch("agentkit_cli.optimize.get_adapter")
+@patch("agentkit_cli.optimize.RedTeamScorer")
+def test_optimize_cli_reports_safe_noop_verdict(mock_redteam, mock_adapter, tmp_path: Path):
+    path = tmp_path / "CLAUDE.md"
+    path.write_text(
+        """# Project
+AgentKit CLI audits AI agent repositories.
+
+## Safety
+Do not bypass approvals.
+Never print secrets.
+""",
+        encoding="utf-8",
+    )
+    mock_adapter.return_value.agentlint_check_context.return_value = None
+    mock_redteam.return_value.score_resistance.return_value = _FakeReport()
+
+    result = runner.invoke(app, ["optimize", "--path", str(tmp_path), "--apply"])
+
+    assert result.exit_code == 0
+    assert "Verdict: Safe no-op" in result.output
+    assert "No rewrite needed" in result.output

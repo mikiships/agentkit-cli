@@ -126,3 +126,15 @@
 **Tests:** `uv run pytest -q tests/test_optimize_smoke.py` -> covered inside focused optimize batch, green
 
 **Next:** D2 protected-section overwrite guardrails
+
+---
+
+## D2: protected-section overwrite guardrails — COMPLETE
+
+**Built:**
+- `agentkit_cli/optimize.py` — added protected-only churn detection so optimize returns a safe no-op instead of rewriting already-safe protected sections, plus normalized no-op comparison to keep deltas bounded and deterministic
+- `tests/test_optimize_d2_hardening.py` — added coverage for protected-only short-circuit behavior and explicit safe no-op CLI verdicts
+
+**Tests:** `uv run pytest -q tests/test_optimize_d2_hardening.py tests/test_optimize_smoke.py` -> 9 passed
+
+**Next:** D3 repo-surface integration coverage
