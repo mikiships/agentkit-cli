@@ -9,7 +9,7 @@ from agentkit_cli.improve_engine import ImproveEngine
 from agentkit_cli.main import app
 import json
 
-from agentkit_cli.models import OptimizeResult, OptimizeStats
+from agentkit_cli.models import OptimizeResult, OptimizeStats, OptimizeSweepResult, OptimizeSweepSummary
 
 runner = CliRunner()
 
@@ -26,6 +26,21 @@ def _opt_result(path: Path, *, no_op: bool = False) -> OptimizeResult:
     )
 
 
+def _sweep(path: Path, *, no_op: bool = False) -> OptimizeSweepResult:
+    result = _opt_result(path, no_op=no_op)
+    return OptimizeSweepResult(
+        root=str(path.parent),
+        results=[result],
+        summary=OptimizeSweepSummary(
+            total_files=1,
+            rewritable_files=0 if no_op else 1,
+            noop_files=1 if no_op else 0,
+            total_line_delta=result.line_delta,
+            total_token_delta=result.token_delta,
+        ),
+    )
+
+
 @patch("agentkit_cli.improve_engine.OptimizeEngine")
 @patch("agentkit_cli.improve_engine._run_harden", return_value=0)
 @patch("agentkit_cli.improve_engine._run_agentmd_generate", return_value=False)
@@ -36,12 +51,12 @@ def test_improve_engine_can_apply_optimize(
 ):
     path = tmp_path / "CLAUDE.md"
     path.write_text("# Project\n\nold\n", encoding="utf-8")
-    mock_optimize.return_value.optimize.return_value = _opt_result(path)
+    mock_optimize.return_value.optimize_sweep.return_value = _sweep(path)
 
     plan = ImproveEngine().run(str(tmp_path), optimize_context=True)
 
     assert "new" in path.read_text(encoding="utf-8")
-    assert any("Optimized CLAUDE.md" in action for action in plan.actions_taken)
+    assert any("Optimized 1 context file(s)" in action for action in plan.actions_taken)
 
 
 @patch("agentkit_cli.improve_engine.ImproveEngine")
@@ -67,7 +82,7 @@ def test_improve_engine_surfaces_optimize_failures_without_aborting(
     mock_score, mock_redteam, mock_generate, mock_harden, mock_optimize, tmp_path: Path
 ):
     (tmp_path / "CLAUDE.md").write_text("# Project\n\nold\n", encoding="utf-8")
-    mock_optimize.return_value.optimize.side_effect = RuntimeError("optimizer exploded")
+    mock_optimize.return_value.optimize_sweep.side_effect = RuntimeError("optimizer exploded")
 
     plan = ImproveEngine().run(str(tmp_path), optimize_context=True)
 
@@ -85,7 +100,7 @@ def test_improve_engine_reports_optimize_safe_noop_honestly(
 ):
     path = tmp_path / "CLAUDE.md"
     path.write_text("# Project\n\nold\n", encoding="utf-8")
-    mock_optimize.return_value.optimize.return_value = _opt_result(path, no_op=True)
+    mock_optimize.return_value.optimize_sweep.return_value = _sweep(path, no_op=True)
 
     plan = ImproveEngine().run(str(tmp_path), optimize_context=True)
 
