@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
+from agentkit_cli.optimize import OptimizeEngine
+
 logger = logging.getLogger(__name__)
 
 # ──────────────────────────────────────────────────────────
@@ -128,6 +130,7 @@ class ImproveEngine:
         no_harden: bool = False,
         dry_run: bool = False,
         min_lift: Optional[float] = None,
+        optimize_context: bool = False,
     ) -> ImprovementPlan:
         """Full improvement workflow.
 
@@ -202,7 +205,26 @@ class ImproveEngine:
             else:
                 actions_skipped.append("redteam hardening (resistance >= 80)")
 
-        # Step 4 — re-score
+        # Step 4 — optional context optimization
+        if optimize_context:
+            try:
+                optimize_result = OptimizeEngine(root).optimize()
+                if optimize_result.optimized_text != optimize_result.original_text:
+                    if dry_run:
+                        actions_skipped.append(
+                            f"context optimization (dry-run, would save {abs(optimize_result.token_delta)} tokens)"
+                        )
+                    else:
+                        Path(optimize_result.source_file).write_text(optimize_result.optimized_text, encoding="utf-8")
+                        actions_taken.append(
+                            f"Optimized {Path(optimize_result.source_file).name} ({optimize_result.line_delta:+d} lines, {optimize_result.token_delta:+d} tokens)"
+                        )
+                else:
+                    actions_skipped.append("context optimization (already tight)")
+            except FileNotFoundError:
+                actions_skipped.append("context optimization (no CLAUDE.md or AGENTS.md found)")
+
+        # Step 5 — re-score
         if dry_run:
             final_score = baseline_score
         else:

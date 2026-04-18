@@ -90,6 +90,7 @@ def run_command(
     improve: bool = False,
     improve_no_generate: bool = False,
     improve_no_harden: bool = False,
+    improve_optimize_context: bool = False,
     improve_threshold: float = 80.0,
     webhook_notify: bool = False,
     checks: Optional[bool] = None,
@@ -675,6 +676,7 @@ def run_command(
                 str(root),
                 no_generate=improve_no_generate,
                 no_harden=improve_no_harden,
+                optimize_context=improve_optimize_context,
             )
             _improve_result = {
                 "baseline": _improve_plan.baseline_score,
