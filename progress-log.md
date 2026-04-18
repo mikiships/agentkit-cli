@@ -195,3 +195,16 @@
 - `uv run pytest -q` -> `4759 passed, 1 warning in 369.84s (0:06:09)`
 
 **Next:** contract complete
+
+---
+
+## D1: repo-level optimize sweep engine — COMPLETE
+
+**Built:**
+- `agentkit_cli/optimize.py` — added deterministic repo discovery for root and nested `CLAUDE.md` / `AGENTS.md` files plus aggregate sweep execution
+- `agentkit_cli/models.py` — added structured sweep summary/result models with per-file rollup metadata for CI and tooling
+- `tests/test_optimize_d1.py` — added coverage for nested discovery ordering and explicit no-context sweep behavior
+
+**Tests:** `uv run pytest -q tests/test_optimize_d1.py` -> 6 passed
+
+**Next:** D2 CLI sweep and check workflow
