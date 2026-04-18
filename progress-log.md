@@ -221,3 +221,15 @@
 **Tests:** `uv run pytest -q tests/test_optimize_d2.py` -> 8 passed
 
 **Next:** D3 aggregated review rendering
+
+---
+
+## D3: aggregated review rendering — COMPLETE
+
+**Built:**
+- `agentkit_cli/renderers/optimize_renderer.py` — added sweep-level text and markdown rendering with totals, per-file verdicts, protected-section signals, and warning summaries
+- `tests/test_optimize_d3.py` — added aggregate renderer coverage for both text and markdown review output
+
+**Tests:** `uv run pytest -q tests/test_optimize_d3.py` -> 4 passed
+
+**Next:** D4 pipeline integration and safety polish
