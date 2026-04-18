@@ -20,5 +20,17 @@
 - Reverted generated noise after test runs (`__pycache__`, `uv.lock`) instead of carrying it forward.
 - Verification: `uv run pytest -q --tb=no tests/test_optimize_d1.py tests/test_optimize_d2.py tests/test_optimize_d2_hardening.py tests/test_optimize_d3.py tests/test_optimize_d4.py tests/test_optimize_realworld.py tests/test_optimize_smoke.py tests/test_release_check.py tests/test_run_command.py tests/test_main.py` passed with 76 tests green.
 
+## D3. Site/pages and docs reconciliation
+- Cherry-picked the shipped v0.98.0 docs/site finalization commit and the chronology clarification follow-up, then resolved conflicts in favor of the shipped v0.98.0 README, changelog, version metadata, build reports, site engine, and published docs surfaces.
+- Kept non-product release logging out of the sync by resolving `progress-log.md` conflicts back to this branch instead of dragging over release-branch narration.
+- Resulting product/docs surface now reflects the optimize sweep and release-check hardening shipped in v0.98.0.
+- Verification: `uv run pytest -q --tb=no tests/test_optimize_d1.py tests/test_optimize_d2.py tests/test_optimize_d2_hardening.py tests/test_optimize_d3.py tests/test_optimize_d4.py tests/test_optimize_realworld.py tests/test_optimize_smoke.py tests/test_release_check.py tests/test_run_command.py tests/test_main.py tests/test_site_command.py tests/test_site_engine.py tests/test_site_integration.py tests/test_site_templates.py tests/test_pages_refresh.py` passed with 194 tests green.
+
+## D4. Validation, hygiene, and handoff
+- Full suite validation: `uv run pytest -q --tb=no` passed with 4759 tests green and 1 warning about optional `anthropic` not being installed for an explain fallback path.
+- Smoke validation: `uv run pytest -m smoke -q --tb=no` passed with 9 tests green.
+- Git hygiene: `git diff --check` returned clean and final `git status --short` is clean.
+- Helper-script note: the contract-requested `scripts/pre-action-recall.sh`, `scripts/check-status-conflicts.sh`, and `scripts/post-agent-hygiene-check.sh` do not exist in this worktree, so I used the available repo-local validation path above instead.
+
 ## Next
-- Reconcile the minimal docs/site surfaces and then run full validation.
+- Ready for handoff.
