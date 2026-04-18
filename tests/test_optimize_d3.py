@@ -16,13 +16,17 @@ def _result() -> OptimizeResult:
         findings=[OptimizeFinding(kind="bloat", severity="medium", message="Repeated line")],
         actions=[OptimizationAction(kind="compress-section", description="Compressed workflow", lines_affected=2)],
         preserved_sections=["Project"],
+        protected_sections=["Project", "Safety"],
         removed_bloat=["Workflow"],
         warnings=["medium: Repeated line"],
+        no_op=False,
     )
 
 
 def test_markdown_renderer_includes_diff_and_sections():
     output = OptimizeRenderer().render(_result(), fmt="markdown")
+    assert "## Verdict" in output
+    assert "## Protected sections preserved" in output
     assert "## Unified diff" in output
     assert "```diff" in output
     assert "-old line" in output
@@ -33,6 +37,18 @@ def test_markdown_renderer_includes_diff_and_sections():
 def test_text_renderer_is_reviewable():
     output = OptimizeRenderer().render(_result(), fmt="text")
     assert "agentkit optimize:" in output
+    assert "Verdict: Changes available" in output
+    assert "Protected sections preserved:" in output
     assert "Preserved:" in output
     assert "Top removed bloat:" in output
     assert "Warnings:" in output
+
+
+def test_renderer_truncates_large_diffs():
+    result = _result()
+    result.original_text = "\n".join([f"line {i}" for i in range(120)]) + "\n"
+    result.optimized_text = "\n".join([f"line {i} updated" for i in range(120)]) + "\n"
+
+    output = OptimizeRenderer().render(result, fmt="text")
+
+    assert "diff truncated, omitted" in output

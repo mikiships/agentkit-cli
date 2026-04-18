@@ -81,5 +81,16 @@
 
 ---
 
+## D3: review UX and apply safety polish — COMPLETE
+
+**Built:**
+- `agentkit_cli/renderers/optimize_renderer.py` — added verdicts, protected-section reporting, and large-diff truncation with explicit omission notice
+- `agentkit_cli/commands/optimize_cmd.py` — `--apply` now skips no-op rewrites and reports when a file is already effectively unchanged
+- `tests/test_optimize_d2.py` and `tests/test_optimize_d3.py` — added no-op apply protection and renderer verdict/protected-section/large-diff coverage
+
+**Tests:** `pytest -q tests/test_optimize_d2.py tests/test_optimize_d3.py tests/test_optimize_d2_hardening.py tests/test_optimize_realworld.py` -> 20 passed
+
+---
+
 ## Next
-- D3 review UX and apply safety polish
+- D4 higher-level workflow hardening
