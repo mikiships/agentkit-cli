@@ -92,5 +92,15 @@
 
 ---
 
+## D4: higher-level workflow hardening — COMPLETE
+
+**Built:**
+- `agentkit_cli/improve_engine.py` — optimize integration now treats no-op results cleanly and surfaces optimize failures as bounded skipped actions instead of aborting the larger improve flow
+- `tests/test_optimize_d4.py` — added coverage for optimize failure surfacing and `agentkit run --improve --improve-optimize-context` passthrough behavior
+
+**Tests:** `pytest -q tests/test_optimize_d4.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 88 passed
+
+---
+
 ## Next
-- D4 higher-level workflow hardening
+- D5 docs, changelog, build report, version prep

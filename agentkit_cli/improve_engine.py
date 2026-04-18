@@ -209,20 +209,21 @@ class ImproveEngine:
         if optimize_context:
             try:
                 optimize_result = OptimizeEngine(root).optimize()
-                if optimize_result.optimized_text != optimize_result.original_text:
-                    if dry_run:
-                        actions_skipped.append(
-                            f"context optimization (dry-run, would save {abs(optimize_result.token_delta)} tokens)"
-                        )
-                    else:
-                        Path(optimize_result.source_file).write_text(optimize_result.optimized_text, encoding="utf-8")
-                        actions_taken.append(
-                            f"Optimized {Path(optimize_result.source_file).name} ({optimize_result.line_delta:+d} lines, {optimize_result.token_delta:+d} tokens)"
-                        )
-                else:
+                if optimize_result.no_op or optimize_result.optimized_text == optimize_result.original_text:
                     actions_skipped.append("context optimization (already tight)")
+                elif dry_run:
+                    actions_skipped.append(
+                        f"context optimization (dry-run, would save {abs(optimize_result.token_delta)} tokens)"
+                    )
+                else:
+                    Path(optimize_result.source_file).write_text(optimize_result.optimized_text, encoding="utf-8")
+                    actions_taken.append(
+                        f"Optimized {Path(optimize_result.source_file).name} ({optimize_result.line_delta:+d} lines, {optimize_result.token_delta:+d} tokens)"
+                    )
             except FileNotFoundError:
                 actions_skipped.append("context optimization (no CLAUDE.md or AGENTS.md found)")
+            except Exception as exc:
+                actions_skipped.append(f"context optimization failed ({exc})")
 
         # Step 5 — re-score
         if dry_run:
