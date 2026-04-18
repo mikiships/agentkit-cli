@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.97.0] - 2026-04-17
+
+### Added
+- `agentkit optimize` command for deterministic dry-run review or in-place optimization of `CLAUDE.md` and `AGENTS.md`, with stats deltas, structured JSON, markdown/text review output, and unified diff rendering.
+- `OptimizeEngine` plus optimize result schemas for local-first context analysis, bloat trimming, stale-instruction cleanup, and risky-instruction removal without LLM dependencies.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` integration so context optimization can compound with the existing improve workflow.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.0 optimize release.
+
 ## [0.96.0] - 2026-04-17
 
 ### Added

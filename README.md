@@ -179,6 +179,33 @@ agentkit run --llmstxt
 agentkit report --llmstxt
 ```
 
+## `agentkit optimize` — Trim stale, risky, bloated context files
+
+`agentkit optimize` reviews an existing `CLAUDE.md` or `AGENTS.md`, detects repeated or risky instructions, renders a deterministic diff, and can optionally apply the tightened rewrite in place.
+
+```bash
+# Safe dry-run review for the current repo
+agentkit optimize
+
+# Review a specific file as markdown
+agentkit optimize --file AGENTS.md --format markdown
+
+# Apply the optimized rewrite in place
+agentkit optimize --apply
+
+# Emit machine-readable JSON
+agentkit optimize --json
+
+# Fold optimize into an existing improve workflow
+agentkit improve --optimize-context
+agentkit run --improve --improve-optimize-context
+```
+
+Caveats:
+- local-first only, no LLM required
+- only targets `CLAUDE.md` and `AGENTS.md`
+- dry-run is the default, so nothing is overwritten unless `--apply` is set
+
 ## `agentkit migrate` — Convert Between AI Agent Context Formats
 
 Developers using Claude Code, Codex, and Gemini CLI each expect different context file formats (`CLAUDE.md`, `AGENTS.md`, `llms.txt`). `agentkit migrate` converts between them automatically.
@@ -313,6 +340,7 @@ agentkit pages-refresh
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
 - `agentkit search [query]` — discover GitHub repos missing CLAUDE.md / AGENTS.md
 - `agentkit frameworks [PATH]` — detect frameworks (Next.js, FastAPI, Django, etc.) and check if your CLAUDE.md/AGENTS.md has framework-specific coverage. Use `--generate` to auto-add missing sections.
+- `agentkit optimize` — review and optionally tighten an existing `CLAUDE.md` or `AGENTS.md`
 - `agentkit hooks install [--path] [--min-score] [--mode git|precommit|both] [--dry-run]` — install pre-commit quality gate hooks.
 - `agentkit hooks status/uninstall/run` — manage installed hooks.
 

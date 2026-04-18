@@ -42,4 +42,17 @@
 
 **Tests:** `pytest -q tests/test_optimize_d4.py` -> 2 passed
 
-**Next:** D5 docs, changelog, build report, version bump, full suite
+---
+
+## D5: docs, changelog, build report, versioning — COMPLETE
+
+**Built:**
+- `README.md` — added `agentkit optimize` documentation, examples, caveats, and integration usage
+- `CHANGELOG.md` — added `0.97.0` release entry
+- `BUILD-REPORT.md` — final optimize build report
+- `agentkit_cli/__init__.py` and `pyproject.toml` — bumped version to `0.97.0`
+
+**Tests:** focused optimize suite green, full suite completed as `4735 passed, 1 warning` in `394.21s`
+
+## Next
+- Commit D5 handoff files
