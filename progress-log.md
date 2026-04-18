@@ -166,15 +166,16 @@
 
 ---
 
-## D2: validation sweep — BLOCKED
+## D2: validation sweep — COMPLETE
 
-**What passed:**
-- `uv run pytest -q tests/test_optimize_smoke.py tests/test_optimize_d2_hardening.py tests/test_optimize_realworld.py tests/test_optimize_d4.py` -> `24 passed in 0.45s`
-- `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py` -> `60 passed in 0.96s`
+**Built:**
+- `docs/index.html` — restored the tracked recently-scored section, scored-stat ids, source-badge/community surface, and fetch/error-handling script expected by the pages refresh/sync contract
+- `tests/test_optimize_d3.py` — aligned the reviewable text renderer assertion with the shipped optimize verdict wording (`Meaningful rewrite available`)
+- `tests/test_watch.py` — hardened the debounce assertion to wait for the callback within a bounded window instead of assuming an exact timing edge
 
-**Blocker found during full-suite gate:**
-- `uv run pytest -q` -> `2 failed, 4757 passed, 1 warning in 376.91s (0:06:16)`
-- unrelated failure class 1: `tests/test_optimize_d3.py::test_text_renderer_is_reviewable` still expects the older verdict text `Changes available`, but the renderer now emits `Meaningful rewrite available`
-- unrelated failure class 2: `tests/test_watch.py::TestChangeHandler::test_last_file_recorded` flaked to `IndexError: list index out of range`, indicating the debounced watch test did not fire within the asserted timing window
+**Tests:**
+- `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py` -> `60 passed in 0.34s`
+- `uv run pytest -q tests/test_pages_refresh.py tests/test_pages_sync_d4.py tests/test_optimize_d3.py tests/test_watch.py tests/test_optimize_smoke.py tests/test_optimize_d2_hardening.py tests/test_optimize_realworld.py tests/test_optimize_d4.py` -> `104 passed in 2.27s`
+- `uv run pytest -q` -> `4759 passed, 1 warning in 369.84s (0:06:09)`
 
-**Next:** stop under contract and hand off a precise blocker report instead of widening scope beyond the pages/docs unblock plus held-back v0.97.2 handoff
+**Next:** D3 release handoff hygiene

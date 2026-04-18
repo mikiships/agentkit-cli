@@ -37,7 +37,7 @@ def test_markdown_renderer_includes_diff_and_sections():
 def test_text_renderer_is_reviewable():
     output = OptimizeRenderer().render(_result(), fmt="text")
     assert "agentkit optimize:" in output
-    assert "Verdict: Changes available" in output
+    assert "Verdict: Meaningful rewrite available" in output
     assert "Protected sections preserved:" in output
     assert "Preserved:" in output
     assert "Top removed bloat:" in output
