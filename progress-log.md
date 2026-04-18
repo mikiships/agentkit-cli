@@ -138,3 +138,16 @@
 **Tests:** `uv run pytest -q tests/test_optimize_d2_hardening.py tests/test_optimize_smoke.py` -> 9 passed
 
 **Next:** D3 repo-surface integration coverage
+
+---
+
+## D3: repo-surface integration coverage — COMPLETE
+
+**Built:**
+- `tests/fixtures/optimize/repo-handbook.md` and `.json` — added a repo-style AGENTS/CLAUDE-shaped fixture with long rules, operator boundaries, and realistic command sections
+- `tests/test_optimize_realworld.py` — extended fixture-driven integration coverage to the repo-style document and second-pass stability
+- `agentkit_cli/improve_engine.py` and `tests/test_optimize_d4.py` — improve integration now reports optimize safe no-ops honestly and keeps failures bounded/readable
+
+**Tests:** `uv run pytest -q tests/test_optimize_realworld.py tests/test_optimize_d4.py tests/test_improve.py tests/test_run.py tests/test_run_command.py` -> 99 passed
+
+**Next:** D4 release handoff hygiene

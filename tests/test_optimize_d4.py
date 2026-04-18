@@ -75,6 +75,24 @@ def test_improve_engine_surfaces_optimize_failures_without_aborting(
     assert plan.final_score == 82.0
 
 
+@patch("agentkit_cli.improve_engine.OptimizeEngine")
+@patch("agentkit_cli.improve_engine._run_harden", return_value=0)
+@patch("agentkit_cli.improve_engine._run_agentmd_generate", return_value=False)
+@patch("agentkit_cli.improve_engine._get_redteam_score", return_value=90.0)
+@patch("agentkit_cli.improve_engine._get_score", side_effect=[82.0, 82.0])
+def test_improve_engine_reports_optimize_safe_noop_honestly(
+    mock_score, mock_redteam, mock_generate, mock_harden, mock_optimize, tmp_path: Path
+):
+    path = tmp_path / "CLAUDE.md"
+    path.write_text("# Project\n\nold\n", encoding="utf-8")
+    mock_optimize.return_value.optimize.return_value = _opt_result(path, no_op=True)
+
+    plan = ImproveEngine().run(str(tmp_path), optimize_context=True)
+
+    assert "context optimization (safe no-op, already tight)" in plan.actions_skipped
+    assert plan.actions_taken == []
+
+
 @patch("agentkit_cli.commands.run_cmd.is_installed", return_value=False)
 @patch("agentkit_cli.improve_engine.ImproveEngine")
 def test_run_cli_forwards_improve_optimize_context(mock_engine, mock_installed, tmp_path: Path):
