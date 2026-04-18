@@ -1,8 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-from agentkit_cli.models import OptimizeFinding, OptimizeResult, OptimizeStats, OptimizationAction
+from agentkit_cli.models import (
+    OptimizeFinding,
+    OptimizeResult,
+    OptimizeStats,
+    OptimizationAction,
+    OptimizeSweepResult,
+    OptimizeSweepSummary,
+)
 from agentkit_cli.renderers.optimize_renderer import OptimizeRenderer
 
 
@@ -52,3 +57,28 @@ def test_renderer_truncates_large_diffs():
     output = OptimizeRenderer().render(result, fmt="text")
 
     assert "diff truncated, omitted" in output
+
+
+def test_sweep_renderer_includes_aggregate_sections():
+    sweep = OptimizeSweepResult(
+        root="/tmp/repo",
+        results=[_result()],
+        summary=OptimizeSweepSummary(
+            total_files=1,
+            rewritable_files=1,
+            noop_files=0,
+            total_line_delta=-1,
+            total_token_delta=-1,
+            protected_signal_files=1,
+            warnings_count=1,
+        ),
+    )
+
+    text_output = OptimizeRenderer().render(sweep, fmt="text")
+    markdown_output = OptimizeRenderer().render(sweep, fmt="markdown")
+
+    assert "agentkit optimize sweep:" in text_output
+    assert "Per-file summary:" in text_output
+    assert "# agentkit optimize sweep" in markdown_output
+    assert "## Totals" in markdown_output
+    assert "## `/tmp/CLAUDE.md`" in markdown_output
