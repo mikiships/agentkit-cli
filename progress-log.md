@@ -20,4 +20,14 @@
 
 **Tests:** `pytest -q tests/test_optimize_d2.py` -> 5 passed
 
-**Next:** D3 reviewable diff/report output
+---
+
+## D3: reviewable diff/report output — COMPLETE
+
+**Built:**
+- `agentkit_cli/renderers/optimize_renderer.py` — deterministic text and markdown review output with unified diff blocks
+- `tests/test_optimize_d3.py` — markdown/text renderer coverage for stats, sections, and diff output
+
+**Tests:** `pytest -q tests/test_optimize_d3.py` -> 2 passed
+
+**Next:** D4 bounded integration through `agentkit improve`
