@@ -246,6 +246,10 @@ header nav a:hover { color: var(--text); }
   margin-bottom: 0.35rem;
 }
 .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.source-badge { display: inline-block; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.3rem; }
+.source-ecosystem { background: rgba(63,185,80,0.15); color: var(--accent); }
+.source-community { background: rgba(88,166,255,0.15); color: var(--blue); }
+.source-manual { background: rgba(230,180,90,0.15); color: #e6b45a; }
 
 /* ── Container ── */
 .container { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem; }
@@ -462,6 +466,41 @@ _SCROLL_JS = """<script>
   }, { threshold: 0.1 });
   bars.forEach(function(b) { bioS.observe(b); });
 })();
+
+// Dynamic leaderboard data from data.json
+function gradeClass(g) { return 'grade-' + (g || 'c').toLowerCase(); }
+function renderRecentlyScored(data) {
+  var el = document.getElementById('recently-scored-list');
+  if (!el) return;
+  var top = data.repos ? data.repos.slice(0, 5) : [];
+  var html = '<ul class="repo-list">';
+  top.forEach(function(r) {
+    var src = r.source || 'ecosystem';
+    var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+    var srcClass = 'source-' + srcLabel;
+    html += '<li class="repo-item">'
+      + '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener" class="repo-name">' + (r.name || '') + '</a>'
+      + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+      + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+      + '<span class="score-val">' + (r.score || 0) + '</span>'
+      + '<span class="grade ' + gradeClass(r.grade) + '">' + (r.grade || '') + '</span>'
+      + '</li>';
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+  var statEl = document.getElementById('repos-scored-stat');
+  if (statEl && data.stats && data.stats.total) { statEl.textContent = data.stats.total; }
+  var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+  var commEl = document.getElementById('community-scored-stat');
+  if (commEl) { commEl.textContent = communityCount; }
+}
+fetch('/agentkit-cli/data.json')
+  .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+  .then(renderRecentlyScored)
+  .catch(function() {
+    var el = document.getElementById('recently-scored-list');
+    if (el) el.innerHTML = '<p style="color:var(--muted)">Score data unavailable.</p>';
+  });
 </script>"""
 
 _PAGE_TEMPLATE = """<!DOCTYPE html>
@@ -624,8 +663,19 @@ class SiteEngine:
           <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4350</div><div class="stat-label">Tests</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">86</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
+
+        <!-- Recently Scored (populated dynamically from data.json) -->
+        <section class="recently-scored-section" id="recently-scored">
+          <div class="container">
+            <h2 class="section-title">Recently Scored</h2>
+            <div id="recently-scored-list" class="recently-scored-list">
+              <p style="color:var(--muted)">Loading...</p>
+            </div>
+          </div>
+        </section>
 
         <!-- Feature grid -->
         <section class="features-section">
@@ -714,6 +764,7 @@ agentkit quickstart</code></pre>
           <div class="ecosystem-pills">{topics_pills}</div>
           {table_html}
         </div>"""
+        body += self._recently_scored_fetch_script()
 
         meta = PageMeta(
             title="agentkit — Agent Quality Rankings",
@@ -730,6 +781,59 @@ agentkit quickstart</code></pre>
         })
         html = self._render_page(body, meta, json_ld)
         return SitePage(path="index.html", html=html, meta=meta)
+
+    def _recently_scored_fetch_script(self) -> str:
+        return """
+<script>
+(function() {
+  function gradeClass(g) {
+    return {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d','F':'grade-f'}[g] || '';
+  }
+  function renderRecentlyScored(data) {
+    var el = document.getElementById('recently-scored-list');
+    if (!el) return;
+    if (!data || !data.repos || !data.repos.length) {
+      el.innerHTML = '<p class="loading-msg">No data available.</p>';
+      return;
+    }
+    var top = data.repos.slice(0, 5);
+    var html = '<ul class="repo-list">';
+    top.forEach(function(r) {
+      var src = r.source || 'ecosystem';
+      var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+      var srcClass = 'source-' + srcLabel;
+      html += '<li class="repo-item">'
+        + '<a href="' + r.url + '" target="_blank" rel="noopener" class="repo-name">' + r.name + '</a>'
+        + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+        + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+        + '<span class="score-val">' + r.score + '</span>'
+        + '<span class="grade ' + gradeClass(r.grade) + '">' + r.grade + '</span>'
+        + '</li>';
+    });
+    html += '</ul>';
+    if (data.stats) {
+      html += '<p class="data-ts">Updated: ' + (data.generated_at ? data.generated_at.slice(0,10) : '') + '</p>';
+    }
+    el.innerHTML = html;
+    var statEl = document.getElementById('repos-scored-stat') || document.querySelector('.stat-num');
+    if (statEl && data.stats && data.stats.total) statEl.textContent = data.stats.total;
+    var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+    var commEl = document.getElementById('community-scored-stat');
+    if (commEl) commEl.textContent = communityCount;
+    var badge = document.querySelector('.hero-badge');
+    if (badge && data.stats && data.stats.total) {
+      badge.textContent = badge.textContent.replace(/\\d+ repos scored/, data.stats.total + ' repos scored');
+    }
+  }
+  fetch('/agentkit-cli/data.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(renderRecentlyScored)
+    .catch(function() {
+      var el = document.getElementById('recently-scored-list');
+      if (el) el.innerHTML = '<p class="loading-msg">Score data unavailable.</p>';
+    });
+})();
+</script>"""
 
     def generate_topic_page(self, topic: str) -> SitePage:
         """Generate topic/{topic}.html."""

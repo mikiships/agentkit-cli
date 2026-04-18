@@ -1,5 +1,62 @@
 # Changelog
 
+## [0.98.0] - 2026-04-18
+
+### Added
+- `agentkit optimize --all` repo sweep mode for deterministic discovery of nested `CLAUDE.md` and `AGENTS.md` files, aggregate per-file review data, and machine-readable repo summaries.
+- `agentkit optimize --check` CI-friendly exit behavior that fails only when at least one context file has a meaningful rewrite available.
+
+### Changed
+- optimize review rendering now supports aggregate text and markdown summaries with per-file verdicts, protected-section signals, warning summaries, and repo totals.
+- `agentkit improve --optimize-context` now uses repo sweep semantics so broader workflows can safely optimize multiple context files in one pass.
+
+### Docs
+- README, BUILD-REPORT, BUILD-REPORT-v0.98.0, and progress log updated for the v0.98.0 optimize sweep release.
+
+## [0.97.2] - 2026-04-18
+
+### Changed
+- Added CLI-level smoke coverage for `agentkit optimize` dry-run and `--apply` flows on realistic context files, including second-pass safe no-op behavior.
+- Restored the tracked GitHub Pages front-page hooks and stat ids required by `pages-refresh` and `pages-sync` validation, so optimize release gating no longer trips over a stale `docs/index.html` surface.
+- Aligned optimize review rendering tests with the shipped `Meaningful rewrite available` verdict wording and hardened the watch debounce regression test against timing flakes.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.2 optimize smoke-and-guardrails follow-up.
+
+## [0.97.1] - 2026-04-18
+
+### Changed
+- Hardened `agentkit optimize` with real-world fixture coverage, stronger protected-section preservation for identity/autonomy/user-critical content, and deterministic no-op detection for already-tight context files.
+- `agentkit optimize` review output now highlights protected sections, reports a clear no-op verdict, truncates very large diffs more safely, and skips `--apply` rewrites when the optimized candidate is effectively unchanged.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` now surface optimize failures as bounded workflow messages instead of corrupting the broader improvement pass.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.1 optimize hardening follow-up.
+
+## [0.97.0] - 2026-04-17
+
+### Added
+- `agentkit optimize` command for deterministic dry-run review or in-place optimization of `CLAUDE.md` and `AGENTS.md`, with stats deltas, structured JSON, markdown/text review output, and unified diff rendering.
+- `OptimizeEngine` plus optimize result schemas for local-first context analysis, bloat trimming, stale-instruction cleanup, and risky-instruction removal without LLM dependencies.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` integration so context optimization can compound with the existing improve workflow.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.0 optimize release.
+
+## [0.96.0] - 2026-04-17
+
+### Added
+- `agentkit release-check` now hardens the full shipped-release surface with explicit `tests`, `smoke_tests`, `git_push`, `git_tag`, and `registry` checks, plus deterministic markdown summary output for CI and GitHub step summaries.
+- `agentkit run --release-check` now appends release verification to the normal pipeline and includes the embedded release-check payload in JSON output.
+
+### Changed
+- Git branch and upstream validation now fail clearly on dirty worktrees, detached HEAD, missing upstream configuration, and missing local upstream refs.
+- Local and remote tag verification now compare the release tag against `HEAD` correctly, including annotated tags via peeled refs.
+- Release-check verdict propagation now updates final pipeline counts, saved last-run state, webhook payloads, and GitHub Checks conclusions consistently.
+
+### Docs
+- README, BUILD-REPORT, and release-hardening progress log updated for the v0.96.0 release-check handoff.
+
 ## [0.95.1] - 2026-03-23
 
 ### Fixed
