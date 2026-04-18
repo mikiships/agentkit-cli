@@ -53,6 +53,7 @@ from agentkit_cli.commands.certify_cmd import certify_app
 from agentkit_cli.commands.timeline_cmd import timeline_command
 from agentkit_cli.commands.explain_cmd import explain_command
 from agentkit_cli.commands.improve import improve_command
+from agentkit_cli.commands.optimize_cmd import optimize_command
 from agentkit_cli.commands.monitor import monitor_app
 from agentkit_cli.commands.webhook import webhook_app
 from agentkit_cli.commands.checks_cmd import checks_app
@@ -174,6 +175,7 @@ def run(
     run_improve: bool = typer.Option(False, "--improve", help="After run, auto-improve if score < threshold"),
     improve_no_generate: bool = typer.Option(False, "--improve-no-generate", help="Skip context generation in --improve"),
     improve_no_harden: bool = typer.Option(False, "--improve-no-harden", help="Skip hardening in --improve"),
+    improve_optimize_context: bool = typer.Option(False, "--improve-optimize-context", help="Also run context optimization inside --improve"),
     improve_threshold: float = typer.Option(80.0, "--improve-threshold", help="Score threshold below which --improve runs (default 80)"),
     webhook_notify: bool = typer.Option(False, "--webhook-notify", help="POST result to configured webhook URL after run"),
     checks: Optional[bool] = typer.Option(None, "--checks/--no-checks", help="Post a GitHub Check Run (default: auto-detect GitHub Actions env)"),
@@ -199,7 +201,7 @@ def run(
     run_pages: bool = typer.Option(False, "--pages", help="Add result to leaderboard (docs/data.json) after run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, release_check=release_check, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, release_check=release_check, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_optimize_context=improve_optimize_context, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
     if run_pages:
         try:
             from agentkit_cli.pages_sync_engine import SyncEngine
@@ -1171,6 +1173,7 @@ def improve(
     min_lift: Optional[float] = typer.Option(None, "--min-lift", help="Exit 1 if score delta < N"),
     pr: bool = typer.Option(False, "--pr", help="Open a GitHub PR with changes after improving"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Plan without applying changes"),
+    optimize_context: bool = typer.Option(False, "--optimize-context", help="Also run agentkit optimize inside improve"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
     share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
@@ -1183,10 +1186,24 @@ def improve(
         min_lift=min_lift,
         pr=pr,
         dry_run=dry_run,
+        optimize_context=optimize_context,
         json_output=json_output,
         share=share,
         output=output,
     )
+
+
+@app.command("optimize")
+def optimize(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory (default: cwd)"),
+    file: Optional[Path] = typer.Option(None, "--file", help="Explicit CLAUDE.md or AGENTS.md target"),
+    apply: bool = typer.Option(False, "--apply", help="Overwrite the targeted context file"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write review or optimized content to file"),
+    json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
+    fmt: str = typer.Option("text", "--format", help="Review format: text or markdown"),
+) -> None:
+    """Optimize an existing CLAUDE.md or AGENTS.md file."""
+    optimize_command(path=path, file=file, apply=apply, output=output, json_output=json_output, fmt=fmt)
 
 
 @app.command("migrate")
