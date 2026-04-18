@@ -69,5 +69,17 @@
 
 ---
 
+## D2: protected-section and no-op hardening — COMPLETE
+
+**Built:**
+- `agentkit_cli/optimize.py` — expanded protected-section detection for identity, autonomy, user-critical, and safety headings; low-signal section dropping after risky-content cleanup; deterministic no-op detection
+- `agentkit_cli/models.py` — added `protected_sections` and `no_op` result fields
+- `tests/test_optimize_d2_hardening.py` — coverage for protected section preservation, low-signal/risky cleanup, and no-op behavior
+- `tests/test_optimize_d1.py` — updated action expectations for the new low-signal drop path
+
+**Tests:** `pytest -q tests/test_optimize_d1.py tests/test_optimize_d2.py tests/test_optimize_d3.py tests/test_optimize_d4.py tests/test_optimize_realworld.py tests/test_optimize_d2_hardening.py` -> 24 passed
+
+---
+
 ## Next
-- D2 protected-section and no-op hardening
+- D3 review UX and apply safety polish
