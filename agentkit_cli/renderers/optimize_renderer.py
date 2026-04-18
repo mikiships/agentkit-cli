@@ -15,10 +15,9 @@ class OptimizeRenderer:
         return self._text(result)
 
     def _text(self, result: OptimizeResult) -> str:
-        verdict = "No-op, already tight" if result.no_op else "Changes available"
         lines = [
             f"agentkit optimize: {result.source_file}",
-            f"Verdict: {verdict}",
+            f"Verdict: {result.verdict}",
             f"Lines: {result.original_stats.lines} -> {result.optimized_stats.lines} ({result.line_delta:+d})",
             f"Tokens: {result.original_stats.estimated_tokens} -> {result.optimized_stats.estimated_tokens} ({result.token_delta:+d})",
             "",
@@ -47,7 +46,7 @@ class OptimizeRenderer:
             "",
             "## Verdict",
             "",
-            f"**{'No-op, already tight' if result.no_op else 'Changes available'}**",
+            f"**{result.verdict}**",
             "",
             "## Stats",
             "",

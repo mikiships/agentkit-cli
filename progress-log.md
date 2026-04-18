@@ -117,5 +117,12 @@
 
 ---
 
-## Next
-- Contract complete
+## D1: black-box optimize smoke harness — COMPLETE
+
+**Built:**
+- `tests/test_optimize_smoke.py` — CLI-level smoke coverage for dry-run verdicts on realistic fixtures, apply-once behavior, and second-pass safe no-op behavior
+- `agentkit_cli/models.py`, `agentkit_cli/renderers/optimize_renderer.py`, and `agentkit_cli/commands/optimize_cmd.py` — surfaced stable optimize verdicts so smoke tests can assert real user-facing outcomes
+
+**Tests:** `uv run pytest -q tests/test_optimize_smoke.py` -> covered inside focused optimize batch, green
+
+**Next:** D2 protected-section overwrite guardrails

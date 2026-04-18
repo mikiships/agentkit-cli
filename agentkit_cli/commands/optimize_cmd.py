@@ -49,7 +49,7 @@ def optimize_command(
             if applied:
                 console.print(f"[green]Applied optimized context to[/green] {result.source_file}\n")
             else:
-                console.print(f"[cyan]No rewrite needed for[/cyan] {result.source_file}\n")
+                console.print(f"[cyan]No rewrite needed for[/cyan] {result.source_file} ([bold]{result.verdict}[/bold])\n")
         console.print(review, end="")
 
     if output:
