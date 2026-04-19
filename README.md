@@ -128,6 +128,46 @@ Explicit CLI flags always override profile values:
 agentkit gate --profile strict --min-score 99
 ```
 
+## `agentkit project` — one canonical context, many projections
+
+Use one canonical context source and fan it out into the filenames different tools now expect.
+
+```bash
+# Review what agentkit would project from the best detected source file
+agentkit project
+
+# Write every supported target next to the canonical source
+agentkit project --targets all --write
+
+# Project only the surfaces your team needs
+agentkit project --targets claude,agent,gemini,copilot --write
+
+# CI drift check, exits non-zero when requested targets are missing or out of date
+agentkit project --targets claude,gemini,llmstxt --check
+
+# Write projections into a separate directory
+agentkit project --targets all --output-dir .agent-context --write
+```
+
+Supported targets:
+- `agents` -> `AGENTS.md`
+- `claude` -> `CLAUDE.md`
+- `agent` -> `AGENT.md`
+- `gemini` -> `GEMINI.md`
+- `copilot` -> `COPILOT.md`
+- `llmstxt` -> `llms.txt`
+
+When to use which command:
+- `agentkit project` when you already have one canonical context file and want deterministic fan-out or drift checks.
+- `agentkit migrate` when you want a one-off conversion from one format into another specific target.
+- `agentkit sync` when you want the classic repo-local health check or to repair missing stale projections from the detected canonical source.
+
+You can also hook projection fan-out into initialization:
+
+```bash
+agentkit init --project-targets claude,gemini --write-projections
+```
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.

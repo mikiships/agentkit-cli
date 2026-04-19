@@ -50,3 +50,16 @@
 **Tests:** `uv run pytest -q tests/test_init.py tests/test_init_projections.py` -> 11 passed
 
 **Next:** D5 docs, release notes, version bump, and full-suite hygiene.
+
+---
+
+## D5: docs, release notes, and versioning — COMPLETE
+
+**Built:**
+- `README.md` usage guidance for canonical-source projection workflows, plus clear guidance on when to use `project` vs `migrate` vs `sync`.
+- `CHANGELOG.md`, `BUILD-REPORT.md`, `pyproject.toml`, and `agentkit_cli/__init__.py` updated for `0.99.0`.
+- Progress log now records the full deliverable path for the release pass.
+
+**Tests:** focused command coverage already exercises the README-adjacent projection flows; full-suite validation is next.
+
+**Next:** final full-suite run and repo-local hygiene sweep.

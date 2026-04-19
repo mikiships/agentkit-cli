@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.99.0] - 2026-04-18
+
+### Added
+- `agentkit project` for projecting one canonical context source into `AGENTS.md`, `CLAUDE.md`, `AGENT.md`, `GEMINI.md`, `COPILOT.md`, and `llms.txt` with dry-run, write, output-dir, drift-check, and JSON reporting modes.
+- Shared `context_projections` engine with deterministic target metadata, source auto-detection priority, projection generation, and hash-backed drift detection.
+
+### Changed
+- `agentkit sync` now understands the expanded projection set while preserving the classic trio check behavior for existing repos.
+- `agentkit init` can optionally fan out projections immediately with `--project-targets` and `--write-projections`.
+- `agentkit migrate` now resolves the wider target alias set through the shared projection engine.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.99.0 context projection release.
+
 ## [0.98.0] - 2026-04-18
 
 ### Added
