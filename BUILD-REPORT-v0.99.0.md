@@ -2,7 +2,7 @@
 
 Date: 2026-04-19
 Builder: subagent mainline RC convergence pass
-Contract: all-day-build-contract-agentkit-cli-v0.99.0-mainline-rc.md
+Contract: all-day-build-contract-agentkit-cli-v0.99.0-release.md
 Prior feature contract: all-day-build-contract-agentkit-cli-v0.99.0-context-projections.md
 
 ## Summary
@@ -25,8 +25,8 @@ This branch is the local v0.99.0 release-candidate convergence pass. It preserve
 
 ## Test Results
 
-- focused projection coverage on `rc/v0.99.0-mainline`: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.41s`
-- final full suite on `rc/v0.99.0-mainline`: `uv run pytest -q` -> `4775 passed, 1 warning in 123.64s (0:02:03)`
+- focused projection coverage on `rc/v0.99.0-mainline`: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.37s`
+- final full suite on `rc/v0.99.0-mainline`: `uv run pytest -q` -> `4775 passed, 1 warning in 126.39s (0:02:06)`
 
 ## Release Notes
 
@@ -41,7 +41,7 @@ This branch is the local v0.99.0 release-candidate convergence pass. It preserve
 
 - branch: `rc/v0.99.0-mainline`
 - HEAD at D4 completion: final D4 commit on `rc/v0.99.0-mainline` (report this commit hash from `git rev-parse --short HEAD` at handoff)
-- targeted validation: `84 passed`
-- full suite: `4775 passed, 1 warning`
+- targeted validation: `84 passed in 1.37s`
+- full suite: `4775 passed, 1 warning in 126.39s (0:02:06)`
 - working tree: clean
 - RC verdict: v0.99.0 is release-ready locally

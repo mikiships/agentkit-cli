@@ -115,6 +115,25 @@
 
 ---
 
+## Release D1: verification baseline and contradiction cleanup — COMPLETE
+
+**Built:**
+- read `BUILD-REPORT-v0.99.0.md`, `BUILD-REPORT.md`, `progress-log.md`, and `pyproject.toml` to confirm all surfaces still describe v0.99.0 as local release-ready, not shipped
+- ran `pre-action-recall.sh` and `check-status-conflicts.sh`; both confirmed no shipped-vs-blocked contradiction narrative before external release work
+- refreshed both build reports to point at the active release contract and to record exact rerun validation timings from this repo checkout
+
+**Tests:**
+- `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.37s`
+- `uv run pytest -q` -> `4775 passed, 1 warning in 126.39s (0:02:06)`
+
+**External proof:**
+- recall/handoff state confirms v0.99.0 is still pending push, tag, and publish
+- contradiction scan: `No contradictory success/blocker narratives found.`
+
+**Next:** D2 release branch and tag verification against origin.
+
+---
+
 ## D5: docs, release notes, and versioning — COMPLETE
 
 **Built:**
