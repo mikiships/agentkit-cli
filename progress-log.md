@@ -55,18 +55,22 @@
 
 ## D5: docs, build report, versioning, and final validation — COMPLETE
 
-**Built:**
-- Updated `README.md`, `CHANGELOG.md`, `BUILD-REPORT.md`, and added `BUILD-REPORT-v1.1.0.md` for the burn observability release.
-- Built `dist/agentkit_cli-1.1.0.tar.gz` and `dist/agentkit_cli-1.1.0-py3-none-any.whl` with `uv build`.
-- Pushed release branch `feat/v1.1.0-burn-observability` to origin and created/pushed annotated tag `v1.1.0`.
-- Published `agentkit-cli==1.1.0` to PyPI and verified the version-specific registry JSON lists both release artifacts.
-- Bumped version metadata to `1.1.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and the editable package entry in `uv.lock`.
-- Reconciled the build-report surface with the existing suite, updated the main version test, and ran the contract helper scripts before final status.
+**Built and verified:**
+- Confirmed the release metadata still reports `1.1.0` in `pyproject.toml` and `agentkit_cli/__init__.py`.
+- Re-ran the contradiction scan and hygiene check from the workspace support scripts, both clean.
+- Re-ran the focused burn validation slice plus `tests/test_main.py`, then re-ran the full suite on the current branch state.
+- Verified the shipped registry state directly from the version-specific PyPI JSON for `agentkit-cli==1.1.0`.
+- Reconciled `BUILD-REPORT.md` and `BUILD-REPORT-v1.1.0.md` to the actual chronology: branch head is now `0c47a5a`, while the shipped `v1.1.0` tag and PyPI release remain on `a704a06`.
 
-**Tests:**
-- `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `24 passed in 0.44s`
-- `uv run pytest -q` -> `4811 passed, 1 warning in 134.73s (0:02:14)`
+**Tests and checks:**
+- `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py tests/test_main.py` -> `31 passed in 0.80s`
+- `uv run pytest -q` -> `4811 passed, 1 warning in 128.98s (0:02:08)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.1.0-burn-observability` -> `0 findings`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.1.0-burn-observability` -> `0 findings`
+- PyPI verification -> live with `agentkit_cli-1.1.0.tar.gz` and `agentkit_cli-1.1.0-py3-none-any.whl`
 
-**Final status:** shipped. All four release surfaces were confirmed directly in this pass: tests green, branch pushed, annotated tag pushed, and `agentkit-cli==1.1.0` live on PyPI.
+**Audit notes:**
+- The contract referenced repo-local helper scripts, but this repo does not contain them. The equivalent workspace support scripts were used for the required contradiction and hygiene checks.
+- The branch and tag no longer point to the same commit. That is now documented explicitly instead of being reported as one commit.
+
+**Final status:** shipped and reconciled. The release is live, validation is green, and the report surfaces now match the actual branch, tag, and PyPI state.
