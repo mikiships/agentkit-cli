@@ -37,3 +37,16 @@
 **Tests:** `uv run pytest -q tests/test_sync_projections.py tests/test_migrate_cmd.py` -> 19 passed
 
 **Next:** D4 workflow integration through an existing high-leverage command.
+
+---
+
+## D4: workflow integration — COMPLETE
+
+**Built:**
+- `agentkit_cli/commands/init_cmd.py` gained optional `--project-targets` and `--write-projections` so init can fan out from one canonical source immediately or report the next step safely.
+- `tests/test_init_projections.py` proves the init integration path works in both write and report-first modes.
+- Existing init tests still pass with the added projection-aware workflow.
+
+**Tests:** `uv run pytest -q tests/test_init.py tests/test_init_projections.py` -> 11 passed
+
+**Next:** D5 docs, release notes, version bump, and full-suite hygiene.
