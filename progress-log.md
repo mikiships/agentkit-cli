@@ -87,3 +87,16 @@
 **Tests:** `uv run pytest -q tests/test_contract_d1.py` -> `4 passed`
 
 **Next:** D2 `agentkit contract` CLI wiring.
+
+---
+
+## D2: `agentkit contract` CLI command — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/contract_cmd.py` and wired `agentkit contract <objective>` into `agentkit_cli/main.py`.
+- Added support for `--path`, `--output`, `--title`, repeated `--deliverable`, repeated `--test-requirement`, and deterministic `--json` metadata.
+- Added guardrails for missing paths and overwrite refusal when the destination contract already exists.
+
+**Tests:** `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py` -> `8 passed in 1.94s`
+
+**Next:** D3 source-aware scaffolding and defaults.

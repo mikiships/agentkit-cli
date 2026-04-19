@@ -62,6 +62,7 @@ from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.project_cmd import project_command
 from agentkit_cli.commands.source_cmd import source_command
+from agentkit_cli.commands.contract_cmd import contract_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
@@ -1296,6 +1297,28 @@ def project(
 ) -> None:
     """Project one canonical context source into multiple target files."""
     project_command(path=path, from_format=from_format, targets=targets, output_dir=output_dir, check=check, write=write, json_output=json_output)
+
+
+@app.command("contract")
+def contract(
+    objective: str = typer.Argument(..., help="Project objective to turn into a build contract"),
+    path: Optional[str] = typer.Option(None, "--path", help="Project directory (default: .)"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Write contract to this file"),
+    title: Optional[str] = typer.Option(None, "--title", help="Override contract title"),
+    deliverable: Optional[List[str]] = typer.Option(None, "--deliverable", help="Repeatable deliverable checklist item"),
+    test_requirement: Optional[List[str]] = typer.Option(None, "--test-requirement", help="Repeatable test requirement"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+) -> None:
+    """Generate a deterministic all-day build contract for a repo objective."""
+    contract_command(
+        objective=objective,
+        path=path,
+        output=output,
+        title=title,
+        deliverable=deliverable,
+        test_requirement=test_requirement,
+        json_output=json_output,
+    )
 
 
 @app.command("llmstxt")
