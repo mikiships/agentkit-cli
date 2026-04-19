@@ -25,7 +25,7 @@ def test_workflow_triggers_on_main():
 def test_workflow_updates_stats():
     content = WORKFLOW.read_text()
     assert "pages-refresh --from-existing-data" in content
-    assert "frontdoor-test-count" in content
+    assert "git add docs/data.json docs/index.html" in content
 
 
 def test_readme_has_docs_badge():

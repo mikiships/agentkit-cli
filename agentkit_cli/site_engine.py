@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,6 +24,47 @@ _FRONTDOOR_VERSION_COUNT = 111
 _FRONTDOOR_PACKAGE_COUNT = 6
 
 
+def _git_output(*args: str) -> str:
+    try:
+        return subprocess.check_output(["git", *args], stderr=subprocess.DEVNULL, text=True).strip()
+    except Exception:
+        return ""
+
+
+def _latest_release_version() -> str:
+    tag = _git_output("tag", "--list", "v[0-9]*.[0-9]*.[0-9]*", "--sort=-version:refname").splitlines()[:1]
+    if tag and tag[0].startswith("v"):
+        return tag[0][1:]
+    return _FRONTDOOR_VERSION
+
+
+def _released_test_count(version: str) -> int:
+    tag = f"v{version}"
+    for path in ("BUILD-REPORT.md", f"BUILD-REPORT-v{version}.md"):
+        content = _git_output("show", f"{tag}:{path}")
+        if not content:
+            continue
+        for pattern in (
+            r"final full suite: .*?-> `([0-9]+) passed",
+            r"-> `([0-9]+) passed,",
+            r"`([0-9]+) passed",
+        ):
+            match = re.search(pattern, content, re.IGNORECASE)
+            if match:
+                return int(match.group(1))
+    return _FRONTDOOR_TEST_COUNT
+
+
+def _released_frontdoor_defaults() -> dict[str, int | str]:
+    version = _latest_release_version()
+    return {
+        "version": version,
+        "tests": _released_test_count(version),
+        "versions": _version_stat_from_version(version),
+        "packages": _FRONTDOOR_PACKAGE_COUNT,
+    }
+
+
 def build_frontdoor_stats(
     existing: Optional[dict[str, Any]] = None,
     *,
@@ -31,15 +73,15 @@ def build_frontdoor_stats(
     versions: Optional[int] = None,
     packages: Optional[int] = None,
     refreshed_at: Optional[str] = None,
+    prefer_existing: bool = True,
 ) -> dict[str, Any]:
     """Build the canonical front-door stats payload shared by data.json and index.html."""
     existing = existing or {}
-    resolved_version = version or existing.get("version") or _FRONTDOOR_VERSION
-    resolved_tests = tests if tests is not None else existing.get("tests", _FRONTDOOR_TEST_COUNT)
-    resolved_versions = versions if versions is not None else existing.get("versions")
-    if resolved_versions is None:
-        resolved_versions = _version_stat_from_version(str(resolved_version))
-    resolved_packages = packages if packages is not None else existing.get("packages", _FRONTDOOR_PACKAGE_COUNT)
+    released = _released_frontdoor_defaults()
+    resolved_version = version or (existing.get("version") if prefer_existing else None) or str(released["version"])
+    resolved_tests = tests if tests is not None else (existing.get("tests") if prefer_existing else None) or int(released["tests"])
+    resolved_versions = versions if versions is not None else (existing.get("versions") if prefer_existing else None) or int(released["versions"])
+    resolved_packages = packages if packages is not None else (existing.get("packages") if prefer_existing else None) or int(released["packages"])
     return {
         "version": str(resolved_version),
         "tests": int(resolved_tests),

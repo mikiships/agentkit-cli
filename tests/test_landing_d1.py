@@ -23,7 +23,7 @@ def test_hero_headline():
     html = _html()
     assert "One canonical context file" in html
     assert ".agentkit/source.md" in html
-    assert "v1.1.0" in html
+    assert "v1.2.0" in html
     assert "agentkit contract" in html
 
 
@@ -93,6 +93,6 @@ def test_dark_theme_colors():
 
 def test_stats_show_current_shipped_counts():
     html = _html()
-    assert 'data-stat="tests">4729<' in html
-    assert 'data-stat="versions">101<' in html
+    assert 'data-stat="tests">4824<' in html
+    assert 'data-stat="versions">102<' in html
     assert 'data-stat="packages">6<' in html

@@ -128,6 +128,7 @@ def pages_refresh_command(
         tests=frontdoor_test_count,
         versions=frontdoor_version_count,
         packages=frontdoor_package_count,
+        prefer_existing=False,
     )
 
     leaderboard_path = docs / "leaderboard.html"
