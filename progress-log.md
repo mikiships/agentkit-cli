@@ -55,6 +55,33 @@
 
 ---
 
+## Release D5: push, tag, publish, and shipped-state reconciliation — COMPLETE
+
+**Built:**
+- pushed branch `feat/v1.0.0-canonical-source-kit` to `origin` and confirmed the remote branch resolves to release commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- created annotated tag `v1.0.0`, pushed it to `origin`, and confirmed the peeled remote tag resolves to `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- rebuilt release artifacts for `1.0.0` with `uv build`
+- published `agentkit-cli==1.0.0` to PyPI and verified both uploaded files plus matching sha256 digests
+- reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.0.0.md`, and this progress log so the repo now tells one shipped story
+
+**Tests:**
+- `uv run pytest -q tests/test_context_projections.py tests/test_source_cmd.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_init.py` -> `37 passed in 1.70s`
+- `uv run pytest -q` -> `4787 passed, 1 warning in 241.07s (0:04:01)`
+- `uv run agentkit release-check --json` before release execution verified the exact missing surfaces: dirty generated state, missing `v1.0.0` tag, and missing PyPI release, while tests and smoke tests were already green
+
+**External proof:**
+- `git ls-remote --heads origin feat/v1.0.0-canonical-source-kit` -> `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- `git ls-remote --tags origin v1.0.0 v1.0.0^{}` -> annotated tag object `b3d68a03956e9f91a4203a368a281a4a01d4ba6e`, dereferenced commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- PyPI JSON confirms `agentkit-cli==1.0.0` is live with two files:
+  - `agentkit_cli-1.0.0-py3-none-any.whl` uploaded `2026-04-19T10:58:47.466825Z`, sha256 `343c1ce76f0f7d9b27b7d9aacaf4d46d55b93d934f5a6c84eb6e692a9ea7bd58`
+  - `agentkit_cli-1.0.0.tar.gz` uploaded `2026-04-19T10:58:49.086655Z`, sha256 `872ab66437b745e1d23c2a7fff4474ce450c1e0d3f2511a64cf6cb83e1054de0`
+
+**Truthful state:** `agentkit-cli==1.0.0` is shipped
+
+**Caveat:** the release tag marks the shipped source commit `e16c7c8`; any later branch movement from this handoff is docs-only chronology cleanup.
+
+---
+
 # Progress Log — agentkit-cli v0.99.0 context projections
 
 ## RC D1: mainline convergence provenance map — COMPLETE

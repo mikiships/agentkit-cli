@@ -3,7 +3,7 @@
 Date: 2026-04-19
 Builder: subagent canonical source pass
 Contract: all-day-build-contract-agentkit-cli-v1.0.0-canonical-source-kit.md
-Status: Complete, fully validated locally
+Status: SHIPPED
 
 ## Summary
 
@@ -40,4 +40,13 @@ Completed the dedicated canonical source workflow that complements the v0.99.0 p
 
 ## Status
 
-Feature-complete locally, fully validated in-repo, not pushed or published by this pass.
+SHIPPED. Release surfaces are now complete for `v1.0.0`.
+
+- tests: targeted slice `37 passed in 1.70s`; full suite `4787 passed, 1 warning in 241.07s (0:04:01)`
+- git push: `origin/feat/v1.0.0-canonical-source-kit` -> `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- git tag: annotated tag `v1.0.0` pushed, peeled commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- PyPI: `agentkit-cli==1.0.0` live
+  - wheel `agentkit_cli-1.0.0-py3-none-any.whl`, uploaded `2026-04-19T10:58:47.466825Z`, sha256 `343c1ce76f0f7d9b27b7d9aacaf4d46d55b93d934f5a6c84eb6e692a9ea7bd58`
+  - sdist `agentkit_cli-1.0.0.tar.gz`, uploaded `2026-04-19T10:58:49.086655Z`, sha256 `872ab66437b745e1d23c2a7fff4474ce450c1e0d3f2511a64cf6cb83e1054de0`
+
+Caveat: the shipped release tag points at the original validated source commit `e16c7c8`; any later branch movement from this pass is docs-only chronology cleanup.
