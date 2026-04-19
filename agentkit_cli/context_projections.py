@@ -18,7 +18,11 @@ FORMAT_AGENT_MD = "agent-md"
 FORMAT_GEMINI_MD = "gemini-md"
 FORMAT_COPILOT_MD = "copilot-md"
 FORMAT_LLMSTXT = "llmstxt"
+FORMAT_AGENTKIT_SOURCE = "agentkit-source"
 FORMAT_ALL = "all"
+
+DEDICATED_SOURCE_DIRNAME = ".agentkit"
+DEDICATED_SOURCE_FILENAME = "source.md"
 
 LEGACY_ALIASES = {
     "agents": FORMAT_AGENTS_MD,
@@ -34,6 +38,9 @@ LEGACY_ALIASES = {
     "llmstxt": FORMAT_LLMSTXT,
     "llms": FORMAT_LLMSTXT,
     "llms.txt": FORMAT_LLMSTXT,
+    "source": FORMAT_AGENTKIT_SOURCE,
+    "agentkit-source": FORMAT_AGENTKIT_SOURCE,
+    "canonical-source": FORMAT_AGENTKIT_SOURCE,
     "all": FORMAT_ALL,
     "auto": "auto",
 }
@@ -60,6 +67,7 @@ KNOWN_FORMATS = tuple(TARGETS.keys())
 FORMAT_FILENAMES = {key: target.filename for key, target in TARGETS.items()}
 FILENAME_FORMATS = {target.filename: key for key, target in TARGETS.items()}
 DETECTION_PRIORITY = (
+    FORMAT_AGENTKIT_SOURCE,
     FORMAT_AGENTS_MD,
     FORMAT_CLAUDE_MD,
     FORMAT_AGENT_MD,
@@ -160,6 +168,16 @@ def _detect_format_from_filename(filename: str) -> Optional[str]:
     return FILENAME_FORMATS.get(Path(filename).name)
 
 
+def dedicated_source_path(directory: str | Path) -> Path:
+    return Path(directory) / DEDICATED_SOURCE_DIRNAME / DEDICATED_SOURCE_FILENAME
+
+
+def source_path_for_format(directory: str | Path, fmt: str) -> Path:
+    if fmt == FORMAT_AGENTKIT_SOURCE:
+        return dedicated_source_path(directory)
+    return Path(directory) / FORMAT_FILENAMES[fmt]
+
+
 def _detect_format_from_content(content: str) -> Optional[str]:
     if re.match(r"^#\s+\S", content) and re.search(r"(^-\s+https?://)|(Generated from:)", content, re.MULTILINE):
         return FORMAT_LLMSTXT
@@ -178,6 +196,8 @@ def _detect_format_from_content(content: str) -> Optional[str]:
 class ContextProjectionEngine:
     def detect_format(self, path: str | Path) -> Optional[str]:
         p = Path(path)
+        if p.name == DEDICATED_SOURCE_FILENAME and p.parent.name == DEDICATED_SOURCE_DIRNAME:
+            return FORMAT_AGENTKIT_SOURCE
         fmt = _detect_format_from_filename(p.name)
         if fmt:
             return fmt
@@ -190,10 +210,10 @@ class ContextProjectionEngine:
         d = Path(directory)
         if override:
             fmt = normalize_format(override)
-            path = d / FORMAT_FILENAMES[fmt]
+            path = source_path_for_format(d, fmt)
             return (fmt, path) if path.exists() else None
         for fmt in DETECTION_PRIORITY:
-            candidate = d / FORMAT_FILENAMES[fmt]
+            candidate = source_path_for_format(d, fmt)
             if candidate.exists():
                 return fmt, candidate
         for candidate in sorted(d.iterdir() if d.exists() else []):

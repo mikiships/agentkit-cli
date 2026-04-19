@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from agentkit_cli.context_projections import (
     ContextProjectionEngine,
+    FORMAT_AGENTKIT_SOURCE,
     FORMAT_AGENT_MD,
     FORMAT_AGENTS_MD,
     FORMAT_CLAUDE_MD,
@@ -9,6 +10,7 @@ from agentkit_cli.context_projections import (
     FORMAT_GEMINI_MD,
     FORMAT_LLMSTXT,
     FORMAT_FILENAMES,
+    dedicated_source_path,
 )
 
 ENGINE = ContextProjectionEngine()
@@ -74,3 +76,22 @@ def test_filenames_cover_supported_targets():
     assert FORMAT_FILENAMES[FORMAT_AGENT_MD] == "AGENT.md"
     assert FORMAT_FILENAMES[FORMAT_GEMINI_MD] == "GEMINI.md"
     assert FORMAT_FILENAMES[FORMAT_COPILOT_MD] == "COPILOT.md"
+
+
+def test_detect_source_priority_prefers_dedicated_source_over_legacy_files(tmp_path):
+    dedicated = dedicated_source_path(tmp_path)
+    dedicated.parent.mkdir()
+    dedicated.write_text("# Repo Soul\n")
+    (tmp_path / "AGENTS.md").write_text(AGENTS_SAMPLE)
+    fmt, path = ENGINE.detect_source(tmp_path)  # type: ignore[misc]
+    assert fmt == FORMAT_AGENTKIT_SOURCE
+    assert path == dedicated
+
+
+def test_detect_source_override_resolves_dedicated_source_path(tmp_path):
+    dedicated = dedicated_source_path(tmp_path)
+    dedicated.parent.mkdir()
+    dedicated.write_text("# Repo Soul\n")
+    fmt, path = ENGINE.detect_source(tmp_path, override="agentkit-source")  # type: ignore[misc]
+    assert fmt == FORMAT_AGENTKIT_SOURCE
+    assert path == dedicated

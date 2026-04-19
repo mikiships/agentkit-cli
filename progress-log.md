@@ -1,3 +1,18 @@
+# Progress Log — agentkit-cli v1.0.0 canonical source kit
+
+## D1: dedicated canonical source engine support — COMPLETE
+
+**Built:**
+- `agentkit_cli/context_projections.py` now defines one agentkit-managed canonical source location at `.agentkit/source.md`.
+- Source detection prefers `.agentkit/source.md` over legacy root-level context files while preserving backwards-compatible AGENTS/CLAUDE/AGENT/GEMINI/COPILOT/llms detection when the dedicated source is absent.
+- Added shared helpers for resolving the dedicated source path so later CLI surfaces can reuse one deterministic location.
+
+**Tests:** `uv run pytest -q tests/test_context_projections.py` -> `9 passed in 0.03s`
+
+**Next:** D2 bootstrap/promote CLI flow for initializing or promoting the dedicated source file.
+
+---
+
 # Progress Log — agentkit-cli v0.99.0 context projections
 
 ## RC D1: mainline convergence provenance map — COMPLETE
