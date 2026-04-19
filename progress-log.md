@@ -1,4 +1,4 @@
-# Progress Log — agentkit-cli v1.1.0 burn observability
+# Progress Log — agentkit-cli v1.2.0 contracts
 
 ## D1: transcript adapters + normalized burn schema — COMPLETE
 
@@ -74,3 +74,16 @@
 - The branch and tag no longer point to the same commit. That is now documented explicitly instead of being reported as one commit.
 
 **Final status:** shipped and reconciled. The release is live, validation is green, and the report surfaces now match the actual branch, tag, and PyPI state.
+
+---
+
+## D1: contract engine + schema-backed rendering — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/contracts.py` with a deterministic contract spec, markdown renderer, source loading, slug generation, and repo-hint inference.
+- Reused the canonical-source detection flow so contracts prefer `.agentkit/source.md` and fall back to legacy context files.
+- Added D1 coverage for dedicated-source loading, legacy fallback, deterministic rendering, and output slug stability.
+
+**Tests:** `uv run pytest -q tests/test_contract_d1.py` -> `4 passed`
+
+**Next:** D2 `agentkit contract` CLI wiring.
