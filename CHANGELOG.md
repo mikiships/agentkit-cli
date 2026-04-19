@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0] - 2026-04-19
+
+### Added
+- `agentkit burn` for local transcript cost observability across Codex, Claude Code, and OpenClaw-style session artifacts.
+- Burn adapters and normalized schema for session, turn, tool, and cost-state ingestion.
+- Burn analytics for project/model/provider/task/source aggregation, waste detection, and shareable HTML reporting.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v1.1.0 burn observability release candidate.
+
 ## [1.0.0] - 2026-04-19
 
 ### Added

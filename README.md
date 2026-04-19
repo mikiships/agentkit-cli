@@ -32,6 +32,31 @@ agentkit ecosystem     # 🌐 "State of AI Agent Readiness" — which language e
 
 **State of Ecosystem:** `agentkit ecosystem` runs a macro scan across major language/tech ecosystems (Python, TypeScript, Rust, Go, Java, and more) and produces a ranked "State of AI Agent Readiness" report. Share it with `--share` or save to HTML with `--output report.html`.
 
+## `agentkit burn` — transcript cost observability
+
+Use `agentkit burn` to inspect local AI coding transcript spend before changing prompts, workflows, or model routing.
+
+```bash
+# Analyze a transcript directory with rich terminal output
+agentkit burn --path ./transcripts
+
+# Filter to one project and export stable JSON
+agentkit burn --path ./transcripts --project /repo/gamma --format json
+
+# Narrow to recent sessions and write a dark-theme HTML report
+agentkit burn --path ./transcripts --since 2026-04-01T00:00:00+00:00 --limit 25 --output burn-report.html
+```
+
+Supported local sources in this release:
+- Codex fixture-style JSON sessions
+- Claude Code fixture-style JSON sessions
+- OpenClaw-style JSONL response transcripts
+
+The burn report surfaces:
+- where spend goes by project, model, provider, task label, and source
+- the most expensive sessions
+- waste patterns like expensive no-tool turns, retry loops, and low one-shot success sessions
+
 ## Demo
 
 <!-- demo.gif placeholder — generate with: agentkit demo --record && vhs demo.tape -->

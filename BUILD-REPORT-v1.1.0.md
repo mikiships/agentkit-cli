@@ -19,34 +19,8 @@ Completed a local-first `agentkit burn` workflow for transcript cost observabili
 | D4 | HTML report + narrative summary | ✅ Complete | Dark-theme HTML and markdown-ready summary highlight where spend goes and what to fix first |
 | D5 | Docs, versioning, build report, and validation | ✅ Complete | README, changelog, progress log, version metadata, helper-script checks, and local validation updated for `1.1.0` |
 
-## Workflow Highlights
-
-- parse local transcript artifacts with deterministic adapters
-- normalize missing or estimated costs instead of guessing silently
-- rank spend by project, model, provider, task label, and session source
-- surface waste patterns before changing prompts or routing
-- export stable JSON or a shareable local HTML report
-
 ## Validation
 
 - focused burn slice: `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `22 passed in 0.34s`
-- full suite baseline target retained: `>= 2623` tests
 - final full suite: `uv run pytest -q` -> `4809 passed, 1 warning in 131.87s (0:02:11)`
 - helper scripts: status-conflict scan `0 findings`, hygiene check `0 findings`
-
-## Version
-
-- `pyproject.toml` -> `1.1.0`
-- `agentkit_cli/__init__.py` -> `1.1.0`
-- `uv.lock` -> `1.1.0`
-- `BUILD-REPORT-v1.1.0.md` added as the versioned build-report copy
-
-## Out of Scope
-
-- cloud billing integrations
-- provider-side instrumentation
-- non-local transcript collection
-
-## Status
-
-LOCAL RC READY. All contract deliverables are implemented in this repo checkout, with final helper-script validation and full-suite confirmation completed in this pass before handoff.
