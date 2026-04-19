@@ -30,12 +30,12 @@ This branch is the local v0.99.0 release-candidate convergence pass. It preserve
 
 ## Release Notes
 
-- current branch state: local RC convergence, not shipped or published
+- current branch state: release branch and tag pushed, local artifacts built, PyPI publish blocked by missing credentials
 
 - version metadata bumped to `0.99.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
 - compatibility preserved for the legacy migrate engine tests while enabling the broader projection workflow in the new command surfaces
 - versioned build report copy added as `BUILD-REPORT-v0.99.0.md`
-- status: RELEASE-READY LOCALLY, not shipped or published
+- status: PUSHED AND TAGGED, NOT SHIPPED, PyPI publish blocked by missing credentials
 
 ## Final RC Summary
 
@@ -44,4 +44,4 @@ This branch is the local v0.99.0 release-candidate convergence pass. It preserve
 - targeted validation: `84 passed in 1.37s`
 - full suite: `4775 passed, 1 warning in 126.39s (0:02:06)`
 - working tree: clean
-- RC verdict: v0.99.0 is release-ready locally
+- RC verdict: v0.99.0 remains unshipped because PyPI publish is blocked by missing credentials

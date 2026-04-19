@@ -152,6 +152,26 @@
 
 ---
 
+## Release D3: build artifacts and publish to PyPI — BLOCKED
+
+**Built:**
+- built release artifacts successfully with `uv build`
+- created `dist/agentkit_cli-0.99.0.tar.gz` and `dist/agentkit_cli-0.99.0-py3-none-any.whl`
+- wrote `BLOCKER-REPORT-v0.99.0.md` after the third credential-path failure on the same publish issue
+
+**Failed attempts on the same issue:**
+1. `uv publish --dry-run dist/*` -> trusted publishing unavailable, no OIDC token, no credentials configured
+2. `uv publish --keyring-provider subprocess dist/*` -> `Missing credentials for https://upload.pypi.org/legacy/`
+3. `security find-internet-password -s upload.pypi.org -g` -> `The specified item could not be found in the keychain.`
+
+**Tests:** no new pytest run in D3, D1 validation still stands
+
+**Truthful state at stop:** branch and tag are pushed, artifacts exist locally, PyPI is not live, and v0.99.0 is not shipped
+
+**Next:** stop here until valid PyPI credentials are available for this machine.
+
+---
+
 ## D5: docs, release notes, and versioning — COMPLETE
 
 **Built:**
