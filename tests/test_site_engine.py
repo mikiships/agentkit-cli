@@ -16,6 +16,7 @@ from agentkit_cli.site_engine import (
     SitePage,
     SiteResult,
     _make_sparkline,
+    build_frontdoor_stats,
     score_to_grade,
 )
 
@@ -143,6 +144,54 @@ def test_generate_index_shows_current_frontdoor_story(engine):
     assert "4824" in page.html
     assert "agentkit contract" in page.html
     assert "agentkit contract --init" in page.html
+
+
+def test_build_frontdoor_stats_derives_version_counter():
+    stats = build_frontdoor_stats({"version": "1.2.1"})
+    assert stats["version"] == "1.2.1"
+    assert stats["versions"] == 102
+
+
+def test_generate_index_uses_site_data_as_frontdoor_source(engine):
+    site_data = {
+        "generated_at": "2026-04-19T12:00:00+00:00",
+        "frontdoor": {
+            "version": "1.2.1",
+            "tests": 4901,
+            "versions": 102,
+            "packages": 7,
+        },
+        "repos": [
+            {
+                "name": "openai/openai-python",
+                "url": "https://github.com/openai/openai-python",
+                "score": 91,
+                "grade": "A",
+                "ecosystem": "python",
+                "source": "ecosystem",
+            },
+            {
+                "name": "pydantic/pydantic",
+                "url": "https://github.com/pydantic/pydantic",
+                "score": 82,
+                "grade": "A",
+                "ecosystem": "python",
+                "source": "community",
+            },
+        ],
+        "stats": {"total": 2, "median": 86.5, "top_score": 91},
+    }
+
+    page = engine.generate_index(site_data=site_data)
+
+    assert "v1.2.1" in page.html
+    assert 'data-stat="tests">4901<' in page.html
+    assert 'data-stat="versions">102<' in page.html
+    assert 'data-stat="packages">7<' in page.html
+    assert 'id="repos-scored-stat">2<' in page.html
+    assert 'id="community-scored-stat">1<' in page.html
+    assert "openai/openai-python" in page.html
+    assert "pydantic/pydantic" in page.html
 
 
 def test_generate_topic_page(populated_engine):

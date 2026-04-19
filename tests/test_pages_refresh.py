@@ -12,6 +12,7 @@ import yaml
 
 from agentkit_cli.commands.pages_refresh import (
     build_data_json,
+    load_existing_data,
     pages_refresh_command,
     score_to_grade,
     update_index_html,
@@ -131,6 +132,12 @@ class TestBuildDataJson:
         dt = datetime.fromisoformat(data["generated_at"].replace("Z", "+00:00"))
         assert dt is not None
 
+    def test_frontdoor_payload_is_embedded(self):
+        result = _make_result()
+        data = build_data_json(result, frontdoor={"version": "1.2.1", "tests": 4901})
+        assert data["frontdoor"]["version"] == "1.2.1"
+        assert data["frontdoor"]["tests"] == 4901
+
     def test_ecosystem_preserved(self):
         result = _make_result()
         data = build_data_json(result)
@@ -168,37 +175,77 @@ class TestUpdateIndexHtml:
 
     def test_hero_badge_updated(self, tmp_path):
         p = self._write_html(tmp_path, MINIMAL_HTML)
-        data = {"stats": {"total": 42, "median": 75.0, "top_score": 91.0}}
+        data = {
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 6},
+            "stats": {"total": 42, "median": 75.0, "top_score": 91.0},
+            "repos": [],
+        }
         update_index_html(p, data)
         html = p.read_text()
         assert "42 repos scored" in html
 
     def test_stat_num_updated(self, tmp_path):
         p = self._write_html(tmp_path, MINIMAL_HTML)
-        data = {"stats": {"total": 15, "median": 70.0, "top_score": 88.0}}
+        data = {
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 6},
+            "stats": {"total": 15, "median": 70.0, "top_score": 88.0},
+            "repos": [],
+        }
         update_index_html(p, data)
         html = p.read_text()
-        assert ">15<" in html
+        assert 'id="repos-scored-stat">15<' in html
 
     def test_recently_scored_section_injected(self, tmp_path):
         p = self._write_html(tmp_path, MINIMAL_HTML)
-        data = {"stats": {"total": 5, "median": 70.0, "top_score": 88.0}}
+        data = {
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 6},
+            "stats": {"total": 5, "median": 70.0, "top_score": 88.0},
+            "repos": [],
+        }
         update_index_html(p, data)
         html = p.read_text()
         assert 'id="recently-scored"' in html
 
     def test_fetch_script_injected(self, tmp_path):
         p = self._write_html(tmp_path, MINIMAL_HTML)
-        data = {"stats": {"total": 5, "median": 70.0, "top_score": 88.0}}
+        data = {
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 6},
+            "stats": {"total": 5, "median": 70.0, "top_score": 88.0},
+            "repos": [],
+        }
         update_index_html(p, data)
         html = p.read_text()
         assert "renderRecentlyScored" in html
 
-    def test_returns_false_for_nonexistent_file(self, tmp_path):
+    def test_full_rewrite_uses_frontdoor_payload(self, tmp_path):
+        p = self._write_html(tmp_path, MINIMAL_HTML)
+        data = {
+            "generated_at": "2026-04-19T12:00:00+00:00",
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 7},
+            "stats": {"total": 2, "median": 80.0, "top_score": 91.0},
+            "repos": [
+                {"name": "openai/openai-python", "url": "https://github.com/openai/openai-python", "score": 91.0, "grade": "A", "ecosystem": "python", "source": "ecosystem"},
+                {"name": "pydantic/pydantic", "url": "https://github.com/pydantic/pydantic", "score": 69.0, "grade": "B", "ecosystem": "python", "source": "community"},
+            ],
+        }
+        update_index_html(p, data)
+        html = p.read_text()
+        assert "v1.2.1" in html
+        assert 'data-stat="tests">4901<' in html
+        assert 'data-stat="versions">102<' in html
+        assert 'data-stat="packages">7<' in html
+        assert 'id="repos-scored-stat">2<' in html
+        assert 'id="community-scored-stat">1<' in html
+
+    def test_returns_true_for_nonexistent_file(self, tmp_path):
         p = tmp_path / "nonexistent.html"
-        data = {"stats": {"total": 5, "median": 70.0, "top_score": 88.0}}
+        data = {
+            "frontdoor": {"version": "1.2.1", "tests": 4901, "versions": 102, "packages": 6},
+            "stats": {"total": 5, "median": 70.0, "top_score": 88.0},
+            "repos": [],
+        }
         result = update_index_html(p, data)
-        assert result is False
+        assert result is True
 
 
 # ---------------------------------------------------------------------------
@@ -239,6 +286,47 @@ class TestPagesRefreshCommand:
         new_dir = tmp_path / "newdocs"
         pages_refresh_command(docs_dir=new_dir, _engine_factory=lambda *a: self._make_engine())
         assert new_dir.exists()
+
+    def test_pages_refresh_keeps_index_and_data_frontdoor_in_sync(self, tmp_path):
+        (tmp_path / "index.html").write_text(MINIMAL_HTML)
+        result = pages_refresh_command(
+            docs_dir=tmp_path,
+            frontdoor_version="1.2.1",
+            frontdoor_test_count=4901,
+            frontdoor_package_count=7,
+            _engine_factory=lambda *a: self._make_engine(),
+        )
+        data = json.loads((tmp_path / "data.json").read_text())
+        html = (tmp_path / "index.html").read_text()
+        assert data["frontdoor"]["version"] == "1.2.1"
+        assert data["frontdoor"]["tests"] == 4901
+        assert data["frontdoor"]["packages"] == 7
+        assert f"v{data['frontdoor']['version']}" in html
+        assert f'data-stat="tests">{data["frontdoor"]["tests"]}<' in html
+        assert f'id="repos-scored-stat">{data["stats"]["total"]}<' in html
+
+    def test_pages_refresh_can_reuse_existing_data(self, tmp_path):
+        payload = {
+            "generated_at": "2026-04-19T08:47:54+00:00",
+            "frontdoor": {"version": "1.2.0", "tests": 4824, "versions": 111, "packages": 6},
+            "repos": [{"name": "langchain-ai/langchain", "url": "https://github.com/langchain-ai/langchain", "score": 50, "grade": "C", "ecosystem": "python", "source": "ecosystem"}],
+            "stats": {"total": 1, "median": 50, "top_score": 50},
+        }
+        (tmp_path / "data.json").write_text(json.dumps(payload), encoding="utf-8")
+        pages_refresh_command(
+            docs_dir=tmp_path,
+            from_existing_data=True,
+            frontdoor_version="1.2.1",
+            frontdoor_test_count=4901,
+        )
+        data = json.loads((tmp_path / "data.json").read_text())
+        html = (tmp_path / "index.html").read_text()
+        assert data["generated_at"] == payload["generated_at"]
+        assert data["stats"]["total"] == 1
+        assert data["frontdoor"]["version"] == "1.2.1"
+        assert data["frontdoor"]["tests"] == 4901
+        assert "v1.2.1" in html
+        assert 'id="repos-scored-stat">1<' in html
 
 
 # ---------------------------------------------------------------------------
@@ -287,11 +375,15 @@ class TestWorkflowFile:
 
     def test_installs_agentkit_cli(self):
         content = WORKFLOW_PATH.read_text()
-        assert "agentkit-cli" in content or "agentkit_cli" in content
+        assert "pip install -e" in content or "agentkit-cli" in content or "agentkit_cli" in content
 
     def test_runs_pages_refresh(self):
         content = WORKFLOW_PATH.read_text()
         assert "pages-refresh" in content
+
+    def test_push_workflow_reuses_existing_data_path(self):
+        content = (Path(__file__).parent.parent / ".github" / "workflows" / "update-pages.yml").read_text()
+        assert "agentkit pages-refresh --from-existing-data" in content
 
     def test_commit_message_skip_ci(self):
         content = WORKFLOW_PATH.read_text()
@@ -360,6 +452,12 @@ class TestDataJson:
     def test_has_generated_at(self):
         data = json.loads(DATA_JSON_PATH.read_text())
         assert "generated_at" in data
+
+    def test_has_frontdoor_payload(self):
+        data = json.loads(DATA_JSON_PATH.read_text())
+        assert "frontdoor" in data
+        assert "version" in data["frontdoor"]
+        assert "tests" in data["frontdoor"]
 
     def test_has_repos_list(self):
         data = json.loads(DATA_JSON_PATH.read_text())

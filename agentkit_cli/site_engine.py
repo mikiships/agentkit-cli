@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from agentkit_cli.history import HistoryDB
 from agentkit_cli.user_scorecard import score_to_grade
@@ -20,6 +21,41 @@ _FRONTDOOR_VERSION = "1.2.0"
 _FRONTDOOR_TEST_COUNT = 4824
 _FRONTDOOR_VERSION_COUNT = 111
 _FRONTDOOR_PACKAGE_COUNT = 6
+
+
+def build_frontdoor_stats(
+    existing: Optional[dict[str, Any]] = None,
+    *,
+    version: Optional[str] = None,
+    tests: Optional[int] = None,
+    versions: Optional[int] = None,
+    packages: Optional[int] = None,
+    refreshed_at: Optional[str] = None,
+) -> dict[str, Any]:
+    """Build the canonical front-door stats payload shared by data.json and index.html."""
+    existing = existing or {}
+    resolved_version = version or existing.get("version") or _FRONTDOOR_VERSION
+    resolved_tests = tests if tests is not None else existing.get("tests", _FRONTDOOR_TEST_COUNT)
+    resolved_versions = versions if versions is not None else existing.get("versions")
+    if resolved_versions is None:
+        resolved_versions = _version_stat_from_version(str(resolved_version))
+    resolved_packages = packages if packages is not None else existing.get("packages", _FRONTDOOR_PACKAGE_COUNT)
+    return {
+        "version": str(resolved_version),
+        "tests": int(resolved_tests),
+        "versions": int(resolved_versions),
+        "packages": int(resolved_packages),
+        "refreshed_at": refreshed_at or existing.get("refreshed_at") or datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def _version_stat_from_version(version: str) -> int:
+    match = re.search(r"(\d+)\.(\d+)", version or "")
+    if not match:
+        return _FRONTDOOR_VERSION_COUNT
+    major = int(match.group(1))
+    minor = int(match.group(2))
+    return major * 100 + minor
 
 # ---------------------------------------------------------------------------
 # Data models
@@ -604,11 +640,27 @@ class SiteEngine:
 
         return SiteResult(pages=pages, sitemap_xml=sitemap)
 
-    def generate_index(self) -> SitePage:
+    def generate_index(self, site_data: Optional[dict] = None) -> SitePage:
         """Generate index.html."""
-        all_repos = self._get_all_repos(limit=self.config.limit)
-        total_repos = self._count_unique_repos()
-        top_score = max((r.score for r in all_repos), default=0.0)
+        frontdoor = build_frontdoor_stats((site_data or {}).get("frontdoor"))
+        if site_data and site_data.get("repos") is not None:
+            all_repos = [
+                RepoEntry(
+                    repo=repo.get("name", ""),
+                    score=float(repo.get("score", 0)),
+                    grade=repo.get("grade", score_to_grade(float(repo.get("score", 0)))),
+                    last_run=repo.get("synced_at", ""),
+                    details=repo,
+                )
+                for repo in site_data.get("repos", [])
+                if repo.get("name")
+            ]
+            total_repos = int((site_data.get("stats") or {}).get("total", len(all_repos)))
+            community_repos = sum(1 for repo in site_data.get("repos", []) if repo.get("source") == "community")
+        else:
+            all_repos = self._get_all_repos(limit=self.config.limit)
+            total_repos = self._count_unique_repos()
+            community_repos = 0
         rows_html = "".join(
             f"<tr>"
             f'<td class="repo-name"><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
@@ -636,7 +688,7 @@ class SiteEngine:
 
         body = f"""
         <div class="hero">
-          <div class="hero-badge">v{_FRONTDOOR_VERSION} &middot; {total_repos} repos scored</div>
+          <div class="hero-badge">v{frontdoor['version']} &middot; {total_repos} repos scored</div>
           <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
           <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, add an <code>agentkit contract</code> when you need shared execution rules, then measure whether the setup is any good.</p>
           <div class="hero-actions">
@@ -665,11 +717,11 @@ class SiteEngine:
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">{_FRONTDOOR_TEST_COUNT}</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">{_FRONTDOOR_VERSION_COUNT}</div><div class="stat-label">Versions</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">{_FRONTDOOR_PACKAGE_COUNT}</div><div class="stat-label">Packages</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">{frontdoor['tests']}</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">{frontdoor['versions']}</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">{frontdoor['packages']}</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
-          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">{community_repos}</div><div class="stat-label">Community Scored</div></div>
         </div>
 
         <!-- Recently Scored (populated dynamically from data.json) -->

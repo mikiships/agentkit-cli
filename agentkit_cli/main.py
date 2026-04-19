@@ -992,6 +992,11 @@ def pages_refresh(
     limit: int = typer.Option(5, "--limit", help="Repos per ecosystem (default: 5, max 25)"),
     docs_dir: Optional[Path] = typer.Option(None, "--docs-dir", help="Docs directory (default: docs/)"),
     token: Optional[str] = typer.Option(None, "--token", help="GitHub API token (or set GITHUB_TOKEN)"),
+    frontdoor_version: Optional[str] = typer.Option(None, "--frontdoor-version", help="Override the landing-page version badge value."),
+    frontdoor_test_count: Optional[int] = typer.Option(None, "--frontdoor-test-count", help="Override the landing-page test count."),
+    frontdoor_version_count: Optional[int] = typer.Option(None, "--frontdoor-version-count", help="Override the landing-page versions stat."),
+    frontdoor_package_count: Optional[int] = typer.Option(None, "--frontdoor-package-count", help="Override the landing-page packages stat."),
+    from_existing_data: bool = typer.Option(False, "--from-existing-data", help="Reuse docs/data.json repo data and only refresh the front-door shell."),
 ) -> None:
     """Refresh GitHub Pages leaderboard: score ecosystems, write docs/data.json + docs/leaderboard.html, update docs/index.html."""
     pages_refresh_command(
@@ -999,6 +1004,11 @@ def pages_refresh(
         limit=limit,
         docs_dir=docs_dir,
         token=token,
+        frontdoor_version=frontdoor_version,
+        frontdoor_test_count=frontdoor_test_count,
+        frontdoor_version_count=frontdoor_version_count,
+        frontdoor_package_count=frontdoor_package_count,
+        from_existing_data=from_existing_data,
     )
 
 

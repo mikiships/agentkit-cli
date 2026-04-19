@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import statistics
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from rich.console import Console
+
+from agentkit_cli.site_engine import SiteEngine, build_frontdoor_stats
 
 console = Console()
 
@@ -31,7 +32,13 @@ def score_to_grade(score: float) -> str:
     return "F"
 
 
-def build_data_json(result, ecosystems_order: Optional[List[str]] = None) -> dict:
+def build_data_json(
+    result,
+    ecosystems_order: Optional[List[str]] = None,
+    *,
+    frontdoor: Optional[dict[str, Any]] = None,
+    generated_at: Optional[str] = None,
+) -> dict:
     """Build the data.json structure from a LeaderboardPageResult."""
     repos = []
     seen = set()
@@ -60,141 +67,34 @@ def build_data_json(result, ecosystems_order: Optional[List[str]] = None) -> dic
     }
 
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": generated_at or datetime.now(timezone.utc).isoformat(),
+        "frontdoor": build_frontdoor_stats(frontdoor),
         "repos": repos,
         "stats": stats,
     }
 
 
+def load_existing_data(docs_dir: Path) -> dict:
+    data_json_path = docs_dir / "data.json"
+    if not data_json_path.exists():
+        return {
+            "generated_at": "",
+            "frontdoor": build_frontdoor_stats(),
+            "repos": [],
+            "stats": {"total": 0, "median": 0, "top_score": 0},
+        }
+    return json.loads(data_json_path.read_text(encoding="utf-8"))
+
+
 def update_index_html(index_path: Path, data: dict) -> bool:
-    """Update docs/index.html stat counters from data.json. Returns True if changed."""
-    if not index_path.exists():
-        return False
-
-    html = index_path.read_text(encoding="utf-8")
-    original = html
-
-    total = data["stats"]["total"]
-
-    # Update hero badge: "v0.93.0 · 0 repos scored" -> "v0.93.0 · N repos scored"
-    html = re.sub(
-        r'(v[\d.]+\s*&middot;\s*)\d+(\s*repos scored)',
-        rf'\g<1>{total}\2',
-        html,
-    )
-
-    # Update stat-num for Repos Scored (handle optional id attribute)
-    html = re.sub(
-        r'(<div class="stat-num"[^>]*>)\d+(</div><div class="stat-label">Repos Scored</div>)',
-        rf'\g<1>{total}\2',
-        html,
-    )
-
-    # Ensure repos-scored-stat id is present on the Repos Scored stat
-    html = re.sub(
-        r'<div class="stat-num"(?! id="repos-scored-stat")([^>]*>)(\d+)(</div><div class="stat-label">Repos Scored</div>)',
-        rf'<div class="stat-num" id="repos-scored-stat"\1\2\3',
-        html,
-    )
-
-    # Inject/replace Recently Scored Repos section and fetch script
-    recently_section = _recently_scored_section()
-    fetch_script = _fetch_script()
-
-    # Replace existing recently-scored-section if present, else insert after stats-strip closing tag
-    if 'id="recently-scored"' in html:
-        html = re.sub(
-            r'<section[^>]*id="recently-scored"[^>]*>.*?</section>',
-            recently_section,
-            html,
-            flags=re.DOTALL,
-        )
-    else:
-        # Insert after </section> that closes the pipeline-section (first </section> after stats-strip)
-        # Find the stats strip close and insert the recently-scored section after it
-        stats_close_pattern = r'(</section>\s*)(<!-- recently-scored placeholder -->)?'
-        # More targeted: insert after the first </section> after stats-strip
-        html = html.replace(
-            '<section class="pipeline-section">',
-            recently_section + '\n        <section class="pipeline-section">',
-            1,
-        )
-
-    # Inject fetch script before </body> if not already present
-    if 'renderRecentlyScored' not in html:
-        html = html.replace('</body>', fetch_script + '\n</body>', 1)
-
+    """Rewrite docs/index.html from the canonical data.json payload. Returns True if changed."""
+    engine = SiteEngine()
+    html = engine.generate_index(site_data=data).html
+    original = index_path.read_text(encoding="utf-8") if index_path.exists() else None
     if html != original:
         index_path.write_text(html, encoding="utf-8")
         return True
     return False
-
-
-def _recently_scored_section() -> str:
-    return """        <section class="recently-scored-section" id="recently-scored">
-          <h2 class="section-title">Recently Scored Repos</h2>
-          <div id="recently-scored-list" class="recently-scored-list">
-            <p class="loading-msg">Loading…</p>
-          </div>
-        </section>"""
-
-
-def _fetch_script() -> str:
-    return """<script>
-(function() {
-  function gradeClass(g) {
-    return {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d','F':'grade-f'}[g] || '';
-  }
-  function renderRecentlyScored(data) {
-    var el = document.getElementById('recently-scored-list');
-    if (!el) return;
-    if (!data || !data.repos || !data.repos.length) {
-      el.innerHTML = '<p class="loading-msg">No data available.</p>';
-      return;
-    }
-    var top = data.repos.slice(0, 5);
-    var html = '<ul class="repo-list">';
-    top.forEach(function(r) {
-      var src = r.source || 'ecosystem';
-      var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
-      var srcClass = 'source-' + srcLabel;
-      html += '<li class="repo-item">'
-        + '<a href="' + r.url + '" target="_blank" rel="noopener" class="repo-name">' + r.name + '</a>'
-        + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
-        + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
-        + '<span class="score-val">' + r.score + '</span>'
-        + '<span class="grade ' + gradeClass(r.grade) + '">' + r.grade + '</span>'
-        + '</li>';
-    });
-    html += '</ul>';
-    if (data.stats) {
-      html += '<p class="data-ts">Updated: ' + (data.generated_at ? data.generated_at.slice(0,10) : '') + '</p>';
-    }
-    el.innerHTML = html;
-    // Update repos-scored stat
-    var statEl = document.getElementById('repos-scored-stat') || document.querySelector('.stat-num');
-    if (statEl && data.stats && data.stats.total) {
-      statEl.textContent = data.stats.total;
-    }
-    // Update community-scored stat
-    var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
-    var commEl = document.getElementById('community-scored-stat');
-    if (commEl) { commEl.textContent = communityCount; }
-    // Update hero badge
-    var badge = document.querySelector('.hero-badge');
-    if (badge && data.stats && data.stats.total) {
-      badge.textContent = badge.textContent.replace(/\\d+ repos scored/, data.stats.total + ' repos scored');
-    }
-  }
-  fetch('/agentkit-cli/data.json')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
-    .then(renderRecentlyScored)
-    .catch(function() {
-      var el = document.getElementById('recently-scored-list');
-      if (el) el.innerHTML = '<p class="loading-msg">Score data unavailable.</p>';
-    });
-})();
-</script>"""
 
 
 def pages_refresh_command(
@@ -202,6 +102,11 @@ def pages_refresh_command(
     limit: int = DEFAULT_LIMIT,
     docs_dir: Optional[Path] = None,
     token: Optional[str] = None,
+    frontdoor_version: Optional[str] = None,
+    frontdoor_test_count: Optional[int] = None,
+    frontdoor_version_count: Optional[int] = None,
+    frontdoor_package_count: Optional[int] = None,
+    from_existing_data: bool = False,
     _engine_factory=None,
 ) -> dict:
     """Run ecosystem scoring and refresh GitHub Pages docs/."""
@@ -212,34 +117,46 @@ def pages_refresh_command(
     docs = docs_dir or DOCS_DIR
     docs.mkdir(parents=True, exist_ok=True)
 
-    console.print("[bold]agentkit pages-refresh[/bold] — scoring ecosystems…")
+    existing_data = load_existing_data(docs)
+    frontdoor = build_frontdoor_stats(
+        existing_data.get("frontdoor"),
+        version=frontdoor_version,
+        tests=frontdoor_test_count,
+        versions=frontdoor_version_count,
+        packages=frontdoor_package_count,
+    )
 
-    if _engine_factory is not None:
-        engine = _engine_factory(eco_list, limit, resolved_token)
+    leaderboard_path = docs / "leaderboard.html"
+    if from_existing_data:
+        console.print("[bold]agentkit pages-refresh[/bold] — refreshing front door from existing docs/data.json…")
+        data = {
+            **existing_data,
+            "frontdoor": frontdoor,
+        }
     else:
-        engine = LeaderboardPageEngine(
-            ecosystems=eco_list,
-            limit=limit,
-            token=resolved_token,
-        )
+        console.print("[bold]agentkit pages-refresh[/bold] — scoring ecosystems…")
 
-    result = engine.run()
+        if _engine_factory is not None:
+            engine = _engine_factory(eco_list, limit, resolved_token)
+        else:
+            engine = LeaderboardPageEngine(
+                ecosystems=eco_list,
+                limit=limit,
+                token=resolved_token,
+            )
 
-    # Build data.json
-    data = build_data_json(result, eco_list)
+        result = engine.run()
+        data = build_data_json(result, eco_list, frontdoor=frontdoor)
+
+        from agentkit_cli.leaderboard_page import render_leaderboard_html
+        html = render_leaderboard_html(result)
+        leaderboard_path.write_text(html, encoding="utf-8")
+        console.print(f"[green]✓[/green] Wrote {leaderboard_path}")
 
     data_json_path = docs / "data.json"
     data_json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
     console.print(f"[green]✓[/green] Wrote {data_json_path} ({data['stats']['total']} repos)")
 
-    # Write leaderboard.html
-    from agentkit_cli.leaderboard_page import render_leaderboard_html
-    html = render_leaderboard_html(result)
-    leaderboard_path = docs / "leaderboard.html"
-    leaderboard_path.write_text(html, encoding="utf-8")
-    console.print(f"[green]✓[/green] Wrote {leaderboard_path}")
-
-    # Update index.html
     index_path = docs / "index.html"
     changed = update_index_html(index_path, data)
     if changed:

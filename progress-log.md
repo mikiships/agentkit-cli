@@ -74,3 +74,16 @@
 - The branch and tag no longer point to the same commit. That is now documented explicitly instead of being reported as one commit.
 
 **Final status:** shipped and reconciled. The release is live, validation is green, and the report surfaces now match the actual branch, tag, and PyPI state.
+
+---
+
+## D1: site freshness drift reproduced and locked down — COMPLETE
+
+**Built:**
+- Mapped the drift to two competing front-door writers: `site_engine.generate_index()` carried one set of hardcoded shell stats while `pages_refresh` and `update-pages.yml` mutated `docs/index.html` independently, so `docs/index.html` and `docs/data.json` could disagree.
+- Added regression coverage for a canonical `frontdoor` payload shared by the landing shell and `data.json`.
+- Added regression tests for full index rewrites, `--from-existing-data` refreshes, workflow wiring, and data payload coherence.
+
+**Tests:** `python3 -m pytest -q tests/test_site_engine.py tests/test_pages_refresh.py` -> `84 passed in 0.50s`
+
+**Next:** D2 deterministic front-door refresh path.
