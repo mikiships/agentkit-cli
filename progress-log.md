@@ -123,11 +123,13 @@
 - Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.2.0.md`, `progress-log.md`, and version metadata for `1.2.0`.
 - Added end-to-end coverage in `tests/test_contract_d4.py` for temp-repo contract generation and key section validation.
 - Verified there is no repo-local contradiction-scan helper, then manually reconciled local status/version surfaces instead.
+- Closed the release-completion pass by fixing two stale validation surfaces: `tests/test_main.py` had a hard-coded `1.1.0` expectation, and `BUILD-REPORT.md` was still missing the final suite count required by `tests/test_daily_d5.py`.
 
 **Tests and checks:**
 - `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py tests/test_contract_d4.py` -> `13 passed in 10.28s`
-- `uv run pytest -q` -> pending final execution
+- `uv run pytest -q tests/test_main.py tests/test_daily_d5.py` -> initially `1 failed, 19 passed in 0.39s`, then green after the release-surface fixes
+- `uv run pytest -q` -> `4824 passed, 1 warning in 134.38s (0:02:14)`
 - repo-local contradiction scan helper -> not present; manual coherence check used across README, CHANGELOG, BUILD-REPORT, `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
-- repo-local hygiene helper -> not present; explicit merge-marker/artifact scan pending final pass
+- repo-local hygiene helper -> not present; explicit repo-only merge-marker/artifact scan ran clean after excluding `.venv`, `__pycache__`, and `.git`
 
-**Next:** final full-suite validation and repo-status capture.
+**Next:** repo-status capture and final release summary.

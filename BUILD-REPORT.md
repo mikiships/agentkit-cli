@@ -33,9 +33,13 @@ Completed a first-class `agentkit contract` workflow that turns a repo objective
   - `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py` -> `8 passed in 1.94s`
   - `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py` -> `12 passed in 1.09s`
   - `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py tests/test_contract_d4.py` -> `13 passed in 10.28s`
-- final full suite: pending final execution on the release-completion pass
+- release-surface fixes before final pass:
+  - `uv run pytest -q tests/test_main.py tests/test_daily_d5.py` -> initially failed on stale `1.1.0` version assertion and missing final suite count in `BUILD-REPORT.md`
+  - updated `tests/test_main.py` to assert the live package version instead of a stale literal
+  - updated `BUILD-REPORT.md` to carry the final full-suite result for release verification
+- final full suite: `uv run pytest -q` -> `4824 passed, 1 warning in 134.38s (0:02:14)`
 - contradiction scan equivalent: no repo-local helper exists, so version strings and release surfaces were reconciled manually across README, CHANGELOG, BUILD-REPORT, `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
-- hygiene pass equivalent: no repo-local helper exists, so final explicit merge-marker/artifact check will run before completion
+- hygiene pass equivalent: no repo-local helper exists, so an explicit repo-only merge-marker/artifact scan ran clean after excluding `.venv`, `__pycache__`, and `.git`
 
 ## Version
 
@@ -52,4 +56,4 @@ Completed a first-class `agentkit contract` workflow that turns a repo objective
 
 ## Status
 
-Complete for feature implementation. Final full-suite validation and final repo status capture are the remaining release-completion checks.
+Complete for feature implementation and release-completion validation. Full-suite tests are green, status surfaces are coherent, and only the untracked contract file remains outside the committed feature set.
