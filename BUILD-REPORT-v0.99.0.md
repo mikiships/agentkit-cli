@@ -20,8 +20,8 @@ Completed the canonical-source context projection release. agentkit can now dete
 
 ## Test Results
 
-- focused projection coverage: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.52s`
-- final full suite: `uv run pytest -q` -> `4772 passed, 1 warning in 135.25s (0:02:15)` after adding the versioned build report copy required by the release tests
+- focused projection coverage: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 2.98s`
+- final full suite: `uv run pytest -q` -> `4775 passed, 1 warning in 256.19s (0:04:16)` on the release-ready verification pass
 
 ## Release Notes
 

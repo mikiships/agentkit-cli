@@ -60,6 +60,6 @@
 - `CHANGELOG.md`, `BUILD-REPORT.md`, `pyproject.toml`, and `agentkit_cli/__init__.py` updated for `0.99.0`.
 - Progress log now records the full deliverable path for the release pass.
 
-**Tests:** focused command coverage already exercises the README-adjacent projection flows; full-suite validation is next.
+**Tests:** focused command coverage already exercises the README-adjacent projection flows, and the release-ready verification pass completed with `84 passed` across the targeted projection suite plus `4775 passed, 1 warning` across the full suite.
 
-**Next:** final full-suite run and repo-local hygiene sweep.
+**Next:** repo-local hygiene sweep and final release-ready handoff.
