@@ -87,3 +87,17 @@
 **Tests:** `python3 -m pytest -q tests/test_site_engine.py tests/test_pages_refresh.py` -> `84 passed in 0.50s`
 
 **Next:** D2 deterministic front-door refresh path.
+
+---
+
+## D2: deterministic front-door refresh path — COMPLETE
+
+**Built:**
+- Replaced the regex-based `docs/index.html` mutation path with a canonical full-page rewrite from `SiteEngine.generate_index(site_data=...)`.
+- Added shared `frontdoor` metadata to `docs/data.json` so the landing shell and data feed derive version/test/version-count/package-count stats from the same payload.
+- Added `agentkit pages-refresh --from-existing-data` for the non-rescoring path, then regenerated `docs/index.html` and `docs/data.json` together from that supported command flow.
+
+**Tests:** `python3 -m pytest -q tests/test_site_engine.py tests/test_pages_refresh.py` -> `84 passed in 0.50s`
+
+**Next:** D3 workflow/docs durability updates.
+
