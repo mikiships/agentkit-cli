@@ -86,6 +86,10 @@ def load_existing_data(docs_dir: Path) -> dict:
     return json.loads(data_json_path.read_text(encoding="utf-8"))
 
 
+def _fetch_script() -> str:
+    return SiteEngine()._recently_scored_fetch_script()
+
+
 def update_index_html(index_path: Path, data: dict) -> bool:
     """Rewrite docs/index.html from the canonical data.json payload. Returns True if changed."""
     engine = SiteEngine()

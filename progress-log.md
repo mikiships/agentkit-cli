@@ -114,3 +114,22 @@
 
 **Next:** D4 reports, full validation, and final summary artifacts.
 
+---
+
+## D4: reports, validation, and final artifacts — COMPLETE
+
+**Built:**
+- Updated `BUILD-REPORT.md` with the drift root cause, the canonical refresh path, workflow changes, and final validation results.
+- Added `FINAL-SUMMARY.md` with the concise repo-local handoff summary.
+- Re-ran the contradiction scan and hygiene check, both clean.
+- Ran the full pytest suite under Python 3.11 with API extras enabled, green.
+
+**Tests and checks:**
+- `python3 -m pytest -q tests/test_site_engine.py tests/test_pages_refresh.py` -> `84 passed in 0.50s`
+- `uv run --python 3.11 --extra api --with pytest pytest -q tests/test_landing_d1.py tests/test_landing_d2.py tests/test_pages_sync_d4.py tests/test_site_engine.py tests/test_pages_refresh.py` -> `113 passed in 0.47s`
+- `uv run --python 3.11 --extra api --with pytest pytest -q` -> `4821 passed, 1 warning in 127.85s (0:02:07)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.2.1-site-freshness` -> `0 findings`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.2.1-site-freshness` -> `0 findings`
+
+**Next:** done.
+

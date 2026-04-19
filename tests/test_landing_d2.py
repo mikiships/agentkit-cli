@@ -24,7 +24,8 @@ def test_workflow_triggers_on_main():
 
 def test_workflow_updates_stats():
     content = WORKFLOW.read_text()
-    assert "data-stat" in content or "stat-value" in content or "TEST_COUNT" in content
+    assert "pages-refresh --from-existing-data" in content
+    assert "frontdoor-test-count" in content
 
 
 def test_readme_has_docs_badge():
