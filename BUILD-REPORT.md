@@ -43,7 +43,7 @@ This canonical build report now tracks the local v0.99.0 release-candidate conve
 ## Final RC Summary
 
 - branch: `rc/v0.99.0-mainline`
-- branch head at shipped-state reconciliation: `d9cb8cf763c97b7ecc8794f827853cc3d57738f0`
+- branch head at final hygiene completion: the docs-only chronology cleanup commit created by this final handoff pass
 - shipped release tag: `v0.99.0` -> `3b2f21df8defa08cbdcfe5b69c140d02292ecdf6`
 - targeted validation: `84 passed in 1.36s`
 - full suite: `4775 passed, 1 warning in 127.61s (0:02:07)`

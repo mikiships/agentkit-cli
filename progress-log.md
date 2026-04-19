@@ -174,6 +174,26 @@
 
 ---
 
+## Release D4: final chronology, hygiene, and handoff — COMPLETE
+
+**Built:**
+- reconciled all release surfaces to one shipped chronology with the earlier blocker explicitly superseded
+- removed the stray untracked contract draft `all-day-build-contract-agentkit-cli-v0.99.0-release-completion.md` so the repo can finish clean
+- prepared the release branch for a final push of the docs-only hygiene pass
+
+**Checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v0.99.0-context-projections`
+- final contradiction scan rerun before handoff
+
+**Final summary:**
+- shipped version: `agentkit-cli==0.99.0`
+- exact tests: targeted slice `84 passed in 1.36s`; full suite `4775 passed, 1 warning in 127.61s (0:02:07)`
+- pushed refs after this pass: branch `origin/rc/v0.99.0-mainline` updated to the docs-only chronology cleanup commit from this handoff; release tag `v0.99.0` -> `3b2f21df8defa08cbdcfe5b69c140d02292ecdf6`
+- registry proof: wheel uploaded `2026-04-19T02:24:46.882825Z`; sdist uploaded `2026-04-19T02:24:48.497683Z`
+- caveat: the release tag marks the shipped source commit, while the release branch advances past it with docs-only chronology cleanup
+
+---
+
 ## D5: docs, release notes, and versioning — COMPLETE
 
 **Built:**
