@@ -13,6 +13,19 @@
 
 ---
 
+## D2: bootstrap and promote source command — COMPLETE
+
+**Built:**
+- Added `agentkit source` with explicit `--init` and `--promote` modes for creating or promoting the dedicated canonical source at `.agentkit/source.md`.
+- Promotion chooses the best legacy source deterministically, supports `--from` overrides, and emits structured JSON when requested.
+- Destination-exists behavior is deterministic and safe unless `--force` is supplied.
+
+**Tests:** `uv run pytest -q tests/test_source_cmd.py` -> `5 passed in 0.29s`
+
+**Next:** D3 integrate the dedicated source workflow into project/init/sync and add integration coverage.
+
+---
+
 # Progress Log — agentkit-cli v0.99.0 context projections
 
 ## RC D1: mainline convergence provenance map — COMPLETE

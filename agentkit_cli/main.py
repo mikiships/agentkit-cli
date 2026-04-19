@@ -61,6 +61,7 @@ from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.project_cmd import project_command
+from agentkit_cli.commands.source_cmd import source_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
@@ -1243,6 +1244,20 @@ def sync(
 ) -> None:
     """Check or fix sync status between canonical context files and projections."""
     sync_command(path=path, check=check, fix=fix)
+
+
+@app.command("source")
+def source(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    init: bool = typer.Option(False, "--init", help="Create a fresh dedicated canonical source template"),
+    promote: bool = typer.Option(False, "--promote", help="Copy the best detected legacy context file into the dedicated source path"),
+    from_format: Optional[str] = typer.Option(None, "--from", help="Legacy source format to promote explicitly"),
+    title: Optional[str] = typer.Option(None, "--title", help="Template title to use with --init"),
+    force: bool = typer.Option(False, "--force", help="Overwrite the dedicated source file if it already exists"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+) -> None:
+    """Manage agentkit's dedicated canonical source file."""
+    source_command(path=path, init=init, promote=promote, from_format=from_format, title=title, force=force, json_output=json_output)
 
 
 @app.command("project")
