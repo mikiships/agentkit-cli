@@ -89,6 +89,7 @@ from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
 from agentkit_cli.commands.pages_refresh import pages_refresh_command
 from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
+from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -253,6 +254,19 @@ def run(
             min_score=None,
             output=None,
         )
+
+
+@app.command("burn")
+def burn(
+    path: Optional[Path] = typer.Option(None, "--path", help="Transcript file or directory"),
+    format: str = typer.Option("table", "--format", help="Output format: table|json"),
+    since: Optional[str] = typer.Option(None, "--since", help="Only include sessions starting on/after this timestamp"),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Maximum sessions after filtering"),
+    project: Optional[str] = typer.Option(None, "--project", help="Filter to one project root"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML burn report to file"),
+) -> None:
+    """Analyze local coding-session transcript burn and waste patterns."""
+    burn_command(path=path, format=format, since=since, limit=limit, project=project, output=output)
 
 
 @app.command("doctor")

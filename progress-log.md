@@ -23,3 +23,28 @@
 **Tests:** `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py` -> `13 passed in 0.04s`
 
 **Next:** D3 `agentkit burn` CLI command.
+
+---
+
+## D3: `agentkit burn` CLI command — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/burn.py` with `--path`, `--format`, `--since`, `--limit`, `--project`, and `--output` support.
+- Added rich terminal output, stable JSON output, and clean empty-directory handling.
+- Added CLI tests for happy path, filters, empty path, JSON shape, and HTML writing.
+
+**Tests:** pending D3/D4 validation run
+
+**Next:** D4 HTML report + narrative summary.
+
+---
+
+## D4: HTML burn report + narrative summary — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/renderers/burn_report.py` with dark-theme HTML and markdown-ready burn summaries.
+- Added renderer tests for report sections, styling markers, and markdown summary content.
+
+**Tests:** pending D3/D4 validation run
+
+**Next:** D5 docs, versioning, and final validation.
