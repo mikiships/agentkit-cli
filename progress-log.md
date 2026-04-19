@@ -10,3 +10,17 @@
 **Tests:** `uv run pytest -q tests/test_context_projections.py tests/test_migrate_engine.py` -> 28 passed
 
 **Next:** D2 project command and reporting surface.
+
+---
+
+## D2: `agentkit project` CLI surface — COMPLETE
+
+**Built:**
+- `agentkit_cli/commands/project_cmd.py` with `--from`, `--targets`, `--output-dir`, `--check`, `--write`, and `--json`.
+- `agentkit_cli/main.py` wiring for the new `agentkit project` command.
+- `agentkit_cli/commands/migrate_cmd.py` now resolves the broader target alias set through the shared projection engine.
+- `tests/test_project_cmd.py` covering write mode, `--check`, JSON summaries, custom output directories, and unknown targets.
+
+**Tests:** `uv run pytest -q tests/test_project_cmd.py tests/test_migrate_cmd.py` -> 22 passed
+
+**Next:** D3 sync and drift verification across the expanded target set.

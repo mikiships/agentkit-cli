@@ -60,6 +60,7 @@ from agentkit_cli.commands.checks_cmd import checks_app
 from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
+from agentkit_cli.commands.project_cmd import project_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
@@ -141,9 +142,11 @@ def quickstart(
 @app.command("init")
 def init(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project root"),
+    project_targets: Optional[str] = typer.Option(None, "--project-targets", help="Optional projection fan-out target list"),
+    write_projections: bool = typer.Option(False, "--write-projections", help="Write requested projections during init"),
 ) -> None:
     """Initialize agentkit in a project. Creates .agentkit.yaml and checks for quartet tools."""
-    init_command(path=path)
+    init_command(path=path, project_targets=project_targets, write_projections=write_projections)
 
 
 @app.command("run")
@@ -1238,8 +1241,22 @@ def sync(
     check: bool = typer.Option(False, "--check", help="Report sync status; exit 1 if stale"),
     fix: bool = typer.Option(False, "--fix", help="Re-run migrate to bring derived files in sync"),
 ) -> None:
-    """Check or fix sync status between AGENTS.md, CLAUDE.md, and llms.txt."""
+    """Check or fix sync status between canonical context files and projections."""
     sync_command(path=path, check=check, fix=fix)
+
+
+@app.command("project")
+def project(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    from_format: Optional[str] = typer.Option(None, "--from", help="Canonical source format override"),
+    targets: str = typer.Option("all", "--targets", help="Comma-separated target list or all"),
+    output_dir: Optional[str] = typer.Option(None, "--output-dir", help="Write projected files into this directory"),
+    check: bool = typer.Option(False, "--check", help="Exit non-zero when projected output would drift"),
+    write: bool = typer.Option(False, "--write", help="Write projected files"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+) -> None:
+    """Project one canonical context source into multiple target files."""
+    project_command(path=path, from_format=from_format, targets=targets, output_dir=output_dir, check=check, write=write, json_output=json_output)
 
 
 @app.command("llmstxt")
