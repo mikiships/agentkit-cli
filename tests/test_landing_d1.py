@@ -23,6 +23,8 @@ def test_hero_headline():
     html = _html()
     assert "One canonical context file" in html
     assert ".agentkit/source.md" in html
+    assert "v1.2.0" in html
+    assert "agentkit contract" in html
 
 
 def test_pipeline_stages():
@@ -56,6 +58,7 @@ def test_quickstart_code_block():
     assert "pip install agentkit-cli" in html
     assert "agentkit source --init" in html
     assert "agentkit project --write" in html
+    assert "agentkit contract --init" in html
 
 
 def test_github_link():
@@ -79,9 +82,17 @@ def test_commands_table_present():
     html = _html()
     assert "cmd-table" in html
     assert "agentkit source --init" in html
+    assert "agentkit contract --init" in html
     assert "agentkit burn --path ./transcripts" in html
 
 
 def test_dark_theme_colors():
     html = _html()
     assert "#0d1117" in html or "0d1117" in html, "Dark background color missing"
+
+
+def test_stats_show_current_shipped_counts():
+    html = _html()
+    assert 'data-stat="tests">4824<' in html
+    assert 'data-stat="versions">111<' in html
+    assert 'data-stat="packages">6<' in html

@@ -137,6 +137,14 @@ def test_generate_index_has_seo_tags(engine):
     assert "application/ld+json" in page.html
 
 
+def test_generate_index_shows_current_frontdoor_story(engine):
+    page = engine.generate_index()
+    assert "v1.2.0" in page.html
+    assert "4824" in page.html
+    assert "agentkit contract" in page.html
+    assert "agentkit contract --init" in page.html
+
+
 def test_generate_topic_page(populated_engine):
     page = populated_engine.generate_topic_page("python")
     assert "python" in page.path.lower()

@@ -376,15 +376,15 @@ footer a:hover { color: var(--text); }
     <a href="https://mikiships.github.io/agentkit-cli/leaderboard.html">Daily Leaderboard</a>
     <a href="https://mikiships.github.io/agentkit-cli/trending.html">Daily Trending</a>
     <a href="https://mikiships.github.io/agentkit-cli/#org-leaderboard">Org Leaderboard</a>
-    <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
+    <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v1.1.0 &middot; 20 repos scored</div>
+          <div class="hero-badge">v1.2.0 &middot; 8 repos scored</div>
           <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
-          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, then measure whether the setup is any good.</p>
+          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, add an <code>agentkit contract</code> when you need shared execution rules, then measure whether the setup is any good.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
             <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">PyPI ↗</a>
@@ -411,12 +411,22 @@ footer a:hover { color: var(--text); }
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4811</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">101</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4824</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">111</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">20</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">8</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
+
+        <!-- Recently Scored (populated dynamically from data.json) -->
+        <section class="recently-scored-section" id="recently-scored">
+          <div class="container">
+            <h2 class="section-title">Recently Scored</h2>
+            <div id="recently-scored-list" class="recently-scored-list">
+              <p style="color:var(--muted)">Loading...</p>
+            </div>
+          </div>
+        </section>
 
         <!-- Feature grid -->
         <section class="features-section">
@@ -439,7 +449,8 @@ footer a:hover { color: var(--text); }
             <h2 class="section-title">Quick Start</h2>
             <pre class="code-block"><code>pip install agentkit-cli
 agentkit source --init
-agentkit project --write</code></pre>
+agentkit project --write
+agentkit contract --init</code></pre>
           </div>
         </section>
 
@@ -452,6 +463,7 @@ agentkit project --write</code></pre>
               <tbody>
                 <tr><td>agentkit source --init</td><td>Create a dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
                 <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and llms.txt from that source</td></tr>
+                <tr><td>agentkit contract --init</td><td>Create an <code>agentkit contract</code> that keeps execution rules, deliverables, and validation visible to every agent</td></tr>
                 <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze any public GitHub repo and publish a shareable scorecard</td></tr>
                 <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>
                 <tr><td>agentkit gate --min-score 80</td><td>Fail CI when the setup drops below your quality bar</td></tr>
@@ -501,21 +513,71 @@ agentkit project --write</code></pre>
           </div>
         </section>
 
-        <!-- Recently Scored (populated dynamically from data.json) -->
-                                                                                                                                                                                                                                        <section class="recently-scored-section" id="recently-scored">
-          <h2 class="section-title">Recently Scored Repos</h2>
-          <div id="recently-scored-list" class="recently-scored-list">
-            <p class="loading-msg">Loading…</p>
-          </div>
-        </section>
-
         <!-- Live Rankings -->
         <div class="container">
-          <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
-          <p style='color:var(--muted)'>No scored repos yet. Run <code>agentkit quickstart</code> to get started.</p>
+          <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
+          
+        <div class="section-header">
+          <h2 class="section-title">Rankings</h2>
+          <span class="section-note">8 repos scored</span>
         </div>
+        <table>
+          <thead><tr><th>Repository</th><th>Score</th><th>Grade</th></tr></thead>
+          <tbody><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/github-a--repo1__vs__github-b--repo2.html">github:a/repo1__vs__github:b/repo2</a></td><td><div class="score-cell"><span class="score-val">80</span><span class="score-bar-wrap"><span class="score-bar" data-pct="80"></span></span></div></td><td><span class="badge badge-A">A</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/a--b__vs__c--d.html">a/b__vs__c/d</a></td><td><div class="score-cell"><span class="score-val">80</span><span class="score-bar-wrap"><span class="score-bar" data-pct="80"></span></span></div></td><td><span class="badge badge-A">A</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/org--repo1__vs__org--repo2.html">org/repo1__vs__org/repo2</a></td><td><div class="score-cell"><span class="score-val">75</span><span class="score-bar-wrap"><span class="score-bar" data-pct="75"></span></span></div></td><td><span class="badge badge-B">B</span></td></tr></tbody>
+        </table>
+        </div>
+<script>
+(function() {
+  function gradeClass(g) {
+    return {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d','F':'grade-f'}[g] || '';
+  }
+  function renderRecentlyScored(data) {
+    var el = document.getElementById('recently-scored-list');
+    if (!el) return;
+    if (!data || !data.repos || !data.repos.length) {
+      el.innerHTML = '<p class="loading-msg">No data available.</p>';
+      return;
+    }
+    var top = data.repos.slice(0, 5);
+    var html = '<ul class="repo-list">';
+    top.forEach(function(r) {
+      var src = r.source || 'ecosystem';
+      var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+      var srcClass = 'source-' + srcLabel;
+      html += '<li class="repo-item">'
+        + '<a href="' + r.url + '" target="_blank" rel="noopener" class="repo-name">' + r.name + '</a>'
+        + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+        + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+        + '<span class="score-val">' + r.score + '</span>'
+        + '<span class="grade ' + gradeClass(r.grade) + '">' + r.grade + '</span>'
+        + '</li>';
+    });
+    html += '</ul>';
+    if (data.stats) {
+      html += '<p class="data-ts">Updated: ' + (data.generated_at ? data.generated_at.slice(0,10) : '') + '</p>';
+    }
+    el.innerHTML = html;
+    var statEl = document.getElementById('repos-scored-stat') || document.querySelector('.stat-num');
+    if (statEl && data.stats && data.stats.total) statEl.textContent = data.stats.total;
+    var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+    var commEl = document.getElementById('community-scored-stat');
+    if (commEl) commEl.textContent = communityCount;
+    var badge = document.querySelector('.hero-badge');
+    if (badge && data.stats && data.stats.total) {
+      badge.textContent = badge.textContent.replace(/\d+ repos scored/, data.stats.total + ' repos scored');
+    }
+  }
+  fetch('/agentkit-cli/data.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(renderRecentlyScored)
+    .catch(function() {
+      var el = document.getElementById('recently-scored-list');
+      if (el) el.innerHTML = '<p class="loading-msg">Score data unavailable.</p>';
+    });
+})();
+</script>
 <footer>
-  <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-03-23 · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
+  <p>Built with <a href="https://github.com/mikiships/agentkit-cli">agentkit-cli</a> · 2026-04-19 · <a href="https://pypi.org/project/agentkit-cli/">PyPI</a></p>
 </footer>
 <script>
 // Stagger table rows in on scroll
@@ -567,10 +629,8 @@ function renderRecentlyScored(data) {
   });
   html += '</ul>';
   el.innerHTML = html;
-  // Update repos-scored stat
   var statEl = document.getElementById('repos-scored-stat');
   if (statEl && data.stats && data.stats.total) { statEl.textContent = data.stats.total; }
-  // Update community-scored stat
   var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
   var commEl = document.getElementById('community-scored-stat');
   if (commEl) { commEl.textContent = communityCount; }
