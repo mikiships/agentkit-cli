@@ -44,6 +44,35 @@ def test_load_sessions_is_deterministic():
     assert [session.session_id for session in sessions] == ["codex-001", "claude-001", "openclaw-001", "openclaw-002"]
 
 
+def test_generated_turn_ids_and_sorting_are_deterministic(tmp_path):
+    transcript = tmp_path / "generated.openclaw.jsonl"
+    transcript.write_text(
+        '\n'.join(
+            [
+                '{"session_id":"sess-1","model":"gpt-4.1","timestamp":"2026-04-18T12:03:00+00:00","input_tokens":5,"output_tokens":7}',
+                '{"session_id":"sess-1","model":"gpt-4.1","timestamp":"2026-04-18T12:01:00+00:00","input_tokens":1,"output_tokens":2}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    first = parse_openclaw_file(transcript)[0]
+    second = parse_openclaw_file(transcript)[0]
+    assert [turn.timestamp for turn in first.turns] == ["2026-04-18T12:01:00+00:00", "2026-04-18T12:03:00+00:00"]
+    assert [turn.turn_id for turn in first.turns] == [turn.turn_id for turn in second.turns]
+    assert all(turn.turn_id.startswith("turn-") for turn in first.turns)
+
+
+def test_null_cost_fields_are_marked_missing(tmp_path):
+    transcript = tmp_path / "missing-cost.codex.json"
+    transcript.write_text(
+        '{"session_id":"codex-missing","turns":[{"id":"t1","cost_usd":null}],"started_at":"2026-04-18T10:00:00+00:00"}',
+        encoding="utf-8",
+    )
+    session = parse_codex_file(transcript)[0]
+    assert session.turns[0].cost.state == "missing"
+    assert session.turns[0].cost.amount_usd is None
+
+
 def test_malformed_json_raises(tmp_path):
     broken = tmp_path / "bad.codex.json"
     broken.write_text("{", encoding="utf-8")

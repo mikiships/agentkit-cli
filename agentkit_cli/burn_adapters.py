@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -113,7 +114,7 @@ def parse_codex_file(path: Path) -> list[BurnSession]:
     payload = _read_json(path)
     if "session_id" not in payload or "turns" not in payload:
         raise BurnAdapterError(f"Malformed Codex transcript: {path}")
-    turns = [_normalize_turn(item, default_source="codex", session=payload) for item in payload.get("turns", [])]
+    turns = _sorted_turns(_normalize_turn(item, default_source="codex", session=payload) for item in payload.get("turns", []))
     return [
         BurnSession(
             session_id=str(payload["session_id"]),
@@ -139,7 +140,7 @@ def parse_claude_file(path: Path) -> list[BurnSession]:
         "project_root": payload.get("workspace"),
         "task_label": payload.get("task") or payload.get("title"),
     }
-    turns = [_normalize_turn(item, default_source="claude-code", session=session_meta) for item in payload.get("messages", [])]
+    turns = _sorted_turns(_normalize_turn(item, default_source="claude-code", session=session_meta) for item in payload.get("messages", []))
     return [
         BurnSession(
             session_id=str(payload["id"]),
@@ -169,7 +170,7 @@ def parse_openclaw_file(path: Path) -> list[BurnSession]:
         metas.setdefault(session_id, record)
     result: list[BurnSession] = []
     for session_id, items in sorted(sessions.items()):
-        turns = [_normalize_turn(item, default_source="openclaw", session=metas[session_id]) for item in items]
+        turns = _sorted_turns(_normalize_turn(item, default_source="openclaw", session=metas[session_id]) for item in items)
         timestamps = [t.timestamp for t in turns if t.timestamp]
         result.append(
             BurnSession(
@@ -194,7 +195,7 @@ def _normalize_turn(item: dict[str, Any], default_source: str, session: dict[str
     tool_uses = _normalize_tools(raw_tools)
     amount, state, estimated = _normalize_cost(item)
     return BurnTurn(
-        turn_id=str(item.get("turn_id") or item.get("id") or item.get("message_id") or f"turn-{abs(hash(json.dumps(item, sort_keys=True, default=str)))}"),
+        turn_id=str(item.get("turn_id") or item.get("id") or item.get("message_id") or _stable_turn_id(item)),
         role=str(item.get("role") or item.get("sender") or "assistant"),
         model=str(model),
         provider=str(provider or "unknown"),
@@ -280,6 +281,16 @@ def _intish(value: Any) -> Optional[int]:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _sorted_turns(turns: Iterable[BurnTurn]) -> list[BurnTurn]:
+    return sorted(turns, key=lambda turn: (turn.timestamp or "", turn.turn_id))
+
+
+def _stable_turn_id(item: dict[str, Any]) -> str:
+    payload = json.dumps(item, sort_keys=True, separators=(",", ":"), default=str)
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return f"turn-{digest}"
 
 
 def _provider_from_model(model: str) -> str:
