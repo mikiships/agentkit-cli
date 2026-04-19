@@ -134,6 +134,24 @@
 
 ---
 
+## Release D2: release branch, tag, and GitHub state — COMPLETE
+
+**Built:**
+- confirmed the working tree was clean before external release actions
+- pushed `rc/v0.99.0-mainline` to `origin`
+- retargeted annotated tag `v0.99.0` to release commit `3b2f21d` and pushed it to `origin`
+- verified the remote branch and dereferenced remote tag both resolve to `3b2f21df8defa08cbdcfe5b69c140d02292ecdf6`
+
+**External proof:**
+- `git ls-remote --heads origin rc/v0.99.0-mainline` -> `3b2f21df8defa08cbdcfe5b69c140d02292ecdf6`
+- `git ls-remote --tags origin v0.99.0 v0.99.0^{}` -> annotated tag object `7b6bca32d571bc411596403681b02bfc3c5d3fe2`, dereferenced commit `3b2f21df8defa08cbdcfe5b69c140d02292ecdf6`
+
+**Tests:** no new test run in D2, relying on D1 verification baseline
+
+**Next:** D3 build release artifacts and publish `agentkit-cli==0.99.0` to PyPI.
+
+---
+
 ## D5: docs, release notes, and versioning — COMPLETE
 
 **Built:**
