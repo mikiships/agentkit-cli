@@ -56,11 +56,12 @@ Completed a first-class `agentkit contract` workflow that turns a repo objective
 
 ## Release completion
 
-- tested release commit: `33dce29` (`docs: record v1.2.0 validation rerun`)
-- origin branch: `origin/feat/v1.2.0-contracts` -> `33dce29`
+- shipped release commit: `33dce29` (`docs: record v1.2.0 validation rerun`)
+- current origin branch head: `origin/feat/v1.2.0-contracts` -> `85377a7` (`docs: reconcile v1.2.0 shipped release state`)
 - annotated tag: `v1.2.0` -> `33dce29`
 - PyPI: `agentkit-cli==1.2.0` live with wheel and sdist uploaded on 2026-04-19
+- release chronology: the package/tagged release shipped from `33dce29`, then the branch advanced to `85377a7` only to reconcile the repo docs to that shipped truth
 
 ## Status
 
-Shipped. Full-suite tests are green on the tagged release commit, the branch/tag/PyPI surfaces are live, and any later repo-root contract markdown files remain intentionally untracked outside the shipped release artifact set.
+Shipped. Full-suite tests are green on the shipped tagged commit, PyPI is live, and the branch now contains one follow-up docs-only reconciliation commit. Any later repo-root contract markdown files remain intentionally untracked outside the shipped release artifact set.

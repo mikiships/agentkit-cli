@@ -8,7 +8,7 @@
 - Contract tests covering dedicated-source loading, legacy fallback, JSON mode, default output slugging, overwrite refusal, repeated flags, and end-to-end temp-repo generation.
 
 ### Docs
-- README, BUILD-REPORT, and progress log updated for the shipped v1.2.0 contracts release, with branch/tag/PyPI release proof reconciled to the tested commit.
+- README, BUILD-REPORT, and progress log updated for the shipped v1.2.0 contracts release, explicitly separating the shipped tag/PyPI commit from the later docs-only branch-head reconciliation commit.
 
 ## [1.1.0] - 2026-04-19
 
