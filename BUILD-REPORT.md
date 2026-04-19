@@ -8,6 +8,10 @@ Contract: all-day-build-contract-agentkit-cli-v0.99.0-context-projections.md
 
 Completed the canonical-source context projection release. agentkit can now detect one source context file, project it into the major tool-specific filenames teams are converging on, report deterministic drift, and optionally wire projection fan-out into init.
 
+## RC Objective
+
+This canonical build report now tracks the local v0.99.0 release-candidate convergence branch. The RC preserves the feature set from `feat/v0.99.0-context-projections`, uses `f2bc687` as the documented pre-feature sync point, and treats this repo state as locally release-ready only after the RC validation and narrative reconciliation gates are complete.
+
 ## Deliverables
 
 | # | Deliverable | Status | Notes |
@@ -28,4 +32,4 @@ Completed the canonical-source context projection release. agentkit can now dete
 - version metadata bumped to `0.99.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
 - compatibility preserved for the legacy migrate engine tests while enabling the broader projection workflow in the new command surfaces
 - versioned build report copy added as `BUILD-REPORT-v0.99.0.md`
-- status: READY
+- status: RC IN PROGRESS, target state is release-ready locally and not published

@@ -1,5 +1,26 @@
 # Progress Log — agentkit-cli v0.99.0 context projections
 
+## RC D1: mainline convergence provenance map — COMPLETE
+
+**Branch:** `rc/v0.99.0-mainline`
+
+**Provenance:**
+- sync point with mainline history: `f2bc687` (`docs: record v0.98.0 sync validation`)
+- source feature line: `feat/v0.99.0-context-projections`
+- RC branch cut from feature HEAD `9140ced` to preserve the completed v0.99.0 context-projections deliverables while repairing release-trail drift locally
+- intended convergence path for publish prep: replay the context-projections deliverables onto a current mainline publish pass with this branch as the local truth source for feature scope, chronology, and validation outcomes
+
+**Built:**
+- created local RC branch `rc/v0.99.0-mainline` for the release-candidate convergence pass
+- added the RC contract file `all-day-build-contract-agentkit-cli-v0.99.0-mainline-rc.md` to keep the handoff self-contained inside the repo
+- refreshed the versioned and canonical build reports with an explicit RC objective so the branch narrative is local release-ready, not already shipped
+
+**Tests:** not run in D1, documentation/provenance pass only
+
+**Next:** D2 release-trail reconciliation across build/report surfaces.
+
+---
+
 ## D1: projection engine core — COMPLETE
 
 **Built:**
