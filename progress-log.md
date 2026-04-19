@@ -146,3 +146,19 @@
 - repo-local hygiene helper -> not present; explicit repo-only merge-marker/artifact scan ran clean after excluding `.venv`, `__pycache__`, and `.git`
 
 **Next:** repo-status capture and final release summary.
+
+---
+
+## Release completion validation rerun — 2026-04-19
+
+**Validated:**
+- Focused contracts slice still passes on the audited `1.2.0` branch head.
+- Full repo suite still passes from this repo after the audit commit.
+- Repo-local contradiction/hygiene equivalent was rerun deterministically inside the project directory by scanning for unresolved merge markers after excluding `.git`, `.venv`, `__pycache__`, and `.pytest_cache`.
+
+**Tests and checks:**
+- `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py tests/test_contract_d4.py` -> `13 passed in 0.38s`
+- `uv run pytest -q` -> `4824 passed, 1 warning in 129.15s (0:02:09)`
+- merge-marker hygiene scan -> `0 findings`
+
+**Next:** build/publish the missing `1.2.0` release surfaces, then reconcile the local release reports from "locally verified" to the final shipped truth.
