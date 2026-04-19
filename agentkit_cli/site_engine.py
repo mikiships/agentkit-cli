@@ -16,6 +16,11 @@ try:
 except Exception:
     _PKG_VERSION = "0.86"
 
+_FRONTDOOR_VERSION = "1.2.0"
+_FRONTDOOR_TEST_COUNT = 4824
+_FRONTDOOR_VERSION_COUNT = 111
+_FRONTDOOR_PACKAGE_COUNT = 6
+
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
@@ -631,9 +636,9 @@ class SiteEngine:
 
         body = f"""
         <div class="hero">
-          <div class="hero-badge">v{_PKG_VERSION} &middot; {total_repos} repos scored</div>
+          <div class="hero-badge">v{_FRONTDOOR_VERSION} &middot; {total_repos} repos scored</div>
           <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
-          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, then measure whether the setup is any good.</p>
+          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, add an <code>agentkit contract</code> when you need shared execution rules, then measure whether the setup is any good.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
             <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">PyPI ↗</a>
@@ -660,9 +665,9 @@ class SiteEngine:
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4811</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">110</div><div class="stat-label">Versions</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">{_FRONTDOOR_TEST_COUNT}</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">{_FRONTDOOR_VERSION_COUNT}</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">{_FRONTDOOR_PACKAGE_COUNT}</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
@@ -698,7 +703,8 @@ class SiteEngine:
             <h2 class="section-title">Quick Start</h2>
             <pre class="code-block"><code>pip install agentkit-cli
 agentkit source --init
-agentkit project --write</code></pre>
+agentkit project --write
+agentkit contract --init</code></pre>
           </div>
         </section>
 
@@ -711,6 +717,7 @@ agentkit project --write</code></pre>
               <tbody>
                 <tr><td>agentkit source --init</td><td>Create a dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
                 <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and llms.txt from that source</td></tr>
+                <tr><td>agentkit contract --init</td><td>Create an <code>agentkit contract</code> that keeps execution rules, deliverables, and validation visible to every agent</td></tr>
                 <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze any public GitHub repo and publish a shareable scorecard</td></tr>
                 <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>
                 <tr><td>agentkit gate --min-score 80</td><td>Fail CI when the setup drops below your quality bar</td></tr>
