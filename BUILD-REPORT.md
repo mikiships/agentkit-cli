@@ -35,4 +35,13 @@ This canonical build report now tracks the local v0.99.0 release-candidate conve
 - version metadata bumped to `0.99.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
 - compatibility preserved for the legacy migrate engine tests while enabling the broader projection workflow in the new command surfaces
 - versioned build report copy added as `BUILD-REPORT-v0.99.0.md`
-- status: RC IN PROGRESS, target state is release-ready locally and not published
+- status: RELEASE-READY LOCALLY, not shipped or published
+
+## Final RC Summary
+
+- branch: `rc/v0.99.0-mainline`
+- HEAD at D4 completion: final D4 commit on `rc/v0.99.0-mainline` (report this commit hash from `git rev-parse --short HEAD` at handoff)
+- targeted validation: `84 passed`
+- full suite: `4775 passed, 1 warning`
+- working tree: clean
+- RC verdict: v0.99.0 is release-ready locally

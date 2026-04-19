@@ -49,6 +49,19 @@
 
 ---
 
+## RC D4: hygiene and final handoff surfaces — COMPLETE
+
+**Built:**
+- ran a contradiction scan across the RC report surfaces and confirmed one coherent status narrative
+- cleared test-generated working tree noise by restoring `.agentkit-last-run.json`
+- finalized the versioned and canonical build reports with branch, HEAD placeholder, test totals, clean-tree state, and the local release-ready verdict
+
+**Tests:** hygiene only, no additional test run beyond D3
+
+**Final status:** branch clean, RC release-ready locally, not shipped or published
+
+---
+
 ## D1: projection engine core — COMPLETE
 
 **Built:**
