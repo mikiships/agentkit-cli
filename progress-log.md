@@ -26,6 +26,19 @@
 
 ---
 
+## D3: project, init, and sync integration — COMPLETE
+
+**Built:**
+- `agentkit project` now prefers `.agentkit/source.md` automatically when the dedicated source exists, even if legacy root files are still present.
+- `agentkit sync` now shows the dedicated source row explicitly, uses it as the drift authority, and can project missing root files from it during `--fix`.
+- `agentkit init` now supports `--init-source`, `--promote-source`, and `--source-title` so a repo can enter the dedicated-source workflow during setup and immediately fan out projections.
+
+**Tests:** `uv run pytest -q tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_init.py` -> `23 passed in 0.90s`
+
+**Next:** D4 docs, changelog, reports, version bump, and full validation.
+
+---
+
 # Progress Log — agentkit-cli v0.99.0 context projections
 
 ## RC D1: mainline convergence provenance map — COMPLETE

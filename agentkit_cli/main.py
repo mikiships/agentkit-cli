@@ -145,9 +145,19 @@ def init(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project root"),
     project_targets: Optional[str] = typer.Option(None, "--project-targets", help="Optional projection fan-out target list"),
     write_projections: bool = typer.Option(False, "--write-projections", help="Write requested projections during init"),
+    init_source: bool = typer.Option(False, "--init-source", help="Create a fresh dedicated canonical source at .agentkit/source.md"),
+    promote_source: bool = typer.Option(False, "--promote-source", help="Promote the best existing context file into .agentkit/source.md before projecting"),
+    source_title: Optional[str] = typer.Option(None, "--source-title", help="Template title to use with --init-source"),
 ) -> None:
     """Initialize agentkit in a project. Creates .agentkit.yaml and checks for quartet tools."""
-    init_command(path=path, project_targets=project_targets, write_projections=write_projections)
+    init_command(
+        path=path,
+        project_targets=project_targets,
+        write_projections=write_projections,
+        init_source=init_source,
+        promote_source=promote_source,
+        source_title=source_title,
+    )
 
 
 @app.command("run")

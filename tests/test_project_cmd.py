@@ -4,6 +4,7 @@ import json
 
 from typer.testing import CliRunner
 
+from agentkit_cli.context_projections import dedicated_source_path
 from agentkit_cli.main import app
 
 runner = CliRunner()
@@ -56,3 +57,15 @@ def test_project_unknown_target_fails(tmp_path):
     (tmp_path / "AGENTS.md").write_text(AGENTS_SAMPLE)
     result = runner.invoke(app, ["project", str(tmp_path), "--targets", "bogus"])
     assert result.exit_code == 1
+
+
+def test_project_prefers_dedicated_source_when_present(tmp_path):
+    dedicated = dedicated_source_path(tmp_path)
+    dedicated.parent.mkdir()
+    dedicated.write_text("# Dedicated Soul\n\n## Overview\nCanonical.\n")
+    (tmp_path / "AGENTS.md").write_text(AGENTS_SAMPLE)
+    result = runner.invoke(app, ["project", str(tmp_path), "--targets", "claude", "--json"])
+    assert result.exit_code == 0
+    payload = json.loads(result.output)
+    assert payload["canonical_source_format"] == "agentkit-source"
+    assert payload["canonical_source"].endswith(".agentkit/source.md")

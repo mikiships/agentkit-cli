@@ -250,8 +250,10 @@ class ContextProjectionEngine:
         source_fmt, source_path = detected
         source_content = source_path.read_text(encoding="utf-8", errors="replace")
         status: dict[str, str] = {}
+        if source_fmt == FORMAT_AGENTKIT_SOURCE:
+            status[FORMAT_AGENTKIT_SOURCE] = "source"
         for fmt in KNOWN_FORMATS:
-            path = root / FORMAT_FILENAMES[fmt]
+            path = source_path_for_format(root, fmt)
             if fmt == source_fmt:
                 status[fmt] = "source"
             elif not path.exists():
