@@ -24,3 +24,16 @@
 **Tests:** `uv run pytest -q tests/test_project_cmd.py tests/test_migrate_cmd.py` -> 22 passed
 
 **Next:** D3 sync and drift verification across the expanded target set.
+
+---
+
+## D3: drift and sync verification — COMPLETE
+
+**Built:**
+- `agentkit_cli/commands/sync_cmd.py` now understands the projection engine, reports the expanded target set, keeps legacy `--check` behavior stable for the classic trio, and repairs stale or missing projections in one pass.
+- `tests/test_sync_projections.py` for new-target drift detection and repair coverage.
+- Backward-compatibility behavior stayed green for existing migrate and sync tests while adding the new projection-aware checks.
+
+**Tests:** `uv run pytest -q tests/test_sync_projections.py tests/test_migrate_cmd.py` -> 19 passed
+
+**Next:** D4 workflow integration through an existing high-leverage command.
