@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0] - 2026-04-19
+
+### Added
+- `agentkit contract` for generating deterministic all-day build contracts from a repo objective plus canonical source context.
+- Shared contract engine with schema-backed rendering, default deliverable scaffolding, repo-aware command hints, stop conditions, and final report requirements.
+- Contract tests covering dedicated-source loading, legacy fallback, JSON mode, default output slugging, overwrite refusal, repeated flags, and end-to-end temp-repo generation.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v1.2.0 contracts release.
+
 ## [1.1.0] - 2026-04-19
 
 ### Added

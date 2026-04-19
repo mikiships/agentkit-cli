@@ -113,3 +113,21 @@
 **Tests:** `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py` -> `12 passed in 1.09s`
 
 **Next:** D4 docs, versioning, and full validation.
+
+---
+
+## D4: docs, build report, versioning, and validation — COMPLETE
+
+**Built and verified:**
+- Added README usage/examples for `agentkit contract`.
+- Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.2.0.md`, `progress-log.md`, and version metadata for `1.2.0`.
+- Added end-to-end coverage in `tests/test_contract_d4.py` for temp-repo contract generation and key section validation.
+- Verified there is no repo-local contradiction-scan helper, then manually reconciled local status/version surfaces instead.
+
+**Tests and checks:**
+- `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py tests/test_contract_d4.py` -> `13 passed in 10.28s`
+- `uv run pytest -q` -> pending final execution
+- repo-local contradiction scan helper -> not present; manual coherence check used across README, CHANGELOG, BUILD-REPORT, `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
+- repo-local hygiene helper -> not present; explicit merge-marker/artifact scan pending final pass
+
+**Next:** final full-suite validation and repo-status capture.

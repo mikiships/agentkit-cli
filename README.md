@@ -204,6 +204,37 @@ agentkit init --init-source --source-title "My Project" --project-targets claude
 agentkit init --promote-source --project-targets all --write-projections
 ```
 
+## `agentkit contract` — deterministic all-day build contracts
+
+Turn an objective plus the repo's canonical source context into a strict build contract a coding agent can execute.
+
+```bash
+# Generate a contract beside the repo using the default slugged filename
+agentkit contract "Ship the release-check reconciliation"
+
+# Target a different repo and customize the contract title/output file
+agentkit contract "Add source-aware scaffolding" \
+  --path ~/src/my-repo \
+  --title "All-Day Build Contract: my-repo contracts" \
+  --output ~/src/my-repo/contracts/build-contract.md
+
+# Add explicit deliverables and test requirements
+agentkit contract "Implement contract workflow" \
+  --deliverable "Build deterministic renderer" \
+  --deliverable "Wire CLI command" \
+  --test-requirement "Run focused contract tests" \
+  --test-requirement "Run full pytest suite"
+
+# Emit deterministic JSON metadata while still writing the contract file
+agentkit contract "Harden release docs" --json
+```
+
+What it does:
+- prefers `.agentkit/source.md` when present, otherwise falls back to detected legacy context files
+- carries forward repo-aware command hints and directory boundaries from explicit local files
+- refuses to overwrite an existing contract output path
+- renders stable markdown sections for objective, rules, deliverables, tests, reports, and stop conditions
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.
