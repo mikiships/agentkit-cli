@@ -162,3 +162,21 @@
 - merge-marker hygiene scan -> `0 findings`
 
 **Next:** build/publish the missing `1.2.0` release surfaces, then reconcile the local release reports from "locally verified" to the final shipped truth.
+
+---
+
+## Release completion surfaces and chronology — 2026-04-19
+
+**Completed:**
+- Pushed `feat/v1.2.0-contracts` to `origin`, so the remote branch now points at the tested release commit `33dce29`.
+- Built fresh `dist/agentkit_cli-1.2.0.tar.gz` and `dist/agentkit_cli-1.2.0-py3-none-any.whl` artifacts from this repo.
+- Published `agentkit-cli==1.2.0` to PyPI and verified the live registry JSON plus both uploaded filenames.
+- Created and pushed annotated tag `v1.2.0`, anchored to the same tested commit `33dce29`.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.2.0.md`, and `CHANGELOG.md` so they now describe shipped truth instead of local-only verification.
+
+**Direct proof:**
+- `git ls-remote --heads origin feat/v1.2.0-contracts` -> `33dce2998acfd7af79aeaa02a4234e0d8496f4e5 refs/heads/feat/v1.2.0-contracts`
+- `git ls-remote --tags origin refs/tags/v1.2.0 refs/tags/v1.2.0^{}` -> annotated tag object plus peeled commit `33dce2998acfd7af79aeaa02a4234e0d8496f4e5`
+- `https://pypi.org/pypi/agentkit-cli/1.2.0/json` -> version `1.2.0` live with `agentkit_cli-1.2.0-py3-none-any.whl` and `agentkit_cli-1.2.0.tar.gz`
+
+**Next:** commit the shipped-status report reconciliation, push the docs follow-up branch commit, and leave the working tree clean apart from intentionally retained repo-root contract markdown files if they remain untracked.
