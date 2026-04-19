@@ -100,3 +100,16 @@
 **Tests:** `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py` -> `8 passed in 1.94s`
 
 **Next:** D3 source-aware scaffolding and defaults.
+
+---
+
+## D3: source-aware scaffolding and useful defaults — COMPLETE
+
+**Built:**
+- Extended the contract engine defaults so a bare objective still yields a useful execution checklist, test requirements, report sections, and stop conditions.
+- Added source-aware rule injection for canonical-source presence vs missing-source fallback, plus repo-derived command hints and directory boundaries.
+- Added guardrail coverage for missing source, repo-aware defaults, pyproject-driven command inference, and explicit output-path writing.
+
+**Tests:** `uv run pytest -q tests/test_contract_d1.py tests/test_contract_d2.py tests/test_contract_d3.py` -> `12 passed in 1.09s`
+
+**Next:** D4 docs, versioning, and full validation.
