@@ -390,9 +390,18 @@ The [GitHub Pages leaderboard](https://mikiships.github.io/agentkit-cli/leaderbo
 To refresh the leaderboard locally:
 
 ```bash
+# Full refresh: rescore ecosystems, rewrite docs/data.json, docs/leaderboard.html, and docs/index.html together
 agentkit pages-refresh
-# Options: --ecosystems python,typescript,rust,go --limit 5 --token <GITHUB_TOKEN>
+
+# Front-door-only refresh: keep the existing repo data, but regenerate docs/data.json frontdoor stats + docs/index.html coherently
+agentkit pages-refresh --from-existing-data
+
+# Common options
+# --ecosystems python,typescript,rust,go --limit 5 --token <GITHUB_TOKEN>
+# --frontdoor-version 1.1.0 --frontdoor-test-count 4729
 ```
+
+The supported Pages workflows now go through the same `agentkit pages-refresh` path so `docs/index.html` and `docs/data.json` do not drift apart.
 
 ## Commands
 

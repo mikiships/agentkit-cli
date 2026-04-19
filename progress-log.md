@@ -101,3 +101,16 @@
 
 **Next:** D3 workflow/docs durability updates.
 
+---
+
+## D3: Pages workflow wiring tightened — COMPLETE
+
+**Built:**
+- Updated `daily-pages-refresh.yml` to install the local checkout, compute front-door version/test stats, and pass them through `agentkit pages-refresh` instead of relying on a stale published CLI.
+- Updated `update-pages.yml` to stop regex-editing `docs/index.html` and instead run `agentkit pages-refresh --from-existing-data` so push-time shell refreshes stay coherent with `docs/data.json`.
+- Documented the supported refresh paths in `README.md`.
+
+**Tests:** `python3 -m pytest -q tests/test_site_engine.py tests/test_pages_refresh.py` -> `84 passed in 0.50s`
+
+**Next:** D4 reports, full validation, and final summary artifacts.
+

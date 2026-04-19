@@ -20,13 +20,31 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install agentkit-cli
-        run: pip install agentkit-cli
+      - name: Install dependencies
+        run: pip install toml pytest && pip install -e ".[api]" --quiet
+
+      - name: Get version from pyproject.toml
+        id: version
+        run: |
+          python3 -c "
+          import toml, pathlib
+          data = toml.loads(pathlib.Path('pyproject.toml').read_text())
+          print('VERSION=' + data['project']['version'])
+          " >> $GITHUB_OUTPUT
+
+      - name: Count passing tests
+        id: tests
+        run: |
+          COUNT=$(python3 -m pytest --co -q 2>&1 | tail -1 | grep -oE '[0-9]+' | head -1 || echo 0)
+          echo "COUNT=$COUNT" >> $GITHUB_OUTPUT
 
       - name: Run pages-refresh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: agentkit pages-refresh
+        run: |
+          agentkit pages-refresh \
+            --frontdoor-version "${{ steps.version.outputs.VERSION }}" \
+            --frontdoor-test-count "${{ steps.tests.outputs.COUNT }}"
 
       - name: Commit docs changes
         run: |
