@@ -1,5 +1,18 @@
 # Progress Log — agentkit-cli v1.2.0 contracts
 
+## Release completion audit start — 2026-04-19
+
+**Starting truth:**
+- `pyproject.toml`, `agentkit_cli/__init__.py`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.2.0.md`, and `CHANGELOG.md` already describe a local `1.2.0` contracts release state.
+- Current branch is `feat/v1.2.0-contracts` at `c654381`, with a dirty working tree only because the release contract markdown files are untracked in the repo root.
+- Remote audit found no `origin/feat/v1.2.0-contracts` branch and no local or remote `v1.2.0` tag.
+- PyPI audit confirmed `https://pypi.org/pypi/agentkit-cli/1.2.0/json` returns 404, so `agentkit-cli==1.2.0` is not live yet.
+- Local prose is contradictory right now because `BUILD-REPORT.md` says "COMPLETE, LOCALLY VERIFIED" while the required release surfaces are still incomplete.
+
+**Next:** rerun focused and full validation from this repo, then complete the missing branch, tag, and PyPI surfaces truthfully.
+
+---
+
 ## D1: transcript adapters + normalized burn schema — COMPLETE
 
 **Built:**
