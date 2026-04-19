@@ -8,7 +8,7 @@
 - Burn analytics for project/model/provider/task/source aggregation, waste detection, and shareable HTML reporting.
 
 ### Docs
-- README, BUILD-REPORT, and progress log updated for the v1.1.0 burn observability release candidate.
+- README, BUILD-REPORT, and progress log updated for the shipped v1.1.0 burn observability release.
 
 ## [1.0.0] - 2026-04-19
 

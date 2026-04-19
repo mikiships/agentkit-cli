@@ -3,7 +3,7 @@
 Date: 2026-04-19
 Builder: subagent burn observability pass
 Contract: all-day-build-contract-agentkit-cli-v1.1.0-burn-observability.md
-Status: LOCAL RC READY
+Status: SHIPPED
 
 ## Summary
 
@@ -29,10 +29,17 @@ Completed a local-first `agentkit burn` workflow for transcript cost observabili
 
 ## Validation
 
-- focused burn slice: `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `22 passed in 0.34s`
+- focused burn slice: `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `24 passed in 0.44s`
 - full suite baseline target retained: `>= 2623` tests
-- final full suite: `uv run pytest -q` -> `4809 passed, 1 warning in 131.87s (0:02:11)`
+- final full suite: `uv run pytest -q` -> `4811 passed, 1 warning in 134.73s (0:02:14)`
 - helper scripts: status-conflict scan `0 findings`, hygiene check `0 findings`
+
+## Release Verification
+
+- git branch pushed: `origin/feat/v1.1.0-burn-observability` -> `a704a0604d00737e9d024a27e67e89a92f212da3`
+- annotated tag pushed: `v1.1.0` tag object `43ca8f79a139f07d8876658a514deeb9c1389aa9`, peeled commit `a704a0604d00737e9d024a27e67e89a92f212da3`
+- build artifacts: `dist/agentkit_cli-1.1.0.tar.gz`, `dist/agentkit_cli-1.1.0-py3-none-any.whl`
+- PyPI live: `https://pypi.org/pypi/agentkit-cli/1.1.0/json` lists both `agentkit_cli-1.1.0.tar.gz` and `agentkit_cli-1.1.0-py3-none-any.whl`
 
 ## Version
 
@@ -49,4 +56,4 @@ Completed a local-first `agentkit burn` workflow for transcript cost observabili
 
 ## Status
 
-LOCAL RC READY. All contract deliverables are implemented in this repo checkout, with final helper-script validation and full-suite confirmation completed in this pass before handoff.
+SHIPPED. All four release surfaces are now confirmed directly in this pass: local tests green, release branch pushed, annotated tag `v1.1.0` pushed, and `agentkit-cli==1.1.0` live on PyPI.
