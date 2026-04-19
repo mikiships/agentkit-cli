@@ -34,6 +34,21 @@
 
 ---
 
+## RC D3: validation hardening — COMPLETE
+
+**Built:**
+- reran the targeted projection, init, and migrate validation slice directly on `rc/v0.99.0-mainline`
+- reran the full test suite on the RC branch to replace inherited feature-pass numbers with current local evidence
+- no validation repairs were required, so the RC remains a docs-and-provenance convergence pass rather than a code-fix pass
+
+**Tests:**
+- `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.41s`
+- `uv run pytest -q` -> `4775 passed, 1 warning in 123.64s (0:02:03)`
+
+**Next:** D4 contradiction scan, hygiene sweep, and final handoff summary.
+
+---
+
 ## D1: projection engine core — COMPLETE
 
 **Built:**

@@ -25,10 +25,8 @@ This branch is the local v0.99.0 release-candidate convergence pass. It preserve
 
 ## Test Results
 
-Pending RC re-validation in this branch. The numbers below are inherited from the completed feature pass and are treated as provisional until D3 reruns them locally on `rc/v0.99.0-mainline`.
-
-- focused projection coverage: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 2.98s`
-- final full suite: `uv run pytest -q` -> `4775 passed, 1 warning in 256.19s (0:04:16)` on the release-ready verification pass
+- focused projection coverage on `rc/v0.99.0-mainline`: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.41s`
+- final full suite on `rc/v0.99.0-mainline`: `uv run pytest -q` -> `4775 passed, 1 warning in 123.64s (0:02:03)`
 
 ## Release Notes
 
