@@ -1,8 +1,9 @@
-# BUILD-REPORT-v0.99.0.md — agentkit-cli v0.99.0 context projections
+# BUILD-REPORT.md — agentkit-cli v0.99.0 release candidate
 
-Date: 2026-04-18
-Builder: subagent context projection pass
-Contract: all-day-build-contract-agentkit-cli-v0.99.0-context-projections.md
+Date: 2026-04-19
+Builder: subagent mainline RC convergence pass
+Contract: all-day-build-contract-agentkit-cli-v0.99.0-mainline-rc.md
+Prior feature contract: all-day-build-contract-agentkit-cli-v0.99.0-context-projections.md
 
 ## Summary
 
@@ -24,10 +25,14 @@ This canonical build report now tracks the local v0.99.0 release-candidate conve
 
 ## Test Results
 
+Pending RC re-validation in this branch. The numbers below are inherited from the completed feature pass and are treated as provisional until D3 reruns them locally on `rc/v0.99.0-mainline`.
+
 - focused projection coverage: `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 2.98s`
 - final full suite: `uv run pytest -q` -> `4775 passed, 1 warning in 256.19s (0:04:16)` on the release-ready verification pass
 
 ## Release Notes
+
+- current branch state: local RC convergence, not shipped or published
 
 - version metadata bumped to `0.99.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
 - compatibility preserved for the legacy migrate engine tests while enabling the broader projection workflow in the new command surfaces

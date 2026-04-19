@@ -21,6 +21,19 @@
 
 ---
 
+## RC D2: release-trail reconciliation — COMPLETE
+
+**Built:**
+- switched both report surfaces to the RC contract as the current governing document while keeping the original context-projections contract as prior provenance
+- clarified that inherited v0.99.0 test counts are provisional until this branch reruns them in D3
+- normalized the status narrative to one explicit state across surfaces: local RC convergence, not shipped or published
+
+**Tests:** not run in D2, documentation reconciliation only
+
+**Next:** D3 targeted validation for projection, init, and migrate surfaces, then full-suite verification.
+
+---
+
 ## D1: projection engine core — COMPLETE
 
 **Built:**
