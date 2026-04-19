@@ -152,23 +152,25 @@
 
 ---
 
-## Release D3: build artifacts and publish to PyPI — BLOCKED
+## Release D3: build artifacts and PyPI verification — COMPLETE
 
 **Built:**
-- built release artifacts successfully with `uv build`
-- created `dist/agentkit_cli-0.99.0.tar.gz` and `dist/agentkit_cli-0.99.0-py3-none-any.whl`
-- wrote `BLOCKER-REPORT-v0.99.0.md` after the third credential-path failure on the same publish issue
+- rebuilt the release artifacts successfully with `uv build`
+- confirmed `dist/agentkit_cli-0.99.0.tar.gz` and `dist/agentkit_cli-0.99.0-py3-none-any.whl` exist from this checkout
+- replaced the stale blocker narrative with a resolution note because PyPI is now verifiably live
 
-**Failed attempts on the same issue:**
-1. `uv publish --dry-run dist/*` -> trusted publishing unavailable, no OIDC token, no credentials configured
-2. `uv publish --keyring-provider subprocess dist/*` -> `Missing credentials for https://upload.pypi.org/legacy/`
-3. `security find-internet-password -s upload.pypi.org -g` -> `The specified item could not be found in the keychain.`
+**Tests:**
+- `uv run pytest -q tests/test_context_projections.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_migrate_cmd.py tests/test_migrate_engine.py tests/test_init.py` -> `84 passed in 1.36s`
+- `uv run pytest -q` -> `4775 passed, 1 warning in 127.61s (0:02:07)`
 
-**Tests:** no new pytest run in D3, D1 validation still stands
+**External proof:**
+- PyPI JSON confirms `agentkit-cli==0.99.0` is live with two files:
+  - `agentkit_cli-0.99.0-py3-none-any.whl` uploaded `2026-04-19T02:24:46.882825Z`, sha256 `47e8f716f3f588c85eeb2f1b3e6a3fe718413955d74be7c2f5ca5e0c72b04766`
+  - `agentkit_cli-0.99.0.tar.gz` uploaded `2026-04-19T02:24:48.497683Z`, sha256 `e0518e4ef25b083bedd6fcc5bc9b206cbed270b3f92ec5d6a5d3624519a2c508`
 
-**Truthful state at stop:** branch and tag are pushed, artifacts exist locally, PyPI is not live, and v0.99.0 is not shipped
+**Truthful state:** branch and tag are pushed, artifacts build cleanly, PyPI is live, and v0.99.0 is shipped
 
-**Next:** stop here until valid PyPI credentials are available for this machine.
+**Next:** D4 chronology cleanup, hygiene, and final clean-tree handoff.
 
 ---
 
