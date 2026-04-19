@@ -246,6 +246,10 @@ header nav a:hover { color: var(--text); }
   margin-bottom: 0.35rem;
 }
 .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.source-badge { display: inline-block; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.3rem; }
+.source-ecosystem { background: rgba(63,185,80,0.15); color: var(--accent); }
+.source-community { background: rgba(88,166,255,0.15); color: var(--blue); }
+.source-manual { background: rgba(230,180,90,0.15); color: #e6b45a; }
 
 /* ── Container ── */
 .container { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem; }
@@ -462,6 +466,41 @@ _SCROLL_JS = """<script>
   }, { threshold: 0.1 });
   bars.forEach(function(b) { bioS.observe(b); });
 })();
+
+// Dynamic leaderboard data from data.json
+function gradeClass(g) { return 'grade-' + (g || 'c').toLowerCase(); }
+function renderRecentlyScored(data) {
+  var el = document.getElementById('recently-scored-list');
+  if (!el) return;
+  var top = data.repos ? data.repos.slice(0, 5) : [];
+  var html = '<ul class="repo-list">';
+  top.forEach(function(r) {
+    var src = r.source || 'ecosystem';
+    var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+    var srcClass = 'source-' + srcLabel;
+    html += '<li class="repo-item">'
+      + '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener" class="repo-name">' + (r.name || '') + '</a>'
+      + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+      + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+      + '<span class="score-val">' + (r.score || 0) + '</span>'
+      + '<span class="grade ' + gradeClass(r.grade) + '">' + (r.grade || '') + '</span>'
+      + '</li>';
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+  var statEl = document.getElementById('repos-scored-stat');
+  if (statEl && data.stats && data.stats.total) { statEl.textContent = data.stats.total; }
+  var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+  var commEl = document.getElementById('community-scored-stat');
+  if (commEl) { commEl.textContent = communityCount; }
+}
+fetch('/agentkit-cli/data.json')
+  .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+  .then(renderRecentlyScored)
+  .catch(function() {
+    var el = document.getElementById('recently-scored-list');
+    if (el) el.innerHTML = '<p style="color:var(--muted)">Score data unavailable.</p>';
+  });
 </script>"""
 
 _PAGE_TEMPLATE = """<!DOCTYPE html>
@@ -593,11 +632,11 @@ class SiteEngine:
         body = f"""
         <div class="hero">
           <div class="hero-badge">v{_PKG_VERSION} &middot; {total_repos} repos scored</div>
-          <h1>Benchmark AI Coding Agents<br>on <em>Your Codebase</em></h1>
-          <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
+          <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
+          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, then measure whether the setup is any good.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">agentkit quickstart</a>
+            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">PyPI ↗</a>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
           </div>
         </div>
@@ -606,26 +645,37 @@ class SiteEngine:
         <section class="pipeline-section">
           <div class="container">
             <div class="pipeline-stages">
-              <span class="pipeline-stage">MEASURE</span>
+              <span class="pipeline-stage">SOURCE</span>
               <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">GENERATE</span>
+              <span class="pipeline-stage">PROJECT</span>
+              <span class="pipeline-arrow">→</span>
+              <span class="pipeline-stage">SCORE</span>
               <span class="pipeline-arrow">→</span>
               <span class="pipeline-stage">GUARD</span>
               <span class="pipeline-arrow">→</span>
               <span class="pipeline-stage">LEARN</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">BENCHMARK</span>
             </div>
           </div>
         </section>
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4350</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">86</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4811</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">110</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
-          <div class="stat-item stat-card"><div class="stat-num">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
+
+        <!-- Recently Scored (populated dynamically from data.json) -->
+        <section class="recently-scored-section" id="recently-scored">
+          <div class="container">
+            <h2 class="section-title">Recently Scored</h2>
+            <div id="recently-scored-list" class="recently-scored-list">
+              <p style="color:var(--muted)">Loading...</p>
+            </div>
+          </div>
+        </section>
 
         <!-- Feature grid -->
         <section class="features-section">
@@ -633,11 +683,11 @@ class SiteEngine:
             <h2 class="section-title">The Agent Quality Stack</h2>
             <div class="feature-grid">
               <div class="feature-card"><h3>coderace</h3><p>Benchmark agents on your own tasks. MEASURE quality.</p></div>
-              <div class="feature-card"><h3>agentmd</h3><p>Generate CLAUDE.md context files. GENERATE context.</p></div>
-              <div class="feature-card"><h3>agentlint</h3><p>Static analysis for agent docs. GUARD quality.</p></div>
+              <div class="feature-card"><h3>agentmd</h3><p>Generate or tighten context files before they drift.</p></div>
+              <div class="feature-card"><h3>agentlint</h3><p>Catch drift, stale paths, year-rot, and bloated instructions.</p></div>
               <div class="feature-card"><h3>agentreflect</h3><p>Learn from agent session logs. LEARN patterns.</p></div>
               <div class="feature-card"><h3>agentkit-mcp</h3><p>MCP server exposing the toolkit. CONNECT tools.</p></div>
-              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point. ORCHESTRATE everything.</p></div>
+              <div class="feature-card"><h3>agentkit-cli</h3><p>Own the source of truth, fan it out, score it, and gate it.</p></div>
             </div>
           </div>
         </section>
@@ -647,7 +697,8 @@ class SiteEngine:
           <div class="container">
             <h2 class="section-title">Quick Start</h2>
             <pre class="code-block"><code>pip install agentkit-cli
-agentkit quickstart</code></pre>
+agentkit source --init
+agentkit project --write</code></pre>
           </div>
         </section>
 
@@ -658,12 +709,12 @@ agentkit quickstart</code></pre>
             <table class="cmd-table">
               <thead><tr><th>Command</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td>agentkit run</td><td>Run the full quality pipeline</td></tr>
-                <tr><td>agentkit analyze github:owner/repo</td><td>Analyze any GitHub repo</td></tr>
-                <tr><td>agentkit score</td><td>Get composite quality score</td></tr>
-                <tr><td>agentkit report</td><td>Generate HTML quality report</td></tr>
-                <tr><td>agentkit doctor</td><td>Check toolkit health</td></tr>
-                <tr><td>agentkit hooks install</td><td>Install pre-commit quality hooks</td></tr>
+                <tr><td>agentkit source --init</td><td>Create a dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
+                <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and llms.txt from that source</td></tr>
+                <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze any public GitHub repo and publish a shareable scorecard</td></tr>
+                <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>
+                <tr><td>agentkit gate --min-score 80</td><td>Fail CI when the setup drops below your quality bar</td></tr>
+                <tr><td>agentkit hooks install</td><td>Install pre-commit guardrails for the repo workflow</td></tr>
               </tbody>
             </table>
           </div>
@@ -714,6 +765,7 @@ agentkit quickstart</code></pre>
           <div class="ecosystem-pills">{topics_pills}</div>
           {table_html}
         </div>"""
+        body += self._recently_scored_fetch_script()
 
         meta = PageMeta(
             title="agentkit — Agent Quality Rankings",
@@ -730,6 +782,59 @@ agentkit quickstart</code></pre>
         })
         html = self._render_page(body, meta, json_ld)
         return SitePage(path="index.html", html=html, meta=meta)
+
+    def _recently_scored_fetch_script(self) -> str:
+        return """
+<script>
+(function() {
+  function gradeClass(g) {
+    return {'A':'grade-a','B':'grade-b','C':'grade-c','D':'grade-d','F':'grade-f'}[g] || '';
+  }
+  function renderRecentlyScored(data) {
+    var el = document.getElementById('recently-scored-list');
+    if (!el) return;
+    if (!data || !data.repos || !data.repos.length) {
+      el.innerHTML = '<p class="loading-msg">No data available.</p>';
+      return;
+    }
+    var top = data.repos.slice(0, 5);
+    var html = '<ul class="repo-list">';
+    top.forEach(function(r) {
+      var src = r.source || 'ecosystem';
+      var srcLabel = src === 'community' ? 'community' : src === 'manual' ? 'manual' : 'ecosystem';
+      var srcClass = 'source-' + srcLabel;
+      html += '<li class="repo-item">'
+        + '<a href="' + r.url + '" target="_blank" rel="noopener" class="repo-name">' + r.name + '</a>'
+        + '<span class="eco-badge">' + (r.ecosystem || '') + '</span>'
+        + '<span class="source-badge ' + srcClass + '">' + srcLabel + '</span>'
+        + '<span class="score-val">' + r.score + '</span>'
+        + '<span class="grade ' + gradeClass(r.grade) + '">' + r.grade + '</span>'
+        + '</li>';
+    });
+    html += '</ul>';
+    if (data.stats) {
+      html += '<p class="data-ts">Updated: ' + (data.generated_at ? data.generated_at.slice(0,10) : '') + '</p>';
+    }
+    el.innerHTML = html;
+    var statEl = document.getElementById('repos-scored-stat') || document.querySelector('.stat-num');
+    if (statEl && data.stats && data.stats.total) statEl.textContent = data.stats.total;
+    var communityCount = (data.repos || []).filter(function(r) { return r.source === 'community'; }).length;
+    var commEl = document.getElementById('community-scored-stat');
+    if (commEl) commEl.textContent = communityCount;
+    var badge = document.querySelector('.hero-badge');
+    if (badge && data.stats && data.stats.total) {
+      badge.textContent = badge.textContent.replace(/\\d+ repos scored/, data.stats.total + ' repos scored');
+    }
+  }
+  fetch('/agentkit-cli/data.json')
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(renderRecentlyScored)
+    .catch(function() {
+      var el = document.getElementById('recently-scored-list');
+      if (el) el.innerHTML = '<p class="loading-msg">Score data unavailable.</p>';
+    });
+})();
+</script>"""
 
     def generate_topic_page(self, topic: str) -> SitePage:
         """Generate topic/{topic}.html."""

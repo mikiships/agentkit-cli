@@ -32,6 +32,31 @@ agentkit ecosystem     # 🌐 "State of AI Agent Readiness" — which language e
 
 **State of Ecosystem:** `agentkit ecosystem` runs a macro scan across major language/tech ecosystems (Python, TypeScript, Rust, Go, Java, and more) and produces a ranked "State of AI Agent Readiness" report. Share it with `--share` or save to HTML with `--output report.html`.
 
+## `agentkit burn` — transcript cost observability
+
+Use `agentkit burn` to inspect local AI coding transcript spend before changing prompts, workflows, or model routing.
+
+```bash
+# Analyze a transcript directory with rich terminal output
+agentkit burn --path ./transcripts
+
+# Filter to one project and export stable JSON
+agentkit burn --path ./transcripts --project /repo/gamma --format json
+
+# Narrow to recent sessions and write a dark-theme HTML report
+agentkit burn --path ./transcripts --since 2026-04-01T00:00:00+00:00 --limit 25 --output burn-report.html
+```
+
+Supported local sources in this release:
+- Codex fixture-style JSON sessions
+- Claude Code fixture-style JSON sessions
+- OpenClaw-style JSONL response transcripts
+
+The burn report surfaces:
+- where spend goes by project, model, provider, task label, and source
+- the most expensive sessions
+- waste patterns like expensive no-tool turns, retry loops, and low one-shot success sessions
+
 ## Demo
 
 <!-- demo.gif placeholder — generate with: agentkit demo --record && vhs demo.tape -->
@@ -128,6 +153,57 @@ Explicit CLI flags always override profile values:
 agentkit gate --profile strict --min-score 99
 ```
 
+## `agentkit source` + `agentkit project` — dedicated canonical source workflow
+
+Use `.agentkit/source.md` as one agentkit-managed source of truth, then fan it out into the filenames different tools expect.
+
+```bash
+# Create a fresh dedicated source template
+agentkit source --init
+
+# Or promote the best existing legacy file into the dedicated path
+agentkit source --promote
+
+# Review what agentkit would project from the dedicated source
+agentkit project
+
+# Write every supported target next to the dedicated source
+agentkit project --targets all --write
+
+# CI drift check, exits non-zero when requested targets are missing or out of date
+agentkit project --targets claude,gemini,llmstxt --check
+
+# Repair missing or stale root projections from .agentkit/source.md
+agentkit sync --fix
+```
+
+Dedicated source path:
+- `.agentkit/source.md` -> canonical file you author directly
+
+Supported projection targets:
+- `agents` -> `AGENTS.md`
+- `claude` -> `CLAUDE.md`
+- `agent` -> `AGENT.md`
+- `gemini` -> `GEMINI.md`
+- `copilot` -> `COPILOT.md`
+- `llmstxt` -> `llms.txt`
+
+When to use which command:
+- `agentkit source` when you want to initialize or promote the dedicated canonical source.
+- `agentkit project` when you want deterministic fan-out or drift checks from that source.
+- `agentkit migrate` when you want a one-off conversion from one specific format into another.
+- `agentkit sync` when you want the repo-local health check or to repair missing stale projections from the detected canonical source.
+
+You can also hook the dedicated-source workflow into initialization:
+
+```bash
+# Start a repo with a fresh canonical source, then write projections immediately
+agentkit init --init-source --source-title "My Project" --project-targets claude,gemini --write-projections
+
+# Or adopt the dedicated source during init from an existing AGENTS.md / CLAUDE.md
+agentkit init --promote-source --project-targets all --write-projections
+```
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.
@@ -178,6 +254,46 @@ agentkit run --llmstxt
 # Include llms.txt card in HTML report
 agentkit report --llmstxt
 ```
+
+## `agentkit optimize` — Trim stale, risky, bloated context files
+
+`agentkit optimize` can now review one context file or sweep an entire repo for nested `CLAUDE.md` and `AGENTS.md` surfaces, render a deterministic aggregate review, and optionally apply the safe rewrites in place.
+
+```bash
+# Safe dry-run review for the nearest root context file
+agentkit optimize
+
+# Sweep every nested CLAUDE.md / AGENTS.md in the repo
+agentkit optimize --all
+
+# CI-friendly check mode, exits non-zero if meaningful rewrites exist
+agentkit optimize --all --check
+
+# Review a specific file as markdown
+agentkit optimize --file AGENTS.md --format markdown
+
+# Apply repo-wide optimized rewrites in place
+agentkit optimize --all --apply
+
+# Emit machine-readable JSON for CI or follow-on tooling
+agentkit optimize --all --json
+
+# Fold optimize sweep into an existing improve workflow
+agentkit improve --optimize-context
+agentkit run --improve --improve-optimize-context
+```
+
+Behavior notes:
+- repo sweep discovery is deterministic and includes nested `CLAUDE.md` and `AGENTS.md` files
+- aggregate output reports per-file verdicts, protected-section signals, concise deltas, and repo totals
+- protected sections like project identity, autonomy, user-critical requests, and safety boundaries are preserved and called out in review output
+- already-tight files return a clear safe no-op verdict, and `--apply` skips rewriting those files
+- `--check` exits non-zero only when at least one file has a meaningful rewrite available
+
+Caveats:
+- local-first only, no LLM required
+- optimize only targets `CLAUDE.md` and `AGENTS.md`
+- dry-run is the default, so nothing is overwritten unless `--apply` is set
 
 ## `agentkit migrate` — Convert Between AI Agent Context Formats
 
@@ -313,6 +429,7 @@ agentkit pages-refresh
 - `agentkit campaign <target>` — batch PR submission to multiple repos in one command
 - `agentkit search [query]` — discover GitHub repos missing CLAUDE.md / AGENTS.md
 - `agentkit frameworks [PATH]` — detect frameworks (Next.js, FastAPI, Django, etc.) and check if your CLAUDE.md/AGENTS.md has framework-specific coverage. Use `--generate` to auto-add missing sections.
+- `agentkit optimize` — review and optionally tighten an existing `CLAUDE.md` or `AGENTS.md`
 - `agentkit hooks install [--path] [--min-score] [--mode git|precommit|both] [--dry-run]` — install pre-commit quality gate hooks.
 - `agentkit hooks status/uninstall/run` — manage installed hooks.
 
@@ -1064,7 +1181,7 @@ What it does:
 
 ## Release Check
 
-`agentkit release-check` verifies the 4-part release surface to confirm a package is truly shipped, not just locally complete:
+`agentkit release-check` verifies the 5-part release surface for Python/pytest projects so a green local run is not mistaken for a shipped release:
 
 ```
 agentkit release-check [PATH] [OPTIONS]
@@ -1073,34 +1190,49 @@ Options:
   --version VERSION   Version to verify (default: from pyproject.toml/package.json)
   --package NAME      Package name (default: from pyproject.toml/package.json)
   --registry          pypi|npm|auto (default: auto-detected)
-  --skip-tests        Skip the pytest/npm test step for quick checks
+  --skip-tests        Skip Python smoke and full pytest execution for quick checks
   --json              Output structured JSON for CI integration
+  --changelog         Append changelog preview to the report
 ```
+
+Checks covered:
+- `tests` (Python projects, via `python3 -m pytest -q --tb=no`)
+- `smoke_tests` (Python projects, via `python3 -m pytest -m smoke -q --tb=no`)
+- `git_push` (clean worktree, attached HEAD, upstream configured, branch pushed)
+- `git_tag` (local tag points at `HEAD`, remote tag exists and matches)
+- `registry` (target version is live on PyPI or npm)
+
+Current scope note:
+- automated `tests` and `smoke_tests` execution is implemented only for Python/pytest projects today
+- npm package detection is used for metadata and registry checks, not npm test runner execution
 
 Example output:
 
 ```
-agentkit release-check — /your/project
+agentkit release-check: /your/project
 
-┌────────────┬────────┬─────────────────────────────────┐
-│ Check      │ Status │ Detail                          │
-├────────────┼────────┼─────────────────────────────────┤
-│ tests      │ ✓ PASS │ 42 passed in 1.23s              │
-│ git_push   │ ✓ PASS │ Local HEAD abc12345 matches rem │
-│ git_tag    │ ✓ PASS │ Tag v1.0.0 found on remote.     │
-│ registry   │ ✓ PASS │ PyPI: mypkg==1.0.0 is live.    │
-└────────────┴────────┴─────────────────────────────────┘
+┌─────────────┬────────┬────────────────────────────────────┐
+│ Check       │ Status │ Detail                             │
+├─────────────┼────────┼────────────────────────────────────┤
+│ tests       │ ✓ PASS │ 42 passed in 1.23s                 │
+│ smoke_tests │ ✓ PASS │ 3 smoke tests passed               │
+│ git_push    │ ✓ PASS │ main matches origin/main at abc123 │
+│ git_tag     │ ✓ PASS │ Tag v1.0.0 points to HEAD locally  │
+│ registry    │ ✓ PASS │ PyPI: mypkg==1.0.0 is live         │
+└─────────────┴────────┴────────────────────────────────────┘
 
 Verdict: SHIPPED
 ```
 
-Verdict levels:
-- **SHIPPED** — all 4 surfaces confirmed (exit 0)
-- **RELEASE-READY** — tests + git confirmed, registry not yet live (exit 1)
-- **BUILT** — tests pass locally, not yet pushed (exit 1)
-- **UNKNOWN** — tests failing (exit 1)
+Structured output now includes the overall verdict, per-surface statuses, and deterministic markdown summary content for CI step summaries.
 
-Integrate with `agentkit gate --release-check` or `agentkit run --release-check` to add release verification to your pipeline.
+Verdict levels:
+- **SHIPPED** — all release surfaces confirmed (exit 0)
+- **RELEASE-READY** — code/tests/git are ready, but the package is not fully live yet (exit 1)
+- **BUILT** — local validation passed, but release surfaces are still incomplete (exit 1)
+- **UNKNOWN** — validation did not establish release state (exit 1)
+
+Use `agentkit run --release-check` to append the same release verification after the normal pipeline and propagate the verdict into human output, JSON output, saved last-run state, and CI notifications.
 
 ## Architecture
 

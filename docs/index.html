@@ -382,12 +382,12 @@ footer a:hover { color: var(--text); }
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v0.95.1 &middot; 20 repos scored</div>
-          <h1>Benchmark AI Coding Agents<br>on <em>Your Codebase</em></h1>
-          <p class="hero-sub">agentkit scores GitHub repos for AI-agent readiness. Lint rules, context files, test coverage, CI patterns. One number.</p>
+          <div class="hero-badge">v1.1.0 &middot; 20 repos scored</div>
+          <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
+          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, then measure whether the setup is any good.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">agentkit quickstart</a>
+            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">PyPI ↗</a>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
           </div>
         </div>
@@ -396,23 +396,23 @@ footer a:hover { color: var(--text); }
         <section class="pipeline-section">
           <div class="container">
             <div class="pipeline-stages">
-              <span class="pipeline-stage">MEASURE</span>
+              <span class="pipeline-stage">SOURCE</span>
               <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">GENERATE</span>
+              <span class="pipeline-stage">PROJECT</span>
+              <span class="pipeline-arrow">→</span>
+              <span class="pipeline-stage">SCORE</span>
               <span class="pipeline-arrow">→</span>
               <span class="pipeline-stage">GUARD</span>
               <span class="pipeline-arrow">→</span>
               <span class="pipeline-stage">LEARN</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">BENCHMARK</span>
             </div>
           </div>
         </section>
 
         <!-- Stats bar -->
         <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4747</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">95</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4811</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">110</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">20</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
@@ -424,11 +424,11 @@ footer a:hover { color: var(--text); }
             <h2 class="section-title">The Agent Quality Stack</h2>
             <div class="feature-grid">
               <div class="feature-card"><h3>coderace</h3><p>Benchmark agents on your own tasks. MEASURE quality.</p></div>
-              <div class="feature-card"><h3>agentmd</h3><p>Generate CLAUDE.md context files. GENERATE context.</p></div>
-              <div class="feature-card"><h3>agentlint</h3><p>Static analysis for agent docs. GUARD quality.</p></div>
+              <div class="feature-card"><h3>agentmd</h3><p>Generate or tighten context files before they drift.</p></div>
+              <div class="feature-card"><h3>agentlint</h3><p>Catch drift, stale paths, year-rot, and bloated instructions.</p></div>
               <div class="feature-card"><h3>agentreflect</h3><p>Learn from agent session logs. LEARN patterns.</p></div>
               <div class="feature-card"><h3>agentkit-mcp</h3><p>MCP server exposing the toolkit. CONNECT tools.</p></div>
-              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point. ORCHESTRATE everything.</p></div>
+              <div class="feature-card"><h3>agentkit-cli</h3><p>Own the source of truth, fan it out, score it, and gate it.</p></div>
             </div>
           </div>
         </section>
@@ -438,7 +438,8 @@ footer a:hover { color: var(--text); }
           <div class="container">
             <h2 class="section-title">Quick Start</h2>
             <pre class="code-block"><code>pip install agentkit-cli
-agentkit quickstart</code></pre>
+agentkit source --init
+agentkit project --write</code></pre>
           </div>
         </section>
 
@@ -449,12 +450,12 @@ agentkit quickstart</code></pre>
             <table class="cmd-table">
               <thead><tr><th>Command</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td>agentkit run</td><td>Run the full quality pipeline</td></tr>
-                <tr><td>agentkit analyze github:owner/repo</td><td>Analyze any GitHub repo</td></tr>
-                <tr><td>agentkit score</td><td>Get composite quality score</td></tr>
-                <tr><td>agentkit report</td><td>Generate HTML quality report</td></tr>
-                <tr><td>agentkit doctor</td><td>Check toolkit health</td></tr>
-                <tr><td>agentkit hooks install</td><td>Install pre-commit quality hooks</td></tr>
+                <tr><td>agentkit source --init</td><td>Create a dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
+                <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and llms.txt from that source</td></tr>
+                <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze any public GitHub repo and publish a shareable scorecard</td></tr>
+                <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>
+                <tr><td>agentkit gate --min-score 80</td><td>Fail CI when the setup drops below your quality bar</td></tr>
+                <tr><td>agentkit hooks install</td><td>Install pre-commit guardrails for the repo workflow</td></tr>
               </tbody>
             </table>
           </div>

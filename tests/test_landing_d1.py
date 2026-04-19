@@ -21,12 +21,13 @@ def test_html_has_doctype():
 
 def test_hero_headline():
     html = _html()
-    assert "Benchmark AI Coding Agents" in html
+    assert "One canonical context file" in html
+    assert ".agentkit/source.md" in html
 
 
 def test_pipeline_stages():
     html = _html()
-    for stage in ("MEASURE", "GENERATE", "GUARD", "LEARN", "BENCHMARK"):
+    for stage in ("SOURCE", "PROJECT", "SCORE", "GUARD", "LEARN"):
         assert stage in html, f"Pipeline stage {stage!r} missing"
 
 
@@ -53,7 +54,8 @@ def test_stat_values_present():
 def test_quickstart_code_block():
     html = _html()
     assert "pip install agentkit-cli" in html
-    assert "agentkit quickstart" in html
+    assert "agentkit source --init" in html
+    assert "agentkit project --write" in html
 
 
 def test_github_link():
@@ -76,7 +78,8 @@ def test_no_external_js_frameworks():
 def test_commands_table_present():
     html = _html()
     assert "cmd-table" in html
-    assert "agentkit run" in html
+    assert "agentkit source --init" in html
+    assert "agentkit burn --path ./transcripts" in html
 
 
 def test_dark_theme_colors():

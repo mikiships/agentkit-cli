@@ -1,0 +1,9 @@
+{
+  "preserved_sections": ["Project", "Commands", "Safety"],
+  "removable_sections": [],
+  "must_not_contain": [],
+  "should_shrink": false,
+  "should_be_noop": true,
+  "second_pass_max_line_delta": 0,
+  "second_pass_max_token_delta": 0
+}

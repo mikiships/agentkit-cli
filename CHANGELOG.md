@@ -1,5 +1,100 @@
 # Changelog
 
+## [1.1.0] - 2026-04-19
+
+### Added
+- `agentkit burn` for local transcript cost observability across Codex, Claude Code, and OpenClaw-style session artifacts.
+- Burn adapters and normalized schema for session, turn, tool, and cost-state ingestion.
+- Burn analytics for project/model/provider/task/source aggregation, waste detection, and shareable HTML reporting.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the shipped v1.1.0 burn observability release.
+
+## [1.0.0] - 2026-04-19
+
+### Added
+- `agentkit source` for managing one dedicated agentkit-owned canonical source file at `.agentkit/source.md`, with explicit `--init`, `--promote`, `--from`, `--force`, and JSON reporting modes.
+- Dedicated canonical-source detection in the projection engine so `.agentkit/source.md` wins over legacy root-level context files when present.
+
+### Changed
+- `agentkit project` now prefers `.agentkit/source.md` automatically while preserving backwards-compatible AGENTS/CLAUDE/AGENT/GEMINI/COPILOT/llms detection when the dedicated source is absent.
+- `agentkit sync` now treats `.agentkit/source.md` as the drift authority, displays it in sync status output, and can regenerate missing projections from it.
+- `agentkit init` now supports `--init-source`, `--promote-source`, and `--source-title` so a repo can enter the dedicated-source workflow during setup.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v1.0.0 canonical source workflow release.
+
+## [0.99.0] - 2026-04-18
+
+### Added
+- `agentkit project` for projecting one canonical context source into `AGENTS.md`, `CLAUDE.md`, `AGENT.md`, `GEMINI.md`, `COPILOT.md`, and `llms.txt` with dry-run, write, output-dir, drift-check, and JSON reporting modes.
+- Shared `context_projections` engine with deterministic target metadata, source auto-detection priority, projection generation, and hash-backed drift detection.
+
+### Changed
+- `agentkit sync` now understands the expanded projection set while preserving the classic trio check behavior for existing repos.
+- `agentkit init` can optionally fan out projections immediately with `--project-targets` and `--write-projections`.
+- `agentkit migrate` now resolves the wider target alias set through the shared projection engine.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.99.0 context projection release.
+
+## [0.98.0] - 2026-04-18
+
+### Added
+- `agentkit optimize --all` repo sweep mode for deterministic discovery of nested `CLAUDE.md` and `AGENTS.md` files, aggregate per-file review data, and machine-readable repo summaries.
+- `agentkit optimize --check` CI-friendly exit behavior that fails only when at least one context file has a meaningful rewrite available.
+
+### Changed
+- optimize review rendering now supports aggregate text and markdown summaries with per-file verdicts, protected-section signals, warning summaries, and repo totals.
+- `agentkit improve --optimize-context` now uses repo sweep semantics so broader workflows can safely optimize multiple context files in one pass.
+
+### Docs
+- README, BUILD-REPORT, BUILD-REPORT-v0.98.0, and progress log updated for the v0.98.0 optimize sweep release.
+
+## [0.97.2] - 2026-04-18
+
+### Changed
+- Added CLI-level smoke coverage for `agentkit optimize` dry-run and `--apply` flows on realistic context files, including second-pass safe no-op behavior.
+- Restored the tracked GitHub Pages front-page hooks and stat ids required by `pages-refresh` and `pages-sync` validation, so optimize release gating no longer trips over a stale `docs/index.html` surface.
+- Aligned optimize review rendering tests with the shipped `Meaningful rewrite available` verdict wording and hardened the watch debounce regression test against timing flakes.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.2 optimize smoke-and-guardrails follow-up.
+
+## [0.97.1] - 2026-04-18
+
+### Changed
+- Hardened `agentkit optimize` with real-world fixture coverage, stronger protected-section preservation for identity/autonomy/user-critical content, and deterministic no-op detection for already-tight context files.
+- `agentkit optimize` review output now highlights protected sections, reports a clear no-op verdict, truncates very large diffs more safely, and skips `--apply` rewrites when the optimized candidate is effectively unchanged.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` now surface optimize failures as bounded workflow messages instead of corrupting the broader improvement pass.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.1 optimize hardening follow-up.
+
+## [0.97.0] - 2026-04-17
+
+### Added
+- `agentkit optimize` command for deterministic dry-run review or in-place optimization of `CLAUDE.md` and `AGENTS.md`, with stats deltas, structured JSON, markdown/text review output, and unified diff rendering.
+- `OptimizeEngine` plus optimize result schemas for local-first context analysis, bloat trimming, stale-instruction cleanup, and risky-instruction removal without LLM dependencies.
+- `agentkit improve --optimize-context` and `agentkit run --improve --improve-optimize-context` integration so context optimization can compound with the existing improve workflow.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v0.97.0 optimize release.
+
+## [0.96.0] - 2026-04-17
+
+### Added
+- `agentkit release-check` now hardens the full shipped-release surface with explicit `tests`, `smoke_tests`, `git_push`, `git_tag`, and `registry` checks, plus deterministic markdown summary output for CI and GitHub step summaries.
+- `agentkit run --release-check` now appends release verification to the normal pipeline and includes the embedded release-check payload in JSON output.
+
+### Changed
+- Git branch and upstream validation now fail clearly on dirty worktrees, detached HEAD, missing upstream configuration, and missing local upstream refs.
+- Local and remote tag verification now compare the release tag against `HEAD` correctly, including annotated tags via peeled refs.
+- Release-check verdict propagation now updates final pipeline counts, saved last-run state, webhook payloads, and GitHub Checks conclusions consistently.
+
+### Docs
+- README, BUILD-REPORT, and release-hardening progress log updated for the v0.96.0 release-check handoff.
+
 ## [0.95.1] - 2026-03-23
 
 ### Fixed

@@ -22,6 +22,7 @@ def improve_command(
     min_lift: Optional[float] = typer.Option(None, "--min-lift", help="Exit 1 if score delta < N"),
     pr: bool = typer.Option(False, "--pr", help="Open a GitHub PR with changes after improving"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Plan what would be done without applying changes"),
+    optimize_context: bool = typer.Option(False, "--optimize-context", help="Also run agentkit optimize inside the improve workflow"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON result"),
     share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now and print URL"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
@@ -46,6 +47,7 @@ def improve_command(
             no_generate=no_generate,
             no_harden=no_harden,
             dry_run=dry_run,
+            optimize_context=optimize_context,
         )
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")

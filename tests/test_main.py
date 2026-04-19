@@ -1,6 +1,8 @@
 """Tests for main app entry point."""
 from __future__ import annotations
 
+from unittest.mock import patch
+
 from typer.testing import CliRunner
 from agentkit_cli.main import app
 
@@ -11,7 +13,7 @@ def test_version_flag():
     """--version prints version."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "0." in result.output
+    assert "1.1.0" in result.output
 
 
 def test_no_args_shows_help():
@@ -41,3 +43,10 @@ def test_run_subcommand_help():
 def test_status_subcommand_help():
     result = runner.invoke(app, ["status", "--help"])
     assert result.exit_code == 0
+
+
+def test_run_release_check_flag_is_forwarded(tmp_path):
+    with patch("agentkit_cli.main.run_command") as mock_run:
+        result = runner.invoke(app, ["run", "--path", str(tmp_path), "--release-check"])
+    assert result.exit_code == 0
+    assert mock_run.call_args.kwargs["release_check"] is True

@@ -53,12 +53,15 @@ from agentkit_cli.commands.certify_cmd import certify_app
 from agentkit_cli.commands.timeline_cmd import timeline_command
 from agentkit_cli.commands.explain_cmd import explain_command
 from agentkit_cli.commands.improve import improve_command
+from agentkit_cli.commands.optimize_cmd import optimize_command
 from agentkit_cli.commands.monitor import monitor_app
 from agentkit_cli.commands.webhook import webhook_app
 from agentkit_cli.commands.checks_cmd import checks_app
 from agentkit_cli.commands.llmstxt_cmd import llmstxt_command
 from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
+from agentkit_cli.commands.project_cmd import project_command
+from agentkit_cli.commands.source_cmd import source_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
@@ -86,6 +89,7 @@ from agentkit_cli.commands.leaderboard_page_cmd import leaderboard_page_command
 from agentkit_cli.commands.pages_refresh import pages_refresh_command
 from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
+from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -140,9 +144,21 @@ def quickstart(
 @app.command("init")
 def init(
     path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project root"),
+    project_targets: Optional[str] = typer.Option(None, "--project-targets", help="Optional projection fan-out target list"),
+    write_projections: bool = typer.Option(False, "--write-projections", help="Write requested projections during init"),
+    init_source: bool = typer.Option(False, "--init-source", help="Create a fresh dedicated canonical source at .agentkit/source.md"),
+    promote_source: bool = typer.Option(False, "--promote-source", help="Promote the best existing context file into .agentkit/source.md before projecting"),
+    source_title: Optional[str] = typer.Option(None, "--source-title", help="Template title to use with --init-source"),
 ) -> None:
     """Initialize agentkit in a project. Creates .agentkit.yaml and checks for quartet tools."""
-    init_command(path=path)
+    init_command(
+        path=path,
+        project_targets=project_targets,
+        write_projections=write_projections,
+        init_source=init_source,
+        promote_source=promote_source,
+        source_title=source_title,
+    )
 
 
 @app.command("run")
@@ -174,6 +190,7 @@ def run(
     run_improve: bool = typer.Option(False, "--improve", help="After run, auto-improve if score < threshold"),
     improve_no_generate: bool = typer.Option(False, "--improve-no-generate", help="Skip context generation in --improve"),
     improve_no_harden: bool = typer.Option(False, "--improve-no-harden", help="Skip hardening in --improve"),
+    improve_optimize_context: bool = typer.Option(False, "--improve-optimize-context", help="Also run context optimization inside --improve"),
     improve_threshold: float = typer.Option(80.0, "--improve-threshold", help="Score threshold below which --improve runs (default 80)"),
     webhook_notify: bool = typer.Option(False, "--webhook-notify", help="POST result to configured webhook URL after run"),
     checks: Optional[bool] = typer.Option(None, "--checks/--no-checks", help="Post a GitHub Check Run (default: auto-detect GitHub Actions env)"),
@@ -199,7 +216,7 @@ def run(
     run_pages: bool = typer.Option(False, "--pages", help="Add result to leaderboard (docs/data.json) after run"),
 ) -> None:
     """Run the full Agent Quality pipeline sequentially."""
-    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
+    run_command(path=path, skip=skip, benchmark=benchmark, json_output=json_output, notes=notes, ci=ci, publish=publish, inject_readme=inject_readme, no_history=no_history, label=label, notify_slack=notify_slack, notify_discord=notify_discord, notify_webhook=notify_webhook, notify_on=notify_on, profile=profile, share=share, release_check=release_check, record_findings=record_findings, harden=run_harden, timeline=run_timeline, explain=run_explain, no_llm=no_llm, improve=run_improve, improve_no_generate=improve_no_generate, improve_no_harden=improve_no_harden, improve_optimize_context=improve_optimize_context, improve_threshold=improve_threshold, webhook_notify=webhook_notify, checks=checks, llmstxt=run_llmstxt, migrate=run_migrate, agent_benchmark=agent_benchmark, user_duel=run_user_duel, user_tournament=run_user_tournament, user_improve=run_user_improve, user_card=run_user_card, user_rank_topic=run_user_rank_topic, ecosystem=run_ecosystem, gist=run_gist, site_dir=run_site, populate=run_populate, populate_topics=run_populate_topics, populate_limit=run_populate_limit, frameworks=run_frameworks, api_cache=api_cache)
     if run_pages:
         try:
             from agentkit_cli.pages_sync_engine import SyncEngine
@@ -227,11 +244,6 @@ def run(
     if serve:
         from agentkit_cli.serve import DEFAULT_PORT
         typer.echo(f"Dashboard: http://localhost:{DEFAULT_PORT}")
-    if release_check:
-        from agentkit_cli.release_check import run_release_check
-        from agentkit_cli.commands.release_check_cmd import _render_table
-        result = run_release_check(path=path or None)
-        _render_table(result)
     if run_redteam:
         redteam_command(
             path=path,
@@ -242,6 +254,19 @@ def run(
             min_score=None,
             output=None,
         )
+
+
+@app.command("burn")
+def burn(
+    path: Optional[Path] = typer.Option(None, "--path", help="Transcript file or directory"),
+    format: str = typer.Option("table", "--format", help="Output format: table|json"),
+    since: Optional[str] = typer.Option(None, "--since", help="Only include sessions starting on/after this timestamp"),
+    limit: Optional[int] = typer.Option(None, "--limit", help="Maximum sessions after filtering"),
+    project: Optional[str] = typer.Option(None, "--project", help="Filter to one project root"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML burn report to file"),
+) -> None:
+    """Analyze local coding-session transcript burn and waste patterns."""
+    burn_command(path=path, format=format, since=since, limit=limit, project=project, output=output)
 
 
 @app.command("doctor")
@@ -682,7 +707,7 @@ def release_check(
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON for CI integration"),
     changelog: bool = typer.Option(False, "--changelog", help="Generate and append a changelog preview to the output"),
 ) -> None:
-    """Verify the 4-part release surface: tests, git push, tag, and registry."""
+    """Verify the release surface: smoke tests, tests, git push, tag, and registry."""
     release_check_command(
         path=path,
         version=version,
@@ -1176,6 +1201,7 @@ def improve(
     min_lift: Optional[float] = typer.Option(None, "--min-lift", help="Exit 1 if score delta < N"),
     pr: bool = typer.Option(False, "--pr", help="Open a GitHub PR with changes after improving"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Plan without applying changes"),
+    optimize_context: bool = typer.Option(False, "--optimize-context", help="Also run agentkit optimize inside improve"),
     json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
     share: bool = typer.Option(False, "--share", help="Publish HTML report to here.now"),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write HTML report to file"),
@@ -1188,10 +1214,26 @@ def improve(
         min_lift=min_lift,
         pr=pr,
         dry_run=dry_run,
+        optimize_context=optimize_context,
         json_output=json_output,
         share=share,
         output=output,
     )
+
+
+@app.command("optimize")
+def optimize(
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="Project directory (default: cwd)"),
+    file: Optional[Path] = typer.Option(None, "--file", help="Explicit CLAUDE.md or AGENTS.md target"),
+    all_files: bool = typer.Option(False, "--all", help="Discover and optimize all CLAUDE.md and AGENTS.md files under the repo"),
+    check: bool = typer.Option(False, "--check", help="Exit non-zero when meaningful rewrites are available"),
+    apply: bool = typer.Option(False, "--apply", help="Overwrite the targeted context file"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write review or optimized content to file"),
+    json_output: bool = typer.Option(False, "--json", help="Output structured JSON"),
+    fmt: str = typer.Option("text", "--format", help="Review format: text or markdown"),
+) -> None:
+    """Optimize one context file or sweep repo context files."""
+    optimize_command(path=path, file=file, all_files=all_files, check=check, apply=apply, output=output, json_output=json_output, fmt=fmt)
 
 
 @app.command("migrate")
@@ -1224,8 +1266,36 @@ def sync(
     check: bool = typer.Option(False, "--check", help="Report sync status; exit 1 if stale"),
     fix: bool = typer.Option(False, "--fix", help="Re-run migrate to bring derived files in sync"),
 ) -> None:
-    """Check or fix sync status between AGENTS.md, CLAUDE.md, and llms.txt."""
+    """Check or fix sync status between canonical context files and projections."""
     sync_command(path=path, check=check, fix=fix)
+
+
+@app.command("source")
+def source(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    init: bool = typer.Option(False, "--init", help="Create a fresh dedicated canonical source template"),
+    promote: bool = typer.Option(False, "--promote", help="Copy the best detected legacy context file into the dedicated source path"),
+    from_format: Optional[str] = typer.Option(None, "--from", help="Legacy source format to promote explicitly"),
+    title: Optional[str] = typer.Option(None, "--title", help="Template title to use with --init"),
+    force: bool = typer.Option(False, "--force", help="Overwrite the dedicated source file if it already exists"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+) -> None:
+    """Manage agentkit's dedicated canonical source file."""
+    source_command(path=path, init=init, promote=promote, from_format=from_format, title=title, force=force, json_output=json_output)
+
+
+@app.command("project")
+def project(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    from_format: Optional[str] = typer.Option(None, "--from", help="Canonical source format override"),
+    targets: str = typer.Option("all", "--targets", help="Comma-separated target list or all"),
+    output_dir: Optional[str] = typer.Option(None, "--output-dir", help="Write projected files into this directory"),
+    check: bool = typer.Option(False, "--check", help="Exit non-zero when projected output would drift"),
+    write: bool = typer.Option(False, "--write", help="Write projected files"),
+    json_output: bool = typer.Option(False, "--json", help="Structured JSON output"),
+) -> None:
+    """Project one canonical context source into multiple target files."""
+    project_command(path=path, from_format=from_format, targets=targets, output_dir=output_dir, check=check, write=write, json_output=json_output)
 
 
 @app.command("llmstxt")

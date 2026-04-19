@@ -1,73 +1,76 @@
-# Progress Log — agentkit-cli v0.95.0 pages-sync
+# Progress Log — agentkit-cli v1.1.0 burn observability
 
-## D1: `agentkit pages-sync` command — COMPLETE
+## D1: transcript adapters + normalized burn schema — COMPLETE
 
 **Built:**
-- `agentkit_cli/pages_sync_engine.py` — SyncEngine class with read_history(), build_entries(), merge_entries(), write_data_json(), git_push(), sync()
-- `agentkit_cli/commands/pages_sync.py` — pages_sync_command() with --push/--no-push, --dry-run, --json, --limit flags
-- `tests/test_pages_sync_d1.py` — 22 tests
+- Added `agentkit_cli/burn_adapters.py` with normalized burn models for sessions, turns, tool usage, and cost states.
+- Implemented deterministic fixture adapters for Codex, Claude Code, and OpenClaw-style local transcript files.
+- Added burn fixtures plus parser coverage for missing fields, malformed JSON/JSONL, estimated costs, and stable ordering.
 
-**Tests:** 22 passed
+**Tests:** `uv run pytest -q tests/test_burn_adapters.py` -> `10 passed in 0.04s`
+
+**Refinement:** tightened deterministic normalization by replacing process-randomized fallback turn IDs with stable SHA-256-derived IDs and sorting normalized turns by timestamp/id.
+
+**Next:** D2 burn analysis engine.
 
 ---
 
-## D2: `--pages` flag on analyze + run — COMPLETE
+## D2: burn analysis engine — COMPLETE
 
 **Built:**
-- `agentkit_cli/commands/analyze_cmd.py` — added `pages: bool = False` parameter; calls SyncEngine.sync(push=False) after successful analysis
-- `agentkit_cli/main.py` — added `--pages` flag on `analyze` and `run` commands; registered `pages-sync` and `pages-add` CLI commands
-- `tests/test_pages_sync_d2.py` — 8 tests
+- Added `agentkit_cli/burn.py` with session filtering, aggregation by project/model/provider/task/source, top-session ranking, and stable JSON-ready report output.
+- Implemented waste finding detection for expensive no-tool turns, retry-loop patterns, and low one-shot success sessions.
+- Added engine tests for aggregation math, deterministic sorting, filters, and waste detection.
 
-**Tests:** 8 passed
+**Tests:** `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py` -> `13 passed in 0.04s`
+
+**Next:** D3 `agentkit burn` CLI command.
 
 ---
 
-## D3: `agentkit pages-add` command — COMPLETE
+## D3: `agentkit burn` CLI command — COMPLETE
 
 **Built:**
-- `agentkit_cli/commands/pages_add.py` — pages_add_command() with --push/--no-push, --share flags; analyze + sync in one step
-- `tests/test_pages_sync_d3.py` — 9 tests
+- Added `agentkit_cli/commands/burn.py` with `--path`, `--format`, `--since`, `--limit`, `--project`, and `--output` support.
+- Added rich terminal output, stable JSON output, and clean empty-directory handling.
+- Added CLI tests for happy path, filters, empty path, JSON shape, and HTML writing.
 
-**Tests:** 9 passed
+**Tests:** `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `22 passed in 1.00s`
+
+**Next:** D4 HTML report + narrative summary.
 
 ---
 
-## D4: `source` field + community badges — COMPLETE
+## D4: HTML burn report + narrative summary — COMPLETE
 
 **Built:**
-- `agentkit_cli/commands/pages_refresh.py` — added `source="ecosystem"` to build_data_json(); updated _fetch_script() to render source-badge chips and community count
-- `docs/index.html` — added source-badge CSS (.source-ecosystem, .source-community, .source-manual); added community-scored-stat element; added id to repos-scored-stat
-- `tests/test_pages_sync_d4.py` — 8 tests
+- Added `agentkit_cli/renderers/burn_report.py` with dark-theme HTML and markdown-ready burn summaries.
+- Added renderer tests for report sections, styling markers, and markdown summary content.
 
-**Tests:** 8 passed
+**Tests:** `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py` -> `22 passed in 1.00s`
 
-**Note:** 6 pre-existing failures in test_pages_refresh.py::TestIndexHtml were present before this build (verified via git stash check). Not caused by D4 changes.
+**Next:** D5 docs, versioning, and final validation.
 
 ---
 
-## D5: Docs, CHANGELOG, BUILD-REPORT, version bump — COMPLETE
+## D5: docs, build report, versioning, and final validation — COMPLETE
 
-**Built:**
-- `CHANGELOG.md` — [0.95.0] entry with all new features
-- `README.md` — "## Community Leaderboard" section documenting pages-add, pages-sync, --pages flag
-- `BUILD-REPORT.md` — full deliverable table + test count
-- `agentkit_cli/__init__.py` — bumped to 0.95.0
-- `pyproject.toml` — bumped to 0.95.0
+**Built and verified:**
+- Confirmed the release metadata still reports `1.1.0` in `pyproject.toml` and `agentkit_cli/__init__.py`.
+- Re-ran the contradiction scan and hygiene check from the workspace support scripts, both clean.
+- Re-ran the focused burn validation slice plus `tests/test_main.py`, then re-ran the full suite on the current branch state.
+- Verified the shipped registry state directly from the version-specific PyPI JSON for `agentkit-cli==1.1.0`.
+- Reconciled `BUILD-REPORT.md` and `BUILD-REPORT-v1.1.0.md` to the actual chronology: branch head is now `0c47a5a`, while the shipped `v1.1.0` tag and PyPI release remain on `a704a06`.
 
----
+**Tests and checks:**
+- `uv run pytest -q tests/test_burn_adapters.py tests/test_burn_engine.py tests/test_burn_command.py tests/test_burn_report.py tests/test_main.py` -> `31 passed in 0.80s`
+- `uv run pytest -q` -> `4811 passed, 1 warning in 128.98s (0:02:08)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.1.0-burn-observability` -> `0 findings`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.1.0-burn-observability` -> `0 findings`
+- PyPI verification -> live with `agentkit_cli-1.1.0.tar.gz` and `agentkit_cli-1.1.0-py3-none-any.whl`
 
-## Final Summary
+**Audit notes:**
+- The contract referenced repo-local helper scripts, but this repo does not contain them. The equivalent workspace support scripts were used for the required contradiction and hygiene checks.
+- The branch and tag no longer point to the same commit. That is now documented explicitly instead of being reported as one commit.
 
-| Deliverable | Status | Tests |
-|-------------|--------|-------|
-| D1: pages-sync command + SyncEngine | ✅ COMPLETE | 22 |
-| D2: --pages flag on analyze + run | ✅ COMPLETE | 8 |
-| D3: pages-add command | ✅ COMPLETE | 9 |
-| D4: source field + community badges | ✅ COMPLETE | 8 |
-| D5: docs + version bump | ✅ COMPLETE | — |
-
-**Total new tests:** 47
-**All new tests passing:** 47/47
-**Pre-existing failures (not caused by this build):** 6 (test_pages_refresh.py::TestIndexHtml — pre-existing, verified)
-**Blockers:** None
-**PyPI publish:** NOT done (per contract rule)
+**Final status:** shipped and reconciled. The release is live, validation is green, and the report surfaces now match the actual branch, tag, and PyPI state.

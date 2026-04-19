@@ -12,7 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from agentkit_cli.tools import is_installed, run_tool, INSTALL_HINTS
-from agentkit_cli.config import find_project_root, save_last_run
+from agentkit_cli.config import find_project_root, load_config, save_last_run
 from agentkit_cli.history import record_run
 from agentkit_cli.composite import CompositeScoreEngine
 from agentkit_cli.notifier import fire_notifications, resolve_notify_configs
@@ -80,6 +80,7 @@ def run_command(
     notify_on: str = "fail",
     profile: Optional[str] = None,
     share: bool = False,
+    release_check: bool = False,
     record_findings: bool = False,
     serve: bool = False,
     harden: bool = False,
@@ -89,6 +90,7 @@ def run_command(
     improve: bool = False,
     improve_no_generate: bool = False,
     improve_no_harden: bool = False,
+    improve_optimize_context: bool = False,
     improve_threshold: float = 80.0,
     webhook_notify: bool = False,
     checks: Optional[bool] = None,
@@ -111,7 +113,6 @@ def run_command(
 ) -> None:
     """Run the full Agent Quality pipeline."""
     # Apply config defaults
-    from agentkit_cli.config import load_config
     from agentkit_cli.profiles import apply_profile
     cfg = load_config(path)
     if profile is not None:
@@ -304,6 +305,42 @@ def run_command(
         "failed": failed_count,
         "skipped": skipped_count,
     }
+
+    def _refresh_summary_counts() -> tuple[int, int, int, int]:
+        current_passed = sum(1 for r in results if r.get("status") == "pass")
+        current_failed = sum(1 for r in results if r.get("status") == "fail")
+        current_skipped = sum(1 for r in results if r.get("status") in ("skipped", "error"))
+        current_total = len(results)
+
+        summary["steps"] = [
+            {
+                "name": r["step"],
+                "status": r.get("status", "unknown"),
+                "duration_ms": int((r.get("duration", 0.0) or 0.0) * 1000),
+                "output_file": None,
+            }
+            for r in results
+        ]
+        summary["summary"]["steps"] = [
+            {
+                "step": r["step"],
+                "status": r.get("status", "unknown"),
+                "duration": r.get("duration", 0.0),
+                "notes": r.get("reason", "") or (r.get("output", "")[:60] if r.get("output") else ""),
+            }
+            for r in results
+        ]
+        summary["success"] = current_failed == 0
+        summary["summary"]["total"] = current_total
+        summary["summary"]["passed"] = current_passed
+        summary["summary"]["failed"] = current_failed
+        summary["summary"]["skipped"] = current_skipped
+        summary["summary"]["result"] = "pass" if current_failed == 0 else "fail"
+        summary["total"] = current_total
+        summary["passed"] = current_passed
+        summary["failed"] = current_failed
+        summary["skipped"] = current_skipped
+        return current_passed, current_failed, current_skipped, current_total
     try:
         save_last_run(summary, root)
     except Exception:
@@ -355,6 +392,45 @@ def run_command(
         except Exception as exc:
             import sys
             print(f"[agentkit history] DEBUG: history recording failed: {exc}", file=sys.stderr)
+
+    # Optional release-check step, runs after the normal pipeline.
+    release_check_result = None
+    release_check_failed = False
+    final_passed_count = passed_count
+    final_failed_count = failed_count
+    final_skipped_count = skipped_count
+    if release_check:
+        try:
+            from agentkit_cli.release_check import run_release_check
+            from agentkit_cli.commands.release_check_cmd import _render_table
+            release_check_result = run_release_check(path=root)
+            summary["release_check"] = release_check_result.as_dict()
+            results.append({
+                "step": "release-check",
+                "tool": "agentkit",
+                "status": "pass" if release_check_result.passed else "fail",
+                "duration": 0.0,
+                "output": release_check_result.verdict,
+            })
+            if not json_output:
+                _render_table(release_check_result)
+            release_check_failed = not release_check_result.passed
+        except Exception as _release_exc:
+            release_check_failed = True
+            summary["release_check"] = {"error": str(_release_exc)}
+            results.append({
+                "step": "release-check",
+                "tool": "agentkit",
+                "status": "error",
+                "reason": str(_release_exc),
+                "duration": 0.0,
+                "output": "",
+            })
+        final_passed_count, final_failed_count, final_skipped_count, _ = _refresh_summary_counts()
+        try:
+            save_last_run(summary, root)
+        except Exception:
+            pass
 
     # json_output deferred to after optional steps (llmstxt, etc.) can add fields
 
@@ -531,7 +607,7 @@ def run_command(
 
     # Fire notifications (never affect exit code)
     try:
-        _notify_verdict = "FAIL" if failed_count > 0 else "PASS"
+        _notify_verdict = "FAIL" if final_failed_count > 0 else "PASS"
         _notify_score = _composite_score if "_composite_score" in dir() else 0.0
         _notify_findings = [r["step"] for r in results if r.get("status") in ("fail", "error")]
         _notify_configs = resolve_notify_configs(
@@ -600,6 +676,7 @@ def run_command(
                 str(root),
                 no_generate=improve_no_generate,
                 no_harden=improve_no_harden,
+                optimize_context=improve_optimize_context,
             )
             _improve_result = {
                 "baseline": _improve_plan.baseline_score,
@@ -653,8 +730,8 @@ def run_command(
                 _payload = _json.dumps({
                     "event": "run_complete",
                     "project": cwd_str,
-                    "passed": passed_count,
-                    "failed": failed_count,
+                    "passed": final_passed_count,
+                    "failed": final_failed_count,
                     "score": _composite_score if "_composite_score" in dir() else None,
                 }).encode("utf-8")
                 _req = _urllib_req.Request(
@@ -702,7 +779,7 @@ def run_command(
             except Exception:
                 pass
             _checks_output = format_check_output(_checks_result)
-            _checks_conclusion = "success" if failed_count == 0 else "failure"
+            _checks_conclusion = "success" if final_failed_count == 0 else "failure"
             _checks_client.update_check_run(
                 _check_run_id,
                 status="completed",
@@ -928,17 +1005,24 @@ def run_command(
             summary["frameworks"] = {"error": str(_fw_exc)}
 
     # Final status
-    if failed_count > 0:
+    exit_failure_count = final_failed_count
+    if release_check_failed and not any(
+        r.get("step") == "release-check" and r.get("status") == "fail"
+        for r in results
+    ):
+        exit_failure_count += 1
+
+    if exit_failure_count > 0:
         if ci:
-            active_console.print(f"\nPipeline completed with {failed_count} failure(s).")
+            active_console.print(f"\nPipeline completed with {exit_failure_count} failure(s).")
         else:
-            console.print(f"\n[red]Pipeline completed with {failed_count} failure(s).[/red]")
+            console.print(f"\n[red]Pipeline completed with {exit_failure_count} failure(s).[/red]")
         raise typer.Exit(code=1)
     else:
         if ci:
-            active_console.print(f"\nPipeline complete. {passed_count} passed, {skipped_count} skipped.\n")
+            active_console.print(f"\nPipeline complete. {final_passed_count} passed, {final_skipped_count} skipped.\n")
         else:
-            console.print(f"\n[green]Pipeline complete.[/green] {passed_count} passed, {skipped_count} skipped.\n")
+            console.print(f"\n[green]Pipeline complete.[/green] {final_passed_count} passed, {final_skipped_count} skipped.\n")
             # Hooks tip: show once if hooks not installed
             if not json_output:
                 try:

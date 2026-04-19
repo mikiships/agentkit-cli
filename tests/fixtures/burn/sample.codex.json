@@ -1,0 +1,30 @@
+{
+  "session_id": "codex-001",
+  "provider": "openai",
+  "model": "gpt-5-codex",
+  "project_root": "/repo/alpha",
+  "task_label": "debug flaky test",
+  "started_at": "2026-04-18T10:00:00+00:00",
+  "ended_at": "2026-04-18T10:05:00+00:00",
+  "turns": [
+    {
+      "id": "c1",
+      "role": "assistant",
+      "input_tokens": 1000,
+      "output_tokens": 500,
+      "cost_usd": 0.03,
+      "tool_uses": [{"name": "read", "count": 1}],
+      "timestamp": "2026-04-18T10:01:00+00:00"
+    },
+    {
+      "id": "c2",
+      "role": "assistant",
+      "input_tokens": 1200,
+      "output_tokens": 700,
+      "pricing": {"input_per_1k": 0.01, "output_per_1k": 0.02},
+      "tool_uses": [],
+      "timestamp": "2026-04-18T10:03:00+00:00",
+      "task_label": "debug flaky test"
+    }
+  ]
+}
