@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.0] - 2026-04-19
+
+### Added
+- `agentkit source` for managing one dedicated agentkit-owned canonical source file at `.agentkit/source.md`, with explicit `--init`, `--promote`, `--from`, `--force`, and JSON reporting modes.
+- Dedicated canonical-source detection in the projection engine so `.agentkit/source.md` wins over legacy root-level context files when present.
+
+### Changed
+- `agentkit project` now prefers `.agentkit/source.md` automatically while preserving backwards-compatible AGENTS/CLAUDE/AGENT/GEMINI/COPILOT/llms detection when the dedicated source is absent.
+- `agentkit sync` now treats `.agentkit/source.md` as the drift authority, displays it in sync status output, and can regenerate missing projections from it.
+- `agentkit init` now supports `--init-source`, `--promote-source`, and `--source-title` so a repo can enter the dedicated-source workflow during setup.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v1.0.0 canonical source workflow release.
+
 ## [0.99.0] - 2026-04-18
 
 ### Added

@@ -128,28 +128,34 @@ Explicit CLI flags always override profile values:
 agentkit gate --profile strict --min-score 99
 ```
 
-## `agentkit project` — one canonical context, many projections
+## `agentkit source` + `agentkit project` — dedicated canonical source workflow
 
-Use one canonical context source and fan it out into the filenames different tools now expect.
+Use `.agentkit/source.md` as one agentkit-managed source of truth, then fan it out into the filenames different tools expect.
 
 ```bash
-# Review what agentkit would project from the best detected source file
+# Create a fresh dedicated source template
+agentkit source --init
+
+# Or promote the best existing legacy file into the dedicated path
+agentkit source --promote
+
+# Review what agentkit would project from the dedicated source
 agentkit project
 
-# Write every supported target next to the canonical source
+# Write every supported target next to the dedicated source
 agentkit project --targets all --write
-
-# Project only the surfaces your team needs
-agentkit project --targets claude,agent,gemini,copilot --write
 
 # CI drift check, exits non-zero when requested targets are missing or out of date
 agentkit project --targets claude,gemini,llmstxt --check
 
-# Write projections into a separate directory
-agentkit project --targets all --output-dir .agent-context --write
+# Repair missing or stale root projections from .agentkit/source.md
+agentkit sync --fix
 ```
 
-Supported targets:
+Dedicated source path:
+- `.agentkit/source.md` -> canonical file you author directly
+
+Supported projection targets:
 - `agents` -> `AGENTS.md`
 - `claude` -> `CLAUDE.md`
 - `agent` -> `AGENT.md`
@@ -158,14 +164,19 @@ Supported targets:
 - `llmstxt` -> `llms.txt`
 
 When to use which command:
-- `agentkit project` when you already have one canonical context file and want deterministic fan-out or drift checks.
-- `agentkit migrate` when you want a one-off conversion from one format into another specific target.
-- `agentkit sync` when you want the classic repo-local health check or to repair missing stale projections from the detected canonical source.
+- `agentkit source` when you want to initialize or promote the dedicated canonical source.
+- `agentkit project` when you want deterministic fan-out or drift checks from that source.
+- `agentkit migrate` when you want a one-off conversion from one specific format into another.
+- `agentkit sync` when you want the repo-local health check or to repair missing stale projections from the detected canonical source.
 
-You can also hook projection fan-out into initialization:
+You can also hook the dedicated-source workflow into initialization:
 
 ```bash
-agentkit init --project-targets claude,gemini --write-projections
+# Start a repo with a fresh canonical source, then write projections immediately
+agentkit init --init-source --source-title "My Project" --project-targets claude,gemini --write-projections
+
+# Or adopt the dedicated source during init from an existing AGENTS.md / CLAUDE.md
+agentkit init --promote-source --project-targets all --write-projections
 ```
 
 ## `agentkit llmstxt` — AI-Accessible Documentation

@@ -39,6 +39,22 @@
 
 ---
 
+## D4: docs, reports, versioning, and final validation — COMPLETE
+
+**Built:**
+- Updated `README.md`, `CHANGELOG.md`, and `BUILD-REPORT.md` to document the dedicated `.agentkit/source.md` authoring workflow, `agentkit source`, and the init/project/sync integration points.
+- Confirmed version metadata is `1.0.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`.
+- Added the required versioned build-report copy at `BUILD-REPORT-v1.0.0.md` so the repo-local report surfaces stay consistent with the release version.
+- Reconciled the canonical build report with the repo’s report tests, then reran the full suite cleanly.
+
+**Tests:**
+- `uv run pytest -q tests/test_context_projections.py tests/test_source_cmd.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_init.py` -> `37 passed in 1.10s`
+- `uv run pytest -q` -> `4787 passed, 1 warning in 213.80s (0:03:33)`
+
+**Final status:** dedicated canonical source workflow complete and fully validated locally, with no push/publish actions taken.
+
+---
+
 # Progress Log — agentkit-cli v0.99.0 context projections
 
 ## RC D1: mainline convergence provenance map — COMPLETE
