@@ -2,7 +2,7 @@
 
 Date: 2026-04-19
 Builder: subagent canonical source pass
-Contract: all-day-build-contract-agentkit-cli-v1.0.0-canonical-source-kit.md
+Contract: all-day-build-contract-agentkit-cli-v1.0.0-release.md
 Status: SHIPPED
 
 ## Summary
@@ -40,13 +40,14 @@ Completed the dedicated canonical source workflow that complements the v0.99.0 p
 
 ## Status
 
-SHIPPED. Release surfaces are now complete for `v1.0.0`.
+SHIPPED. Release surfaces are complete for `v1.0.0`, and this report now reflects the verified final chronology.
 
-- tests: targeted slice `37 passed in 1.70s`; full suite `4787 passed, 1 warning in 241.07s (0:04:01)`
-- git push: `origin/feat/v1.0.0-canonical-source-kit` -> `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- git tag: annotated tag `v1.0.0` pushed, peeled commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- PyPI: `agentkit-cli==1.0.0` live
+- tests rerun in this pass: targeted slice `37 passed in 1.23s`; full suite `4787 passed, 1 warning in 129.67s (0:02:09)`
+- hygiene rerun in this pass: `post-agent-hygiene-check.sh` reported `0 findings`
+- branch truth: local `feat/v1.0.0-canonical-source-kit` and `origin/feat/v1.0.0-canonical-source-kit` now point at docs-only cleanup commit `3685aabecb600b106c79590389c08dceeb0e8af5`
+- tag truth: annotated tag `v1.0.0` peels to shipped commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- PyPI truth: `agentkit-cli==1.0.0` live with both release artifacts present
   - wheel `agentkit_cli-1.0.0-py3-none-any.whl`, uploaded `2026-04-19T10:58:47.466825Z`, sha256 `343c1ce76f0f7d9b27b7d9aacaf4d46d55b93d934f5a6c84eb6e692a9ea7bd58`
   - sdist `agentkit_cli-1.0.0.tar.gz`, uploaded `2026-04-19T10:58:49.086655Z`, sha256 `872ab66437b745e1d23c2a7fff4474ce450c1e0d3f2511a64cf6cb83e1054de0`
 
-Caveat: the shipped release tag points at the original validated source commit `e16c7c8`; any later branch movement from this pass is docs-only chronology cleanup.
+Caveat: the shipped release is the tested tag commit `e16c7c8`; the current branch head `3685aab` is a later docs-only release-record commit.

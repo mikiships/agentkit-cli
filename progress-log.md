@@ -55,30 +55,30 @@
 
 ---
 
-## Release D5: push, tag, publish, and shipped-state reconciliation — COMPLETE
+## Release D1-D5: audited shipped truth, reran validation, and reconciled chronology — COMPLETE
 
 **Built:**
-- pushed branch `feat/v1.0.0-canonical-source-kit` to `origin` and confirmed the remote branch resolves to release commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- created annotated tag `v1.0.0`, pushed it to `origin`, and confirmed the peeled remote tag resolves to `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- rebuilt release artifacts for `1.0.0` with `uv build`
-- published `agentkit-cli==1.0.0` to PyPI and verified both uploaded files plus matching sha256 digests
-- reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.0.0.md`, and this progress log so the repo now tells one shipped story
+- ran the required recall and contradiction checks first; neither surfaced a live shipped-vs-blocked conflict for `v1.0.0`
+- verified local and remote git truth: branch `feat/v1.0.0-canonical-source-kit` and `origin/feat/v1.0.0-canonical-source-kit` both point at docs-only cleanup commit `3685aabecb600b106c79590389c08dceeb0e8af5`
+- verified annotated tag `v1.0.0` still peels to the tested shipped commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- verified PyPI directly: `agentkit-cli==1.0.0` is already live, and the version JSON exposes both the wheel and sdist
+- reran the required focused slice, reran the full suite, and reran the hygiene check from this checkout
+- reconciled the release docs so they now distinguish the current branch head (`3685aab`) from the shipped tag commit (`e16c7c8`) instead of claiming the branch still points at the release commit
 
 **Tests:**
-- `uv run pytest -q tests/test_context_projections.py tests/test_source_cmd.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_init.py` -> `37 passed in 1.70s`
-- `uv run pytest -q` -> `4787 passed, 1 warning in 241.07s (0:04:01)`
-- `uv run agentkit release-check --json` before release execution verified the exact missing surfaces: dirty generated state, missing `v1.0.0` tag, and missing PyPI release, while tests and smoke tests were already green
+- `uv run pytest -q tests/test_context_projections.py tests/test_source_cmd.py tests/test_project_cmd.py tests/test_sync_projections.py tests/test_init_projections.py tests/test_init.py` -> `37 passed in 1.23s`
+- `uv run pytest -q` -> `4787 passed, 1 warning in 129.67s (0:02:09)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.0.0-canonical-source-kit` -> `0 findings`
 
 **External proof:**
-- `git ls-remote --heads origin feat/v1.0.0-canonical-source-kit` -> `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- `git ls-remote --tags origin v1.0.0 v1.0.0^{}` -> annotated tag object `b3d68a03956e9f91a4203a368a281a4a01d4ba6e`, dereferenced commit `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
-- PyPI JSON confirms `agentkit-cli==1.0.0` is live with two files:
-  - `agentkit_cli-1.0.0-py3-none-any.whl` uploaded `2026-04-19T10:58:47.466825Z`, sha256 `343c1ce76f0f7d9b27b7d9aacaf4d46d55b93d934f5a6c84eb6e692a9ea7bd58`
-  - `agentkit_cli-1.0.0.tar.gz` uploaded `2026-04-19T10:58:49.086655Z`, sha256 `872ab66437b745e1d23c2a7fff4474ce450c1e0d3f2511a64cf6cb83e1054de0`
+- remote branch: `origin/feat/v1.0.0-canonical-source-kit` -> `3685aabecb600b106c79590389c08dceeb0e8af5`
+- remote tag object: `v1.0.0` -> `b3d68a03956e9f91a4203a368a281a4a01d4ba6e`
+- remote peeled tag commit: `v1.0.0^{}` -> `e16c7c89fabc4bf7045a9d5ff7cae90900cb71c8`
+- PyPI JSON confirms `agentkit-cli==1.0.0` is live with `agentkit_cli-1.0.0-py3-none-any.whl` and `agentkit_cli-1.0.0.tar.gz`
 
-**Truthful state:** `agentkit-cli==1.0.0` is shipped
+**Truthful state:** `agentkit-cli==1.0.0` was already shipped before this pass; this pass revalidated the release and fixed the chronology narrative so branch-head truth, tag truth, and PyPI truth now agree.
 
-**Caveat:** the release tag marks the shipped source commit `e16c7c8`; any later branch movement from this handoff is docs-only chronology cleanup.
+**Caveat:** the shipped release is the tested tag commit `e16c7c8`; the current branch head `3685aab` is a later docs-only release-record commit.
 
 ---
 
