@@ -209,3 +209,49 @@ def test_launch_engine_blocks_missing_lane_handoff_artifacts(tmp_path):
     action = plan.actions[0]
     assert action.state == "blocked"
     assert "handoff markdown is missing" in action.state_reason
+
+
+def test_launch_engine_writes_lane_packet_directory_with_helper_scripts(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_materialize(project, target="codex", overlap=True)
+
+    plan = LaunchEngine().build(project, target="codex")
+    output_dir = tmp_path / "launch"
+    LaunchEngine().write_directory(plan, output_dir)
+
+    assert (output_dir / "launch.md").exists()
+    assert (output_dir / "launch.json").exists()
+    assert (output_dir / "lanes" / "lane-01" / "launch.json").exists()
+    assert (output_dir / "lanes" / "lane-01" / "launch.md").exists()
+    helper = output_dir / "lanes" / "lane-01" / "launch.sh"
+    assert helper.exists()
+    assert helper.read_text(encoding="utf-8").startswith("#!/usr/bin/env bash")
+    waiting_payload = json.loads((output_dir / "lanes" / "lane-02" / "launch.json").read_text(encoding="utf-8"))
+    assert waiting_payload["state"] == "waiting"
+    assert waiting_payload["dependencies"][0]["lane_id"] == "lane-01"
+
+
+def test_launch_engine_rejects_execution_when_tool_is_missing(tmp_path, monkeypatch):
+    project = _make_repo(tmp_path)
+    _write_materialize(project, target="codex", single_lane=True)
+
+    monkeypatch.setenv("PATH", "")
+    try:
+        LaunchEngine().launch(project, target="codex")
+    except Exception as exc:
+        assert "Required tool not found on PATH: codex" in str(exc)
+    else:
+        raise AssertionError("expected missing tool failure")
+
+
+def test_launch_engine_blocks_missing_worktree(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_materialize(project, target="generic", single_lane=True)
+
+    worktree_path = project / "stage" / "worktrees" / "demo-repo-phase-01-lane-01"
+    subprocess.run(["rm", "-rf", str(worktree_path)], check=True)
+
+    plan = LaunchEngine().build(project, target="generic")
+
+    assert plan.blocked_lane_ids == ["lane-01"]
+    assert "worktree is missing" in plan.actions[0].state_reason

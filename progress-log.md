@@ -567,3 +567,19 @@
 
 **Blockers:**
 - None.
+
+## v1.13.0 D3: launch packet and script artifacts — COMPLETE
+
+**Built:**
+- Expanded `LaunchEngine.write_directory()` to emit top-level `launch.md` and `launch.json` plus per-lane `launch.md`, `launch.json`, and reusable helper command files under `lanes/<lane-id>/`.
+- Wrote shell-launch helpers for local executable targets and plain `command.txt` helpers for manual generic handoff packets.
+- Preserved waiting-lane dependency metadata in the per-lane packet output so serialized follow-on lanes stay explicit.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py` -> `16 passed in 3.65s`
+
+**Next:**
+- D4 regression and edge-case coverage across the full post-materialize handoff lane.
+
+**Blockers:**
+- None.
