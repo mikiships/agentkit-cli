@@ -228,3 +228,23 @@
 **Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `28 passed in 0.86s`
 
 **Next:** D5 versioning, reports, required validation scripts, and full-suite verification.
+
+---
+
+## D5: docs, reports, and release surfaces — COMPLETE
+
+**Built:**
+- Updated README with `agentkit map` purpose, usage, and explicit local plus GitHub examples.
+- Bumped package metadata to `1.3.0` in `pyproject.toml` and `agentkit_cli/__init__.py`, and added a v1.3.0 changelog entry.
+- Rewrote `BUILD-REPORT.md` and added `BUILD-REPORT-v1.3.0.md` for the repo-map release.
+- Ran the required pre-action recall, contradiction scan, hygiene check, focused validation, and final full-suite pass.
+
+**Tests and checks:**
+- `uv run pytest -q tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `28 passed in 0.86s`
+- `uv run pytest -q tests/test_daily_d5.py` -> `13 passed in 0.03s`
+- `uv run pytest -q` -> `4833 passed, 1 warning in 135.18s (0:02:15)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> `0 findings`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> `0 findings`
+
+**Final status:** all deliverables complete, validations green, and the repo is ready for a later release-completion pass.
