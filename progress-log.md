@@ -136,3 +136,33 @@
 - Final release status: four surfaces verified, no blocker.
 
 **Next:** commit the chronology reconciliation surfaces, push the docs-only follow-up commit, and leave the repo clean.
+
+---
+
+## Release completion pass: source-of-truth shipment verified and branch chronology reconciled
+
+**Reconciled:**
+- Ran the workspace recall and contradiction checks before trusting any shipped prose.
+- Re-ran the focused observe slice, cross-lane slice, and full suite from the declared runtime-deps path.
+- Removed transient `.agentkit-last-run.json` so the hygiene check returned clean before trusting repo state.
+- Verified the shipped surfaces directly from origin and PyPI instead of assuming the uncommitted report edits were true.
+- Confirmed the shipped release commit is `047707ede48157e9dbc8ca65cd578562aa04d029`, and this pass is leaving a docs-only reconciliation commit on the branch without moving the shipped tag.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.14.0-observe-lanes` -> refreshed current shipped chronology and warned about stale historical `v1.1.0` memory drift.
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.14.0-observe-lanes` -> `No contradictory success/blocker narratives found.`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_main.py` -> `17 passed in 2.73s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `80 passed in 10.40s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4930 passed, 1 warning in 157.56s (0:02:37)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.14.0-observe-lanes` -> `Total findings: 0`
+- `git ls-remote --heads origin feat/v1.14.0-observe-lanes` -> `047707ede48157e9dbc8ca65cd578562aa04d029 refs/heads/feat/v1.14.0-observe-lanes`
+- `git ls-remote --tags origin refs/tags/v1.14.0^{}` -> `047707ede48157e9dbc8ca65cd578562aa04d029 refs/tags/v1.14.0^{}`
+- `curl -fsSL https://pypi.org/pypi/agentkit-cli/1.14.0/json` -> version `1.14.0` with `agentkit_cli-1.14.0-py3-none-any.whl` and `agentkit_cli-1.14.0.tar.gz`
+- `curl -I -fsSL https://pypi.org/project/agentkit-cli/1.14.0/ | sed -n '1,5p'` -> `HTTP/2 200`
+
+**Current truth:**
+- `v1.14.0` is already shipped.
+- Tag target, remote shipped commit, and published PyPI payload all agree on `047707ede48157e9dbc8ca65cd578562aa04d029`.
+- This pass only adds the final docs-only chronology reconciliation commit so branch-head truth stays explicit after shipment.
+
+**Next:** commit and push the report-surface reconciliation update without moving the `v1.14.0` tag.
