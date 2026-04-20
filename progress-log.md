@@ -1,5 +1,17 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 D2: clarify CLI workflow + actionable rendering — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/clarify_cmd.py` and wired `agentkit clarify <path>` into `agentkit_cli/main.py`.
+- Supported markdown, JSON, `--output`, and `--output-dir` flows so humans and orchestrators can save `clarify.md` plus `clarify.json` without glue code.
+- Added focused CLI coverage in `tests/test_clarify_cmd.py` for JSON output, packet-directory writing, and required markdown sections.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_clarify_cmd.py` -> `2 passed`
+
+**Next:** D3 end-to-end ambiguity loop validation and docs/report updates.
+
 ## v1.8.0 D1: deterministic clarify engine + schema — COMPLETE
 
 **Built:**

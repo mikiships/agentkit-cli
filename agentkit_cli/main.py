@@ -95,6 +95,7 @@ from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.commands.map_cmd import map_command
 from agentkit_cli.commands.bundle_cmd import bundle_command
 from agentkit_cli.commands.taskpack_cmd import taskpack_command
+from agentkit_cli.commands.clarify_cmd import clarify_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1343,6 +1344,19 @@ def taskpack(
 ) -> None:
     """Generate an execution-ready handoff packet for a coding agent."""
     taskpack_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
+@app.command("clarify")
+def clarify(
+    path: str = typer.Argument(..., help="Project directory to clarify before coding-agent execution"),
+    target: str = typer.Option("generic", "--target", help="Target agent: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered clarification brief to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write clarify.md and clarify.json to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Generate a clarification brief for the source -> audit -> map -> contract -> bundle -> taskpack lane."""
+    clarify_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
 @app.command("contract")
