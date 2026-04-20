@@ -599,3 +599,21 @@
 
 **Blockers:**
 - None.
+
+## v1.13.0 D5: docs and local release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated `README.md` with `agentkit launch` usage, dry-run planning by default, packet-directory output, and explicit opt-in `--execute` behavior.
+- Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py` for the local `1.13.0` release-ready state.
+- Kept the scope local only: no push, tag, publish, or remote mutation in this pass.
+
+**Validation:**
+- Pending final reruns for recall, contradiction, hygiene, and the full suite on the D5 repo state.
+
+**Current truth:**
+- D1-D5 implementation work is complete.
+- The supported handoff lane is `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch`.
+- Final release-ready status depends only on the last required validation reruns.
+
+**Next:**
+- Run the contract-required recall, contradiction, hygiene, and full-suite checks on the final repo state.

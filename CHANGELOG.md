@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.13.0] - 2026-04-20
+
+### Added
+- Added `agentkit launch` for deterministic post-materialize launch planning from saved `materialize.json` artifacts and per-lane `.agentkit/materialize/` handoff packets.
+- Added stable launch markdown and JSON rendering, `--output`, `--output-dir`, and explicit `--execute` support for eligible local `codex` and `claude-code` targets.
+- Added portable launch packet directories with top-level `launch.md` and `launch.json`, per-lane `launch.md` and `launch.json`, and reusable helper command files.
+- Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch`, serialized waiting lanes, missing artifacts, unsupported execute targets, and missing-tool failures.
+
+### Docs
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `launch` after `materialize`, with the pass kept local release-ready only.
+
 ## [1.12.0] - 2026-04-20
 
 ### Added

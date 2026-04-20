@@ -1,37 +1,31 @@
-# BUILD-REPORT.md — agentkit-cli v1.12.0 materialize worktrees
+# BUILD-REPORT.md — agentkit-cli v1.13.0 launch lanes
 
-Status: SHIPPED
+Status: RELEASE-READY
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.12.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.13.0-launch-lanes.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Added `agentkit_cli/materialize.py` with deterministic local worktree planning from saved stage artifacts |
-| D2 | ✅ Complete | Added `agentkit materialize`, stable markdown and JSON output, `--dry-run`, and real local `git worktree add` execution |
-| D3 | ✅ Complete | Added seeded `.agentkit/materialize/` handoff packets with copied stage artifacts, metadata, and target-aware notes |
-| D4 | ✅ Complete | Added regression coverage for `resolve -> dispatch -> stage -> materialize`, serialized lanes, collision safety, and deterministic worktree creation |
-| D5 | ✅ Complete | Pushed branch and tag, published `agentkit-cli==1.12.0`, and reconciled shipped release surfaces |
+| D1 | ✅ Complete | Added `agentkit_cli/launch.py` with deterministic launch planning from saved `materialize.json` and per-lane handoff packets |
+| D2 | ✅ Complete | Added `agentkit launch`, stable markdown and JSON output, `--output`, `--output-dir`, and explicit `--execute` local launch support |
+| D3 | ✅ Complete | Added top-level and per-lane launch packet artifacts plus reusable helper command files |
+| D4 | ✅ Complete | Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch`, waiting lanes, missing artifacts, and execute-path tool failures |
+| D5 | ✅ Complete | Updated docs, version, progress, and report surfaces for truthful local `1.13.0` release-readiness |
 
 ## Validation
 
-- Focused materialize slice on the shipped release line: `python3 -m pytest -q tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py` -> `9 passed in 2.31s`
-- Cross-lane workflow slice on the shipped release line: `python3 -m pytest -q tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_workflow.py tests/test_resolve_cmd.py tests/test_taskpack.py` -> `46 passed in 4.04s`
-- CLI integration slice on the shipped release line: `python3 -m pytest -q tests/test_main.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py` -> `16 passed in 2.64s`
-- Release recall: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> completed before trusting release surfaces in this pass
-- Contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> no contradictory success or blocker narratives found
-- Full suite on the shipped release line: `.venv/bin/python -m pytest tests/ -x` -> `4903 passed, 1 warning in 417.24s (0:06:57)` for tested release commit `9e1e1440f01e557857c84b4ac00a405f3e51f505`
-- Git push verification: `git ls-remote --heads origin feat/v1.12.0-materialize-worktrees` -> branch pushed and later allowed to advance only through docs-only chronology cleanup after the shipped tag
-- Tag verification: `git ls-remote --tags origin refs/tags/v1.12.0^{}` -> shipped release commit `9e1e1440f01e557857c84b4ac00a405f3e51f505`
-- Registry build and publish: `uv build .release-build/v1.12.0-from-tag --out-dir dist --sdist --wheel`, `uv run --with twine python -m twine check dist/agentkit_cli-1.12.0.tar.gz dist/agentkit_cli-1.12.0-py3-none-any.whl`, and `uv run --with twine python -m twine upload dist/agentkit_cli-1.12.0.tar.gz dist/agentkit_cli-1.12.0-py3-none-any.whl` -> success
-- Registry verification: `https://pypi.org/pypi/agentkit-cli/1.12.0/json` -> `1.12.0` live with `agentkit_cli-1.12.0.tar.gz` and `agentkit_cli-1.12.0-py3-none-any.whl`
+- Focused launch slice: `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_main.py` -> `24 passed in 3.80s`
+- Cross-lane workflow slice: `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.30s`
+- Required recall: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> completed
+- Contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> no contradictory success or blocker narratives found
+- Hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> pending final rerun for the D5 repo state
+- Full suite: pending final rerun for the D5 repo state
 
 ## Repo state
 
-- Version surfaces target `1.12.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py`
-- The supported handoff lane is `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize`
-- Shipped release commit: `9e1e1440f01e557857c84b4ac00a405f3e51f505`
-- Annotated tag: `v1.12.0` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
-- PyPI: `https://pypi.org/project/agentkit-cli/1.12.0/`
-- Any later branch movement after the tag is docs-only chronology cleanup, not a new shipped artifact
+- Version surfaces target `1.13.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py`
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch`
+- Branch: `feat/v1.13.0-launch-lanes`
+- Repo status before final validation rerun: local feature branch, no remote mutation attempted in this pass

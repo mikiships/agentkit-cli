@@ -487,6 +487,31 @@ The materialize packet surfaces:
 - target-aware notes preserved for `generic`, `codex`, and `claude-code`
 - local-only behavior: no agent spawning, no publish flow, and no remote repo mutation
 
+## `agentkit launch` — deterministic post-materialize launch planning
+
+Use `agentkit launch` after `materialize` when you want exact launch commands and reusable packet artifacts for each eligible lane without reconstructing runner commands from prose.
+
+```bash
+# Preview launch commands without starting any local subprocesses
+agentkit launch . --target codex
+
+# Emit stable JSON for orchestration or CI
+agentkit launch . --target codex --json > launch-plan.json
+
+# Write launch.md, launch.json, and per-lane launch packets
+agentkit launch . --target codex --output-dir ./launch
+
+# Explicitly run eligible local builder commands from saved worktrees
+agentkit launch . --target codex --execute --output-dir ./launch-run
+```
+
+The launch packet surfaces:
+- deterministic target-aware commands for `generic`, `codex`, and `claude-code`
+- explicit waiting and blocked reasons when serialized lanes or missing artifacts prevent launch
+- top-level `launch.md` and `launch.json` plus per-lane launch packets under `lanes/<lane-id>/`
+- reusable helper command files for local execution targets and manual handoff targets
+- local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
+
 Recommended full handoff lane:
 
 ```bash
@@ -504,6 +529,7 @@ cp ./dispatch/dispatch.json ./dispatch.json
 agentkit stage . --target codex --output-dir ./stage
 agentkit materialize . --target codex --dry-run --output-dir ./materialize-plan
 agentkit materialize . --target codex --output-dir ./materialize
+agentkit launch . --target codex --output-dir ./launch
 ```
 
 Recommended full dispatch lane:
