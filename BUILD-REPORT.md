@@ -1,13 +1,13 @@
 # BUILD-REPORT.md — agentkit-cli v1.4.0 contract handoff
 
 Date: 2026-04-20
-Builder: subagent release-readiness pass
+Builder: subagent release completion pass
 Contract: all-day-build-contract-agentkit-cli-v1.4.0-contract-handoff.md
-Status: RELEASE-READY LOCALLY
+Status: SHIPPED
 
 ## Summary
 
-Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the contract flow map-aware, and verified the real `analyze -> map -> contract` lane with a broader focused validation slice plus a clean full-suite release baseline.
+Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the contract flow map-aware, validated the full release baseline, then completed push, tag, and PyPI publish for `v1.4.0`.
 
 ## Deliverables
 
@@ -26,14 +26,15 @@ Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the
 - broader focused release-readiness slice: `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `34 passed in 1.03s`
 - full suite release baseline: `uv run --python 3.11 --with pytest pytest -q` -> `4839 passed, 1 warning`
 
-## Release-Readiness Truth
+## Release Truth
 
 - branch: `feat/v1.4.0-contract-handoff`
-- base upstream still reflects the last shipped line: `origin/feat/v1.3.0-map`
-- feature head before this pass: `0d55e4d feat: restore contract handoff workflow`
-- release surface in this repo is local only: no push, no tag, no publish attempted in this pass
-- intended release version after this pass: `1.4.0`
+- pushed branch commit: `76c0058 test: finalize v1.4.0 release baseline`
+- remote branch: `origin/feat/v1.4.0-contract-handoff` -> `76c00581b283d9bb254def57f9c36dc09b8dfa92`
+- annotated tag: `v1.4.0` -> tag object `3c7d1a935b562d2f778302f5e054d68483ce58fe`
+- peeled release commit: `76c00581b283d9bb254def57f9c36dc09b8dfa92`
+- PyPI: `agentkit-cli==1.4.0` live with wheel + sdist
 
 ## Notes
 
-This report intentionally records local release-readiness only. External release surfaces are still untouched, so the truthful state is release-ready locally rather than shipped.
+The tagged release commit is the tested baseline commit. Any later repo-surface reconciliation belongs on the branch after tag creation, not inside the shipped tag.

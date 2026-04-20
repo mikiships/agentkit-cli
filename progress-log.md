@@ -1,5 +1,74 @@
 # Progress Log — agentkit-cli release chronology
 
+## Release completion D5: final chronology reconciliation — COMPLETE
+
+**Reconciled:**
+- Updated `BUILD-REPORT.md`, `BUILD-REPORT-v1.4.0.md`, and `progress-log.md` to one shipped chronology.
+- Preserved the exact release truth that branch push, annotated tag `v1.4.0`, and PyPI `1.4.0` all point to the tested release commit `76c00581b283d9bb254def57f9c36dc09b8dfa92`.
+- Kept the release chronology honest by leaving the tagged commit as the tested baseline and doing this report reconciliation afterward.
+
+**Final checks:**
+- `git ls-remote --heads origin feat/v1.4.0-contract-handoff` -> `76c00581b283d9bb254def57f9c36dc09b8dfa92 refs/heads/feat/v1.4.0-contract-handoff`
+- `git ls-remote --tags origin refs/tags/v1.4.0 refs/tags/v1.4.0^{}` -> tag object `3c7d1a935b562d2f778302f5e054d68483ce58fe`, peeled commit `76c00581b283d9bb254def57f9c36dc09b8dfa92`
+- `https://pypi.org/pypi/agentkit-cli/1.4.0/json` -> live with wheel + sdist
+- `https://pypi.org/pypi/agentkit-cli/json` -> top-level project JSON now reports `1.4.0`
+
+**Next:** done.
+
+---
+
+## Release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Built and published:**
+- Built fresh `1.4.0` wheel and sdist from the clean tagged release state.
+- Published both artifacts to PyPI through the authenticated `uv run --with twine twine upload ...` path after confirming global `twine` was absent in this shell.
+- Verified both the version-specific and top-level PyPI JSON endpoints after upload.
+
+**Build + registry proof:**
+- `uv build` -> built `dist/agentkit_cli-1.4.0.tar.gz` and `dist/agentkit_cli-1.4.0-py3-none-any.whl`
+- `uv run --with twine twine upload dist/agentkit_cli-1.4.0.tar.gz dist/agentkit_cli-1.4.0-py3-none-any.whl` -> success
+- `https://pypi.org/pypi/agentkit-cli/1.4.0/json` -> `1.4.0` with:
+  - `agentkit_cli-1.4.0-py3-none-any.whl` (`bdist_wheel`, `595071` bytes)
+  - `agentkit_cli-1.4.0.tar.gz` (`sdist`, `1067335` bytes)
+- `https://pypi.org/pypi/agentkit-cli/json` -> top-level project JSON reports `1.4.0`
+
+**Next:** D5 final chronology reconciliation.
+
+---
+
+## Release completion D3: git release surfaces — COMPLETE
+
+**Published refs:**
+- Pushed `feat/v1.4.0-contract-handoff` to `origin` at the tested release commit `76c00581b283d9bb254def57f9c36dc09b8dfa92`.
+- Created annotated tag `v1.4.0` at that same commit.
+- Verified the remote branch head and peeled tag ref directly from `origin` after push.
+
+**Ref proof:**
+- `git push -u origin feat/v1.4.0-contract-handoff` -> success
+- `git tag -a v1.4.0 -m "agentkit-cli v1.4.0" 76c0058` -> success
+- `git push origin refs/tags/v1.4.0` -> success
+- `git ls-remote --heads origin feat/v1.4.0-contract-handoff` -> `76c00581b283d9bb254def57f9c36dc09b8dfa92 refs/heads/feat/v1.4.0-contract-handoff`
+- `git ls-remote --tags origin refs/tags/v1.4.0 refs/tags/v1.4.0^{}` -> annotated object `3c7d1a935b562d2f778302f5e054d68483ce58fe`, peeled commit `76c00581b283d9bb254def57f9c36dc09b8dfa92`
+
+**Next:** D4 PyPI publish and registry verification.
+
+---
+
+## Release completion D2: validation baseline — COMPLETE
+
+**Validated:**
+- Re-ran the focused `contract/map/main/docs` release slice on the reconciled repo state.
+- Fixed the stale release-surface blockers discovered during validation: one outdated version assertion in `tests/test_main.py`, one version-counter derivation bug in `agentkit_cli/site_engine.py`, one stale landing-page expectation in `tests/test_site_engine.py`, and a build report that omitted a verified full-suite count.
+- Re-ran the full supported pytest suite from the same repo state and cut tested baseline commit `76c0058` only after it was clean.
+
+**Tests:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `34 passed in 1.03s`
+- `uv run --python 3.11 --with pytest pytest -q` -> `4839 passed, 1 warning in 348.07s (0:05:48)`
+
+**Next:** D3 git release surfaces.
+
+---
+
 ## v1.4.0 release-readiness pass: local chronology reconciliation — COMPLETE
 
 **Reconciled:**
