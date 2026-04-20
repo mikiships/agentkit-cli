@@ -1,44 +1,31 @@
-# BUILD-REPORT.md — agentkit-cli v1.9.0 resolve loop
+# BUILD-REPORT.md — agentkit-cli v1.10.0 dispatch lanes
 
+Status: RELEASE-READY (local)
 Date: 2026-04-20
-Builder: OpenClaw subagent execution pass
-Contract: all-day-build-contract-agentkit-cli-v1.9.0-release.md
-Status: SHIPPED
-
-## Summary
-
-Added a deterministic `agentkit resolve` lane that consumes the shipped `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify` workflow plus an answers file, then emits one stable resolved packet with answered questions folded in, remaining blockers called out, assumption updates recorded, and an updated execution recommendation.
+Contract: all-day-build-contract-agentkit-cli-v1.10.0-dispatch-lanes.md
 
 ## Deliverables
 
-| # | Deliverable | Status | Notes |
-|---|-------------|--------|-------|
-| D1 | Deterministic resolve engine + schema | ✅ Complete | Added `agentkit_cli/resolve.py` with stable markdown/JSON rendering and deterministic ordering for answers, blockers, follow-ups, and assumption updates |
-| D2 | CLI workflow + actionable rendering | ✅ Complete | Added `agentkit resolve <path> --answers <file>` with `--json`, `--output`, and `--output-dir` support |
-| D3 | End-to-end resolution loop validation | ✅ Complete | Added focused workflow coverage for full-lane resolve success plus incomplete-answer and contradiction pause paths |
-| D4 | Release-readiness pass | ✅ Complete | Bumped version metadata to `1.9.0`, reconciled local docs/report surfaces, and re-ran final contradiction and hygiene checks |
-| D5 | Git release surfaces | ✅ Complete | Pushed `feat/v1.9.0-resolve-loop` to origin, created annotated tag `v1.9.0`, and verified both remote refs peel to `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84` |
-| D6 | PyPI publish + final reconciliation | ✅ Complete | Built `dist/` artifacts, published `agentkit-cli==1.9.0`, verified the live registry artifacts, and reconciled final shipped chronology |
+| Deliverable | Status | Notes |
+| --- | --- | --- |
+| D1 | ✅ Complete | Added `agentkit_cli/dispatch.py` with deterministic phases, lanes, ownership, dependencies, and recommendation carry-through from resolve |
+| D2 | ✅ Complete | Added `agentkit dispatch`, stable JSON and markdown output, plus packet-directory writing |
+| D3 | ✅ Complete | Added target-aware per-lane packets for `generic`, `codex`, and `claude-code`, plus worktree-safe guidance for multi-lane plans |
+| D4 | ✅ Complete | Added regression coverage for `resolve -> dispatch`, overlap serialization, blocker pause behavior, and fallback planning |
+| D5 | ✅ Complete | Updated README, CHANGELOG, version surfaces, progress log, and build-report surfaces for `1.10.0` |
 
 ## Validation
 
-- focused resolve workflow slice at release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`: `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.11s`
-- full suite at release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 141.11s (0:02:21)`
-- release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> no contradictory success or blocker narratives found
-- git release proof: `git push -u origin feat/v1.9.0-resolve-loop` succeeded; at release time `git ls-remote --heads origin feat/v1.9.0-resolve-loop` and `git ls-remote --tags origin refs/tags/v1.9.0^{}` both returned `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`; later docs-only reconciliation commits advanced the branch head while the shipped tag remained pinned to the tested release commit
-- build artifacts: `uv build` -> `dist/agentkit_cli-1.9.0.tar.gz` (1099350 bytes) and `dist/agentkit_cli-1.9.0-py3-none-any.whl` (617854 bytes)
-- PyPI publish: `twine upload dist/agentkit_cli-1.9.0.tar.gz dist/agentkit_cli-1.9.0-py3-none-any.whl` -> success, view at `https://pypi.org/project/agentkit-cli/1.9.0/`
-- registry verification: `https://pypi.org/project/agentkit-cli/1.9.0/` returned `HTTP/2 200`; `https://pypi.org/pypi/agentkit-cli/1.9.0/json` returned `HTTP/2 200` and listed both `agentkit_cli-1.9.0.tar.gz` and `agentkit_cli-1.9.0-py3-none-any.whl`
-- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> passed with no findings
+- Focused dispatch slice: `python3 -m pytest -q tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_main.py` -> `20 passed in 1.03s`
+- Release recall: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> completed with current release context refreshed before trusting local narratives
+- Contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> no contradictory success or blocker narratives found
+- Full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4882 passed, 1 warning in 142.50s (0:02:22)` before the final build-report test fix, then `4883 passed, 1 warning` after the report update in this pass
+- Hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> pending final run after docs reconciliation
 
-## Current release truth
+## Repo state
 
-- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` agree on `1.9.0`
-- The supported handoff lane is now `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve`
-- Release commit: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
-- Current branch state: `origin/feat/v1.9.0-resolve-loop` is ahead of the shipped tag only by docs-only reconciliation commits
-- Annotated tag: `v1.9.0` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
-- Focused resolve validation is green on the shipped release commit
-- Full supported pytest validation is green on the shipped release commit: `4870 passed, 1 warning in 141.11s (0:02:21)`
-- PyPI `agentkit-cli==1.9.0` is live with both the wheel and sdist artifacts
-- This pass reached truthful `SHIPPED` state
+- Version surfaces agree on `1.10.0` in `agentkit_cli/__init__.py`, `pyproject.toml`, `uv.lock`, and `tests/test_main.py`
+- The supported handoff lane is now `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch`
+- README, CHANGELOG, progress log, and build-report surfaces now describe the dispatch release-ready state
+- Verified local suite count is `4883`, which stays above the required minimum regression threshold
+- Local branch goal only: no publish, tag, or external repo mutation performed in this pass

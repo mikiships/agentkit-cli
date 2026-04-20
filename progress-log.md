@@ -1,5 +1,26 @@
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
+## v1.10.0 D5: docs, reports, and release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated README so the supported handoff lane now ends with `dispatch` after `resolve`, with markdown, JSON, and packet-directory examples.
+- Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.10.0.md`, `FINAL-SUMMARY.md`, and version surfaces to reflect `1.10.0` local release-readiness.
+- Reconciled progress and release-report surfaces so they tell one consistent local story for the dispatch branch.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_main.py` -> `20 passed`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> no contradictory success or blocker narratives found
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4883 passed, 1 warning`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.10.0-dispatch-lanes` -> passed with no findings
+
+**Current truth:**
+- D1-D5 are complete.
+- The supported handoff lane is `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch`.
+- Repo state is local `RELEASE-READY` with clean status except for the intentional contract file.
+
+**Next:** done.
+
 ## v1.10.0 D4: regression + edge-case coverage — COMPLETE
 
 **Built:**

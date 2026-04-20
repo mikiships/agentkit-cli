@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0] - 2026-04-20
+
+### Added
+- Added `agentkit dispatch` for deterministic post-resolve execution planning with explicit phases, lane ownership, dependency edges, and target-aware runner packets.
+- Added portable dispatch packet directories with `dispatch.md`, `dispatch.json`, and per-lane markdown and JSON packet files.
+- Added regression coverage for `resolve -> dispatch`, overlapping ownership serialization, unresolved-blocker pause behavior, and fallback single-lane planning when no saved upstream planning artifacts exist.
+
 ## [1.9.0] - 2026-04-20
 
 ### Added
