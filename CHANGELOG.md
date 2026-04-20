@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.0] - 2026-04-20
+
+### Added
+- Restored `agentkit contract` on top of the shipped repo-map branch with deterministic markdown and JSON contract output.
+- Map-aware `agentkit contract --map` handoff for either a live local target or a saved `agentkit map` JSON artifact.
+- Narrow contract/map command-surface validation covering contract, map, main CLI wiring, and release-adjacent docs/help surfaces.
+
+### Docs
+- README contract-handoff flow, BUILD-REPORT, versioned build report, and progress log updated for the local v1.4.0 release-readiness handoff.
+
 ## [1.3.0] - 2026-04-19
 
 ### Added

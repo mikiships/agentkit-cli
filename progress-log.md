@@ -1,5 +1,23 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.4.0 release-readiness pass: local chronology reconciliation — COMPLETE
+
+**Reconciled:**
+- Ran the next broader focused validation slice for the contract/map/help/docs surface on the current `feat/v1.4.0-contract-handoff` branch state.
+- Bumped release metadata from `1.3.0` to `1.4.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`.
+- Updated `CHANGELOG.md`, rewrote `BUILD-REPORT.md`, and added `BUILD-REPORT-v1.4.0.md` so the repo tells one truthful local release-readiness story.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `34 passed in 1.09s`
+
+**Truth after this pass:**
+- Branch remains local-only on `feat/v1.4.0-contract-handoff`.
+- No push, tag, or PyPI publish was attempted in this pass.
+- State is `RELEASE-READY` locally, not shipped.
+
+**Next:** release-completion pass when push/tag/publish are in scope.
+
+
 ## Release completion D5: final chronology reconciliation — COMPLETE
 
 **Reconciled:**
