@@ -94,6 +94,7 @@ from agentkit_cli.commands.populate_cmd import populate_command
 from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.commands.map_cmd import map_command
 from agentkit_cli.commands.bundle_cmd import bundle_command
+from agentkit_cli.commands.taskpack_cmd import taskpack_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1329,6 +1330,19 @@ def bundle(
 ) -> None:
     """Assemble a portable source, audit, map, and contract handoff bundle."""
     bundle_command(path=path, json_output=json_output, output=output, format=format)
+
+
+@app.command("taskpack")
+def taskpack(
+    path: str = typer.Argument(..., help="Project directory to pack for coding-agent handoff"),
+    target: str = typer.Option("generic", "--target", help="Target agent: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered taskpack to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write taskpack.md and taskpack.json to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Generate an execution-ready handoff packet for a coding agent."""
+    taskpack_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
 @app.command("contract")
