@@ -4,6 +4,7 @@ Date: 2026-04-19
 Builder: subagent pages-data-refresh pass
 Contract: all-day-build-contract-agentkit-cli-v1.2.3-pages-data-refresh.md
 Status: COMPLETE
+Release version: v1.1.0
 
 ## Summary
 
@@ -31,8 +32,8 @@ The push-time workflow was calling the supported command in a partial mode that 
 
 ## Validation
 
-- Focused pages/site/workflow slice: pending final run
-- Full suite: pending final run
+- Focused pages/site/workflow slice: `uv run --python 3.11 --extra api --with pytest pytest -q tests/test_pages_refresh.py tests/test_landing_d2.py tests/test_site_engine.py` -> `93 passed in 2.94s`
+- Full suite: `uv run --python 3.11 --extra api --with pytest pytest -q` -> `4823 passed, 1 warning in 130.20s (0:02:10)`
 
 ## Final State
 

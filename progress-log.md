@@ -172,3 +172,6 @@
 **Tests:** awaiting final validation run.
 
 **Next:** final focused tests, full `pytest -q`, and clean-state verification.
+
+
+**Final validation:** `uv run --python 3.11 --extra api --with pytest pytest -q` -> `4823 passed, 1 warning in 130.20s (0:02:10)`
