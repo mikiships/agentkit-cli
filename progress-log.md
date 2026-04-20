@@ -1,5 +1,24 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.7.0 release completion D1: release-state audit and repo cleanup — COMPLETE
+
+**Audited source-of-truth first:**
+- Ran the required release recall and status-conflict scan from the shared workspace script path before trusting the local release prose.
+- Confirmed branch `feat/v1.7.0-taskpack-handoff` at `45d41ef`, remote `origin https://github.com/mikiships/agentkit-cli.git`, release metadata `1.7.0` in both `pyproject.toml` and `agentkit_cli/__init__.py`, and no existing local `v1.7.0` tag.
+- Re-ran the focused taskpack release slice and the full supported pytest suite from the audited repo state to confirm the tested baseline before any irreversible release actions.
+
+**Reconciled local drift:**
+- Reverted `.agentkit-last-run.json` so the release state is not tied to transient local runner output.
+- Added the explicit release-completion contract file to the repo so the current pass is documented in tracked history instead of left as untracked noise.
+
+**Checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> completed with no temporal conflicts relevant to this release line
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> no contradictory success/blocker narratives found
+- `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_taskpack.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `49 passed in 1.24s`
+- `uv run --python 3.11 --with pytest pytest -q` -> `4857 passed, 1 warning in 136.18s (0:02:16)`
+
+**Next:** D2 validation baseline is already re-established on the audited state, then proceed to D3 git release surfaces.
+
 ## v1.7.0 D4: release-readiness pass — COMPLETE
 
 **Reconciled:**
