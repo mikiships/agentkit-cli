@@ -3,7 +3,7 @@
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
 Contract: all-day-build-contract-agentkit-cli-v1.8.0-clarify-loop.md
-Status: RELEASE-IN-PROGRESS
+Status: SHIPPED
 
 ## Summary
 
@@ -29,12 +29,12 @@ Added a deterministic `agentkit clarify` lane that composes the shipped `source 
 
 - `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` agree on `1.8.0`
 - The required release recall and contradiction scan were re-run from this repo state before validation and found no contradictory success or blocker narratives
-- Focused clarify validation re-passed: `32 passed in 1.72s`
-- Full supported suite re-passed: `4863 passed, 1 warning in 141.80s (0:02:21)`
-- `origin/feat/v1.8.0-clarify-loop` currently points to the tested release commit `3ed7f140394711e5822616dbe7006a9146d92465`
-- Annotated tag `v1.8.0` exists on origin and peels to that same tested release commit
+- Focused clarify validation passed: `32 passed in 1.72s`
+- Full supported suite passed: `4863 passed, 1 warning in 141.80s (0:02:21)`
+- The shipped release commit is `3ed7f140394711e5822616dbe7006a9146d92465`
+- Annotated tag `v1.8.0` on origin peels to that shipped release commit
 - PyPI `agentkit-cli==1.8.0` is live with both artifacts verified directly:
   - `agentkit_cli-1.8.0-py3-none-any.whl` (`bdist_wheel`, `613519` bytes)
   - `agentkit_cli-1.8.0.tar.gz` (`sdist`, `1100491` bytes)
-- The top-level PyPI project JSON now reports `1.8.0`
-- Final branch chronology reconciliation and end-of-pass hygiene verification are still pending
+- The top-level PyPI project JSON reports `1.8.0`
+- The branch chronology continues past the shipped tag with later docs-only reconciliation commits so the repo reports match the external release truth

@@ -1,5 +1,19 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 release completion D5: final chronology reconciliation — COMPLETE
+
+**Reconciled:**
+- Updated `BUILD-REPORT.md`, `BUILD-REPORT-v1.8.0.md`, and `progress-log.md` to one shipped chronology.
+- Preserved the exact release truth that annotated tag `v1.8.0` and PyPI `1.8.0` both resolve to the tested release commit `3ed7f140394711e5822616dbe7006a9146d92465`, while later branch commits exist only for chronology reconciliation.
+- Restored the repo to a clean working tree after publishing from the tagged release state.
+
+**Final checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> no contradictory success/blocker narratives found
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> `Total findings: 0`
+- origin branch head, origin tag, and live PyPI state re-verified after final reconciliation
+
+**Next:** done.
+
 ## v1.8.0 release completion D4: PyPI publish and registry verification — COMPLETE
 
 **Built and published:**

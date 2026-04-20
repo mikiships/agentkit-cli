@@ -2,7 +2,7 @@
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Status: RELEASE-IN-PROGRESS
+Status: SHIPPED
 
 ## What shipped locally in this pass
 
@@ -21,4 +21,4 @@ Status: RELEASE-IN-PROGRESS
 
 ## Truthful release status
 
-This repo has now passed the required release recall, contradiction scan, focused clarify slice, and full supported pytest suite again from the current `feat/v1.8.0-clarify-loop` state. The tested release commit `3ed7f140394711e5822616dbe7006a9146d92465` is pushed on `origin/feat/v1.8.0-clarify-loop`, annotated tag `v1.8.0` on origin peels to that same commit, and PyPI `agentkit-cli==1.8.0` is live with both the wheel (`613519` bytes) and sdist (`1100491` bytes) verified directly. Final chronology reconciliation on the branch is still pending, so this report is not yet the final shipped handoff.
+`agentkit-cli v1.8.0` is shipped. The focused clarify release slice and full supported pytest suite passed from the tested release commit `3ed7f140394711e5822616dbe7006a9146d92465`, annotated tag `v1.8.0` on origin peels to that same commit, and PyPI `agentkit-cli==1.8.0` is live with both the wheel (`613519` bytes) and sdist (`1100491` bytes) verified directly. The branch now carries later docs-only chronology reconciliation commits after the shipped tag so the repo surfaces stay truthful without changing the released artifact.
