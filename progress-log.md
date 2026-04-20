@@ -59,3 +59,17 @@
 - `pytest -q tests/test_observe_packets.py` -> passed (1 test)
 
 **Next:** add end-to-end workflow and edge-case coverage for D4.
+
+---
+
+## D4 complete: end-to-end workflow and edge-case coverage
+
+**What changed:**
+- Added full `resolve -> dispatch -> stage -> materialize -> launch -> observe` coverage in `tests/test_observe_workflow.py`.
+- Covered successful and failed observed lanes in the same saved launch packet.
+- Covered generic/manual launch targets that have no local subprocess result packet yet, keeping them in `unknown` instead of hallucinating success.
+
+**Validation:**
+- `pytest -q tests/test_observe_workflow.py tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py` -> passed (10 tests)
+
+**Next:** update docs, version surfaces, and release-ready reports for D5, then run contradiction and hygiene checks.
