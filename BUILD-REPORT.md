@@ -3,7 +3,7 @@
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
 Contract: all-day-build-contract-agentkit-cli-v1.8.0-clarify-loop.md
-Status: RELEASE-READY, LOCAL-ONLY
+Status: RELEASE-IN-PROGRESS
 
 ## Summary
 
@@ -25,9 +25,11 @@ Added a deterministic `agentkit clarify` lane that composes the shipped `source 
 - release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> no contradictory success/blocker narratives found, with recall confirming `v1.7.0` as the last shipped line and `v1.8.0` as the active local build
 - hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> `Total findings: 0`
 
-## Local release-ready truth
+## Current release truth
 
-- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` now agree on `1.8.0`
-- README, CHANGELOG, `BUILD-REPORT.md`, `BUILD-REPORT-v1.8.0.md`, and `progress-log.md` all describe the same local clarify release-ready state
-- No push, tag, or PyPI publish was attempted in this pass
-- The repo is ready for a truthful local `RELEASE-READY` handoff, not a shipped/public claim
+- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` agree on `1.8.0`
+- The required release recall and contradiction scan were re-run from this repo state before validation and found no contradictory success or blocker narratives
+- Focused clarify validation re-passed: `32 passed in 1.72s`
+- Full supported suite re-passed: `4863 passed, 1 warning in 141.80s (0:02:21)`
+- The branch is still local-only for `1.8.0`, with push, tag, and PyPI publication still pending
+- The repo is now validated and ready to proceed to external release surfaces, not yet shipped

@@ -2,7 +2,7 @@
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Status: RELEASE-READY, LOCAL-ONLY
+Status: RELEASE-IN-PROGRESS
 
 ## What shipped locally in this pass
 
@@ -21,4 +21,4 @@ Status: RELEASE-READY, LOCAL-ONLY
 
 ## Truthful release status
 
-This repo is locally `RELEASE-READY` for `1.8.0`. It is not shipped yet. No push, tag, registry publication, or PyPI mutation happened in this pass.
+This repo has now passed the required release recall, contradiction scan, focused clarify slice, and full supported pytest suite again from the current `feat/v1.8.0-clarify-loop` state. It is validated for `1.8.0`, but still not shipped yet. Push, annotated tag creation, remote ref verification, package publication, and live PyPI verification are still pending.

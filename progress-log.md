@@ -1,5 +1,36 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 release completion D2: validation baseline — COMPLETE
+
+**Validated:**
+- Re-ran the focused `agentkit clarify` release slice from the current `feat/v1.8.0-clarify-loop` branch state.
+- Re-ran the full supported pytest suite from the same state under Python 3.11 with the required extras.
+- Confirmed the release candidate remains green after the D1 audit and cleanup pass.
+
+**Tests:**
+- `python3 -m pytest -q tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `32 passed in 1.72s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4863 passed, 1 warning in 141.80s (0:02:21)`
+
+**Next:** D3 git release surfaces.
+
+## v1.8.0 release completion D1: release-state audit and repo cleanup — COMPLETE
+
+**Audited source-of-truth first:**
+- Ran the required release recall and status-conflict scan from the shared workspace script path before trusting the local v1.8.0 prose.
+- Confirmed branch `feat/v1.8.0-clarify-loop` at `415cc57`, remote `origin https://github.com/mikiships/agentkit-cli.git`, version metadata `1.8.0` in both `pyproject.toml` and `agentkit_cli/__init__.py`, and no existing local `v1.8.0` tag.
+- Confirmed `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.8.0.md`, and `progress-log.md` are aligned on the v1.8.0 clarify release line before external release steps.
+
+**Reconciled local drift:**
+- Promoted the release-completion contract file into tracked repo history so the pass is documented inside the repo instead of left as untracked noise.
+- Updated the v1.8.0 build-report surfaces from `RELEASE-READY, LOCAL-ONLY` to active release-completion truth after the audit and before external mutation.
+
+**Checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> recall confirmed `v1.7.0` as the last shipped line and `v1.8.0` as the active local build
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> no contradictory success/blocker narratives found
+- `git status --short --branch` reviewed before cleanup, showing the untracked release-completion contract file
+
+**Next:** D2 validation baseline.
+
 ## v1.8.0 D4: release-readiness pass — COMPLETE
 
 **Reconciled:**
