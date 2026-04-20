@@ -1,5 +1,21 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.7.0 release completion D3: git release surfaces — COMPLETE
+
+**Published refs:**
+- Pushed `feat/v1.7.0-taskpack-handoff` to `origin` at the tested release commit `a32b143422481591206511ec17ef810de29e0c4b`.
+- Created annotated tag `v1.7.0` at that same commit.
+- Verified the remote branch head and peeled tag ref directly from `origin` after push.
+
+**Ref proof:**
+- `git push -u origin feat/v1.7.0-taskpack-handoff` -> success
+- `git tag -a v1.7.0 -m "agentkit-cli v1.7.0" a32b143` -> success
+- `git push origin refs/tags/v1.7.0` -> success
+- `git ls-remote --heads origin feat/v1.7.0-taskpack-handoff` -> `a32b143422481591206511ec17ef810de29e0c4b refs/heads/feat/v1.7.0-taskpack-handoff`
+- `git ls-remote --tags origin refs/tags/v1.7.0 refs/tags/v1.7.0^{}` -> annotated object `b1ea22d0cbea23e5548f41bc964eee344be4fca1`, peeled commit `a32b143422481591206511ec17ef810de29e0c4b`
+
+**Next:** D4 PyPI publish and registry verification.
+
 ## v1.7.0 release completion D2: validation baseline — COMPLETE
 
 **Validated:**
