@@ -9,7 +9,7 @@
 - Updated shipped report surfaces so branch, tag, and registry truth are recorded distinctly from any later docs-only chronology cleanup.
 
 **Validation:**
-- `git ls-remote --heads origin feat/v1.10.0-dispatch-lanes` -> `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
+- `git ls-remote --heads origin feat/v1.10.0-dispatch-lanes` -> `c05561fda14079644efbfadbb44d4471082536b2`
 - `git ls-remote --tags origin refs/tags/v1.10.0^{}` -> `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
 - `uv build` -> `dist/agentkit_cli-1.10.0.tar.gz` and `dist/agentkit_cli-1.10.0-py3-none-any.whl`
 - `uv run --with twine python -m twine upload dist/agentkit_cli-1.10.0.tar.gz dist/agentkit_cli-1.10.0-py3-none-any.whl` -> success
@@ -18,9 +18,9 @@
 
 **Current truth:**
 - `agentkit-cli v1.10.0` is shipped.
-- The tested release commit, remote branch head, and annotated tag target all match at `a87c03d28fbe3f235d0b5909614c544e5439dcdd`.
+- The tested release commit and annotated tag target match at `a87c03d28fbe3f235d0b5909614c544e5439dcdd`.
+- The current remote branch head is docs-only chronology cleanup commit `c05561fda14079644efbfadbb44d4471082536b2`.
 - PyPI is live at `https://pypi.org/project/agentkit-cli/1.10.0/`.
-- A docs-only chronology cleanup commit may follow this entry if these shipped-report edits are committed after release.
 
 **Next:** done.
 

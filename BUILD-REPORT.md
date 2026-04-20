@@ -29,7 +29,7 @@ PyPI: https://pypi.org/project/agentkit-cli/1.10.0/
 
 - Version surfaces agree on `1.10.0` in `agentkit_cli/__init__.py`, `pyproject.toml`, `uv.lock`, and `tests/test_main.py`
 - The supported handoff lane is now `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch`
-- Origin branch `feat/v1.10.0-dispatch-lanes` and annotated tag `v1.10.0` both verify to the tested release commit `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
+- Origin branch `feat/v1.10.0-dispatch-lanes` now points at docs-only chronology cleanup commit `c05561fda14079644efbfadbb44d4471082536b2`, while annotated tag `v1.10.0` peels to the tested release commit `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
 - PyPI `agentkit-cli==1.10.0` is live with both `agentkit_cli-1.10.0.tar.gz` and `agentkit_cli-1.10.0-py3-none-any.whl`
 - Verified local suite count is `4883`, which stays above the required minimum regression threshold
-- Any later report-only reconciliation commit must remain distinct from the shipped tag target
+- The shipped release commit and later docs-only chronology cleanup are recorded distinctly on purpose
