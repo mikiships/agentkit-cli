@@ -1,5 +1,23 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.5.0 D1-D2: source audit engine + CLI workflow — COMPLETE
+
+**Built:**
+- Added deterministic `agentkit_cli/source_audit.py` with explicit canonical-source preference, legacy fallback detection, required-section checks, ambiguity heuristics, contradiction hints, and stable JSON output.
+- Added first-class `agentkit source-audit` CLI wiring with rich text view, markdown rendering, `--json`, and output-file support.
+- Added focused regression coverage for canonical-source preference, legacy fallback, missing sections, ambiguity detection, contradiction hints, markdown export, and CLI help.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_source_audit.py tests/test_source_cmd.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `33 passed in 5.90s`
+
+**Current truth:**
+- D1 deterministic source-audit engine + schema: complete.
+- D2 CLI workflow + actionable rendering: complete enough for local use and tests.
+- D3 docs/workflow handoff/release surfaces: still pending.
+
+**Next:** update README/changelog/build-report surfaces for `source -> source-audit -> map -> contract`, add an end-to-end workflow fixture, and run the broader focused validation slice.
+
+
 ## Release completion D5: final chronology reconciliation — COMPLETE
 
 **Reconciled:**

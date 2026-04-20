@@ -62,6 +62,7 @@ from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.project_cmd import project_command
 from agentkit_cli.commands.source_cmd import source_command
+from agentkit_cli.commands.source_audit_cmd import source_audit_command
 from agentkit_cli.commands.contract_cmd import contract_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
@@ -1305,6 +1306,17 @@ def source(
 ) -> None:
     """Manage agentkit's dedicated canonical source file."""
     source_command(path=path, init=init, promote=promote, from_format=from_format, title=title, force=force, json_output=json_output)
+
+
+@app.command("source-audit")
+def source_audit(
+    path: Optional[str] = typer.Argument(None, help="Project directory (default: .)"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the audit to this file"),
+    format: str = typer.Option("text", "--format", help="Output format: text, markdown, or json"),
+) -> None:
+    """Audit canonical source structure before map and contract generation."""
+    source_audit_command(path=path, json_output=json_output, output=output, format=format)
 
 
 @app.command("contract")
