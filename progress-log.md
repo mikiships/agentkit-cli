@@ -1,5 +1,31 @@
 # Progress Log — agentkit-cli v1.12.0 materialize worktrees
 
+## v1.12.0 release completion D5: shipped release reconciliation — COMPLETE
+
+**Reconciled:**
+- Pushed `feat/v1.12.0-materialize-worktrees` to origin and verified the remote branch directly from git.
+- Created and pushed annotated tag `v1.12.0` on the tested release commit `9e1e1440f01e557857c84b4ac00a405f3e51f505`.
+- Built fresh `1.12.0` distribution artifacts from the tagged release tree before upload so the registry surface matches the shipped tag even though the branch had later docs-only audit movement.
+- Published `agentkit-cli==1.12.0` to PyPI and verified the version-specific registry surface is live with both required files present.
+- Updated shipped report surfaces so branch, tag, and registry truth are recorded distinctly from any later docs-only chronology cleanup.
+
+**Validation:**
+- `.venv/bin/python -m pytest tests/ -x` -> `4903 passed, 1 warning in 417.24s (0:06:57)` for tested release commit `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+- `git ls-remote --heads origin feat/v1.12.0-materialize-worktrees` -> remote branch verified after push
+- `git ls-remote --tags origin refs/tags/v1.12.0^{}` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+- `uv build .release-build/v1.12.0-from-tag --out-dir dist --sdist --wheel` -> `dist/agentkit_cli-1.12.0.tar.gz` and `dist/agentkit_cli-1.12.0-py3-none-any.whl`
+- `uv run --with twine python -m twine check dist/agentkit_cli-1.12.0.tar.gz dist/agentkit_cli-1.12.0-py3-none-any.whl` -> passed
+- `uv run --with twine python -m twine upload dist/agentkit_cli-1.12.0.tar.gz dist/agentkit_cli-1.12.0-py3-none-any.whl` -> success
+- `https://pypi.org/pypi/agentkit-cli/1.12.0/json` -> `1.12.0` live with `agentkit_cli-1.12.0.tar.gz` and `agentkit_cli-1.12.0-py3-none-any.whl`
+
+**Current truth:**
+- `agentkit-cli v1.12.0` is shipped.
+- The tested release commit and annotated tag target match at `9e1e1440f01e557857c84b4ac00a405f3e51f505`.
+- The branch may advance later only through docs-only chronology cleanup after the shipped tag.
+- PyPI is live at `https://pypi.org/project/agentkit-cli/1.12.0/`.
+
+**Next:** done.
+
 ## v1.12.0 release completion D1: release-state recall and contradiction audit — COMPLETE
 
 **Reconciled:**
