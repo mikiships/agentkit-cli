@@ -73,3 +73,19 @@
 - `pytest -q tests/test_observe_workflow.py tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py` -> passed (10 tests)
 
 **Next:** update docs, version surfaces, and release-ready reports for D5, then run contradiction and hygiene checks.
+
+---
+
+## D5 complete: docs, reports, and release-ready surfaces for v1.14.0
+
+**What changed:**
+- Added README usage docs for `agentkit observe`, including JSON and packet-directory examples plus the supported `launch -> observe` handoff story.
+- Bumped version surfaces to `1.14.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, `tests/test_main.py`, and lock/report surfaces.
+- Reconciled `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.14.0.md`, and `FINAL-SUMMARY.md` to truthful local `LOCAL RELEASE-READY` status only.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> passed (`4930 passed, 1 warning`)
+- Contradiction scan equivalent: repo-local surface scan across README, changelog, report, summary, progress, and version files confirmed aligned `v1.14.0` + `agentkit observe` + local-only release-ready wording.
+- Hygiene check equivalent: `git status --short --branch` reviewed after cleanup, with only intentional D5/report artifacts remaining for commit.
+
+**Next:** commit D5 and leave the repo in coherent local release-ready state.

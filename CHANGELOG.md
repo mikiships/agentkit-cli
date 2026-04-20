@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.14.0] - 2026-04-20
+
+### Added
+- Added `agentkit observe` for deterministic post-launch lane outcome observation from saved `launch.json` artifacts, lane worktrees, and explicit `.agentkit/observe/result.json` evidence packets.
+- Added stable observe markdown and JSON rendering, `--output`, `--output-dir`, per-lane observe packets, summary counts, and recommended next actions for orchestration.
+- Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch -> observe`, waiting and blocked carry-forward states, manual/generic unknown outcomes, malformed evidence failures, and packet-directory output.
+
+### Docs
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `observe` after `launch`, with `v1.14.0` left in truthful local release-ready state only.
+
 ## [1.13.0] - 2026-04-20
 
 ### Added

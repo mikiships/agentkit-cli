@@ -512,6 +512,27 @@ The launch packet surfaces:
 - reusable helper command files for local execution targets and manual handoff targets
 - local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
 
+## `agentkit observe` — deterministic lane outcome observation after launch
+
+Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result.
+
+```bash
+# Print a human-readable observe summary
+agentkit observe . --target codex
+
+# Emit stable JSON for orchestration or CI
+agentkit observe . --target codex --json > observe.json
+
+# Write observe.md, observe.json, and per-lane observe packets
+agentkit observe . --target codex --output-dir ./observe
+```
+
+The observe packet surfaces:
+- deterministic lane statuses: `success`, `failure`, `running`, `waiting`, `blocked`, and `unknown`
+- explicit evidence for each lane from saved launch artifacts, materialize metadata, handoff packets, and optional `.agentkit/observe/result.json` files
+- top-level `observe.md` and `observe.json` plus per-lane packets under `lanes/<lane-id>/`
+- recommended next actions so an orchestrator can decide whether to wait, repair, merge, or relaunch without restitching lane state manually
+
 Recommended full handoff lane:
 
 ```bash
@@ -530,6 +551,8 @@ agentkit stage . --target codex --output-dir ./stage
 agentkit materialize . --target codex --dry-run --output-dir ./materialize-plan
 agentkit materialize . --target codex --output-dir ./materialize
 agentkit launch . --target codex --output-dir ./launch
+cp ./launch/launch.json ./launch.json
+agentkit observe . --target codex --output-dir ./observe
 ```
 
 Recommended full dispatch lane:

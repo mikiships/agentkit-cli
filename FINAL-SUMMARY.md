@@ -1,37 +1,23 @@
-# Final Summary — agentkit-cli v1.13.0 launch lanes
+# Final Summary — agentkit-cli v1.14.0 observe lane outcomes
 
-Status: SHIPPED
+Status: LOCAL RELEASE-READY
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.13.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.14.0-observe-lanes.md
 
-## What shipped in this pass
+## What completed in this pass
 
-- Added `agentkit launch` as the deterministic post-materialize step for launch planning and optional explicit local execution.
-- Added schema-backed launch planning with waiting-lane preservation, artifact validation, target-aware commands, and reusable per-lane launch packets.
-- Added explicit local `--execute` support for eligible `codex` and `claude-code` lanes while keeping dry-run planning as the default path.
-- Reconciled repo report surfaces so the shipped tag, remote branch chronology, and live PyPI state now tell one truthful `v1.13.0` story.
+- Added `agentkit observe` as the deterministic post-launch step for summarizing lane outcomes from saved launch artifacts and explicit local result packets.
+- Added schema-backed observe planning with stable statuses, lane evidence, recommended next actions, and reusable top-level plus per-lane observe packets.
+- Extended workflow coverage through `observe`, including success, failure, running, waiting, blocked, and unknown/manual lanes.
+- Updated release surfaces for truthful local `v1.14.0` release-readiness only.
 
-## Shipped truth
+## Local truth
 
-- Branch: `feat/v1.13.0-launch-lanes`
-- Tested release commit: `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
-- Shipped tag: `v1.13.0` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
-- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch`
-- Branch head later than the shipped tag, if present, is docs-only chronology cleanup from this release-completion pass.
-- PyPI is live at `https://pypi.org/project/agentkit-cli/1.13.0/`
+- Branch: `feat/v1.14.0-observe-lanes`
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe`
+- No push, no tag, no publish, and no remote mutation were performed in this pass.
+- Final validation command results are recorded in `BUILD-REPORT.md` and `progress-log.md`, including the full-suite closeout at `4930 passed, 1 warning`.
 
-## Validation surfaces used for shipped truth
+## Remaining blockers
 
-- Focused launch slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_main.py` -> `24 passed in 3.84s`
-- Cross-lane workflow slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.50s`
-- Full suite with runtime deps present: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4920 passed, 1 warning in 148.68s (0:02:28)`
-- Remote branch proof: `git ls-remote --heads origin feat/v1.13.0-launch-lanes` -> verified directly during release completion
-- Remote tag proof: `git ls-remote --tags origin refs/tags/v1.13.0^{}` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
-- Registry proof: `https://pypi.org/pypi/agentkit-cli/1.13.0/json` -> `1.13.0` live with `agentkit_cli-1.13.0-py3-none-any.whl` and `agentkit_cli-1.13.0.tar.gz`
-- Hygiene check: passed after cleanup with `Total findings: 0`
-
-## Final state
-
-- D1 through D5 release-completion work is complete.
-- `agentkit-cli v1.13.0` is shipped.
-- Remaining blocker: none.
+- None at implementation level. Follow-up risk is limited to future release-completion work outside this local-only contract.
