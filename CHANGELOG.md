@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.7.0] - 2026-04-20
+
+### Added
+- `agentkit taskpack` for turning the full `source -> source-audit -> map -> contract -> bundle` lane into an execution-ready packet for coding agents.
+- Stable taskpack markdown and JSON rendering with explicit durable context, task brief, execution checklist, target-aware instructions, and carried-forward gap reporting.
+- Packet-directory output with `taskpack.md` and `taskpack.json`, plus focused workflow coverage for `generic`, `codex`, and `claude-code` handoffs.
+
+### Docs
+- README, BUILD-REPORT, BUILD-REPORT-v1.7.0, and progress log updated to make the full handoff story `source -> audit -> map -> contract -> bundle -> taskpack`.
+
 ## [1.6.0] - 2026-04-20
 
 ### Added

@@ -1,5 +1,46 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.7.0 D4: release-readiness pass — COMPLETE
+
+**Reconciled:**
+- Bumped `pyproject.toml`, `agentkit_cli/__init__.py`, `uv.lock`, and the CLI version test to `1.7.0`.
+- Ran the required release recall plus status-conflict scan from the shared workspace script path, then cleared the remaining report-surface failures by recording verified focused and full-suite counts in both build reports.
+- Ran the final hygiene scan and left the repo with no merge markers, comment slop, or untracked-noise findings.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> no contradictory success/blocker narratives found
+- `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_taskpack.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `49 passed in 1.26s`
+- `uv run --python 3.11 --with pytest pytest -q` -> `4857 passed, 1 warning in 139.57s (0:02:19)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> `Total findings: 0`
+
+**Current truth:**
+- D1-D4 are complete.
+- Focused workflow tests are green.
+- Full suite is green.
+- `BUILD-REPORT.md`, `BUILD-REPORT-v1.7.0.md`, and `progress-log.md` now tell one truthful local release-ready story.
+- No push, tag, or PyPI publish was attempted in this pass.
+
+**Next:** done.
+
+## v1.7.0 D1-D3: taskpack engine, CLI workflow, and handoff validation — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/taskpack.py` as a deterministic composition layer over the shipped bundle lane, separating durable context, task brief, execution checklist, target-aware instructions, and carried-forward gap reporting.
+- Added `agentkit_cli/commands/taskpack_cmd.py` plus `agentkit taskpack <path>` wiring in `agentkit_cli/main.py` with `--target generic|codex|claude-code`, `--json`, `--output`, and `--output-dir` support.
+- Added `tests/test_taskpack.py` to cover deterministic engine structure, target shaping, packet-directory writing, gap handling, CLI help, and the full `source -> contract -> bundle -> taskpack` lane.
+- Updated README, CHANGELOG, and build-report surfaces so the supported handoff story is now `source -> source-audit -> map -> contract -> bundle -> taskpack`.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_taskpack.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `36 passed in 1.79s`
+
+**Current truth:**
+- D1 deterministic taskpack engine + schema: complete.
+- D2 CLI workflow + target modes: complete.
+- D3 workflow validation and docs/report updates: complete.
+- D4 release-readiness pass: pending final version bump, contradiction scan, hygiene check, and full-suite validation.
+
+**Next:** bump release metadata to `1.7.0`, run the required recall/conflict/hygiene checks, then run the full suite and finalize the release-ready reports.
+
 ## v1.6.0 release completion D1: release-state audit and repo cleanup — COMPLETE
 
 **Audited source-of-truth first:**

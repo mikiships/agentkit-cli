@@ -312,6 +312,32 @@ The bundle surfaces:
 - either a saved all-day contract artifact or the deterministic repo-map handoff fallback
 - explicit open gaps instead of silently dropping missing upstream surfaces
 
+## `agentkit taskpack` — execution-ready coding-agent handoff packet
+
+Use `agentkit taskpack` when the bundle is not enough by itself and you want a paste-ready or attachable packet for a specific coding-agent context.
+
+```bash
+# Print a generic markdown handoff packet
+agentkit taskpack .
+
+# Shape the packet for Codex or Claude Code
+agentkit taskpack . --target codex
+agentkit taskpack . --target claude-code
+
+# Write both markdown + JSON artifacts into one packet directory
+agentkit taskpack . --target codex --output-dir ./taskpack
+
+# Emit stable JSON only
+agentkit taskpack . --target generic --json > taskpack.json
+```
+
+The taskpack surfaces:
+- durable context separated from execution instructions
+- a concise task brief derived from the bundle lane
+- target-aware runner notes for `generic`, `codex`, and `claude-code`
+- an explicit execution checklist plus the carried-forward gap report
+- a portable packet directory containing `taskpack.md` and `taskpack.json`
+
 Recommended full lane:
 
 ```bash
@@ -320,6 +346,7 @@ agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
 agentkit contract "Ship the next increment" --path . --map repo-map.json
 agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
 ```
 
 ## `agentkit llmstxt` — AI-Accessible Documentation
