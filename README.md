@@ -419,6 +419,80 @@ agentkit clarify . --target codex --output-dir ./clarify
 agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
 ```
 
+## `agentkit dispatch` — deterministic execution phases and lane packets
+
+Use `agentkit dispatch` after `resolve` when you want a build plan that says what can run in parallel, what must serialize, and what each lane should own without spawning anything.
+
+```bash
+# Print a human-readable dispatch plan
+agentkit dispatch .
+
+# Emit stable JSON for orchestration or CI
+agentkit dispatch . --target codex --json > dispatch.json
+
+# Write a portable packet directory with lane handoff files
+agentkit dispatch . --target claude-code --output-dir ./dispatch
+```
+
+The dispatch plan surfaces:
+- explicit phases with deterministic lane ordering
+- owned paths and overlap-aware serialization when two lanes would touch the same files
+- per-lane runner packets for `generic`, `codex`, and `claude-code`
+- worktree-safe guidance when multiple lanes can run in parallel
+- a portable packet directory containing `dispatch.md`, `dispatch.json`, and per-lane packet files under `lanes/`
+
+Recommended full handoff lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
+cp ./resolve/resolve.json ./resolve.json
+agentkit dispatch . --target codex --output-dir ./dispatch
+```
+
+## `agentkit dispatch` — deterministic execution lanes after resolve
+
+Use `agentkit dispatch` after `resolve` when you want an explicit execution plan with phases, lane ownership, dependencies, worktree-safe parallelism, and target-aware runner packets without actually executing anything.
+
+```bash
+# Print a human-readable dispatch plan
+agentkit dispatch .
+
+# Emit stable JSON for orchestration or CI
+agentkit dispatch . --target codex --json > dispatch.json
+
+# Write markdown, JSON, and per-lane packets into one directory
+agentkit dispatch . --target claude-code --output-dir ./dispatch
+```
+
+The dispatch packet surfaces:
+- explicit phases with deterministic lane ordering
+- per-lane owned paths and dependency edges
+- serialized execution when lane ownership overlaps
+- target-aware runner notes for `generic`, `codex`, and `claude-code`
+- worktree-safe guidance when multiple lanes can run in parallel
+
+Recommended full dispatch lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
+cp ./resolve/resolve.json ./resolve.json
+agentkit dispatch . --target codex --output-dir ./dispatch
+```
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.

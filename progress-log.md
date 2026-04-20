@@ -1,5 +1,17 @@
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
+## v1.10.0 D3: target-aware lane packets — COMPLETE
+
+**Built:**
+- Expanded dispatch packet coverage so each lane now has explicit target runner notes, owned-path guidance, dependency-aware stop conditions, and clean single-lane rendering without fake parallelism.
+- Added README examples showing where `dispatch` fits after `resolve`, including markdown, JSON, and packet-directory usage.
+- Added focused dispatch assertions for worktree guidance, per-lane packet content, and stable single-lane rendering.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_main.py` -> `18 passed`
+
+**Next:** D4 regression and edge-case coverage.
+
 ## v1.10.0 D2: dispatch CLI + packet directory — COMPLETE
 
 **Built:**

@@ -129,6 +129,34 @@ def test_dispatch_command_writes_packet_directory(tmp_path):
     assert "Wrote dispatch directory" in result.output
 
 
+def test_dispatch_packets_include_target_notes_and_worktree_guidance(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_resolve(project)
+
+    plan = DispatchEngine().build(project, target="claude-code")
+
+    assert len(plan.lanes) >= 2
+    assert any("Use separate worktrees or isolated branches per lane" in item for item in plan.worktree_guidance)
+    for lane in plan.lanes:
+        assert lane.packet is not None
+        assert lane.packet.objective
+        assert lane.packet.runner == "claude --print --permission-mode bypassPermissions"
+        assert any("Owned paths:" in note for note in lane.packet.execution_notes)
+        assert any("Stop if the work requires files outside the owned paths." == stop for stop in lane.packet.stop_conditions)
+
+
+def test_dispatch_markdown_single_lane_does_not_claim_parallelism(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_resolve(project, recommendation="pause")
+
+    plan = DispatchEngine().build(project, target="generic")
+    markdown = DispatchEngine().render_markdown(plan)
+
+    assert len(plan.lanes) == 1
+    assert "Single-lane plan, so no fake parallelism is claimed." in markdown
+    assert "generic coding agent" in markdown
+
+
 def test_dispatch_command_requires_saved_resolve_packet(tmp_path):
     project = _make_repo(tmp_path)
 

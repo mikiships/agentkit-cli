@@ -104,4 +104,67 @@ def test_dispatch_falls_back_to_single_lane_without_saved_upstream_artifacts(tmp
     payload = json.loads(result.output)
     assert payload["execution_recommendation"] == "proceed-with-assumptions"
     assert len(payload["lanes"]) == 1
+    assert payload["worktree_guidance"] == ["Single-lane plan, so no fake parallelism is claimed."]
     assert payload["lanes"][0]["packet"]["runner"] == "claude --print --permission-mode bypassPermissions"
+
+
+def test_dispatch_json_output_is_schema_stable(tmp_path):
+    project = tmp_path / "stable-repo"
+    _write_repo(project)
+    (project / "resolve.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "agentkit.resolve.v1",
+                "project_path": str(project),
+                "answers_path": str(project / "answers.json"),
+                "execution_recommendation": "proceed",
+                "recommendation_reason": "Ready.",
+                "resolved_questions": [],
+                "remaining_blockers": [],
+                "remaining_follow_ups": [],
+                "confirmed_assumptions": [],
+                "superseded_assumptions": [],
+                "unresolved_assumptions": [],
+                "answers_summary": {"remaining_blockers": 0},
+                "source_clarify": {},
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["dispatch", str(project), "--target", "generic", "--json"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert list(payload.keys()) == [
+        "execution_recommendation",
+        "lanes",
+        "ownership_conflicts",
+        "phases",
+        "project_path",
+        "recommendation_reason",
+        "schema_version",
+        "source_bundle",
+        "source_resolve",
+        "source_taskpack",
+        "target",
+        "worktree_guidance",
+    ]
+    assert list(payload["lanes"][0].keys()) == [
+        "dependencies",
+        "lane_id",
+        "owned_paths",
+        "ownership_mode",
+        "packet",
+        "phase_id",
+        "phase_index",
+        "subsystem_hints",
+        "title",
+    ]
+    assert list(payload["lanes"][0]["packet"].keys()) == [
+        "execution_notes",
+        "objective",
+        "runner",
+        "stop_conditions",
+    ]
