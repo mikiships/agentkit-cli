@@ -50,6 +50,27 @@
 
 **Next:** D2 validation baseline rerun.
 
+## v1.12.0 release completion D2: validation baseline rerun — COMPLETE
+
+**Reconciled:**
+- Re-ran the focused materialize release slice from the current v1.12.0 release head.
+- Re-ran the full pytest suite from the same repo state so the release branch is anchored to a freshly tested commit, not inherited trust.
+- Re-ran the required hygiene check after test execution, then removed the regenerated `.agentkit-last-run.json` and `.release-build/` noise so the repo returned to a clean tested release state.
+
+**Validation:**
+- `.venv/bin/python -m pytest -q tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py` -> `9 passed in 19.01s`
+- `.venv/bin/python -m pytest tests/ -x` -> `4903 passed, 1 warning in 548.97s (0:09:08)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> first run found regenerated `.agentkit-last-run.json` and `.release-build/v1.12.0-from-tag/.agentkit-last-run.json`; after cleanup, rerun passed with `Total findings: 0`
+- `git rev-parse HEAD` -> `99791621931fa6e198650a6f7b5bfb0237a34231`
+- `git status --short --branch` -> clean tested release commit, with only the intentional release contract file left untracked
+
+**Current truth:**
+- D2 validation baseline is freshly re-verified from tested commit `99791621931fa6e198650a6f7b5bfb0237a34231`.
+- The repo is clean at the tested release commit before any push, tag, or publish step.
+- No irreversible release step has been attempted yet in this completion pass.
+
+**Next:** D3 git release surfaces.
+
 ## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
 
 **Built:**
