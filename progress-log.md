@@ -92,6 +92,26 @@
 
 **Next:** D4 registry release surface.
 
+## v1.12.0 release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Reconciled:**
+- Built fresh `1.12.0` distribution artifacts from the shipped tag worktree at `v1.12.0`.
+- Published `agentkit-cli==1.12.0` from the tag checkout using the supported local `twine upload` path.
+- Verified PyPI live truth directly from the version-specific registry JSON and project page instead of trusting the first upload exit code, because the initial upload returned HTTP 400 only after the files had already been accepted.
+
+**Validation:**
+- `git worktree add --detach .release-build/v1.12.0-from-tag v1.12.0 && cd .release-build/v1.12.0-from-tag && uv build` -> built `dist/agentkit_cli-1.12.0.tar.gz` and `dist/agentkit_cli-1.12.0-py3-none-any.whl`
+- `cd .release-build/v1.12.0-from-tag && uv run --with twine python -m twine upload dist/agentkit_cli-1.12.0.tar.gz dist/agentkit_cli-1.12.0-py3-none-any.whl` -> upload attempted; follow-up verbose retry proved PyPI had already accepted the files because it returned `400 File already exists`
+- `https://pypi.org/pypi/agentkit-cli/1.12.0/json` -> `200`, `info.version == 1.12.0`, files present: `agentkit_cli-1.12.0-py3-none-any.whl`, `agentkit_cli-1.12.0.tar.gz`
+- `HEAD https://pypi.org/project/agentkit-cli/1.12.0/` -> `200`
+
+**Current truth:**
+- PyPI is live for `agentkit-cli==1.12.0`.
+- Both required artifacts are present on the registry.
+- All four release surfaces are now externally verified; remaining work is chronology reconciliation across local report files.
+
+**Next:** D5 shipped chronology reconciliation.
+
 ## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
 
 **Built:**
