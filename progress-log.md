@@ -490,3 +490,16 @@
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> `0 findings`
 
 **Final status:** all deliverables complete, validations green, and the repo is ready for a later release-completion pass.
+
+---
+
+## D1: deterministic bundle engine + schema — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/bundle.py` with a schema-backed `HandoffBundle` result that deterministically composes source context, source-audit output, repo map output, contract surface detection, and explicit gap reporting.
+- Reused existing `ContractEngine`, `SourceAuditEngine`, and `RepoMapEngine` paths instead of inventing new repo-understanding semantics.
+- Added focused bundle-engine coverage for assembled surfaces, explicit missing-contract gaps, and stable JSON output.
+
+**Tests:** `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `29 passed in 6.32s`
+
+**Next:** D2 CLI wiring and portable markdown rendering.
