@@ -31,5 +31,6 @@ Added a deterministic `agentkit clarify` lane that composes the shipped `source 
 - The required release recall and contradiction scan were re-run from this repo state before validation and found no contradictory success or blocker narratives
 - Focused clarify validation re-passed: `32 passed in 1.72s`
 - Full supported suite re-passed: `4863 passed, 1 warning in 141.80s (0:02:21)`
-- The branch is still local-only for `1.8.0`, with push, tag, and PyPI publication still pending
-- The repo is now validated and ready to proceed to external release surfaces, not yet shipped
+- `origin/feat/v1.8.0-clarify-loop` now points to the tested release commit `3ed7f140394711e5822616dbe7006a9146d92465`
+- Annotated tag `v1.8.0` now exists on origin and peels to that same tested release commit
+- PyPI publication and registry verification are still pending, so the release is not shipped yet

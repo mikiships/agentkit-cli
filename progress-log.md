@@ -1,5 +1,21 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 release completion D3: git release surfaces — COMPLETE
+
+**Published refs:**
+- Pushed `feat/v1.8.0-clarify-loop` to `origin` at the tested release commit `3ed7f140394711e5822616dbe7006a9146d92465`.
+- Created annotated tag `v1.8.0` at that same commit.
+- Verified the remote branch head and peeled tag ref directly from `origin` after push.
+
+**Ref proof:**
+- `git push -u origin feat/v1.8.0-clarify-loop` -> success
+- `git tag -a v1.8.0 -m "agentkit-cli v1.8.0" HEAD` -> success
+- `git push origin refs/tags/v1.8.0` -> success
+- `git ls-remote --heads origin feat/v1.8.0-clarify-loop` -> `3ed7f140394711e5822616dbe7006a9146d92465 refs/heads/feat/v1.8.0-clarify-loop`
+- `git ls-remote --tags origin refs/tags/v1.8.0 refs/tags/v1.8.0^{}` -> annotated object `4b7c9a34daefb9566be24f487a3f0accb4703263`, peeled commit `3ed7f140394711e5822616dbe7006a9146d92465`
+
+**Next:** D4 PyPI publish and registry verification.
+
 ## v1.8.0 release completion D2: validation baseline — COMPLETE
 
 **Validated:**
