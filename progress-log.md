@@ -1,5 +1,23 @@
 # Progress Log — agentkit-cli release chronology
 
+## Release completion D3: git release surfaces — COMPLETE
+
+**Published refs:**
+- Pushed `feat/v1.3.0-map` to `origin` at the tested release commit `c4d4489cbf2342e2ad8bf691466428c3291607dc`.
+- Created annotated tag `v1.3.0` at that same commit.
+- Verified the remote branch head and peeled tag ref directly from `origin` after push.
+
+**Ref proof:**
+- `git push -u origin feat/v1.3.0-map` -> success
+- `git tag -a v1.3.0 -m "agentkit-cli v1.3.0" c4d4489cbf2342e2ad8bf691466428c3291607dc`
+- `git push origin refs/tags/v1.3.0` -> success
+- `git ls-remote --heads origin feat/v1.3.0-map` -> `c4d4489cbf2342e2ad8bf691466428c3291607dc refs/heads/feat/v1.3.0-map`
+- `git ls-remote --tags origin refs/tags/v1.3.0 refs/tags/v1.3.0^{}` -> annotated object `07346849f99e638981250faa6350d6ceaf1ce061`, peeled commit `c4d4489cbf2342e2ad8bf691466428c3291607dc`
+
+**Next:** D4 PyPI publish and registry verification.
+
+---
+
 ## Release completion D2: validation baseline — COMPLETE
 
 **Validated:**
