@@ -1,6 +1,6 @@
 # BUILD-REPORT.md — agentkit-cli v1.15.0 supervise restack
 
-Status: RELEASE-READY
+Status: SHIPPED
 Date: 2026-04-20
 Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
 
@@ -24,11 +24,18 @@ Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
 - Recall check: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> refreshed current cues, confirmed shipped `v1.14.0` observe truth, and exposed stale historical temporal memory that should not override live branch/PyPI chronology
 - Conflict scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> `No contradictory success/blocker narratives found.`
 - Hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> initial failure for transient `.agentkit-last-run.json`, then `Total findings: 0` after removal
+- Remote branch proof: `git ls-remote --heads origin feat/v1.15.0-supervise-restack` -> `123eb095a7221a105fc5f46c4689a4954f04949a refs/heads/feat/v1.15.0-supervise-restack`
+- Remote tag proof: `git ls-remote --tags origin refs/tags/v1.15.0^{}` -> `123eb095a7221a105fc5f46c4689a4954f04949a refs/tags/v1.15.0^{}`
+- Artifact check: `uv run --with twine twine check dist/agentkit_cli-1.15.0.tar.gz dist/agentkit_cli-1.15.0-py3-none-any.whl` -> both `PASSED`
+- PyPI JSON proof: `https://pypi.org/pypi/agentkit-cli/1.15.0/json` returned `1.15.0` with `agentkit_cli-1.15.0-py3-none-any.whl` and `agentkit_cli-1.15.0.tar.gz`
+- PyPI project proof: `https://pypi.org/project/agentkit-cli/1.15.0/` returned `HTTP/2 200`
 
 ## Repo state
 
 - Version surfaces target `1.15.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, `tests/test_main.py`, and `uv.lock`
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise`
 - Base chronology remains truthful: `v1.14.0` is already shipped from the observe line
-- This branch is a local unreleased `v1.15.0` restack only, with no push, tag, or publish performed
+- Shipped release commit: `123eb095a7221a105fc5f46c4689a4954f04949a` (`v1.15.0` tag target, PyPI `1.15.0` payload)
+- Branch-head chronology is reconciled after shipment in a later docs-only commit on `feat/v1.15.0-supervise-restack`
+- PyPI live: `agentkit-cli==1.15.0`
 - Versioned build report copy: `BUILD-REPORT-v1.15.0.md`

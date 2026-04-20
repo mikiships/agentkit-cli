@@ -8,7 +8,7 @@
 - Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch -> supervise`, serialized unblocking, missing worktrees, missing packets, dirty worktrees, and detached HEAD drift.
 
 ### Docs
-- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `supervise` after `observe`, with this pass kept truthfully local release-ready and unreleased.
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `supervise` after `observe`, with shipped `v1.15.0` chronology reconciled across the tested release commit, remote refs, PyPI payload, and later docs-only branch head.
 
 ## [1.14.0] - 2026-04-20
 

@@ -20,6 +20,36 @@
 
 ---
 
+## Release completion pass: four-surface shipment for v1.15.0
+
+**Reconciled:**
+- Re-ran release recall and contradiction checks before trusting any local status prose.
+- Re-ran the full suite from the declared runtime-deps path and removed transient `.agentkit-last-run.json` before irreversible release steps.
+- Verified `v1.15.0` was absent from origin tags and PyPI before shipping, then pushed the branch, pushed the annotated tag, built artifacts, and published to PyPI.
+- Reconciled report surfaces afterward so the shipped tag target and later docs-only branch head are both explicit.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4939 passed, 1 warning in 402.06s (0:06:42)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> `Total findings: 0`
+- `git push -u origin feat/v1.15.0-supervise-restack` -> created remote branch successfully
+- `git tag -a v1.15.0 123eb095a7221a105fc5f46c4689a4954f04949a -m "agentkit-cli v1.15.0" && git push origin v1.15.0` -> pushed annotated tag successfully
+- `uv build` -> `dist/agentkit_cli-1.15.0.tar.gz` and `dist/agentkit_cli-1.15.0-py3-none-any.whl`
+- `uv run --with twine twine check dist/agentkit_cli-1.15.0.tar.gz dist/agentkit_cli-1.15.0-py3-none-any.whl` -> both `PASSED`
+- `uv run --with twine twine upload dist/agentkit_cli-1.15.0.tar.gz dist/agentkit_cli-1.15.0-py3-none-any.whl` -> success, PyPI returned `https://pypi.org/project/agentkit-cli/1.15.0/`
+- `git ls-remote --heads origin feat/v1.15.0-supervise-restack` -> `123eb095a7221a105fc5f46c4689a4954f04949a refs/heads/feat/v1.15.0-supervise-restack`
+- `git ls-remote --tags origin refs/tags/v1.15.0^{}` -> `123eb095a7221a105fc5f46c4689a4954f04949a refs/tags/v1.15.0^{}`
+- `curl -fsSL https://pypi.org/pypi/agentkit-cli/1.15.0/json` -> version `1.15.0` with `agentkit_cli-1.15.0-py3-none-any.whl` and `agentkit_cli-1.15.0.tar.gz`
+- `curl -I -fsSL https://pypi.org/project/agentkit-cli/1.15.0/ | sed -n '1,5p'` -> `HTTP/2 200`
+
+**Current truth:**
+- `v1.15.0` is now shipped.
+- Shipped release commit, remote tag target, remote release branch proof, and PyPI payload all agree on `123eb095a7221a105fc5f46c4689a4954f04949a`.
+- This branch head now carries the docs-only chronology reconciliation follow-up so shipped truth and branch-head truth are both explicit.
+
+**Next:** commit and push the reconciliation surfaces, then leave the repo clean.
+
+---
+
 ## D4 complete: supervise workflow and edge-case coverage restacked
 
 **What changed:**
