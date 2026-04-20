@@ -18,8 +18,8 @@ Built `agentkit stage` as the deterministic post-dispatch staging step. The comm
 
 ## Validation
 
-- Focused stage slice: `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 0.98s`
+- Focused stage slice: `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 1.03s`
 - Release recall: completed with `scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees`
 - Contradiction scan: no contradictory success or blocker narratives found via `scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees`
-- Full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 143.29s (0:02:23)`
+- Full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 142.27s (0:02:22)`
 - Hygiene check: `scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> passed with 0 findings

@@ -16,10 +16,10 @@ Contract: all-day-build-contract-agentkit-cli-v1.11.0-stage-worktrees.md
 
 ## Validation
 
-- Focused stage slice: `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 0.98s`
+- Focused stage slice: `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 1.03s`
 - Release recall: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> completed before trusting release surfaces in this pass
 - Contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> no contradictory success or blocker narratives found
-- Full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 143.29s (0:02:23)`
+- Full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 142.27s (0:02:22)`
 - Verified regression threshold surface: local suite count is `4894`, which remains well above the required minimum regression floor of `2623`
 - Hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> passed with 0 findings
 

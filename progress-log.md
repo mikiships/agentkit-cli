@@ -10,8 +10,8 @@
 **Validation:**
 - `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> completed
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> no contradictory success or blocker narratives found
-- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 0.98s`
-- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 143.29s (0:02:23)`
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 1.03s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 142.27s (0:02:22)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> passed with 0 findings
 
 **Current truth:**
