@@ -97,6 +97,7 @@ from agentkit_cli.commands.bundle_cmd import bundle_command
 from agentkit_cli.commands.taskpack_cmd import taskpack_command
 from agentkit_cli.commands.clarify_cmd import clarify_command
 from agentkit_cli.commands.resolve_cmd import resolve_command
+from agentkit_cli.commands.dispatch_cmd import dispatch_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1372,6 +1373,19 @@ def resolve(
 ) -> None:
     """Resolve clarify answers into an execution-ready packet."""
     resolve_command(path=path, answers=answers, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
+@app.command("dispatch")
+def dispatch(
+    path: str = typer.Argument(..., help="Project directory to plan after resolve"),
+    target: str = typer.Option("generic", "--target", help="Target agent: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered dispatch plan to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write dispatch.md, dispatch.json, and per-lane packets to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Plan deterministic execution lanes from a saved resolve packet."""
+    dispatch_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
 @app.command("contract")

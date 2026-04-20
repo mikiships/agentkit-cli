@@ -1,3 +1,17 @@
+# Progress Log — agentkit-cli v1.10.0 dispatch lanes
+
+## v1.10.0 D1: deterministic dispatch planning engine — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/dispatch.py` with a schema-backed dispatch planner that reads a saved `resolve.json`, derives lane ownership from mapped subsystems, and emits deterministic phases, dependencies, ownership modes, and runner packets.
+- Serialized overlapping ownership into later phases instead of pretending conflicting lanes can run in parallel.
+- Added focused dispatch coverage in `tests/test_dispatch.py` for parallel planning, serialized overlap handling, pause behavior, and packet-directory writing.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_dispatch.py` -> `5 passed`
+
+**Next:** D2 CLI wiring, packet output polish, and workflow coverage.
+
 # Progress Log — agentkit-cli v1.9.0 resolve loop
 
 ## v1.9.0 release completion D2: validation baseline rerun — COMPLETE
