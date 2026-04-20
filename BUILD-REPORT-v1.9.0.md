@@ -26,7 +26,7 @@ Status: SHIPPED
 
 - Release commit: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
 - Release commit: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
-- Current branch head after final docs reconciliation: `origin/feat/v1.9.0-resolve-loop` -> `fb6de180085338d6bacf61d071781632c565d5d0` (docs-only follow-up)
+- Current branch state: `origin/feat/v1.9.0-resolve-loop` is ahead of the shipped tag only by docs-only reconciliation commits
 - Annotated tag: `v1.9.0` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
 - Focused release slice at the release commit: `52 passed in 2.11s`
 - Full supported pytest suite at the release commit: `4870 passed, 1 warning in 141.11s (0:02:21)`
