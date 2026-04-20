@@ -1,5 +1,17 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 D1: deterministic clarify engine + schema — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/clarify.py` with a schema-backed clarify engine that composes bundle + taskpack surfaces into deterministic blocking questions, follow-up questions, assumptions, contradictions, and an execution recommendation.
+- Kept ordering stable with explicit sort rules and stable JSON output under `agentkit.clarify.v1`.
+- Added focused D1 coverage in `tests/test_clarify.py` for deterministic structure and recommendation behavior.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_clarify.py` -> `1 passed`
+
+**Next:** D2 CLI workflow + actionable rendering.
+
 ## v1.7.0 release completion D5: final chronology reconciliation — COMPLETE
 
 **Reconciled:**
