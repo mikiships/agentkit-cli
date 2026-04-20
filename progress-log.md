@@ -1,19 +1,22 @@
 # Progress Log — agentkit-cli v1.15.0 supervise restack
 
-## D5 in progress: release-readiness validation and report-surface closeout
+## D5 complete: release-readiness validation, recall, contradiction, and hygiene closeout
 
 **What changed:**
 - Ran the focused supervise slice and adjacent workflow slice successfully on the restacked `v1.15.0` line.
-- Full suite surfaced one truthful release-surface regression: `tests/test_daily_d5.py` requires `BUILD-REPORT.md` to include a verified 4-digit test count, and the new report draft was too sparse.
-- Updated `BUILD-REPORT.md` and `BUILD-REPORT-v1.15.0.md` to record actual validation counts before the final rerun.
+- Full suite first surfaced one truthful release-surface regression: `tests/test_daily_d5.py` requires `BUILD-REPORT.md` to include a verified 4-digit test count, so I updated the report surfaces instead of weakening the test.
+- Re-ran the full suite after the report fix, then ran recall, contradiction, and hygiene checks, including cleanup of transient `.agentkit-last-run.json`.
 
-**Validation so far:**
+**Validation:**
 - `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_supervise_engine.py tests/test_supervise_cmd.py tests/test_supervise_workflow.py tests/test_main.py` -> `16 passed in 3.64s`
 - `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_supervise_engine.py tests/test_supervise_cmd.py tests/test_supervise_workflow.py tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `89 passed in 12.26s`
-- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `1 failed, 4938 passed, 1 warning in 161.86s (0:02:41)`
-- Failure was truthful and narrow: `tests/test_daily_d5.py::TestBuildReport::test_build_report_mentions_test_count`
+- Full-suite baseline before report fix: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `1 failed, 4938 passed, 1 warning in 161.86s (0:02:41)`
+- Full-suite rerun after report fix: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4939 passed, 1 warning in 439.67s (0:07:19)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> refreshed current cues and confirmed shipped `v1.14.0` observe truth, while flagging stale historical temporal memory that should not override live release chronology
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> initial transient `.agentkit-last-run.json` finding, then `Total findings: 0` after cleanup
 
-**Next:** rerun the full suite after the report fix, then run recall, contradiction, and hygiene checks.
+**Next:** final clean-state verification and closeout commit.
 
 ---
 

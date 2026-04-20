@@ -19,9 +19,11 @@ Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
 
 - Focused supervise slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_supervise_engine.py tests/test_supervise_cmd.py tests/test_supervise_workflow.py tests/test_main.py` -> `16 passed in 3.64s`
 - Adjacent workflow slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_supervise_engine.py tests/test_supervise_cmd.py tests/test_supervise_workflow.py tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `89 passed in 12.26s`
-- Full suite baseline before report fix: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `1 failed, 4938 passed, 1 warning in 161.86s (0:02:41)`
-- Full suite release-ready rerun must finish green with verified test count >= 2623 before final status is trusted
-- Recall / contradiction / hygiene checks are recorded in `progress-log.md` after final rerun
+- Full suite baseline before report fix: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `1 failed, 4938 passed, 1 warning in 161.86s (0:02:41)` because `BUILD-REPORT.md` did not yet mention a verified 4-digit test count
+- Full suite release-ready rerun after the report fix: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4939 passed, 1 warning in 439.67s (0:07:19)`
+- Recall check: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> refreshed current cues, confirmed shipped `v1.14.0` observe truth, and exposed stale historical temporal memory that should not override live branch/PyPI chronology
+- Conflict scan: `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> `No contradictory success/blocker narratives found.`
+- Hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.15.0-supervise-restack` -> initial failure for transient `.agentkit-last-run.json`, then `Total findings: 0` after removal
 
 ## Repo state
 

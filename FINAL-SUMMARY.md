@@ -22,4 +22,4 @@ Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
 
 ## Remaining blockers
 
-- None, if final validation remains green.
+- None. Final validation is green and the branch is locally release-ready.
