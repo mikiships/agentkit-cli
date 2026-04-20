@@ -1,5 +1,29 @@
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
+## v1.10.0 release completion D5: shipped release reconciliation — COMPLETE
+
+**Reconciled:**
+- Pushed `feat/v1.10.0-dispatch-lanes` to origin from the tested release commit `a87c03d28fbe3f235d0b5909614c544e5439dcdd`.
+- Created and pushed annotated tag `v1.10.0` on that same tested commit.
+- Built and published `agentkit-cli==1.10.0`, then verified PyPI live truth from version-specific registry surfaces.
+- Updated shipped report surfaces so branch, tag, and registry truth are recorded distinctly from any later docs-only chronology cleanup.
+
+**Validation:**
+- `git ls-remote --heads origin feat/v1.10.0-dispatch-lanes` -> `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
+- `git ls-remote --tags origin refs/tags/v1.10.0^{}` -> `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
+- `uv build` -> `dist/agentkit_cli-1.10.0.tar.gz` and `dist/agentkit_cli-1.10.0-py3-none-any.whl`
+- `uv run --with twine python -m twine upload dist/agentkit_cli-1.10.0.tar.gz dist/agentkit_cli-1.10.0-py3-none-any.whl` -> success
+- `https://pypi.org/pypi/agentkit-cli/json` -> latest `1.10.0` with both required files present
+- `https://pypi.org/pypi/agentkit-cli/1.10.0/json` -> `HTTP 200`
+
+**Current truth:**
+- `agentkit-cli v1.10.0` is shipped.
+- The tested release commit, remote branch head, and annotated tag target all match at `a87c03d28fbe3f235d0b5909614c544e5439dcdd`.
+- PyPI is live at `https://pypi.org/project/agentkit-cli/1.10.0/`.
+- A docs-only chronology cleanup commit may follow this entry if these shipped-report edits are committed after release.
+
+**Next:** done.
+
 ## v1.10.0 D5: docs, reports, and release-readiness surfaces — COMPLETE
 
 **Built:**
