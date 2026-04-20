@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- `agentkit pages-refresh --from-existing-data` now rewrites `docs/leaderboard.html` and refreshes `docs/data.json` timestamps from the same canonical payload used for `docs/index.html`.
+- `.github/workflows/update-pages.yml` now stages `docs/leaderboard.html` alongside `docs/data.json` and `docs/index.html`, so the push-time Pages refresh no longer leaves a mixed docs state behind.
+
 ## [1.1.0] - 2026-04-19
 
 ### Added

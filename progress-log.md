@@ -146,3 +146,29 @@
 **Tests:** `python3 -m pytest -q tests/test_pages_refresh.py tests/test_landing_d2.py tests/test_site_engine.py` -> `93 passed in 1.92s`
 
 **Next:** D2 regression coverage and D3 docs/report surfaces.
+
+---
+
+## D2: regression coverage for mixed-state Pages drift — COMPLETE
+
+**Built:**
+- Added regression coverage for rebuilding `docs/leaderboard.html` from `docs/data.json` during `agentkit pages-refresh --from-existing-data`.
+- Added regression coverage for fresh `generated_at` timestamps on supported refresh runs that reuse existing repo payloads.
+- Tightened workflow coverage so the push-time Pages job must stage `docs/leaderboard.html` together with the other generated docs surfaces.
+
+**Tests:** `python3 -m pytest -q tests/test_pages_refresh.py tests/test_landing_d2.py tests/test_site_engine.py` -> `93 passed in 1.92s`
+
+**Next:** D3 docs/build-report surfaces and final validation.
+
+---
+
+## D3: docs and handoff surfaces updated — COMPLETE
+
+**Built:**
+- Updated `README.md` so the supported `--from-existing-data` path explicitly documents the coherent regeneration of `docs/data.json`, `docs/leaderboard.html`, and `docs/index.html`.
+- Added a changelog entry for the mixed-state Pages refresh fix.
+- Rewrote `BUILD-REPORT.md` for this branch's Pages data-refresh pass.
+
+**Tests:** awaiting final validation run.
+
+**Next:** final focused tests, full `pytest -q`, and clean-state verification.
