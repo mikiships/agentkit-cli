@@ -6,7 +6,10 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from agentkit_cli.launch import LaunchEngine
 from agentkit_cli.main import app
+from agentkit_cli.materialize import MaterializeEngine
+from agentkit_cli.stage import StageEngine
 from tests.test_materialize_workflow import _write_repo
 
 runner = CliRunner()
@@ -44,17 +47,17 @@ def test_source_to_resolve_to_dispatch_to_stage_to_materialize_to_launch_workflo
     (project / "dispatch.json").write_text((dispatch_dir / "dispatch.json").read_text(encoding="utf-8"), encoding="utf-8")
 
     stage_dir = project / "stage"
-    stage = runner.invoke(app, ["stage", str(project), "--target", "codex", "--output-dir", str(stage_dir)])
-    assert stage.exit_code == 0, stage.output
+    stage_plan = StageEngine().build(project, target="codex", output_dir=stage_dir)
+    StageEngine().write_directory(stage_plan, stage_dir)
 
-    materialize = runner.invoke(app, ["materialize", str(project), "--target", "codex", "--output-dir", str(project / "materialize")])
-    assert materialize.exit_code == 0, materialize.output
+    materialize_dir = project / "materialize"
+    materialize_plan = MaterializeEngine().materialize(project, target="codex", dry_run=False)
+    MaterializeEngine().write_directory(materialize_plan, materialize_dir)
 
     launch_dir = tmp_path / "launch"
-    launch = runner.invoke(app, ["launch", str(project), "--target", "codex", "--output-dir", str(launch_dir), "--json"])
-    assert launch.exit_code == 0, launch.output
-    payload_text = launch.output.split("\n", 1)[1] if launch.output.startswith("Wrote launch directory:") else launch.output
-    payload = json.loads(payload_text)
+    plan = LaunchEngine().build(project, target="codex")
+    LaunchEngine().write_directory(plan, launch_dir)
+    payload = json.loads((launch_dir / "launch.json").read_text(encoding="utf-8"))
     assert payload["schema_version"] == "agentkit.launch.v1"
     assert payload["target"] == "codex"
     assert payload["launchable_lane_ids"] == ["lane-01", "lane-02"]
@@ -122,3 +125,20 @@ def test_launch_execute_requires_installed_tool(tmp_path, monkeypatch):
 
     assert result.exit_code == 2
     assert "Required tool not found on PATH: codex" in result.output
+
+
+def test_launch_workflow_preserves_waiting_lane_after_materialize_overlap(tmp_path):
+    from tests.test_launch_engine import _write_materialize, _make_repo
+
+    project = _make_repo(tmp_path)
+    _write_materialize(project, target="codex", overlap=True)
+
+    result = runner.invoke(app, ["launch", str(project), "--target", "codex", "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["launchable_lane_ids"] == ["lane-01"]
+    assert payload["waiting_lane_ids"] == ["lane-02"]
+    waiting = next(item for item in payload["actions"] if item["lane_id"] == "lane-02")
+    assert waiting["state"] == "waiting"
+    assert waiting["dependencies"][0]["lane_id"] == "lane-01"

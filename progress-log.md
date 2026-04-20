@@ -583,3 +583,19 @@
 
 **Blockers:**
 - None.
+
+## v1.13.0 D4: regression and edge-case coverage — COMPLETE
+
+**Built:**
+- Added launch regression coverage for lane packet directory writing, missing-worktree blocking, missing-tool execution refusal, and overlap-preserved waiting lanes.
+- Extended the full handoff workflow test through `launch` so the supported lane now validates `resolve -> dispatch -> stage -> materialize -> launch` end to end.
+- Re-ran the related resolve/dispatch/stage/materialize/launch slice to confirm existing adjacent workflow surfaces still pass.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.30s`
+
+**Next:**
+- D5 docs, report surfaces, recall/contradiction/hygiene checks, and final release-readiness truth.
+
+**Blockers:**
+- None.
