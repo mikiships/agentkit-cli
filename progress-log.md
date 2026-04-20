@@ -1,5 +1,30 @@
 # Progress Log — agentkit-cli v1.13.0 launch lanes
 
+## v1.13.0 release completion D1: release-state recall and contradiction audit — COMPLETE
+
+**Reconciled:**
+- Re-ran the required release recall and contradiction scan before trusting any local `v1.13.0` release prose.
+- Verified the local release branch, current HEAD, version surfaces, local tag absence, and working tree state from `feat/v1.13.0-launch-lanes`.
+- Confirmed the current local HEAD is `30243ff479782852f83a02f4d7a3cc229a6245fc`, the version surface is `1.13.0` in `pyproject.toml` and `agentkit_cli/__init__.py`, no local `v1.13.0` tag exists yet, and the working tree is clean except for the intentional untracked release contract file `all-day-build-contract-agentkit-cli-v1.13.0-release.md`.
+- Accounted for release-noise artifacts explicitly: no `.agentkit-last-run.json` or `.release-build/` noise was present at the start of this completion pass.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> no contradictory success or blocker narratives found
+- `git branch --show-current` -> `feat/v1.13.0-launch-lanes`
+- `git rev-parse HEAD` -> `30243ff479782852f83a02f4d7a3cc229a6245fc`
+- version parse from `pyproject.toml` and `agentkit_cli/__init__.py` -> `1.13.0`
+- `git tag -l v1.13.0` -> no local tag present
+- `git status --short --branch` -> clean branch state except the intentional untracked contract file
+- `find . -maxdepth 2 \( -name '.agentkit-last-run.json' -o -name '.release-build' \) -print` -> no release-noise artifacts found
+
+**Current truth:**
+- D1 release-state recall is freshly re-verified from the current local head.
+- Branch truth, tag truth, and PyPI truth are still unverified external surfaces at this point in the pass.
+- No irreversible release step has been attempted yet in this completion pass.
+
+**Next:** D2 validation baseline rerun.
+
 ## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
 
 **Blocker:**
