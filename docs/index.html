@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>agentkit — Agent Quality Rankings</title>
-<meta name="description" content="Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.">
+<title>agentkit — Canonical source and guardrails for AI coding agents</title>
+<meta name="description" content="Write one canonical source for AI coding agents, project it into AGENTS.md and other agent files, add execution contracts, and score agent-readiness with agentkit-cli.">
 <link rel="canonical" href="https://mikiships.github.io/agentkit-cli/">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Agent Quality Rankings", "description": "Browse GitHub repos ranked by AI agent-readiness score across Python, TypeScript, Rust, Go and more.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Canonical source and guardrails for AI coding agents", "description": "Write one canonical source for AI coding agents, project it into AGENTS.md and other agent files, add execution contracts, and score agent-readiness with agentkit-cli.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -81,7 +81,7 @@ header nav a:hover { color: var(--text); }
 
 /* ── Hero ── */
 .hero {
-  padding: 7rem 2rem 5rem;
+  padding: 7rem 2rem 4.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -109,11 +109,11 @@ header nav a:hover { color: var(--text); }
   animation: fadeUp 0.6s ease 0.1s forwards;
 }
 .hero h1 {
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.7rem, 6vw, 4.4rem);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
+  line-height: 1.05;
+  margin-bottom: 1rem;
   opacity: 0;
   animation: fadeUp 0.6s ease 0.2s forwards;
 }
@@ -122,11 +122,11 @@ header nav a:hover { color: var(--text); }
   color: var(--accent);
 }
 .hero-sub {
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   color: var(--muted);
-  max-width: 480px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.6;
+  max-width: 760px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
   opacity: 0;
   animation: fadeUp 0.6s ease 0.3s forwards;
 }
@@ -146,24 +146,62 @@ header nav a:hover { color: var(--text); }
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.6rem 1rem;
+  padding: 0.7rem 1rem;
   font-family: var(--mono);
   font-size: 0.9rem;
   color: var(--text);
 }
 .install-block .prompt { color: var(--accent); }
 .btn-gh {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 1.1rem;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1.1rem;
   border-radius: 8px;
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 0.85rem;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.btn-gh:hover { border-color: var(--blue); color: var(--blue); }
+.btn-gh:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+.hero-proof {
+  max-width: 920px;
+  margin: 2.5rem auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.5s forwards;
+}
+.proof-item {
+  background: var(--surface);
+  padding: 1.25rem;
+  text-align: left;
+}
+.proof-kicker {
+  display: block;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.proof-item strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.45rem;
+}
+.proof-item p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
 
 /* ── Stats strip ── */
 .stats-strip {
@@ -182,7 +220,7 @@ header nav a:hover { color: var(--text); }
   border-right: 1px solid var(--border);
 }
 .stat-item:last-child { border-right: none; }
-.stat-num {
+.stat-num, .stat-value {
   font-family: var(--mono);
   font-size: 1.9rem;
   font-weight: 600;
@@ -197,30 +235,168 @@ header nav a:hover { color: var(--text); }
 .source-manual { background: rgba(230,180,90,0.15); color: #e6b45a; }
 
 /* ── Container ── */
-.container { max-width: 920px; margin: 0 auto; padding: 3rem 1.5rem; }
+.container { max-width: 1080px; margin: 0 auto; padding: 3.25rem 1.5rem; }
 
 /* ── Section titles ── */
 .section-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.25rem;
 }
 h2.section-title {
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 600;
   color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-.section-note { font-size: 0.8rem; color: var(--muted); }
+.section-note { font-size: 0.9rem; color: var(--muted); line-height: 1.6; max-width: 720px; }
+.section-lead {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 760px;
+  margin: 0.75rem 0 0;
+}
+.section-frame {
+  background: linear-gradient(180deg, rgba(13,17,23,0.98), rgba(13,17,23,0.9));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.workflow-grid, .feature-grid, .trust-grid, .secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.feature-grid { margin-top: 1.5rem; }
+.feature-card, .workflow-card, .trust-card, .secondary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.workflow-card .step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(63,185,80,0.3);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+.workflow-card h3, .feature-card h3, .trust-card h3, .secondary-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.55rem;
+}
+.workflow-card p, .feature-card p, .trust-card p, .secondary-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.feature-card code, .secondary-card code {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+}
+.secondary-card pre { margin-top: 0.9rem; }
+
+.quickstart-shell {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 1rem;
+}
+.code-block {
+  background: #05080c;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.15rem 1.2rem;
+  overflow-x: auto;
+}
+.code-block code {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre;
+}
+.quickstart-notes {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.quickstart-list {
+  list-style: none;
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem 0 1.25rem;
+}
+.quickstart-list li {
+  color: var(--muted);
+  line-height: 1.65;
+  padding-left: 1.4rem;
+  position: relative;
+}
+.quickstart-list li::before {
+  content: '•';
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+}
+.inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.recently-scored-list .repo-list {
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+.repo-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) auto auto auto auto;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.eco-badge, .grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.data-ts, .loading-msg {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.9rem;
+}
 
 /* ── Ecosystem pills ── */
 .ecosystem-pills {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .pill {
   font-size: 0.8rem;
@@ -297,11 +473,11 @@ tbody tr:hover { background: var(--surface2); }
   font-weight: 600;
   font-size: 0.78rem;
 }
-.badge-A { background: rgba(26,127,55,0.25); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
-.badge-B { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
-.badge-C { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
-.badge-D { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
-.badge-F { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
+.badge-A, .grade-a { background: rgba(26,127,55,0.25); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+.badge-B, .grade-b { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+.badge-C, .grade-c { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+.badge-D, .grade-d { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
+.badge-F, .grade-f { background: rgba(248,81,73,0.12); color: #f85149; border: 1px solid rgba(248,81,73,0.25); }
 
 /* ── Topic page cards (cardless: sections instead) ── */
 .topics-grid {
@@ -327,6 +503,61 @@ tbody tr:hover { background: var(--surface2); }
   margin-bottom: 0.35rem;
 }
 .topic-block p { font-size: 0.8rem; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .hero-proof, .workflow-grid, .feature-grid, .trust-grid, .secondary-grid, .quickstart-shell {
+    grid-template-columns: 1fr;
+  }
+  .stats-strip {
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    min-width: 33.33%;
+    max-width: none;
+  }
+  .repo-item {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 640px) {
+  header {
+    height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1rem 1.25rem;
+  }
+  header nav {
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+  .hero {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 10vw, 3.2rem);
+  }
+  .hero-actions {
+    flex-direction: column;
+  }
+  .install-block, .btn-gh, .nav-cta {
+    width: 100%;
+    justify-content: center;
+  }
+  .stat-item {
+    min-width: 50%;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .repo-item {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ── Repo detail ── */
 .breadcrumb { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem; }
@@ -373,155 +604,187 @@ footer a:hover { color: var(--text); }
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
-    <a href="https://mikiships.github.io/agentkit-cli/leaderboard.html">Daily Leaderboard</a>
-    <a href="https://mikiships.github.io/agentkit-cli/trending.html">Daily Trending</a>
-    <a href="https://mikiships.github.io/agentkit-cli/#org-leaderboard">Org Leaderboard</a>
+    <a href="https://mikiships.github.io/agentkit-cli/#quickstart">Quickstart</a>
+    <a href="https://mikiships.github.io/agentkit-cli/#proof">Proof</a>
+    <a href="https://mikiships.github.io/agentkit-cli/#rankings">Rankings</a>
     <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
   </nav>
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v1.2.0 &middot; 20 repos scored</div>
-          <h1>One canonical context file<br>for <em>AI coding agents</em></h1>
-          <p class="hero-sub">Keep one source at <code>.agentkit/source.md</code>, project it into the filenames real tools already read, add an <code>agentkit contract</code> when you need shared execution rules, then measure whether the setup is any good.</p>
+          <div class="hero-badge">v1.12.0 &middot; open source workflow kit for AI coding agents</div>
+          <h1>Keep <em>one canonical source</em><br>for every AI coding agent</h1>
+          <p class="hero-sub">agentkit-cli gives you a source-first workflow for agent context and execution rules. Write once in <code>.agentkit/source.md</code>, project that into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, add an <code>agentkit contract</code> when work needs shared guardrails, then score what ships.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="nav-cta">PyPI ↗</a>
+            <a href="#quickstart" class="nav-cta">See quickstart ↓</a>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
+          </div>
+          <div class="hero-proof">
+            <div class="proof-item">
+              <span class="proof-kicker">Source</span>
+              <strong>Stop maintaining the same prompt file six times.</strong>
+              <p>Keep one source of truth, then project it into the filenames real agents already read.</p>
+            </div>
+            <div class="proof-item">
+              <span class="proof-kicker">Execution</span>
+              <strong>Make every agent see the same job contract.</strong>
+              <p>Use <code>agentkit contract</code> for scope, deliverables, checks, and team-wide execution rules.</p>
+            </div>
+            <div class="proof-item">
+              <span class="proof-kicker">Guardrails</span>
+              <strong>Catch drift before agent runs go sideways.</strong>
+              <p>Lint context files, gate quality in CI, and review transcript waste instead of guessing.</p>
+            </div>
+            <div class="proof-item">
+              <span class="proof-kicker">Proof</span>
+              <strong>4903 tests, 112 shipped versions, 6 packages.</strong>
+              <p>Real release cadence and real surface area, not a one-command demo that stops at the headline.</p>
+            </div>
           </div>
         </div>
 
-        <!-- Pipeline stages -->
-        <section class="pipeline-section">
-          <div class="container">
-            <div class="pipeline-stages">
-              <span class="pipeline-stage">SOURCE</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">PROJECT</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">SCORE</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">GUARD</span>
-              <span class="pipeline-arrow">→</span>
-              <span class="pipeline-stage">LEARN</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Stats bar -->
-        <div class="stats-strip">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4824</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">102</div><div class="stat-label">Versions</div></div>
+        <div class="stats-strip" id="proof">
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4903</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">112</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">20</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">0</div><div class="stat-label">Community Scored</div></div>
         </div>
 
-        <!-- Recently Scored (populated dynamically from data.json) -->
-        <section class="recently-scored-section" id="recently-scored">
-          <div class="container">
-            <h2 class="section-title">Recently Scored</h2>
-            <div id="recently-scored-list" class="recently-scored-list">
-              <p style="color:var(--muted)">Loading...</p>
+        <section class="workflow-section">
+          <div class="container section-frame">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">How agentkit works</h2>
+                <p class="section-lead">The front door is a repo workflow, not just a leaderboard. Start with a canonical source, project it into agent-specific files, and put measurable guardrails around the whole loop.</p>
+              </div>
+            </div>
+            <div class="workflow-grid">
+              <div class="workflow-card"><span class="step">01</span><h3>Write the canonical source</h3><p>Initialize <code>.agentkit/source.md</code> so your team edits one file instead of manually keeping AGENTS.md, CLAUDE.md, and friends in sync.</p></div>
+              <div class="workflow-card"><span class="step">02</span><h3>Project into real agent files</h3><p>Generate the filenames existing tools expect, so Claude Code, Codex, Gemini, Copilot, and MCP flows inherit the same context.</p></div>
+              <div class="workflow-card"><span class="step">03</span><h3>Score, gate, and learn</h3><p>Add contracts, lint for drift, benchmark execution quality, and inspect transcripts so the workflow gets better over time.</p></div>
             </div>
           </div>
         </section>
 
-        <!-- Feature grid -->
-        <section class="features-section">
-          <div class="container">
-            <h2 class="section-title">The Agent Quality Stack</h2>
-            <div class="feature-grid">
-              <div class="feature-card"><h3>coderace</h3><p>Benchmark agents on your own tasks. MEASURE quality.</p></div>
-              <div class="feature-card"><h3>agentmd</h3><p>Generate or tighten context files before they drift.</p></div>
-              <div class="feature-card"><h3>agentlint</h3><p>Catch drift, stale paths, year-rot, and bloated instructions.</p></div>
-              <div class="feature-card"><h3>agentreflect</h3><p>Learn from agent session logs. LEARN patterns.</p></div>
-              <div class="feature-card"><h3>agentkit-mcp</h3><p>MCP server exposing the toolkit. CONNECT tools.</p></div>
-              <div class="feature-card"><h3>agentkit-cli</h3><p>Own the source of truth, fan it out, score it, and gate it.</p></div>
+        <section class="quickstart-section" id="quickstart">
+          <div class="container section-frame">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Quickstart</h2>
+                <p class="section-lead">This is the fastest path to a useful repo setup. You can get a canonical source, write the projected files, add an execution contract, and score the result in a few commands.</p>
+              </div>
             </div>
-          </div>
-        </section>
-
-        <!-- Quick-start code block -->
-        <section class="quickstart-section">
-          <div class="container">
-            <h2 class="section-title">Quick Start</h2>
-            <pre class="code-block"><code>pip install agentkit-cli
+            <div class="quickstart-shell">
+              <pre class="code-block"><code>pip install agentkit-cli
 agentkit source --init
 agentkit project --write
-agentkit contract --init</code></pre>
+agentkit contract --init
+agentkit score</code></pre>
+              <div class="quickstart-notes">
+                <h3>What those commands do</h3>
+                <ul class="quickstart-list">
+                  <li><strong><code>source --init</code></strong> creates the canonical source file at <code>.agentkit/source.md</code>.</li>
+                  <li><strong><code>project --write</code></strong> fans that source out into the filenames AI tools already read.</li>
+                  <li><strong><code>contract --init</code></strong> gives each agent run a shared execution brief with clear constraints.</li>
+                  <li><strong><code>score</code></strong> tells you whether the setup is actually ready for agent work.</li>
+                </ul>
+                <div class="inline-links">
+                  <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="btn-gh">PyPI ↗</a>
+                  <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">Docs and source ↗</a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        <!-- Commands table -->
+        <section class="features-section">
+          <div class="container">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">The workflow stack</h2>
+                <p class="section-lead">agentkit-cli is the entry point, but the product story is the full workflow around source management, projection, scoring, linting, benchmarking, and transcript learning.</p>
+              </div>
+            </div>
+            <div class="feature-grid">
+              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point for source, project, contract, score, and guard flows.</p></div>
+              <div class="feature-card"><h3>agentmd</h3><p>Generate or tighten agent-facing context files from the canonical source before they drift.</p></div>
+              <div class="feature-card"><h3>agentlint</h3><p>Catch stale paths, year-rot, missing references, and bloated instructions before they mislead agents.</p></div>
+              <div class="feature-card"><h3>coderace</h3><p>Benchmark AI coding agents on your own tasks instead of trusting generic benchmark marketing.</p></div>
+              <div class="feature-card"><h3>agentreflect</h3><p>Read transcript history to see where agent runs burned budget, stalled, or repeated avoidable mistakes.</p></div>
+              <div class="feature-card"><h3>agentkit-mcp</h3><p>Expose the toolkit through MCP when you want the same workflow available inside other agent surfaces.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="recently-scored-section" id="recently-scored">
+          <div class="container section-frame">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Public proof</h2>
+                <p class="section-lead">The public site still matters, but it belongs as evidence for the workflow. These scorecards show what the toolkit measures against real repositories.</p>
+              </div>
+            </div>
+            <div id="recently-scored-list" class="recently-scored-list">
+              <p class="loading-msg">Loading...</p>
+            </div>
+          </div>
+        </section>
+
         <section class="commands-section">
           <div class="container">
-            <h2 class="section-title">Commands</h2>
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Core commands</h2>
+                <p class="section-lead">The high-leverage commands line up with the workflow: source, project, contract, score, analyze, and guard.</p>
+              </div>
+            </div>
             <table class="cmd-table">
               <thead><tr><th>Command</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td>agentkit source --init</td><td>Create a dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
-                <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and llms.txt from that source</td></tr>
-                <tr><td>agentkit contract --init</td><td>Create an <code>agentkit contract</code> that keeps execution rules, deliverables, and validation visible to every agent</td></tr>
-                <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze any public GitHub repo and publish a shareable scorecard</td></tr>
+                <tr><td>agentkit source --init</td><td>Create the dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
+                <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code> from that source</td></tr>
+                <tr><td>agentkit contract --init</td><td>Create an <code>agentkit contract</code> so every agent sees the same scope, deliverables, and validation rules</td></tr>
+                <tr><td>agentkit score</td><td>Compute the repo's composite agent-readiness score</td></tr>
+                <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze a public repo and publish a shareable scorecard</td></tr>
                 <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>
                 <tr><td>agentkit gate --min-score 80</td><td>Fail CI when the setup drops below your quality bar</td></tr>
-                <tr><td>agentkit hooks install</td><td>Install pre-commit guardrails for the repo workflow</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <!-- Daily Trending section -->
-        <section class="trending-section" id="daily-trending">
-          <div class="container">
-            <h2 class="section-title">Daily Trending</h2>
-            <p class="section-note">See which trending GitHub repos score highest for agent-readiness today.</p>
-            <a class="btn-gh" href="trending.html">View Daily Trending ↗</a>
-            <div class="feature-card pages-trending" style="margin-top:1rem">
-              <h3>Daily Trending Repos</h3>
-              <p>Track agent-readiness scores for today's trending repositories.</p>
-              <pre class="code-block"><code>agentkit daily-duel --pages</code></pre>
+        <section class="secondary-section">
+          <div class="container secondary-grid">
+            <div class="secondary-card">
+              <h3>Explore live rankings</h3>
+              <p>Browse ecosystem scoreboards and repo pages when you want examples, comparisons, or public proof points.</p>
+              <div class="inline-links" style="margin-top:1rem"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a><a class="pill" href="leaderboard.html">Leaderboard</a><a class="pill" href="trending.html">Trending</a></div>
+            </div>
+            <div class="secondary-card" id="org-leaderboard">
+              <h3>Org leaderboard</h3>
+              <p>Rank all public repos in a GitHub org to spot where agent workflows are already strong and where they need cleanup.</p>
+              <pre class="code-block"><code>agentkit org github:ORG</code></pre>
+            </div>
+            <div class="secondary-card">
+              <h3>Share a developer scorecard</h3>
+              <p>Generate a public profile card when you want a simple external artifact for a person or repository set.</p>
+              <pre class="code-block"><code>agentkit user-scorecard github:USERNAME</code></pre>
             </div>
           </div>
         </section>
 
-        <!-- Org Leaderboard section -->
-        <section class="org-leaderboard-section" id="org-leaderboard">
-          <div class="container">
-            <h2 class="section-title">Org Leaderboard</h2>
-            <p class="section-note">Score all public repos in any GitHub org and rank them by agent-readiness.</p>
-            <a class="btn-gh" href="leaderboard.html">View Leaderboard ↗</a>
+        <div class="container" id="rankings">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Recent rankings</h2>
+              <p class="section-lead">A sample of currently scored repositories. The rankings are still useful, but they now support the broader workflow story instead of pretending to be the whole product.</p>
+            </div>
+            <span class="section-note">20 repos scored</span>
           </div>
-        </section>
-
-        <!-- Developer Profile Card section -->
-        <section class="user-scorecard-section" id="user-scorecard">
-          <div class="container">
-            <h2 class="section-title">Developer Profile Card</h2>
-            <p class="section-note">Grade any developer's public repos for agent-readiness with a shareable profile card.</p>
-            <pre class="code-block"><code>agentkit user-scorecard github:USERNAME</code></pre>
-          </div>
-        </section>
-
-        <!-- Subscribe CTA -->
-        <section class="subscribe-section">
-          <div class="container">
-            <h2 class="section-title">Subscribe to Updates</h2>
-            <p>Watch the <a href="https://github.com/mikiships/agentkit-cli">GitHub repo</a> for new releases and features.</p>
-          </div>
-        </section>
-
-        <!-- Live Rankings -->
-        <div class="container">
-          <div class="ecosystem-pills"><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a><a class="pill" href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a></div>
-          
-        <div class="section-header">
-          <h2 class="section-title">Rankings</h2>
-          <span class="section-note">20 repos scored</span>
-        </div>
-        <table>
+          <table>
           <thead><tr><th>Repository</th><th>Score</th><th>Grade</th></tr></thead>
           <tbody><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/langchain-ai--langchain.html">langchain-ai/langchain</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/fastapi--fastapi.html">fastapi/fastapi</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/django--django.html">django/django</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/psf--requests.html">psf/requests</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/pallets--flask.html">pallets/flask</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/vercel--next.js.html">vercel/next.js</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/microsoft--vscode.html">microsoft/vscode</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/nestjs--nest.html">nestjs/nest</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/supabase--supabase.html">supabase/supabase</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/trpc--trpc.html">trpc/trpc</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/rust-lang--rust.html">rust-lang/rust</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/tokio-rs--tokio.html">tokio-rs/tokio</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/actix--actix-web.html">actix/actix-web</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/hyperium--hyper.html">hyperium/hyper</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/serde-rs--serde.html">serde-rs/serde</a></td><td><div class="score-cell"><span class="score-val">45</span><span class="score-bar-wrap"><span class="score-bar" data-pct="45"></span></span></div></td><td><span class="badge badge-D">D</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/golang--go.html">golang/go</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/gin-gonic--gin.html">gin-gonic/gin</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/gofiber--fiber.html">gofiber/fiber</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/spf13--cobra.html">spf13/cobra</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr><tr><td class="repo-name"><a href="https://mikiships.github.io/agentkit-cli/repo/kubernetes--kubernetes.html">kubernetes/kubernetes</a></td><td><div class="score-cell"><span class="score-val">50</span><span class="score-bar-wrap"><span class="score-bar" data-pct="50"></span></span></div></td><td><span class="badge badge-C">C</span></td></tr></tbody>
         </table>

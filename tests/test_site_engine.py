@@ -140,10 +140,13 @@ def test_generate_index_has_seo_tags(engine):
 
 def test_generate_index_shows_current_frontdoor_story(engine):
     page = engine.generate_index()
-    assert "v1.2.0" in page.html
-    assert "4824" in page.html
+    stats = build_frontdoor_stats()
+    assert f"v{stats['version']}" in page.html
+    assert str(stats["tests"]) in page.html
+    assert "one canonical source" in page.html.lower()
+    assert ".agentkit/source.md" in page.html
     assert "agentkit contract" in page.html
-    assert "agentkit contract --init" in page.html
+    assert "agentkit score" in page.html
 
 
 def test_build_frontdoor_stats_derives_version_counter():

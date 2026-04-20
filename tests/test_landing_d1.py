@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from agentkit_cli.site_engine import build_frontdoor_stats
+
 DOCS_DIR = Path(__file__).parent.parent / "docs"
 INDEX_HTML = DOCS_DIR / "index.html"
 
@@ -21,16 +23,18 @@ def test_html_has_doctype():
 
 def test_hero_headline():
     html = _html()
-    assert "One canonical context file" in html
+    stats = build_frontdoor_stats()
+    assert "one canonical source" in html.lower()
     assert ".agentkit/source.md" in html
-    assert "v1.2.0" in html
+    assert f"v{stats['version']}" in html
     assert "agentkit contract" in html
+    assert "AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md" in html
 
 
 def test_pipeline_stages():
     html = _html()
-    for stage in ("SOURCE", "PROJECT", "SCORE", "GUARD", "LEARN"):
-        assert stage in html, f"Pipeline stage {stage!r} missing"
+    for phrase in ("Write the canonical source", "Project into real agent files", "Score, gate, and learn"):
+        assert phrase in html, f"Workflow phrase {phrase!r} missing"
 
 
 def test_feature_grid_six_tools():
@@ -59,6 +63,7 @@ def test_quickstart_code_block():
     assert "agentkit source --init" in html
     assert "agentkit project --write" in html
     assert "agentkit contract --init" in html
+    assert "agentkit score" in html
 
 
 def test_github_link():
@@ -93,6 +98,7 @@ def test_dark_theme_colors():
 
 def test_stats_show_current_shipped_counts():
     html = _html()
-    assert 'data-stat="tests">4824<' in html
-    assert 'data-stat="versions">102<' in html
-    assert 'data-stat="packages">6<' in html
+    stats = build_frontdoor_stats()
+    assert f'data-stat="tests">{stats["tests"]}<' in html
+    assert f'data-stat="versions">{stats["versions"]}<' in html
+    assert f'data-stat="packages">{stats["packages"]}<' in html
