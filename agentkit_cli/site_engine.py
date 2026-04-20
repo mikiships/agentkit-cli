@@ -80,7 +80,12 @@ def build_frontdoor_stats(
     released = _released_frontdoor_defaults()
     resolved_version = version or (existing.get("version") if prefer_existing else None) or str(released["version"])
     resolved_tests = tests if tests is not None else (existing.get("tests") if prefer_existing else None) or int(released["tests"])
-    resolved_versions = versions if versions is not None else (existing.get("versions") if prefer_existing else None) or int(released["versions"])
+    resolved_versions = (
+        versions
+        if versions is not None
+        else (existing.get("versions") if prefer_existing else None)
+        or _version_stat_from_version(str(resolved_version))
+    )
     resolved_packages = packages if packages is not None else (existing.get("packages") if prefer_existing else None) or int(released["packages"])
     return {
         "version": str(resolved_version),

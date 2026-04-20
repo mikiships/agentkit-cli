@@ -7,7 +7,7 @@ Status: RELEASE-READY LOCALLY
 
 ## Summary
 
-Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the contract flow map-aware, and verified the real `analyze -> map -> contract` lane with a broader focused validation slice.
+Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the contract flow map-aware, and verified the real `analyze -> map -> contract` lane with a broader focused validation slice plus a clean full-suite release baseline.
 
 ## Deliverables
 
@@ -23,7 +23,8 @@ Restored `agentkit contract` on top of the shipped `v1.3.0 map` branch, made the
 
 - prior focused contract+map slice: `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py` -> `16 passed in 5.01s`
 - direct contract recheck: `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py` -> `6 passed in 1.03s`
-- broader focused release-readiness slice: `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `34 passed in 1.09s`
+- broader focused release-readiness slice: `uv run --python 3.11 --with pytest pytest -q tests/test_contract_d2.py tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `34 passed in 1.03s`
+- full suite release baseline: `uv run --python 3.11 --with pytest pytest -q` -> `4839 passed, 1 warning`
 
 ## Release-Readiness Truth
 
