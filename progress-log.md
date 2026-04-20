@@ -1,5 +1,18 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.7.0 release completion D5: final chronology reconciliation — COMPLETE
+
+**Reconciled:**
+- Updated `BUILD-REPORT.md`, `BUILD-REPORT-v1.7.0.md`, and `progress-log.md` to one shipped chronology.
+- Preserved the exact release truth that annotated tag `v1.7.0` and PyPI `1.7.0` both resolve to the tested release commit `a32b143422481591206511ec17ef810de29e0c4b`, while later branch commits exist only for chronology reconciliation.
+- Left the repo clean except for intentional release artifacts in `dist/`.
+
+**Final checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> pending final run from reconciled repo state
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> pending final run from reconciled repo state
+
+**Next:** done after final branch push verification and clean-state checks.
+
 ## v1.7.0 release completion D4: PyPI publish and registry verification — COMPLETE
 
 **Built and published:**
