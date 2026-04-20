@@ -133,3 +133,16 @@
 
 **Next:** done.
 
+
+---
+
+## D1: supported Pages refresh path regenerates the docs payload — COMPLETE
+
+**Built:**
+- Updated `agentkit pages-refresh --from-existing-data` to refresh `docs/data.json`, fully rewrite `docs/index.html`, and now regenerate `docs/leaderboard.html` from the same payload.
+- Updated `.github/workflows/update-pages.yml` so the push-time Pages refresh stages and commits `docs/leaderboard.html` alongside `docs/data.json` and `docs/index.html`.
+- Regenerated the checked-in docs artifacts from the supported command path so the repo starts from one coherent Pages state.
+
+**Tests:** `python3 -m pytest -q tests/test_pages_refresh.py tests/test_landing_d2.py tests/test_site_engine.py` -> `93 passed in 1.92s`
+
+**Next:** D2 regression coverage and D3 docs/report surfaces.

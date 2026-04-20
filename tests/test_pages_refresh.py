@@ -12,6 +12,7 @@ import yaml
 
 from agentkit_cli.commands.pages_refresh import (
     build_data_json,
+    leaderboard_result_from_data_json,
     load_existing_data,
     pages_refresh_command,
     score_to_grade,
@@ -143,6 +144,21 @@ class TestBuildDataJson:
         data = build_data_json(result)
         ecosystems = {r["ecosystem"] for r in data["repos"]}
         assert "python" in ecosystems
+
+
+class TestLeaderboardResultFromDataJson:
+    def test_rebuilds_ecosystems_from_payload(self):
+        data = {
+            "generated_at": "2026-04-19T12:00:00+00:00",
+            "repos": [
+                {"name": "openai/openai-python", "score": 91.0, "grade": "A", "ecosystem": "python"},
+                {"name": "vercel/ai", "score": 80.0, "grade": "A", "ecosystem": "typescript"},
+            ],
+        }
+        result = leaderboard_result_from_data_json(data, ["python", "typescript"])
+        assert [eco.ecosystem for eco in result.ecosystems] == ["python", "typescript"]
+        assert result.ecosystems[0].entries[0].repo_full_name == "openai/openai-python"
+        assert result.generated_at == "2026-04-19T12:00:00+00:00"
 
 
 # ---------------------------------------------------------------------------
@@ -321,12 +337,38 @@ class TestPagesRefreshCommand:
         )
         data = json.loads((tmp_path / "data.json").read_text())
         html = (tmp_path / "index.html").read_text()
-        assert data["generated_at"] == payload["generated_at"]
+        leaderboard_html = (tmp_path / "leaderboard.html").read_text()
+        assert data["generated_at"] != payload["generated_at"]
         assert data["stats"]["total"] == 1
         assert data["frontdoor"]["version"] == "1.2.1"
         assert data["frontdoor"]["tests"] == 4901
         assert "v1.2.1" in html
         assert 'id="repos-scored-stat">1<' in html
+        assert "langchain-ai/langchain" in leaderboard_html
+        assert data["generated_at"] in leaderboard_html
+
+    def test_pages_refresh_from_existing_data_rewrites_leaderboard_and_timestamp(self, tmp_path):
+        payload = {
+            "generated_at": "2026-04-19T08:47:54+00:00",
+            "frontdoor": {"version": "1.2.0", "tests": 4824, "versions": 111, "packages": 6},
+            "repos": [
+                {"name": "openai/openai-python", "url": "https://github.com/openai/openai-python", "score": 91, "grade": "A", "ecosystem": "python", "source": "ecosystem"},
+                {"name": "vercel/ai", "url": "https://github.com/vercel/ai", "score": 80, "grade": "A", "ecosystem": "typescript", "source": "ecosystem"}
+            ],
+            "stats": {"total": 2, "median": 85.5, "top_score": 91},
+        }
+        (tmp_path / "data.json").write_text(json.dumps(payload), encoding="utf-8")
+        (tmp_path / "leaderboard.html").write_text("stale leaderboard", encoding="utf-8")
+
+        pages_refresh_command(docs_dir=tmp_path, from_existing_data=True)
+
+        data = json.loads((tmp_path / "data.json").read_text())
+        leaderboard_html = (tmp_path / "leaderboard.html").read_text()
+        assert data["generated_at"] != payload["generated_at"]
+        assert "stale leaderboard" not in leaderboard_html
+        assert "openai/openai-python" in leaderboard_html
+        assert "vercel/ai" in leaderboard_html
+        assert data["generated_at"] in leaderboard_html
 
 
 # ---------------------------------------------------------------------------

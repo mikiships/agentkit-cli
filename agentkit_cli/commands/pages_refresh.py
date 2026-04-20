@@ -10,6 +10,12 @@ from typing import Any, List, Optional
 
 from rich.console import Console
 
+from agentkit_cli.leaderboard_page import (
+    EcosystemLeaderboard,
+    LeaderboardEntry,
+    LeaderboardPageResult,
+    render_leaderboard_html,
+)
 from agentkit_cli.site_engine import SiteEngine, build_frontdoor_stats
 
 console = Console()
@@ -90,6 +96,44 @@ def _fetch_script() -> str:
     return SiteEngine()._recently_scored_fetch_script()
 
 
+def leaderboard_result_from_data_json(data: dict, ecosystems_order: Optional[List[str]] = None) -> LeaderboardPageResult:
+    """Rebuild leaderboard HTML from an existing docs/data.json payload."""
+    entries_by_ecosystem: dict[str, list[dict[str, Any]]] = {}
+    for repo in data.get("repos", []):
+        ecosystem = str(repo.get("ecosystem") or "unknown").lower()
+        entries_by_ecosystem.setdefault(ecosystem, []).append(repo)
+
+    ordered_ecosystems = ecosystems_order or list(entries_by_ecosystem.keys()) or DEFAULT_ECOSYSTEMS
+    ecosystems: list[EcosystemLeaderboard] = []
+    for ecosystem in ordered_ecosystems:
+        repo_rows = entries_by_ecosystem.get(ecosystem, [])
+        entries = [
+            LeaderboardEntry(
+                rank=index,
+                repo_full_name=str(repo.get("name", "")),
+                score=float(repo.get("score", 0)),
+                grade=str(repo.get("grade") or score_to_grade(float(repo.get("score", 0)))),
+                stars=int(repo.get("stars", 0) or 0),
+                description=str(repo.get("description", "") or ""),
+                ecosystem=ecosystem,
+            )
+            for index, repo in enumerate(repo_rows, start=1)
+            if repo.get("name")
+        ]
+        ecosystems.append(
+            EcosystemLeaderboard(
+                ecosystem=ecosystem,
+                entries=entries,
+                total_analyzed=len(entries),
+            )
+        )
+
+    return LeaderboardPageResult(
+        ecosystems=ecosystems,
+        generated_at=str(data.get("generated_at") or datetime.now(timezone.utc).isoformat()),
+    )
+
+
 def update_index_html(index_path: Path, data: dict) -> bool:
     """Rewrite docs/index.html from the canonical data.json payload. Returns True if changed."""
     engine = SiteEngine()
@@ -132,12 +176,17 @@ def pages_refresh_command(
     )
 
     leaderboard_path = docs / "leaderboard.html"
+    generated_at = datetime.now(timezone.utc).isoformat()
     if from_existing_data:
         console.print("[bold]agentkit pages-refresh[/bold] — refreshing front door from existing docs/data.json…")
         data = {
             **existing_data,
             "frontdoor": frontdoor,
+            "generated_at": generated_at,
         }
+        html = render_leaderboard_html(leaderboard_result_from_data_json(data, eco_list))
+        leaderboard_path.write_text(html, encoding="utf-8")
+        console.print(f"[green]✓[/green] Wrote {leaderboard_path}")
     else:
         console.print("[bold]agentkit pages-refresh[/bold] — scoring ecosystems…")
 
@@ -151,9 +200,8 @@ def pages_refresh_command(
             )
 
         result = engine.run()
-        data = build_data_json(result, eco_list, frontdoor=frontdoor)
+        data = build_data_json(result, eco_list, frontdoor=frontdoor, generated_at=generated_at)
 
-        from agentkit_cli.leaderboard_page import render_leaderboard_html
         html = render_leaderboard_html(result)
         leaderboard_path.write_text(html, encoding="utf-8")
         console.print(f"[green]✓[/green] Wrote {leaderboard_path}")
