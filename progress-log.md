@@ -1,5 +1,28 @@
 # Progress Log — agentkit-cli v1.11.0 stage worktrees
 
+## v1.11.0 release completion D5: shipped release reconciliation — COMPLETE
+
+**Reconciled:**
+- Pushed `feat/v1.11.0-stage-worktrees` to origin from the tested release commit `5a001cc47af2389585477bf252c892486be34ea1`.
+- Created and pushed annotated tag `v1.11.0` on that same tested release commit.
+- Built and published `agentkit-cli==1.11.0`, then verified PyPI live truth from version-specific registry surfaces.
+- Updated shipped report surfaces so branch, tag, and registry truth are recorded distinctly from any later docs-only chronology cleanup.
+
+**Validation:**
+- `git ls-remote --heads origin feat/v1.11.0-stage-worktrees` -> `5a001cc47af2389585477bf252c892486be34ea1`
+- `git ls-remote --tags origin refs/tags/v1.11.0^{}` -> `5a001cc47af2389585477bf252c892486be34ea1`
+- `uv build` -> `dist/agentkit_cli-1.11.0.tar.gz` and `dist/agentkit_cli-1.11.0-py3-none-any.whl`
+- `uv run --with twine python -m twine upload dist/agentkit_cli-1.11.0.tar.gz dist/agentkit_cli-1.11.0-py3-none-any.whl` -> success
+- `https://pypi.org/pypi/agentkit-cli/json` and `https://pypi.org/pypi/agentkit-cli/1.11.0/json` -> `1.11.0` live with both required files present
+
+**Current truth:**
+- `agentkit-cli v1.11.0` is shipped.
+- The tested release commit and annotated tag target match at `5a001cc47af2389585477bf252c892486be34ea1`.
+- The branch may advance later only through docs-only chronology cleanup after the shipped tag.
+- PyPI is live at `https://pypi.org/project/agentkit-cli/1.11.0/`.
+
+**Next:** done.
+
 ## v1.11.0 D5: docs, reports, and release-readiness surfaces — COMPLETE
 
 **Built:**
