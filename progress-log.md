@@ -1,5 +1,27 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.5.0 release completion D3-D5: shipped and reconciled — COMPLETE
+
+**Published refs:**
+- `origin/feat/v1.5.0-source-audit` -> `5d340ac`
+- annotated tag `v1.5.0` object `60613af6dc5c8aca5a00aab51b724b173af80bee`, peeled commit `5d340ac`
+
+**Registry proof:**
+- `https://pypi.org/pypi/agentkit-cli/1.5.0/json` -> live with wheel + sdist
+- `https://pypi.org/pypi/agentkit-cli/json` -> top-level project JSON reports `1.5.0`
+
+**Important chronology note:**
+- The release-completion sub-agent timed out after finishing the irreversible release steps, so the shipped truth had to be reconciled afterward from source-of-truth surfaces instead of trusting the stale local-only prose.
+- Restored the repo to a clean working tree after the timed-out pass temporarily removed tracked historical `dist/` artifacts.
+
+**Current truth:**
+- `agentkit-cli v1.5.0` is shipped.
+- Tests green at the shipped release commit: `4845 passed, 1 warning`.
+- Branch, tag, and PyPI all resolve to `1.5.0`.
+- Final repo/report chronology is now coherent again.
+
+**Next:** done.
+
 ## v1.5.0 D3: docs, workflow handoff, and release-readiness surfaces — COMPLETE
 
 **Built:**

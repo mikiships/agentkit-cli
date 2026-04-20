@@ -3,11 +3,11 @@
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
 Contract: all-day-build-contract-agentkit-cli-v1.5.0-source-audit.md
-Status: RELEASE-READY (local)
+Status: SHIPPED
 
 ## Summary
 
-Added a deterministic `agentkit source-audit` lane that checks canonical or fallback source readiness before `map` and `contract`, updated docs for the `source -> source-audit -> map -> contract` flow, and left the branch in release-ready local state for `v1.5.0`.
+Added a deterministic `agentkit source-audit` lane that checks canonical or fallback source readiness before `map` and `contract`, then completed the full four-surface release checklist for `v1.5.0`.
 
 ## Deliverables
 
@@ -16,6 +16,8 @@ Added a deterministic `agentkit source-audit` lane that checks canonical or fall
 | D1 | Deterministic source-audit engine + schema | ✅ Complete | Canonical-source preference, legacy fallback, required-section checks, ambiguity heuristics, contradiction hints, and stable JSON output |
 | D2 | CLI workflow + actionable rendering | ✅ Complete | Added first-class `agentkit source-audit` with rich text, markdown/text output, `--json`, and contract-readiness summary |
 | D3 | Docs + workflow handoff + validation | ✅ Complete | README, CHANGELOG, BUILD-REPORT, version metadata, progress log, and workflow coverage now match the new source-audit lane |
+| D4 | Git + registry release surfaces | ✅ Complete | Branch pushed, annotated tag `v1.5.0` pushed, and PyPI `agentkit-cli==1.5.0` is live with wheel + sdist |
+| D5 | Final chronology reconciliation | ✅ Complete | Repo reports now match the shipped branch/tag/registry truth |
 
 ## Validation
 
@@ -29,11 +31,14 @@ Added a deterministic `agentkit source-audit` lane that checks canonical or fall
 
 ## Release Truth
 
-- branch: `feat/v1.5.0-source-audit`
-- status: local-only release-readiness handoff
-- version metadata: `1.5.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
-- no push, tag, or publish attempted in this pass
+- tested release commit and current branch head: `5d340ac` (`test: reconcile v1.5.0 release validation baseline`)
+- remote branch: `origin/feat/v1.5.0-source-audit` -> `5d340ac`
+- annotated tag: `v1.5.0` object `60613af6dc5c8aca5a00aab51b724b173af80bee`, peeled commit `5d340ac`
+- PyPI version JSON: `agentkit-cli/1.5.0` live with:
+  - `agentkit_cli-1.5.0-py3-none-any.whl`
+  - `agentkit_cli-1.5.0.tar.gz`
+- top-level PyPI project JSON now reports `1.5.0`
 
 ## Notes
 
-This report reflects local branch truth only. Shipping steps remain out of scope for this contract pass.
+The release-completion sub-agent timed out after the irreversible release steps had already succeeded, so this final chronology reconciliation was completed afterward from source-of-truth surfaces. The package was shipped before this report was rewritten; this report now reflects that shipped truth.
