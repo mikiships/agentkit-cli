@@ -384,6 +384,41 @@ agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
 ```
 
+## `agentkit resolve` — deterministic clarification reconciliation before execution
+
+Use `agentkit resolve` when you already have a clarify-ready packet, explicit answers from a human or orchestrator, and you want one stable execution packet that says what is resolved, what still blocks the work, and whether execution can proceed.
+
+```bash
+# Print a human-readable resolved packet
+agentkit resolve . --answers ./answers.json
+
+# Emit stable JSON for orchestration or CI
+agentkit resolve . --answers ./answers.json --target codex --json > resolve.json
+
+# Write both markdown + JSON artifacts into one directory
+agentkit resolve . --answers ./answers.json --target claude-code --output-dir ./resolve
+```
+
+The resolved packet surfaces:
+- questions that were explicitly resolved from the clarify brief
+- remaining blockers that still require a pause
+- remaining follow-ups that are still open but non-blocking
+- assumptions that were confirmed, superseded, or left unresolved
+- a deterministic recommendation: `proceed`, `proceed-with-assumptions`, or `pause`
+
+Recommended full resolution loop:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
+```
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.

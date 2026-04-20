@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.9.0] - 2026-04-20
+
+### Added
+- `agentkit resolve` for consuming a clarify-ready handoff plus explicit answers and turning them into a deterministic resolved packet.
+- Stable resolve markdown and JSON rendering with resolved questions, remaining blockers, remaining follow-ups, confirmed assumptions, superseded assumptions, unresolved assumptions, and an updated execution recommendation.
+- Focused workflow coverage for the full `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve` lane, including incomplete-answer and contradiction pauses.
+
+### Docs
+- README and local build/progress surfaces updated so the supported handoff story now ends with `resolve` after `clarify`.
+
 ## [1.8.0] - 2026-04-20
 
 ### Added
