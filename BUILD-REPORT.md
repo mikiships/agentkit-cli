@@ -21,6 +21,9 @@ Added a deterministic `agentkit source-audit` lane that checks canonical or fall
 
 - focused source-audit slice: `uv run --python 3.11 --with pytest pytest -q tests/test_source_audit.py tests/test_source_cmd.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `33 passed in 5.26s`
 - workflow handoff slice: `uv run --python 3.11 --with pytest pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_source_cmd.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `34 passed in 1.26s`
+- full suite baseline (pre-release fixup run): `uv run --python 3.11 --with pytest pytest -q` -> `2 failed, 4843 passed, 1 warning in 294.14s (0:04:54)`
+- post-fix focused release-surface rerun: `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_site_engine.py` -> `39 passed in 0.46s`
+- final full suite: `uv run --python 3.11 --with pytest pytest -q` -> `4845 passed, 1 warning in 303.39s (0:05:03)`
 - release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit` -> no contradictory success/blocker narratives found
 - hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit` -> `Total findings: 0`
 

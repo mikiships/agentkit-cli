@@ -139,9 +139,13 @@ def test_generate_index_has_seo_tags(engine):
 
 
 def test_generate_index_shows_current_frontdoor_story(engine):
+    from agentkit_cli.site_engine import _latest_release_version, _released_test_count
+
     page = engine.generate_index()
-    assert "v1.3.0" in page.html
-    assert "4833" in page.html
+    released_version = _latest_release_version()
+    released_tests = _released_test_count(released_version)
+    assert f"v{released_version}" in page.html
+    assert str(released_tests) in page.html
     assert "agentkit contract" in page.html
     assert "agentkit contract --init" in page.html
 

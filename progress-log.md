@@ -20,7 +20,12 @@
 - D3 docs, workflow handoff, and release surfaces: complete.
 - Branch is release-ready locally for `v1.5.0`; no push, tag, or publish was attempted.
 
-**Next:** done.
+**Later release-completion note:**
+- Full-suite release validation on 2026-04-20 initially found 2 stale release-surface failures: `BUILD-REPORT.md` lacked a 4-digit verified full-suite count, and `tests/test_site_engine.py::test_generate_index_shows_current_frontdoor_story` still hardcoded the prior shipped frontdoor story instead of deriving it from the latest released tag.
+- Fixed the drift by recording the full-suite counts in the build reports and making the frontdoor test derive release truth from the latest shipped tag.
+- Verification reruns: `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_site_engine.py` -> `39 passed in 0.46s`; `uv run --python 3.11 --with pytest pytest -q` -> `4845 passed, 1 warning in 303.39s (0:05:03)`.
+
+**Next:** proceed to git release surfaces from this now-green repo state.
 
 ## v1.5.0 D1-D2: source audit engine + CLI workflow — COMPLETE
 
