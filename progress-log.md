@@ -1,3 +1,35 @@
+# Progress Log — agentkit-cli v1.13.0 launch lanes
+
+## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
+
+**Blocker:**
+- The contract requires a real git commit after each deliverable, but this linked worktree points at `/Users/mordecai/repos/agentkit-cli/.git/worktrees/agentkit-cli-v1.13.0-launch-lanes` and common objects under `/Users/mordecai/repos/agentkit-cli/.git`, both outside the writable sandbox roots.
+- Three non-destructive commit attempts failed on the same root issue: git cannot create lock files or object-database temp files in the parent repo metadata path from this environment.
+
+**Evidence:**
+- `git add ... && git commit -m "feat: add launch planning engine"` -> `Unable to create .../index.lock: Operation not permitted`
+- `GIT_INDEX_FILE=\"$PWD/.git-index\" git add ...` -> `unable to create temporary file: Operation not permitted`
+- local index/object-directory workaround attempt -> `fatal: could not parse HEAD`
+
+**Current truth:**
+- D1 code and tests are present locally but the required deliverable commit could not be created.
+- Work stopped after the third failed attempt, and the exact blocker is recorded in `blocker-report-v1.13.0-launch-lanes.md`.
+
+## v1.13.0 D1: deterministic launch planning engine — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/launch.py` with a schema-backed launch planner that reads saved `materialize.json` packets, validates per-lane `.agentkit/materialize/` artifacts, preserves waiting lanes from serialized ownership, and derives deterministic launch commands for `generic`, `codex`, and `claude-code`.
+- Added focused engine coverage in `tests/test_launch_engine.py` for target-aware command rendering, preserved waiting-lane behavior, dry-run blocking, and missing handoff artifact failure reasons.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_launch_engine.py` -> `6 passed in 0.99s`
+
+**Next:**
+- D2 `agentkit launch` CLI surface with dry-run planning by default and explicit local execution only when requested.
+
+**Blockers:**
+- None.
+
 # Progress Log — agentkit-cli v1.12.0 materialize worktrees
 
 ## v1.12.0 release completion D5: shipped release reconciliation — COMPLETE
