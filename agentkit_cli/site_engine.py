@@ -22,11 +22,17 @@ _FRONTDOOR_VERSION = "1.2.0"
 _FRONTDOOR_TEST_COUNT = 4824
 _FRONTDOOR_VERSION_COUNT = 111
 _FRONTDOOR_PACKAGE_COUNT = 6
+_REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _git_output(*args: str) -> str:
     try:
-        return subprocess.check_output(["git", *args], stderr=subprocess.DEVNULL, text=True).strip()
+        return subprocess.check_output(
+            ["git", *args],
+            stderr=subprocess.DEVNULL,
+            text=True,
+            cwd=_REPO_ROOT,
+        ).strip()
     except Exception:
         return ""
 
