@@ -72,6 +72,30 @@
 
 **Next:** D4 registry release surface.
 
+## v1.13.0 release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Reconciled:**
+- Verified the version-specific PyPI JSON surface was still `404` before publish, so `1.13.0` was not live yet.
+- Built fresh `1.13.0` distribution artifacts from a detached tag worktree at `v1.13.0` so the registry surface matches the shipped tag instead of the later docs-only branch head.
+- Published `agentkit-cli==1.13.0` with the supported local `twine upload` path and verified the version-specific registry surface directly after propagation completed.
+
+**Validation:**
+- pre-publish `https://pypi.org/pypi/agentkit-cli/1.13.0/json` -> `HTTP 404`
+- `git worktree add --detach .release-build/v1.13.0-from-tag v1.13.0` -> detached tag checkout created at `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- `uv build --out-dir ../../dist --sdist --wheel` from `.release-build/v1.13.0-from-tag` -> built `dist/agentkit_cli-1.13.0.tar.gz` and `dist/agentkit_cli-1.13.0-py3-none-any.whl`
+- `uv run --with twine python -m twine check ../../dist/agentkit_cli-1.13.0.tar.gz ../../dist/agentkit_cli-1.13.0-py3-none-any.whl` -> passed
+- `uv run --with twine python -m twine upload ../../dist/agentkit_cli-1.13.0.tar.gz ../../dist/agentkit_cli-1.13.0-py3-none-any.whl` -> success, PyPI returned `View at: https://pypi.org/project/agentkit-cli/1.13.0/`
+- post-publish `https://pypi.org/pypi/agentkit-cli/1.13.0/json` -> `200`, `info.version == 1.13.0`, files `agentkit_cli-1.13.0-py3-none-any.whl`, `agentkit_cli-1.13.0.tar.gz`
+- post-publish `https://pypi.org/pypi/agentkit-cli/json` -> `200`, latest version `1.13.0`
+- post-publish `https://pypi.org/project/agentkit-cli/1.13.0/` -> `200`
+
+**Current truth:**
+- PyPI is live for `agentkit-cli==1.13.0`.
+- Both required artifacts are present on the registry.
+- All four release surfaces are now externally verified; remaining work is chronology reconciliation across local report files and branch cleanup commits.
+
+**Next:** D5 shipped chronology reconciliation.
+
 ## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
 
 **Blocker:**
