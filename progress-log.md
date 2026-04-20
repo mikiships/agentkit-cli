@@ -1,5 +1,30 @@
 # Progress Log — agentkit-cli v1.16.0 reconcile lane state
 
+## D6 shipped: parent session completed release promotion and verified all four surfaces
+
+**What changed:**
+- Resolved the child finisher's sandbox-only git-write blocker from the parent session instead of leaving the lane parked at local `RELEASE-READY`.
+- Committed the sandbox-safe validation hardening plus release contract/blocker artifacts as `e52bed7` (`test: harden sandboxed release validation`).
+- Pushed `feat/v1.16.0-reconcile-lanes`, created and pushed annotated tag `v1.16.0`, built the release artifacts with `uv build --out-dir dist-release-v1.16.0`, and published both artifacts with `twine upload`.
+- Verified the release from source-of-truth surfaces before reconciling the shipped chronology docs.
+
+**Validation:**
+- `git push -u origin feat/v1.16.0-reconcile-lanes` -> remote branch now tracks `e52bed7`
+- `git tag -a v1.16.0 -m "agentkit-cli v1.16.0" && git push origin v1.16.0` -> annotated tag `v1.16.0` now peels to `e52bed7`
+- `uv build --out-dir dist-release-v1.16.0` -> built `agentkit_cli-1.16.0.tar.gz` and `agentkit_cli-1.16.0-py3-none-any.whl`
+- `twine upload dist-release-v1.16.0/*` -> uploaded both `1.16.0` artifacts successfully
+- `git ls-remote --heads origin feat/v1.16.0-reconcile-lanes` -> `e52bed7`
+- `git ls-remote --tags origin v1.16.0^{}` -> `e52bed7`
+- `curl -s -o /dev/null -w '%{http_code}' https://pypi.org/project/agentkit-cli/1.16.0/` -> `200`
+- `curl -s -o /dev/null -w '%{http_code}' https://pypi.org/pypi/agentkit-cli/1.16.0/json` -> `200`
+
+**Current truth:**
+- `agentkit-cli v1.16.0` is shipped.
+- The shipped release commit is `e52bed7` (`test: harden sandboxed release validation`).
+- The pushed release tag `v1.16.0` peels to `e52bed7`.
+- PyPI serves both the project page and version JSON for `1.16.0`.
+- Next step is only chronology cleanup, not more release work.
+
 ## D3 blocked: parent worktree git metadata is not writable from this sandbox
 
 **What changed:**
