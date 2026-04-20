@@ -1,3 +1,17 @@
+# Progress Log — agentkit-cli v1.11.0 stage worktrees
+
+## v1.11.0 D1: deterministic stage planning engine — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/stage.py` with a schema-backed stage planner that reads a saved `dispatch.json` artifact and emits deterministic phases, serialization groups, branch names, worktree names, worktree paths, and packet references.
+- Preserved serialized overlap constraints from dispatch instead of flattening them into fake parallel stage output.
+- Added focused stage coverage in `tests/test_stage.py` for deterministic lane planning, serialized waits, missing dispatch handling, target mismatch validation, and help output.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `15 passed`
+
+**Next:** D2 CLI artifact writing, D3 lane staging packet polish, and D4 workflow regression coverage.
+
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
 ## v1.10.0 release completion D5: shipped release reconciliation — COMPLETE

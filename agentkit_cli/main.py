@@ -98,6 +98,7 @@ from agentkit_cli.commands.taskpack_cmd import taskpack_command
 from agentkit_cli.commands.clarify_cmd import clarify_command
 from agentkit_cli.commands.resolve_cmd import resolve_command
 from agentkit_cli.commands.dispatch_cmd import dispatch_command
+from agentkit_cli.commands.stage_cmd import stage_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1386,6 +1387,19 @@ def dispatch(
 ) -> None:
     """Plan deterministic execution lanes from a saved resolve packet."""
     dispatch_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
+@app.command("stage")
+def stage(
+    path: str = typer.Argument(..., help="Project directory to stage after dispatch"),
+    target: str = typer.Option("generic", "--target", help="Target agent: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered stage plan to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write stage.md, stage.json, and per-lane stage packets to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Plan deterministic worktree-safe staging artifacts from a saved dispatch packet."""
+    stage_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
 @app.command("contract")
