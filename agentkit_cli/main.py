@@ -99,6 +99,7 @@ from agentkit_cli.commands.clarify_cmd import clarify_command
 from agentkit_cli.commands.resolve_cmd import resolve_command
 from agentkit_cli.commands.dispatch_cmd import dispatch_command
 from agentkit_cli.commands.stage_cmd import stage_command
+from agentkit_cli.commands.materialize_cmd import materialize_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1400,6 +1401,30 @@ def stage(
 ) -> None:
     """Plan deterministic worktree-safe staging artifacts from a saved dispatch packet."""
     stage_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
+@app.command("materialize")
+def materialize(
+    path: str = typer.Argument(..., help="Project directory to materialize after stage"),
+    target: Optional[str] = typer.Option(None, "--target", help="Optional target validation override: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered materialize plan to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write materialize.md and materialize.json to this directory"),
+    worktree_root: Optional[Path] = typer.Option(None, "--worktree-root", help="Override the root directory where local worktrees are created"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Plan local worktree creation without mutating git state"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Create deterministic local worktrees from a saved stage packet."""
+    materialize_command(
+        path=path,
+        target=target,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        worktree_root=worktree_root,
+        dry_run=dry_run,
+        format=format,
+    )
 
 
 @app.command("contract")

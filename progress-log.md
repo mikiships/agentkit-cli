@@ -1,3 +1,60 @@
+# Progress Log — agentkit-cli v1.12.0 materialize worktrees
+
+## v1.12.0 unblock: linked-worktree git metadata writes restored — COMPLETE
+
+**Resolved:**
+- The previous sandbox-only failure mode no longer applies in this unsandboxed continuation pass, so linked-worktree metadata writes and local commits now work normally.
+- Historical failure context remains captured in `blocker-report-v1.12.0-materialize-worktrees.md`, but it is no longer an active stop condition for this branch.
+
+**Current truth:**
+- Local feature commits can now be created from this worktree.
+- The remaining work is release-surface cleanup plus final full-suite and hygiene validation.
+
+## v1.12.0 D4: regression + edge-case coverage — COMPLETE
+
+**Built:**
+- Added end-to-end workflow coverage for `resolve -> dispatch -> stage -> materialize`, plus explicit checks for dry-run stability, serialized waiting lanes, branch-collision failure behavior, and deterministic worktree creation.
+- Added target-aware handoff assertions so seeded materialize packets preserve the saved runner notes for `generic`, `codex`, and `claude-code`.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_workflow.py tests/test_resolve_cmd.py tests/test_taskpack.py` -> `46 passed`
+
+**Next:** D5 docs, version surfaces, reports, and final release-readiness validation.
+
+## v1.12.0 D3: lane packet seeding and safety behavior — COMPLETE
+
+**Built:**
+- Seeded each created worktree under `.agentkit/materialize/` with copied lane `stage.json`, copied `stage.md`, machine-readable `materialize.json`, and a target-aware `handoff.md`.
+- Preserved serialization-group metadata, waiting-lane behavior, and collision refusal so only eligible local worktrees materialize.
+- Kept single-lane plans clean while preserving saved stage notes for `generic`, `codex`, and `claude-code`.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py` -> `9 passed`
+
+**Next:** D4 regression and edge-case coverage.
+
+## v1.12.0 D2: materialize CLI + local worktree execution — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/materialize_cmd.py` and wired `agentkit materialize` into `agentkit_cli/main.py` with `--target`, `--json`, `--output`, `--output-dir`, `--worktree-root`, and `--dry-run`.
+- Executed real local `git worktree add` flows for ready lanes, wrote portable `materialize.md` and `materialize.json` outputs, and failed cleanly on branch or path collisions.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_materialize_cmd.py tests/test_materialize_workflow.py` -> `7 passed`
+
+**Next:** D3 lane packet seeding and safety behavior.
+
+## v1.12.0 D1: deterministic materialize planning engine — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/materialize.py` with a schema-backed planner that reads a saved `stage.json`, derives deterministic worktree roots, preflights git/path collisions, resolves lane packet sources, and preserves serialized lanes as explicit waiting actions instead of materializing them early.
+- Added focused engine coverage in `tests/test_materialize_engine.py` for stable dry-run planning, packet-source resolution from real stage packet directories, and `--worktree-root` overrides for single-lane plans.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_materialize_engine.py` -> `2 passed`
+
+**Next:** done.
+
 # Progress Log — agentkit-cli v1.11.0 stage worktrees
 
 ## v1.11.0 release completion D5: shipped release reconciliation — COMPLETE
