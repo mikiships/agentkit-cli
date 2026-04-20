@@ -16,6 +16,24 @@
 **Next:** D2 validation baseline.
 
 
+## v1.6.0 release completion D2: validation baseline — COMPLETE
+
+**Validated:**
+- Re-ran the focused `agentkit bundle` release slice on the audited `feat/v1.6.0-handoff-bundle` repo state.
+- Re-ran the full supported pytest suite from the same repo state.
+- Cleared the one release-surface blocker by recording a verified 4-digit full-suite count in `BUILD-REPORT.md` and `BUILD-REPORT-v1.6.0.md`, then re-ran the gates until they were clean.
+
+**Tests:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `43 passed in 1.00s`
+- `uv run --python 3.11 --with pytest pytest -q` -> `4851 passed, 1 warning in 135.62s (0:02:15)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> no contradictory success/blocker narratives found
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> `Total findings: 0`
+
+**Release baseline commit:**
+- Tested release commit is `28a8ab29c05aa0a7a5fe4bf184c33d94ec77c592`.
+
+**Next:** D3 git release surfaces.
+
 ## v1.5.0 release completion D3-D5: shipped and reconciled — COMPLETE
 
 **Published refs:**
