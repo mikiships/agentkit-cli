@@ -1,5 +1,26 @@
 # Progress Log — agentkit-cli v1.11.0 stage worktrees
 
+## v1.11.0 D5: docs, reports, and release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated README so the supported handoff lane now ends with `stage` after `dispatch`, including markdown, JSON, and output-directory examples.
+- Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.11.0.md`, `FINAL-SUMMARY.md`, and version surfaces to reflect the local `1.11.0` release-ready state.
+- Reconciled progress and report surfaces so they describe the same planning-only scope: no real worktrees, no agent spawning, and no external mutation.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> no contradictory success or blocker narratives found
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed in 0.98s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4894 passed, 1 warning in 143.29s (0:02:23)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.11.0-stage-worktrees` -> passed with 0 findings
+
+**Current truth:**
+- D1-D5 are complete.
+- The supported handoff lane is `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage`.
+- Repo state is local `RELEASE-READY` with clean status except for the intentional contract file.
+
+**Next:** done.
+
 ## v1.11.0 D4: regression + edge-case coverage — COMPLETE
 
 **Built:**

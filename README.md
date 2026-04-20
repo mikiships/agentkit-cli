@@ -419,43 +419,6 @@ agentkit clarify . --target codex --output-dir ./clarify
 agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
 ```
 
-## `agentkit dispatch` — deterministic execution phases and lane packets
-
-Use `agentkit dispatch` after `resolve` when you want a build plan that says what can run in parallel, what must serialize, and what each lane should own without spawning anything.
-
-```bash
-# Print a human-readable dispatch plan
-agentkit dispatch .
-
-# Emit stable JSON for orchestration or CI
-agentkit dispatch . --target codex --json > dispatch.json
-
-# Write a portable packet directory with lane handoff files
-agentkit dispatch . --target claude-code --output-dir ./dispatch
-```
-
-The dispatch plan surfaces:
-- explicit phases with deterministic lane ordering
-- owned paths and overlap-aware serialization when two lanes would touch the same files
-- per-lane runner packets for `generic`, `codex`, and `claude-code`
-- worktree-safe guidance when multiple lanes can run in parallel
-- a portable packet directory containing `dispatch.md`, `dispatch.json`, and per-lane packet files under `lanes/`
-
-Recommended full handoff lane:
-
-```bash
-agentkit source --promote
-agentkit source-audit . --json > source-audit.json
-agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
-agentkit bundle . --output handoff-bundle.md
-agentkit taskpack . --target codex --output-dir ./taskpack
-agentkit clarify . --target codex --output-dir ./clarify
-agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
-cp ./resolve/resolve.json ./resolve.json
-agentkit dispatch . --target codex --output-dir ./dispatch
-```
-
 ## `agentkit dispatch` — deterministic execution lanes after resolve
 
 Use `agentkit dispatch` after `resolve` when you want an explicit execution plan with phases, lane ownership, dependencies, worktree-safe parallelism, and target-aware runner packets without actually executing anything.
@@ -477,6 +440,46 @@ The dispatch packet surfaces:
 - serialized execution when lane ownership overlaps
 - target-aware runner notes for `generic`, `codex`, and `claude-code`
 - worktree-safe guidance when multiple lanes can run in parallel
+- a portable packet directory containing `dispatch.md`, `dispatch.json`, and per-lane packet files under `lanes/`
+
+## `agentkit stage` — deterministic worktree-safe staging artifacts
+
+Use `agentkit stage` after `dispatch` when you want the next handoff turned into concrete staging artifacts without creating real git worktrees yet.
+
+```bash
+# Print a human-readable stage plan
+agentkit stage . --target codex
+
+# Emit stable JSON for orchestration or CI
+agentkit stage . --target codex --json > stage.json
+
+# Write stage.md, stage.json, and per-lane stage packets
+agentkit stage . --target claude-code --output-dir ./stage
+```
+
+The stage packet surfaces:
+- deterministic suggested branch names and worktree names per lane
+- portable worktree path suggestions rooted under the chosen stage output directory
+- per-lane staging packets with owned paths, dependencies, and dispatch packet references
+- serialized phase notes when a lane must wait on an earlier overlapping lane
+- target-aware stage notes for `generic`, `codex`, and `claude-code`
+
+Recommended full handoff lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
+cp ./resolve/resolve.json ./resolve.json
+agentkit dispatch . --target codex --output-dir ./dispatch
+cp ./dispatch/dispatch.json ./dispatch.json
+agentkit stage . --target codex --output-dir ./stage
+```
 
 Recommended full dispatch lane:
 

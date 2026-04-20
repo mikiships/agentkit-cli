@@ -1,13 +1,18 @@
-# Final Summary — agentkit-cli v1.10.0 dispatch lanes
+# Final Summary — agentkit-cli v1.11.0 stage worktrees
 
-## Outcome
-- Added deterministic `agentkit dispatch` planning on top of a saved `resolve.json` packet.
-- Dispatch now emits explicit phases, lane ownership, dependency edges, target-aware runner packets, and worktree-safe guidance.
-- Overlapping ownership is serialized instead of being represented as unsafe parallelism.
+Status: RELEASE-READY (local)
+Date: 2026-04-20
+Contract: all-day-build-contract-agentkit-cli-v1.11.0-stage-worktrees.md
 
-## Release truth
-- Tested release commit: `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
-- Origin branch head: `feat/v1.10.0-dispatch-lanes` -> `c05561fda14079644efbfadbb44d4471082536b2`
-- Annotated tag target: `v1.10.0` -> `a87c03d28fbe3f235d0b5909614c544e5439dcdd`
-- PyPI: https://pypi.org/project/agentkit-cli/1.10.0/ live with wheel and sdist
-- Chronology cleanup after release: docs-only commit `c05561fda14079644efbfadbb44d4471082536b2` records shipped chronology while staying distinct from the shipped tag target
+## What shipped in this pass
+
+- Added `agentkit stage` as the deterministic post-dispatch staging step.
+- Added stage manifests with suggested branch names, worktree names, worktree paths, serialization groups, and per-lane packet references.
+- Updated README, changelog, build reports, progress log, and version surfaces so the supported handoff lane now ends at `stage`.
+
+## Current local truth
+
+- Branch: `feat/v1.11.0-stage-worktrees`
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage`
+- Scope guardrails held: no real git worktrees, no agent spawning, no external repo mutation, no publish actions
+- Final validation status: pending final focused/full-suite reruns plus recall, contradiction scan, and hygiene pass

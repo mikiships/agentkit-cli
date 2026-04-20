@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.11.0] - 2026-04-20
+
+### Added
+- Added `agentkit stage` for deterministic post-dispatch staging plans with suggested branch names, worktree names, worktree paths, serialization groups, and portable per-lane stage packets.
+- Added stage packet directories with `stage.md`, `stage.json`, and per-lane `stage.md` and `stage.json` files under `lanes/<lane-id>/`.
+- Added regression coverage for `resolve -> dispatch -> stage`, saved-dispatch validation, target mismatch failures, serialized wait notes, and schema-stable stage JSON output.
+
+### Docs
+- README, BUILD-REPORT, and progress surfaces updated so the supported handoff lane now ends with `stage` after `dispatch`.
+
 ## [1.10.0] - 2026-04-20
 
 ### Added
