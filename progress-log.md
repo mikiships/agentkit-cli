@@ -1,5 +1,21 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.6.0 release completion D1: release-state audit and repo cleanup — COMPLETE
+
+**Audited source-of-truth first:**
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` before trusting local prose.
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` and found no contradictory success/blocker narratives.
+- Confirmed branch `feat/v1.6.0-handoff-bundle` at `b7fb900bc65a264262069533c483933d959cd72d`, local version metadata `1.6.0`, and no existing local `v1.6.0` tag.
+- Reconciled local drift that had not been committed yet: `uv.lock` already reflected the intended `1.6.0` bump, while `BUILD-REPORT.md` and `BUILD-REPORT-v1.6.0.md` still described the branch as locally release-ready rather than active release completion.
+
+**Checks:**
+- `git status --short --branch && git remote -v` -> branch is local `feat/v1.6.0-handoff-bundle`, remote `origin https://github.com/mikiships/agentkit-cli.git`
+- `git log --oneline --decorate -n 8` -> release branch head `b7fb900`, prior shipped tag `v1.5.0` at `5d340ac`
+- version metadata check -> `pyproject.toml` and `agentkit_cli/__init__.py` both report `1.6.0`
+
+**Next:** D2 validation baseline.
+
+
 ## v1.5.0 release completion D3-D5: shipped and reconciled — COMPLETE
 
 **Published refs:**

@@ -3,7 +3,7 @@
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
 Contract: all-day-build-contract-agentkit-cli-v1.6.0-handoff-bundle.md
-Status: READY FOR LOCAL RELEASE
+Status: RELEASE VALIDATION IN PROGRESS
 
 ## Summary
 
@@ -19,10 +19,11 @@ Added a deterministic `agentkit bundle` lane that composes canonical source, sou
 
 ## Validation
 
-- focused bundle slice: `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `30 passed in 1.38s`
-- repo-understanding workflow slice: `python3 -m pytest -q tests/test_bundle.py tests/test_source_cmd.py tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `40 passed in 1.66s`
+- focused bundle slice: `uv run --python 3.11 --with pytest pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `30 passed in 1.74s`
+- full supported suite: `uv run --python 3.11 --with pytest pytest -q` -> `1 failed, 4850 passed, 1 warning in 140.33s (0:02:20)`
+- current release blocker: `tests/test_daily_d5.py::TestBuildReport::test_build_report_mentions_test_count` failed because `BUILD-REPORT.md` did not yet record a verified 4-digit full-suite count
 - release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> no contradictory success/blocker narratives found
-- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> `Total findings: 0`
+- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> pending final rerun after release-surface reconciliation
 
 ## Notes
 
