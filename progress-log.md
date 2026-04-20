@@ -25,6 +25,28 @@
 
 **Next:** D2 validation baseline rerun.
 
+## v1.13.0 release completion D2: validation baseline rerun — COMPLETE
+
+**Reconciled:**
+- Re-ran the focused launch release slice from the current `v1.13.0` release head.
+- Re-ran the cross-lane workflow slice and the full pytest suite from the declared runtime-deps path so the release is anchored to a fresh tested commit instead of inherited trust.
+- Re-ran the required hygiene check after test execution, then removed the regenerated `.agentkit-last-run.json` artifact and restored the incidental `uv.lock` drift so the repo returned to a clean tested release state.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_main.py` -> `24 passed in 3.84s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.50s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4920 passed, 1 warning in 148.68s (0:02:28)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> first run found regenerated `.agentkit-last-run.json`; after cleanup, rerun passed with `Total findings: 0`
+- `git rev-parse HEAD` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- `git status --short --branch` -> clean tested release commit, with only the intentional untracked release contract file left untracked
+
+**Current truth:**
+- D2 validation baseline is freshly re-verified from tested commit `20502b4c4a3f2b36dc47a7754226d8b746e28a81`.
+- The repo is clean at the tested release commit before any push, tag, or publish step.
+- No irreversible release step has been attempted yet in this completion pass.
+
+**Next:** D3 git release surfaces.
+
 ## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
 
 **Blocker:**
