@@ -1,5 +1,29 @@
 # Progress Log — agentkit-cli v1.12.0 materialize worktrees
 
+## v1.12.0 release completion D1: release-state recall and contradiction audit — COMPLETE
+
+**Reconciled:**
+- Re-ran the required release recall and contradiction checks before trusting any local v1.12.0 release prose.
+- Verified the local release branch, tested HEAD, version surface, local tag absence, and working tree state from `feat/v1.12.0-materialize-worktrees`.
+- Confirmed the current tested local HEAD is `9e1e1440f01e557857c84b4ac00a405f3e51f505`, the version surface is `1.12.0`, no local `v1.12.0` tag exists yet, and the working tree was clean except for the intentional release contract file before this pass started.
+- Cleared stale release-noise by deleting `.agentkit-last-run.json`, which was an unrelated March 2026 artifact pointing at `/Users/mordecai/repos/agentkit-cli` rather than this release worktree.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> no contradictory success/blocker narratives found
+- `git branch --show-current` -> `feat/v1.12.0-materialize-worktrees`
+- `git rev-parse HEAD` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+- `python3` version parse from `pyproject.toml` -> `1.12.0`
+- `git tag -l v1.12.0` -> no local tag present
+- `git status --short --branch` -> clean branch state except the intentional release contract file before artifact cleanup; after cleanup only the contract file remained untracked
+
+**Current truth:**
+- D1 release-state recall is freshly re-verified from the current local head.
+- Branch truth, tag truth, and PyPI truth are still unverified external surfaces at this point in the pass.
+- No irreversible release step has been attempted yet in this completion pass.
+
+**Next:** D2 validation baseline rerun.
+
 ## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
 
 **Built:**
