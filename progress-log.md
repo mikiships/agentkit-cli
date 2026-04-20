@@ -1,5 +1,26 @@
 # Progress Log — agentkit-cli v1.9.0 resolve loop
 
+## v1.9.0 release completion D2: validation baseline rerun — COMPLETE
+
+**Reconciled:**
+- Re-ran the required release recall and contradiction checks before trusting any local release narrative.
+- Re-ran the focused resolve release slice from the current `feat/v1.9.0-resolve-loop` head.
+- Re-ran the full supported pytest suite from the same repo state to refresh release truth before any external step.
+- Corrected the contract filename reference in `BUILD-REPORT.md` so the report now points at `all-day-build-contract-agentkit-cli-v1.9.0-release.md`.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> completed; recall refreshed before trusting local narratives
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> no contradictory success or blocker narratives found
+- `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.12s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 139.47s (0:02:19)`
+
+**Current truth:**
+- D1 release-state audit and D2 validation baseline are freshly re-verified from the current local head.
+- Repo state is still local `RELEASE-READY` pending git push, tag push, and PyPI publish verification.
+- No irreversible release step has been attempted yet in this completion pass.
+
+**Next:** D3 git release surfaces.
+
 ## v1.9.0 D4: release-readiness pass — COMPLETE
 
 **Reconciled:**

@@ -14,8 +14,8 @@ Status: RELEASE-READY, LOCAL-ONLY
 
 ## Validation summary
 
-- Focused resolve workflow slice passed: `52 passed in 2.10s`, covering deterministic engine ordering, CLI rendering, output directories, full-lane integration, incomplete answers, contradiction pauses, clarify compatibility, version CLI output, and release-report guardrails.
-- Full pytest suite passed locally from this repo state under Python 3.11 with the required extras: `4870 passed, 1 warning in 136.62s (0:02:16)`.
+- Focused resolve workflow slice passed: `52 passed in 2.12s`, covering deterministic engine ordering, CLI rendering, output directories, full-lane integration, incomplete answers, contradiction pauses, clarify compatibility, version CLI output, and release-report guardrails.
+- Full pytest suite passed locally from this repo state under Python 3.11 with the required extras: `4870 passed, 1 warning in 139.47s (0:02:19)`.
 - Status-conflict scan passed with no contradictory success or blocker narratives.
 - Post-agent hygiene check passed with zero findings.
 

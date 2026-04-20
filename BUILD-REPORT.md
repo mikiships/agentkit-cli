@@ -2,7 +2,7 @@
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Contract: all-day-build-contract-agentkit-cli-v1.9.0-resolve-loop.md
+Contract: all-day-build-contract-agentkit-cli-v1.9.0-release.md
 Status: RELEASE-READY, LOCAL-ONLY
 
 ## Summary
@@ -20,8 +20,8 @@ Added a deterministic `agentkit resolve` lane that consumes the shipped `source 
 
 ## Validation
 
-- focused resolve workflow slice: `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.10s`
-- full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 136.62s (0:02:16)`
+- focused resolve workflow slice: `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.12s`
+- full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 139.47s (0:02:19)`
 - release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> no contradictory success or blocker narratives found
 - hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> passed with no findings
 
