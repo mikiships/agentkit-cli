@@ -1,5 +1,20 @@
 # Progress Log — agentkit-cli release chronology
 
+## Release completion D2: validation baseline — COMPLETE
+
+**Validated:**
+- Re-ran the focused `agentkit map` release slice on the reconciled repo state.
+- Re-ran the full supported pytest suite from the same repo state.
+- Confirmed the release candidate commit stayed stable across both runs.
+
+**Tests:**
+- `uv run pytest -q tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `28 passed in 0.95s`
+- `uv run pytest -q` -> `4833 passed, 1 warning in 134.24s (0:02:14)`
+
+**Next:** D3 git release surfaces.
+
+---
+
 ## Release completion D1: release-state audit and repo cleanup — COMPLETE
 
 **Audited:**
