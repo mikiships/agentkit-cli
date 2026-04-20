@@ -1,5 +1,24 @@
 # Progress Log — agentkit-cli release chronology
 
+## Release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Built and published:**
+- Built fresh `1.3.0` wheel and sdist from the clean tagged release state.
+- Published both artifacts to PyPI through the authenticated local `twine upload` path.
+- Verified the live version-specific PyPI JSON and project page after upload.
+
+**Build + registry proof:**
+- `uv build` -> built `dist/agentkit_cli-1.3.0.tar.gz` and `dist/agentkit_cli-1.3.0-py3-none-any.whl`
+- `twine upload dist/agentkit_cli-1.3.0.tar.gz dist/agentkit_cli-1.3.0-py3-none-any.whl` -> success
+- `https://pypi.org/pypi/agentkit-cli/1.3.0/json` -> `1.3.0` with:
+  - `agentkit_cli-1.3.0-py3-none-any.whl` (`bdist_wheel`, `588754` bytes)
+  - `agentkit_cli-1.3.0.tar.gz` (`sdist`, `1058379` bytes)
+- `https://pypi.org/project/agentkit-cli/1.3.0/` -> `HTTP/2 200`
+
+**Next:** D5 final chronology reconciliation.
+
+---
+
 ## Release completion D3: git release surfaces — COMPLETE
 
 **Published refs:**
