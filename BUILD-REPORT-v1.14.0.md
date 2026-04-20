@@ -27,3 +27,4 @@ Contract: all-day-build-contract-agentkit-cli-v1.14.0-observe-lanes.md
 - Version surfaces target `1.14.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py`
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe`
 - This repo is left in LOCAL RELEASE-READY state only. No tag, publish, or remote mutation was performed in this pass.
+- Versioned build report copy: `BUILD-REPORT-v1.14.0.md`

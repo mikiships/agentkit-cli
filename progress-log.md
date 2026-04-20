@@ -76,6 +76,25 @@
 
 ---
 
+## D5 complete: docs, reports, and local release-ready surfaces
+
+**What changed:**
+- Updated README to extend the supported handoff lane through `agentkit observe` and documented observe usage plus packet output.
+- Bumped local version surfaces to `1.14.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, `tests/test_main.py`, and `uv.lock`.
+- Updated `CHANGELOG.md`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.14.0.md`, and `FINAL-SUMMARY.md` to truthful LOCAL RELEASE-READY status only, with no push/tag/publish claims.
+- Ran repo-local contradiction and hygiene equivalents because the workspace-level helper scripts named in the contract are outside this repo-only execution scope.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_main.py` -> `17 passed in 4.22s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `80 passed in 10.32s`
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4930 passed, 1 warning in 157.85s (0:02:37)`
+- Repo-local contradiction scan equivalent -> README/CHANGELOG/BUILD-REPORT/FINAL-SUMMARY/version surfaces all aligned on `v1.14.0`, `agentkit observe`, and LOCAL RELEASE-READY truth.
+- Repo-local hygiene check equivalent -> transient `.agentkit-last-run.json` removed before final commit.
+
+**Next:** final commit and clean-state verification.
+
+---
+
 ## D5 complete: docs, reports, and release-ready surfaces for v1.14.0
 
 **What changed:**
