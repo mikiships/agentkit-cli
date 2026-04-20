@@ -512,9 +512,9 @@ The launch packet surfaces:
 - reusable helper command files for local execution targets and manual handoff targets
 - local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
 
-## `agentkit observe` — deterministic lane outcome observation after launch
+## `agentkit observe` + `agentkit supervise` — deterministic post-launch observation and local lane supervision
 
-Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result.
+Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed.
 
 ```bash
 # Print a human-readable observe summary
@@ -525,6 +525,12 @@ agentkit observe . --target codex --json > observe.json
 
 # Write observe.md, observe.json, and per-lane observe packets
 agentkit observe . --target codex --output-dir ./observe
+
+# Summarize local lane progress from saved launch artifacts and worktrees
+agentkit supervise . --json > supervise.json
+
+# Write supervise.md, supervise.json, and per-lane supervision packets
+agentkit supervise . --output-dir ./supervise
 ```
 
 The observe packet surfaces:
@@ -532,6 +538,13 @@ The observe packet surfaces:
 - explicit evidence for each lane from saved launch artifacts, materialize metadata, handoff packets, and optional `.agentkit/observe/result.json` files
 - top-level `observe.md` and `observe.json` plus per-lane packets under `lanes/<lane-id>/`
 - recommended next actions so an orchestrator can decide whether to wait, repair, merge, or relaunch without restitching lane state manually
+
+The supervision packet surfaces:
+- stable local-only states for each lane: `ready`, `running`, `waiting`, `blocked`, `completed`, and `drifted`
+- explicit reasons and next actions for missing worktrees, missing launch packets, dirty worktrees, detached HEAD, branch drift, and completed work
+- deterministic `supervise.md` and `supervise.json` plus per-lane supervision packets under `lanes/<lane-id>/`
+- newly unblocked serialized lanes surfaced clearly so the next safe local launch is obvious
+- local-only observational behavior, with no launch, kill, push, tag, publish, or remote mutation side effects
 
 Recommended full handoff lane:
 
@@ -553,6 +566,7 @@ agentkit materialize . --target codex --output-dir ./materialize
 agentkit launch . --target codex --output-dir ./launch
 cp ./launch/launch.json ./launch.json
 agentkit observe . --target codex --output-dir ./observe
+agentkit supervise . --output-dir ./supervise
 ```
 
 Recommended full dispatch lane:

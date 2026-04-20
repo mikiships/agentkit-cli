@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.15.0] - 2026-04-20
+
+### Added
+- Added `agentkit supervise` for deterministic post-launch local lane supervision from saved `launch.json` artifacts and local worktree state.
+- Added stable supervision markdown and JSON rendering, `--output`, `--output-dir`, `--launch-path`, and per-lane supervision packets.
+- Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch -> supervise`, serialized unblocking, missing worktrees, missing packets, dirty worktrees, and detached HEAD drift.
+
+### Docs
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `supervise` after `observe`, with this pass kept truthfully local release-ready and unreleased.
+
 ## [1.14.0] - 2026-04-20
 
 ### Added

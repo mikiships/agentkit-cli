@@ -1,26 +1,25 @@
-# Final Summary — agentkit-cli v1.14.0 observe lane outcomes
+# Final Summary — agentkit-cli v1.15.0 supervise restack
 
-Status: SHIPPED
+Status: RELEASE-READY
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.14.0-observe-lanes.md
+Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
 
 ## What completed in this pass
 
-- Added `agentkit observe` as the deterministic post-launch step for summarizing lane outcomes from saved launch artifacts and explicit local result packets.
-- Added schema-backed observe planning with stable statuses, lane evidence, recommended next actions, and reusable top-level plus per-lane observe packets.
-- Extended workflow coverage through `observe`, including success, failure, running, waiting, blocked, and unknown/manual lanes.
-- Completed the four-surface release checklist and reconciled release surfaces to truthful shipped `v1.14.0` chronology.
+- Restacked `agentkit supervise` cleanly onto the already shipped `v1.14.0` observe chronology instead of reusing the blocked `v1.14.0` supervise branch as release truth.
+- Added schema-backed local supervision with stable lane states, explicit reasons, next actions, and reusable top-level plus per-lane supervision packets.
+- Extended workflow coverage through `supervise`, while keeping shipped observe surfaces intact.
+- Updated local docs and version metadata to truthful unreleased `v1.15.0` release-ready status.
 
 ## Release truth
 
-- Branch: `feat/v1.14.0-observe-lanes`
-- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe`
-- Shipped release commit: `047707ede48157e9dbc8ca65cd578562aa04d029`
-- Shipped tag proof: `v1.14.0^{}` -> `047707ede48157e9dbc8ca65cd578562aa04d029`
-- Branch head was reconciled afterward with a docs-only chronology commit on `feat/v1.14.0-observe-lanes`
-- PyPI proof: `agentkit-cli==1.14.0` live at `https://pypi.org/project/agentkit-cli/1.14.0/` with both wheel and sdist listed in the version JSON
-- Final validation command results are recorded in `BUILD-REPORT.md` and `progress-log.md`, including the full-suite closeout at `4930 passed, 1 warning in 155.21s (0:02:35)`
+- Branch: `feat/v1.15.0-supervise-restack`
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise`
+- Base shipped chronology: `v1.14.0` is already shipped from the observe line
+- This repo state is local `v1.15.0` RELEASE-READY only
+- No push, tag, or publish was performed in this pass
+- Final validation details are recorded in `BUILD-REPORT.md` and `progress-log.md`
 
 ## Remaining blockers
 
-- None. `v1.14.0` is shipped.
+- None, if final validation remains green.
