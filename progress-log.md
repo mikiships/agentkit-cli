@@ -1,5 +1,19 @@
 # Progress Log — agentkit-cli v1.15.0 supervise restack
 
+## D2 complete: `agentkit supervise` CLI restacked onto shipped observe base
+
+**What changed:**
+- Added `agentkit_cli/commands/supervise_cmd.py` and wired `agentkit supervise` into `agentkit_cli/main.py` on top of the shipped observe line.
+- Preserved the read-only supervision surface with `--json`, `--output`, `--output-dir`, `--launch-path`, and stable format handling.
+- Kept `agentkit observe` intact and added `supervise` as the next adjacent command after it.
+
+**Validation:**
+- Pending targeted supervise test run after D3 workflow coverage lands.
+
+**Next:** restack focused supervise workflow and command regression coverage.
+
+---
+
 ## D1 complete: supervise engine restacked onto shipped v1.14.0 observe base
 
 **What changed:**
