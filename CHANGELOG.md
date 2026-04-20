@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.0] - 2026-04-20
+
+### Added
+- `agentkit source-audit` for deterministic canonical-source readiness checks before repo mapping and contract drafting.
+- Schema-backed audit output covering missing execution-critical sections, legacy fallback detection, ambiguity heuristics, contradiction hints, and contract-readiness summaries.
+- End-to-end `source -> source-audit -> map -> contract` workflow coverage alongside focused source-audit command tests.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the local v1.5.0 source-audit release-readiness handoff.
+
 ## [1.4.0] - 2026-04-20
 
 ### Added

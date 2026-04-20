@@ -1,5 +1,27 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.5.0 D3: docs, workflow handoff, and release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated README to document `agentkit source-audit` and the recommended `source -> source-audit -> map -> contract` lane.
+- Added `tests/test_source_audit_workflow.py` to cover a realistic canonical-source handoff through `source-audit`, `map`, and `contract`.
+- Bumped local release metadata to `1.5.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`.
+- Added the `1.5.0` changelog entry and rewrote `BUILD-REPORT.md` plus `BUILD-REPORT-v1.5.0.md` for truthful local release-readiness.
+
+**Validation:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_source_audit.py tests/test_source_cmd.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `33 passed in 5.26s`
+- `uv run --python 3.11 --with pytest pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_source_cmd.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `34 passed in 1.26s`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit` -> no contradictory success/blocker narratives found
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.5.0-source-audit` -> `Total findings: 0`
+
+**Current truth:**
+- D1 deterministic source-audit engine + schema: complete.
+- D2 CLI workflow + actionable rendering: complete.
+- D3 docs, workflow handoff, and release surfaces: complete.
+- Branch is release-ready locally for `v1.5.0`; no push, tag, or publish was attempted.
+
+**Next:** done.
+
 ## v1.5.0 D1-D2: source audit engine + CLI workflow — COMPLETE
 
 **Built:**

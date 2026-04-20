@@ -204,6 +204,36 @@ agentkit init --init-source --source-title "My Project" --project-targets claude
 agentkit init --promote-source --project-targets all --write-projections
 ```
 
+## `agentkit source-audit` — deterministic source readiness checks
+
+Use `agentkit source-audit` after you have a canonical source and before you draft a contract. It audits `.agentkit/source.md` first, falls back to a promoted legacy context file when needed, and calls out missing sections, weak constraints, ambiguity, and contradiction hints.
+
+```bash
+# Audit the current repo's canonical or fallback source
+agentkit source-audit .
+
+# Emit stable JSON for automation or CI
+agentkit source-audit . --json > source-audit.json
+
+# Save a markdown artifact for review
+agentkit source-audit . --format markdown --output source-audit.md
+```
+
+The audit surfaces:
+- objective, scope, constraints, validation, and deliverables coverage
+- explicit legacy fallback detection when `.agentkit/source.md` is missing
+- actionable findings with severity, evidence, and suggested fixes
+- a contract-readiness summary that tells you whether to tighten the source before handoff
+
+Recommended handoff lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit .
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+```
+
 ## `agentkit map` — deterministic repo explorer for agent work
 
 Use `agentkit map` when you need an explorer artifact before writing a build contract or assigning work in an unfamiliar repo.
@@ -229,13 +259,14 @@ The map surfaces:
 Recommended flow:
 
 ```bash
+agentkit source-audit .
 agentkit map . --json > repo-map.json
 agentkit contract "Ship the next repo-understanding increment" --map repo-map.json
 ```
 
 ## `agentkit contract` — deterministic build contracts with repo-map handoff
 
-Use `agentkit contract` when you want an explicit execution contract after analysis and repo exploration.
+Use `agentkit contract` when you want an explicit execution contract after source auditing and repo exploration.
 
 ```bash
 # Draft a contract directly from a live local repo map
