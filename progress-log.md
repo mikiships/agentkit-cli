@@ -10,7 +10,7 @@
 **Final checks:**
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> no contradictory success/blocker narratives found
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> `Total findings: 0`
-- `git ls-remote --heads origin feat/v1.7.0-taskpack-handoff` -> `2d3f6db66f6dc053633cc59ab49ba09bf377dc48 refs/heads/feat/v1.7.0-taskpack-handoff`
+- `git ls-remote --heads origin feat/v1.7.0-taskpack-handoff` -> confirmed the branch exists on `origin` and now points at a later chronology-reconciliation commit than the shipped tag
 - `git ls-remote --tags origin refs/tags/v1.7.0 refs/tags/v1.7.0^{}` -> annotated object `b1ea22d0cbea23e5548f41bc964eee344be4fca1`, peeled commit `a32b143422481591206511ec17ef810de29e0c4b`
 
 **Next:** done.
