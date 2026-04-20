@@ -8,7 +8,7 @@
 - Added regression coverage for `resolve -> dispatch -> stage -> materialize`, dry-run stability, serialized wait preservation, branch-collision failure handling, and target-specific handoff notes.
 
 ### Docs
-- README, progress, blocker, and build-report surfaces updated so the supported handoff lane now ends with `materialize` after `stage`, with local-only release-readiness for `1.12.0`.
+- README, progress, blocker, build-report, and final-summary surfaces updated so the supported handoff lane now ends with `materialize` after `stage`, with shipped `v1.12.0` chronology reconciled across branch, tag, and PyPI truth.
 
 ## [1.11.0] - 2026-04-20
 

@@ -112,6 +112,26 @@
 
 **Next:** D5 shipped chronology reconciliation.
 
+## v1.12.0 release completion D5: shipped release reconciliation — COMPLETE
+
+**Reconciled:**
+- Updated the shipped report surfaces so `BUILD-REPORT.md`, `BUILD-REPORT-v1.12.0.md`, `FINAL-SUMMARY.md`, `CHANGELOG.md`, and this progress log now tell one shipped story for `v1.12.0`.
+- Preserved the chronology split explicitly: the shipped artifact is pinned by annotated tag `v1.12.0` at `9e1e1440f01e557857c84b4ac00a405f3e51f505`, while later branch movement after that tag is docs-only chronology cleanup.
+- Left the repo clean apart from the intentional release contract file and the intentional `.release-build/v1.12.0-from-tag/` verification worktree used to prove the shipped registry artifacts from the tag checkout.
+
+**Validation:**
+- `git rev-parse v1.12.0^{}` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+- `python3` registry proof parse from `https://pypi.org/pypi/agentkit-cli/1.12.0/json` -> version `1.12.0`, files `agentkit_cli-1.12.0-py3-none-any.whl`, `agentkit_cli-1.12.0.tar.gz`
+- `HEAD https://pypi.org/project/agentkit-cli/1.12.0/` -> `200`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> `Total findings: 0` before the intentional tag-build worktree was recreated for registry proof
+
+**Current truth:**
+- `agentkit-cli v1.12.0` is shipped.
+- The tested release commit remains `9e1e1440f01e557857c84b4ac00a405f3e51f505`.
+- Any branch head later than that tag is docs-only chronology cleanup, not a different shipped artifact.
+
+**Next:** done.
+
 ## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
 
 **Built:**
