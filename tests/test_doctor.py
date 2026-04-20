@@ -222,12 +222,18 @@ def test_run_doctor_summary_counts(tmp_path: Path, monkeypatch) -> None:
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_toolchain), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
          patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_history_db_has_data") as mock_hd, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
          patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta, \
          patch("agentkit_cli.doctor.check_hooks_installed") as mock_hi, \
          patch("agentkit_cli.doctor.check_api_reachable") as mock_api:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_hd.return_value = _pass_check("history.data", "history")
+        mock_sga.return_value = _pass_check("spotlight.github_api", "spotlight")
         mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
+        mock_hta.return_value = _pass_check("hot.trending_access", "hot")
         mock_hi.return_value = _pass_check("hooks.installed", "hooks")
         mock_api.return_value = _pass_check("api.reachable", "api")
         report = run_doctor(tmp_path)
@@ -242,8 +248,12 @@ def test_doctor_cli_exit_zero_for_warn_only(tmp_path: Path, monkeypatch) -> None
     monkeypatch.chdir(tmp_path)
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=[]), \
-         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf:
+         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta:
         mock_cf.return_value = _pass_check("context.freshness", "context")
+        mock_sga.return_value = _warn_check("spotlight.github_api", "spotlight")
+        mock_hta.return_value = _warn_check("hot.trending_access", "hot")
         result = runner.invoke(app, ["doctor"])
 
     assert result.exit_code == 0
@@ -278,8 +288,12 @@ def test_doctor_cli_human_output_contains_core_checks(tmp_path: Path, monkeypatc
     ]
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_toolchain), \
-         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf:
+         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta:
         mock_cf.return_value = _pass_check("context.freshness", "context")
+        mock_sga.return_value = _pass_check("spotlight.github_api", "spotlight")
+        mock_hta.return_value = _warn_check("hot.trending_access", "hot")
         result = runner.invoke(app, ["doctor"])
 
     assert "Git repository" in result.output
@@ -306,12 +320,18 @@ def test_doctor_cli_json_payload_uses_same_model(tmp_path: Path, monkeypatch) ->
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_toolchain), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
          patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_history_db_has_data") as mock_hd, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
          patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta, \
          patch("agentkit_cli.doctor.check_hooks_installed") as mock_hi, \
          patch("agentkit_cli.doctor.check_api_reachable") as mock_api:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_hd.return_value = _pass_check("history.data", "history")
+        mock_sga.return_value = _pass_check("spotlight.github_api", "spotlight")
         mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
+        mock_hta.return_value = _pass_check("hot.trending_access", "hot")
         mock_hi.return_value = _pass_check("hooks.installed", "hooks")
         mock_api.return_value = _pass_check("api.reachable", "api")
         result = runner.invoke(app, ["doctor", "--json"])
@@ -327,8 +347,12 @@ def test_doctor_cli_json_exit_code_tracks_failures(tmp_path: Path, monkeypatch) 
     monkeypatch.chdir(tmp_path)
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=[]), \
-         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf:
+         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta:
         mock_cf.return_value = _pass_check("context.freshness", "context")
+        mock_sga.return_value = _warn_check("spotlight.github_api", "spotlight")
+        mock_hta.return_value = _warn_check("hot.trending_access", "hot")
         result = runner.invoke(app, ["doctor", "--json"])
 
     assert result.exit_code == 1
@@ -695,8 +719,12 @@ def test_doctor_fail_on_warn_exits_1_when_warns_present(tmp_path: Path, monkeypa
     monkeypatch.chdir(tmp_path)
 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=[]), \
-         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf:
+         patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta:
         mock_cf.return_value = _pass_check("context.freshness", "context")
+        mock_sga.return_value = _warn_check("spotlight.github_api", "spotlight")
+        mock_hta.return_value = _warn_check("hot.trending_access", "hot")
         result = runner.invoke(app, ["doctor", "--fail-on", "warn"])
 
     assert result.exit_code == 1
@@ -718,12 +746,18 @@ def test_doctor_fail_on_warn_exits_0_when_all_pass(tmp_path: Path, monkeypatch) 
     with patch("agentkit_cli.doctor.check_toolchain", return_value=all_pass_tc), \
          patch("agentkit_cli.doctor.check_context_freshness") as mock_cf, \
          patch("agentkit_cli.doctor.check_redteam_recency") as mock_rt, \
+         patch("agentkit_cli.doctor.check_history_db_has_data") as mock_hd, \
+         patch("agentkit_cli.doctor.check_spotlight_github_access") as mock_sga, \
          patch("agentkit_cli.doctor.check_spotlight_queue") as mock_sq, \
+         patch("agentkit_cli.doctor.check_hot_trending_access") as mock_hta, \
          patch("agentkit_cli.doctor.check_hooks_installed") as mock_hi, \
          patch("agentkit_cli.doctor.check_api_reachable") as mock_api:
         mock_cf.return_value = _pass_check("context.freshness", "context")
         mock_rt.return_value = _pass_check("context.redteam_recency", "context")
+        mock_hd.return_value = _pass_check("history.data", "history")
+        mock_sga.return_value = _pass_check("spotlight.github_api", "spotlight")
         mock_sq.return_value = _pass_check("spotlight.queue", "spotlight")
+        mock_hta.return_value = _pass_check("hot.trending_access", "hot")
         mock_hi.return_value = _pass_check("hooks.installed", "hooks")
         mock_api.return_value = _pass_check("api.reachable", "api")
         result = runner.invoke(app, ["doctor", "--fail-on", "warn"])

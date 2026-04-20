@@ -125,6 +125,7 @@ class TestApiRunsEndpoint:
     def test_api_runs_endpoint(self, tmp_path):
         """GET /api/runs returns JSON array with run data."""
         from agentkit_cli.serve import AgenkitDashboard, SseBroker
+        import socket
 
         db = self._make_db(tmp_path)
         broker = SseBroker()
@@ -135,14 +136,22 @@ class TestApiRunsEndpoint:
         )
 
         # Use a free port
-        server = HTTPServer(("localhost", 0), handler_class)
+        host = "localhost"
+        try:
+            server = HTTPServer((host, 0), handler_class)
+        except PermissionError:
+            host = "127.0.0.1"
+            try:
+                server = HTTPServer((host, 0), handler_class)
+            except PermissionError:
+                pytest.skip("loopback socket bind unavailable in sandbox")
         port = server.server_address[1]
 
         t = threading.Thread(target=server.handle_request)
         t.start()
 
         import urllib.request
-        url = f"http://localhost:{port}/api/runs"
+        url = f"http://{host}:{port}/api/runs"
         resp = urllib.request.urlopen(url, timeout=5)
         data = json.loads(resp.read())
 

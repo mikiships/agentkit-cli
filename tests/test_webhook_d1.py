@@ -71,7 +71,10 @@ def test_verify_signature_tampered_payload():
 def _find_free_port() -> int:
     import socket
     with socket.socket() as s:
-        s.bind(("", 0))
+        try:
+            s.bind(("", 0))
+        except PermissionError:
+            pytest.skip("loopback socket bind unavailable in sandbox")
         return s.getsockname()[1]
 
 

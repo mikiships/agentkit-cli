@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import textwrap
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -173,7 +173,8 @@ def test_daily_duel_engine_passes_existing_to_repo_engine(tmp_path):
 
     engine = DailyDuelEngine(existing=True, _analyze_factory=fake_factory)
     # Use seed that gives ruff vs pylint
-    result = engine.run_daily_duel(seed="2026-03-21")
+    with patch("agentkit_cli.daily_duel._write_latest_json"):
+        result = engine.run_daily_duel(seed="2026-03-21")
     # Should have called analyze for both repos
     assert len(analyze_modes) == 2
 
@@ -189,7 +190,8 @@ def test_daily_duel_result_is_not_draw_with_different_scores():
         return r
 
     engine = DailyDuelEngine(existing=True, _analyze_factory=fake_factory)
-    result = engine.run_daily_duel(seed="2026-03-21")
+    with patch("agentkit_cli.daily_duel._write_latest_json"):
+        result = engine.run_daily_duel(seed="2026-03-21")
     # Both repos have different scores
     assert result.repo1_score != result.repo2_score
     assert result.winner != "draw"

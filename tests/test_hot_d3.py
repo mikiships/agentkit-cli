@@ -60,8 +60,11 @@ def test_post_hot_sh_dry_run_exits_0(tmp_path, monkeypatch):
     fake_jq.write_text("#!/usr/bin/env bash\necho '{}'\n")
     fake_jq.chmod(0o755)
 
-    env = os.environ.copy()
-    env["PATH"] = str(tmp_path) + ":" + env.get("PATH", "")
+    env = {
+        "HOME": str(tmp_path),
+        "XDG_DATA_HOME": str(tmp_path / ".local" / "share"),
+        "PATH": str(tmp_path) + ":" + os.environ.get("PATH", ""),
+    }
 
     result = subprocess.run(
         ["bash", str(SCRIPT_PATH), "--dry-run"],
@@ -83,8 +86,11 @@ def test_post_hot_sh_dry_run_prints_tweet(tmp_path):
     fake_jq.write_text("#!/usr/bin/env bash\necho '{}'\n")
     fake_jq.chmod(0o755)
 
-    env = os.environ.copy()
-    env["PATH"] = str(tmp_path) + ":" + env.get("PATH", "")
+    env = {
+        "HOME": str(tmp_path),
+        "XDG_DATA_HOME": str(tmp_path / ".local" / "share"),
+        "PATH": str(tmp_path) + ":" + os.environ.get("PATH", ""),
+    }
 
     result = subprocess.run(
         ["bash", str(SCRIPT_PATH), "--dry-run"],

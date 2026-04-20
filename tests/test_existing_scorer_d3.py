@@ -8,7 +8,7 @@ Verifies:
 """
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -124,7 +124,8 @@ def test_daily_duel_engine_existing_mode_tweet_not_100(monkeypatch):
         return r
 
     engine = DailyDuelEngine(existing=True, _analyze_factory=fake_factory)
-    result = engine.run_daily_duel(seed="2026-03-21")
+    with patch("agentkit_cli.daily_duel._write_latest_json"):
+        result = engine.run_daily_duel(seed="2026-03-21")
     assert "100/100" not in result.tweet_text
     assert "both score" not in result.tweet_text.lower()
 
@@ -140,7 +141,8 @@ def test_daily_duel_existing_mode_tweet_shows_winner():
         return r
 
     engine = DailyDuelEngine(existing=True, _analyze_factory=fake_factory)
-    result = engine.run_daily_duel(seed="2026-03-21")
+    with patch("agentkit_cli.daily_duel._write_latest_json"):
+        result = engine.run_daily_duel(seed="2026-03-21")
     assert result.winner != "draw"
     assert "draw of champions" not in result.tweet_text
 
