@@ -503,3 +503,16 @@
 **Tests:** `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `29 passed in 6.32s`
 
 **Next:** D2 CLI wiring and portable markdown rendering.
+
+---
+
+## D2: `agentkit bundle` CLI workflow — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/bundle_cmd.py` plus `agentkit bundle <path>` wiring in `agentkit_cli/main.py`.
+- Added portable markdown output with sections for source, source audit, architecture map, execution contract, and open gaps, plus `--json` for stable machine-readable output.
+- Kept partial upstream availability explicit by surfacing a saved-contract gap while still including the deterministic map handoff prompt fallback.
+
+**Tests:** `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `29 passed in 6.32s`
+
+**Next:** D3 docs, versioning, reports, and final validation.

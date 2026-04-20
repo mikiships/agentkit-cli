@@ -93,6 +93,7 @@ from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
 from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.commands.map_cmd import map_command
+from agentkit_cli.commands.bundle_cmd import bundle_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1317,6 +1318,17 @@ def source_audit(
 ) -> None:
     """Audit canonical source structure before map and contract generation."""
     source_audit_command(path=path, json_output=json_output, output=output, format=format)
+
+
+@app.command("bundle")
+def bundle(
+    path: str = typer.Argument(..., help="Project directory to bundle for handoff"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the bundle to this file"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Assemble a portable source, audit, map, and contract handoff bundle."""
+    bundle_command(path=path, json_output=json_output, output=output, format=format)
 
 
 @app.command("contract")
