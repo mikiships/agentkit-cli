@@ -617,3 +617,24 @@
 
 **Next:**
 - Run the contract-required recall, contradiction, hygiene, and full-suite checks on the final repo state.
+
+
+## v1.13.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated `README.md` so the supported handoff lane now ends with `launch` after `materialize`, including dry-run planning, packet-directory output, and explicit local `--execute` examples.
+- Reconciled `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, and `blocker-report-v1.13.0-launch-lanes.md` so they now tell one truthful local `RELEASE-READY` story for `1.13.0`.
+- Preserved the safety boundary for this pass: no push, tag, publish, or remote mutation, with the earlier linked-worktree blocker retained only as resolved historical context.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> no contradictory success/blocker narratives found
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4920 passed in 155.55s (0:02:35)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.13.0-launch-lanes` -> first run found `.agentkit-last-run.json`; after cleanup, rerun passed with `Total findings: 0`
+
+**Current truth:**
+- D1-D5 are complete.
+- Repo state is local `RELEASE-READY`.
+- The linked-worktree metadata write blocker is resolved for this pass.
+
+**Next:** done.
