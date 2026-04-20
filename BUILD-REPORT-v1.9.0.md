@@ -2,7 +2,7 @@
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Status: RELEASE-READY, LOCAL-ONLY
+Status: SHIPPED
 
 ## What changed in this pass
 
@@ -14,11 +14,21 @@ Status: RELEASE-READY, LOCAL-ONLY
 
 ## Validation summary
 
-- Focused resolve workflow slice passed: `52 passed in 2.12s`, covering deterministic engine ordering, CLI rendering, output directories, full-lane integration, incomplete answers, contradiction pauses, clarify compatibility, version CLI output, and release-report guardrails.
-- Full pytest suite passed locally from this repo state under Python 3.11 with the required extras: `4870 passed, 1 warning in 139.47s (0:02:19)`.
+- Focused resolve workflow slice passed at the release commit: `52 passed in 2.11s`, covering deterministic engine ordering, CLI rendering, output directories, full-lane integration, incomplete answers, contradiction pauses, clarify compatibility, version CLI output, and release-report guardrails.
+- Full pytest suite passed from the release commit under Python 3.11 with the required extras: `4870 passed, 1 warning in 141.11s (0:02:21)`.
 - Status-conflict scan passed with no contradictory success or blocker narratives.
+- Git release verification passed: origin branch and peeled `v1.9.0` tag both matched `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`.
 - Post-agent hygiene check passed with zero findings.
 
 ## Truthful release status
 
-`agentkit-cli v1.9.0` is local `RELEASE-READY`. The resolve lane, focused workflow slice, full supported pytest suite, contradiction scan, and hygiene check all passed from the current local repo state. This pass intentionally stopped before any push, tag, or PyPI publish step.
+`agentkit-cli v1.9.0` is `SHIPPED`.
+
+- Release commit: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- Origin branch: `origin/feat/v1.9.0-resolve-loop` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- Annotated tag: `v1.9.0` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- Focused release slice at the release commit: `52 passed in 2.11s`
+- Full supported pytest suite at the release commit: `4870 passed, 1 warning in 141.11s (0:02:21)`
+- Build artifacts: `dist/agentkit_cli-1.9.0.tar.gz` and `dist/agentkit_cli-1.9.0-py3-none-any.whl`
+- PyPI live proof: `https://pypi.org/project/agentkit-cli/1.9.0/` returned `HTTP/2 200`
+- Registry JSON proof: `https://pypi.org/pypi/agentkit-cli/1.9.0/json` returned `HTTP/2 200` and listed both published artifacts

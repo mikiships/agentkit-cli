@@ -21,6 +21,49 @@
 
 **Next:** D3 git release surfaces.
 
+## v1.9.0 release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Reconciled:**
+- Built fresh `1.9.0` distribution artifacts from the shipped release commit with `uv build`.
+- Published `agentkit-cli==1.9.0` with the supported authenticated local path via `twine upload`.
+- Verified live PyPI truth directly from version-specific surfaces instead of trusting the upload exit code.
+- Prepared final shipped chronology so local reports match origin refs and the live registry.
+
+**Validation:**
+- `uv build` -> `dist/agentkit_cli-1.9.0.tar.gz` and `dist/agentkit_cli-1.9.0-py3-none-any.whl`
+- `twine upload dist/agentkit_cli-1.9.0.tar.gz dist/agentkit_cli-1.9.0-py3-none-any.whl` -> success
+- `curl -I https://pypi.org/project/agentkit-cli/1.9.0/` -> `HTTP/2 200`
+- `curl -I https://pypi.org/pypi/agentkit-cli/1.9.0/json` -> `HTTP/2 200`
+- version-specific JSON listed both `agentkit_cli-1.9.0.tar.gz` and `agentkit_cli-1.9.0-py3-none-any.whl`
+
+**Current truth:**
+- PyPI is live for `agentkit-cli==1.9.0`.
+- Both required artifacts are present on the registry.
+- Remaining work is final chronology reconciliation and hygiene verification only.
+
+**Next:** D5 final chronology reconciliation.
+
+## v1.9.0 release completion D3: git release surfaces — COMPLETE
+
+**Reconciled:**
+- Pushed the release branch to origin only after the current HEAD was re-tested.
+- Created the annotated `v1.9.0` tag at the tested release commit.
+- Verified the remote branch ref and peeled remote tag ref from source-of-truth origin surfaces.
+
+**Validation:**
+- `git push -u origin feat/v1.9.0-resolve-loop` -> success
+- `git tag -a v1.9.0 -m "agentkit-cli v1.9.0"` -> created locally
+- `git push origin v1.9.0` -> success
+- `git ls-remote --heads origin feat/v1.9.0-resolve-loop` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- `git ls-remote --tags origin refs/tags/v1.9.0^{}` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+
+**Current truth:**
+- Origin branch and annotated tag both point to the tested release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`.
+- Git release surfaces are externally verified.
+- PyPI publish is the only remaining irreversible surface.
+
+**Next:** D4 PyPI publish and registry verification.
+
 ## v1.9.0 D4: release-readiness pass — COMPLETE
 
 **Reconciled:**
