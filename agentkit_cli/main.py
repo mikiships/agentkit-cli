@@ -101,6 +101,7 @@ from agentkit_cli.commands.dispatch_cmd import dispatch_command
 from agentkit_cli.commands.stage_cmd import stage_command
 from agentkit_cli.commands.materialize_cmd import materialize_command
 from agentkit_cli.commands.launch_cmd import launch_command
+from agentkit_cli.commands.observe_cmd import observe_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1446,6 +1447,26 @@ def launch(
         output=output,
         output_dir=output_dir,
         execute=execute,
+        format=format,
+    )
+
+
+@app.command("observe")
+def observe(
+    path: str = typer.Argument(..., help="Project directory to observe after launch"),
+    target: Optional[str] = typer.Option(None, "--target", help="Optional target validation override: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered observe plan to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write observe.md, observe.json, and per-lane observe packets to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Observe deterministic lane outcomes from saved launch artifacts and local lane evidence."""
+    observe_command(
+        path=path,
+        target=target,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
         format=format,
     )
 

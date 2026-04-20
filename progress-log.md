@@ -31,3 +31,17 @@
 - `pytest -q tests/test_observe_engine.py` -> passed (4 tests)
 
 **Next:** wire the `agentkit observe` CLI command and stable markdown/JSON rendering surfaces for D2.
+
+---
+
+## D2 complete: CLI wiring and stable markdown/JSON rendering
+
+**What changed:**
+- Added `agentkit_cli/commands/observe_cmd.py` and registered `agentkit observe` in `agentkit_cli/main.py`.
+- Exposed stable markdown and JSON rendering for observe plans, including per-lane evidence, summary counts, and recommended next actions.
+- Added clear target-mismatch and malformed-evidence failures through the new command surface.
+
+**Validation:**
+- `pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py` -> passed (7 tests)
+
+**Next:** verify top-level and per-lane packet directory output for D3.
