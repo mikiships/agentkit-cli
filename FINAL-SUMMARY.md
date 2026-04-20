@@ -16,8 +16,8 @@ Contract: all-day-build-contract-agentkit-cli-v1.14.0-observe-lanes.md
 - Branch: `feat/v1.14.0-observe-lanes`
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe`
 - Shipped release commit: `047707ede48157e9dbc8ca65cd578562aa04d029`
-- Remote branch proof: `origin/feat/v1.14.0-observe-lanes` -> `047707ede48157e9dbc8ca65cd578562aa04d029`
 - Shipped tag proof: `v1.14.0^{}` -> `047707ede48157e9dbc8ca65cd578562aa04d029`
+- Branch head was reconciled afterward with a docs-only chronology commit on `feat/v1.14.0-observe-lanes`
 - PyPI proof: `agentkit-cli==1.14.0` live at `https://pypi.org/project/agentkit-cli/1.14.0/` with both wheel and sdist listed in the version JSON
 - Final validation command results are recorded in `BUILD-REPORT.md` and `progress-log.md`, including the full-suite closeout at `4930 passed, 1 warning in 155.21s (0:02:35)`
 
