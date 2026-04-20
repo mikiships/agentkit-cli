@@ -1,5 +1,26 @@
 # Progress Log — agentkit-cli v1.12.0 materialize worktrees
 
+## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
+
+**Built:**
+- Updated `README.md` so the supported handoff lane now ends with `materialize` after `stage`, including dry-run and real local materialization examples.
+- Updated `CHANGELOG.md`, `agentkit_cli/__init__.py`, `pyproject.toml`, `tests/test_main.py`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.12.0.md`, and the blocker/progress surfaces for the local `1.12.0` release-ready state.
+- Reconciled the previous sandbox-only blocker narrative into a resolved historical note and kept the release story local-only: no agent spawning, no remote repo mutation, and no publish actions.
+
+**Validation:**
+- `uv sync` -> created `.venv` with the declared dev/test dependencies for `agentkit-cli==1.12.0`
+- `.venv/bin/python -m pytest tests/ -x` -> `4903 passed, 1 warning in 221.97s (0:03:41)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> no contradictory success/blocker narratives found
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.12.0-materialize-worktrees` -> `Total findings: 0`
+
+**Current truth:**
+- D1-D5 are complete.
+- The supported local handoff lane is `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize`.
+- Repo state is local `RELEASE-READY` once the final docs/report commit lands from this pass, with no remaining blocker for the materialize scope.
+
+**Next:** done.
+
 ## v1.12.0 unblock: linked-worktree git metadata writes restored — COMPLETE
 
 **Resolved:**
@@ -8,7 +29,7 @@
 
 **Current truth:**
 - Local feature commits can now be created from this worktree.
-- The remaining work is release-surface cleanup plus final full-suite and hygiene validation.
+- The historical stop condition is resolved and no longer blocks this branch.
 
 ## v1.12.0 D4: regression + edge-case coverage — COMPLETE
 

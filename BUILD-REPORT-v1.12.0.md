@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v1.12.0 materialize worktrees
+# BUILD-REPORT-v1.12.0.md — agentkit-cli v1.12.0 materialize worktrees
 
 Status: RELEASE-READY (LOCAL)
 Date: 2026-04-20
@@ -6,9 +6,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.12.0-materialize-worktrees.md
 
 ## Summary
 
-- Built `agentkit materialize` as the deterministic post-stage step for local worktree creation.
-- The command reads a saved `stage.json`, preserves serialized waiting lanes, refuses unsafe branch or path collisions, creates eligible local git worktrees, and seeds `.agentkit/materialize/` handoff directories per lane.
-- The previous linked-worktree sandbox blocker is resolved in this unsandboxed continuation pass, local feature commits now work normally, and the branch is release-ready locally without any remote mutation or publish step.
+Built `agentkit materialize` as the deterministic post-stage step for local worktree creation. The command reads a saved `stage.json`, preserves serialized waiting lanes, refuses unsafe collisions, creates eligible local git worktrees, and seeds `.agentkit/materialize/` handoff directories per lane.
 
 ## Deliverables
 

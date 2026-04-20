@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.12.0] - 2026-04-20
+
+### Added
+- Added `agentkit materialize` for deterministic local worktree creation from a saved `stage.json`, with dry-run planning, collision refusal, serialized waiting lanes, and local-only `git worktree add` execution.
+- Added seeded `.agentkit/materialize/` handoff directories inside each created worktree, including copied lane `stage.json`, copied `stage.md`, machine-readable `materialize.json`, and target-aware `handoff.md`.
+- Added regression coverage for `resolve -> dispatch -> stage -> materialize`, dry-run stability, serialized wait preservation, branch-collision failure handling, and target-specific handoff notes.
+
+### Docs
+- README, progress, blocker, and build-report surfaces updated so the supported handoff lane now ends with `materialize` after `stage`, with local-only release-readiness for `1.12.0`.
+
 ## [1.11.0] - 2026-04-20
 
 ### Added

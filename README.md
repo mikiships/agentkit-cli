@@ -464,6 +464,29 @@ The stage packet surfaces:
 - serialized phase notes when a lane must wait on an earlier overlapping lane
 - target-aware stage notes for `generic`, `codex`, and `claude-code`
 
+## `agentkit materialize` — deterministic local worktree creation from stage
+
+Use `agentkit materialize` after `stage` when you want to turn the saved staging packet into real local git worktrees and builder-ready handoff directories without spawning agents or mutating remotes.
+
+```bash
+# Preview the local worktree plan without touching git state
+agentkit materialize . --target codex --dry-run
+
+# Emit stable JSON for orchestration or CI
+agentkit materialize . --target codex --dry-run --json > materialize-plan.json
+
+# Create eligible local worktrees and save a markdown/JSON report
+agentkit materialize . --target codex --output-dir ./materialize
+```
+
+The materialize packet surfaces:
+- deterministic local branch names and worktree paths derived from the saved stage packet
+- collision refusal for existing branch names, registered worktrees, and pre-existing paths
+- explicit waiting lanes when serialized overlap must finish before the next worktree can be created
+- seeded `.agentkit/materialize/` handoff files inside each created worktree
+- target-aware notes preserved for `generic`, `codex`, and `claude-code`
+- local-only behavior: no agent spawning, no publish flow, and no remote repo mutation
+
 Recommended full handoff lane:
 
 ```bash
@@ -479,6 +502,8 @@ cp ./resolve/resolve.json ./resolve.json
 agentkit dispatch . --target codex --output-dir ./dispatch
 cp ./dispatch/dispatch.json ./dispatch.json
 agentkit stage . --target codex --output-dir ./stage
+agentkit materialize . --target codex --dry-run --output-dir ./materialize-plan
+agentkit materialize . --target codex --output-dir ./materialize
 ```
 
 Recommended full dispatch lane:
@@ -494,6 +519,23 @@ agentkit clarify . --target codex --output-dir ./clarify
 agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
 cp ./resolve/resolve.json ./resolve.json
 agentkit dispatch . --target codex --output-dir ./dispatch
+```
+
+Recommended full stage lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+agentkit resolve . --answers ./answers.json --target codex --output-dir ./resolve
+cp ./resolve/resolve.json ./resolve.json
+agentkit dispatch . --target codex --output-dir ./dispatch
+cp ./dispatch/dispatch.json ./dispatch.json
+agentkit stage . --target codex --output-dir ./stage
 ```
 
 ## `agentkit llmstxt` — AI-Accessible Documentation
