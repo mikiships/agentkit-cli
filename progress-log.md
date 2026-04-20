@@ -45,3 +45,17 @@
 - `pytest -q tests/test_observe_engine.py tests/test_observe_cmd.py` -> passed (7 tests)
 
 **Next:** verify top-level and per-lane packet directory output for D3.
+
+---
+
+## D3 complete: portable observe packet directory output
+
+**What changed:**
+- Verified `ObserveEngine.write_directory()` writes deterministic `observe.md`, `observe.json`, and per-lane `lanes/<lane-id>/observe.md|json` packets.
+- Ensured each lane packet preserves explicit evidence plus a concrete recommended next action for orchestration handoff.
+- Added dedicated packet-directory regression coverage.
+
+**Validation:**
+- `pytest -q tests/test_observe_packets.py` -> passed (1 test)
+
+**Next:** add end-to-end workflow and edge-case coverage for D4.
