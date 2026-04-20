@@ -1,5 +1,33 @@
 # Progress Log — agentkit-cli v1.15.0 supervise restack
 
+## D4 complete: supervise workflow and edge-case coverage restacked
+
+**What changed:**
+- Added focused `resolve -> dispatch -> stage -> materialize -> launch -> supervise` workflow coverage in `tests/test_supervise_workflow.py`.
+- Preserved completed-lane detection and post-launch supervision expectations on top of the shipped observe base.
+- Kept the supervise test slice additive, without removing or rewriting shipped observe workflow coverage.
+
+**Validation:**
+- Pending restack-wide targeted test run after docs/version surfaces are updated.
+
+**Next:** update truthful unreleased `v1.15.0` docs, version, and release-readiness surfaces.
+
+---
+
+## D3 complete: supervision packet and command coverage restacked
+
+**What changed:**
+- Preserved deterministic `supervise.md` and `supervise.json` output plus per-lane supervision packets.
+- Added focused CLI coverage for `--output-dir`, `--launch-path`, and help output in `tests/test_supervise_cmd.py`.
+- Kept single-lane and multi-lane supervision output stable on the shipped observe base.
+
+**Validation:**
+- Pending targeted supervise test run after docs/version surfaces are updated.
+
+**Next:** restack focused supervise workflow coverage.
+
+---
+
 ## D2 complete: `agentkit supervise` CLI restacked onto shipped observe base
 
 **What changed:**
