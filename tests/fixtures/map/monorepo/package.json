@@ -1,0 +1,13 @@
+{
+  "name": "fixture-monorepo",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
+  },
+  "bin": {
+    "fixture-map": "packages/app/index.js"
+  }
+}

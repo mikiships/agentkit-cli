@@ -90,6 +90,7 @@ from agentkit_cli.commands.pages_refresh import pages_refresh_command
 from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
 from agentkit_cli.commands.burn import burn_command
+from agentkit_cli.commands.map_cmd import map_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -267,6 +268,17 @@ def burn(
 ) -> None:
     """Analyze local coding-session transcript burn and waste patterns."""
     burn_command(path=path, format=format, since=since, limit=limit, project=project, output=output)
+
+
+@app.command("map")
+def map_repo(
+    target: str = typer.Argument(..., help="Target: local path first-class, plus github:owner/repo shorthand"),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write rendered output to file"),
+    format: str = typer.Option("text", "--format", help="Output format: text|markdown|json"),
+) -> None:
+    """Generate a deterministic explorer-style repo map."""
+    map_command(target=target, json_output=json_output, output=output, format=format)
 
 
 @app.command("doctor")

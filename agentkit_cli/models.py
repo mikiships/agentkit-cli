@@ -119,3 +119,121 @@ class OptimizeSweepResult:
             "summary": self.summary.to_dict(),
             "results": [item.to_dict() for item in self.results],
         }
+
+
+@dataclass
+class RepoMapSummary:
+    name: str
+    root: str
+    total_files: int
+    total_dirs: int
+    primary_language: Optional[str] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapImportantPath:
+    path: str
+    kind: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapEntryPoint:
+    path: str
+    kind: str
+    reason: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapScript:
+    name: str
+    command: str
+    source: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapTestSurface:
+    path: str
+    kind: str
+    related_area: Optional[str] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapSubsystem:
+    name: str
+    path: str
+    why: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapHint:
+    kind: str
+    severity: str
+    title: str
+    detail: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMapContractHandoff:
+    suggested_artifact: str
+    summary_lines: list[str] = field(default_factory=list)
+    contract_prompt: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class RepoMap:
+    target: str
+    target_kind: str
+    resolved_path: Optional[str]
+    repo_slug: Optional[str]
+    summary: RepoMapSummary
+    languages: list[dict[str, Any]] = field(default_factory=list)
+    important_paths: list[RepoMapImportantPath] = field(default_factory=list)
+    entrypoints: list[RepoMapEntryPoint] = field(default_factory=list)
+    scripts: list[RepoMapScript] = field(default_factory=list)
+    tests: list[RepoMapTestSurface] = field(default_factory=list)
+    subsystems: list[RepoMapSubsystem] = field(default_factory=list)
+    hints: list[RepoMapHint] = field(default_factory=list)
+    risks: list[RepoMapHint] = field(default_factory=list)
+    contract_handoff: RepoMapContractHandoff = field(default_factory=lambda: RepoMapContractHandoff(suggested_artifact='map.json'))
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'target': self.target,
+            'target_kind': self.target_kind,
+            'resolved_path': self.resolved_path,
+            'repo_slug': self.repo_slug,
+            'summary': self.summary.to_dict(),
+            'languages': list(self.languages),
+            'important_paths': [item.to_dict() for item in self.important_paths],
+            'entrypoints': [item.to_dict() for item in self.entrypoints],
+            'scripts': [item.to_dict() for item in self.scripts],
+            'tests': [item.to_dict() for item in self.tests],
+            'subsystems': [item.to_dict() for item in self.subsystems],
+            'hints': [item.to_dict() for item in self.hints],
+            'risks': [item.to_dict() for item in self.risks],
+            'contract_handoff': self.contract_handoff.to_dict(),
+        }

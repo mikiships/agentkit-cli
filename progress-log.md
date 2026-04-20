@@ -175,3 +175,17 @@
 
 
 **Final validation:** `uv run --python 3.11 --extra api --with pytest pytest -q` -> `4823 passed, 1 warning in 130.20s (0:02:10)`
+
+---
+
+## D1: core map engine + schema — COMPLETE
+
+**Built:**
+- Added deterministic repo-map schema models for summary, important paths, entrypoints, scripts, tests, subsystems, hints, risks, and contract handoff.
+- Added `agentkit_cli/map_engine.py` with offline-safe local repo walking, stable ordering, junk-directory ignores, language counting, entrypoint/script/test detection, subsystem inference, and explainable hints.
+- Added targeted map fixtures covering a basic Python repo, a workspace-style monorepo, a script-heavy repo, and an empty repo.
+- Added D1-focused tests for fixture mapping, ignored junk directories, empty repos, and local paths with spaces.
+
+**Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py` -> `17 passed in 1.29s`
+
+**Next:** D2 command surface tightening, then D3/D4 docs and handoff polish.
