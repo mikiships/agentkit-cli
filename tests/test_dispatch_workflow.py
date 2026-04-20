@@ -168,3 +168,94 @@ def test_dispatch_json_output_is_schema_stable(tmp_path):
         "runner",
         "stop_conditions",
     ]
+
+
+def test_dispatch_forces_pause_when_saved_resolve_has_blockers(tmp_path):
+    project = tmp_path / "paused-repo"
+    _write_repo(project)
+    (project / "resolve.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "agentkit.resolve.v1",
+                "project_path": str(project),
+                "answers_path": str(project / "answers.json"),
+                "execution_recommendation": "proceed",
+                "recommendation_reason": "Resolve asked to proceed, but blockers remain.",
+                "resolved_questions": [],
+                "remaining_blockers": [
+                    {
+                        "code": "missing_policy",
+                        "title": "Missing policy answer",
+                        "status": "unanswered",
+                        "answer": "",
+                        "source_section": "blocking_questions",
+                        "kind": "question",
+                        "rationale": "Need a final answer.",
+                    }
+                ],
+                "remaining_follow_ups": [],
+                "confirmed_assumptions": [],
+                "superseded_assumptions": [],
+                "unresolved_assumptions": [],
+                "answers_summary": {"remaining_blockers": 1},
+                "source_clarify": {},
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["dispatch", str(project), "--json"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["execution_recommendation"] == "pause"
+    assert len(payload["lanes"]) == 1
+    assert payload["recommendation_reason"] == "Resolve still contains remaining blockers, so dispatch must pause."
+
+
+def test_dispatch_serializes_overlapping_paths_in_json_output(tmp_path):
+    project = tmp_path / "overlap-repo"
+    _write_repo(project)
+    (project / "resolve.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "agentkit.resolve.v1",
+                "project_path": str(project),
+                "answers_path": str(project / "answers.json"),
+                "execution_recommendation": "proceed",
+                "recommendation_reason": "Ready.",
+                "resolved_questions": [],
+                "remaining_blockers": [],
+                "remaining_follow_ups": [],
+                "confirmed_assumptions": [],
+                "superseded_assumptions": [],
+                "unresolved_assumptions": [],
+                "answers_summary": {"remaining_blockers": 0},
+                "source_clarify": {
+                    "source_bundle": {
+                        "architecture_map": {
+                            "subsystems": [
+                                {"name": "src", "path": "src", "why": "app"},
+                                {"name": "api", "path": "src/api", "why": "api"},
+                            ],
+                            "tests": [],
+                            "hints": [],
+                        }
+                    }
+                },
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["dispatch", str(project), "--json"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert len(payload["phases"]) == 2
+    assert payload["phases"][1]["execution_mode"] == "serial"
+    assert payload["ownership_conflicts"] == [{"left_lane_id": "lane-01", "right_lane_id": "lane-02", "overlap": "src"}]
+    assert payload["lanes"][1]["ownership_mode"] == "serialized-overlap"
+    assert payload["lanes"][1]["dependencies"] == [{"lane_id": "lane-01", "reason": "overlapping ownership: src"}]

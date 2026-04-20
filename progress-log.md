@@ -1,5 +1,16 @@
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
+## v1.10.0 D4: regression + edge-case coverage — COMPLETE
+
+**Built:**
+- Added explicit regression coverage for `resolve -> dispatch` workflow truth, unresolved blocker pause behavior, overlapping path serialization, fallback single-lane planning, and schema-stable JSON fields.
+- Verified the dispatch command continues to render deterministic lane packets across `generic`, `codex`, and `claude-code` targets.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_main.py` -> `20 passed`
+
+**Next:** D5 docs, reports, release-readiness surfaces, and final validation.
+
 ## v1.10.0 D3: target-aware lane packets — COMPLETE
 
 **Built:**
