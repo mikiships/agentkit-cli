@@ -189,3 +189,42 @@
 **Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py` -> `17 passed in 1.29s`
 
 **Next:** D2 command surface tightening, then D3/D4 docs and handoff polish.
+
+---
+
+## D2: `agentkit map` CLI command — COMPLETE
+
+**Built:**
+- Added `agentkit map <target>` wiring with `--json`, `--output`, and `--format text|markdown|json` support.
+- Added Rich terminal rendering plus deterministic markdown and JSON outputs from one shared map engine.
+- Tightened local-path handling so bare existing directories work first-class, including paths with spaces.
+
+**Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py` -> `17 passed in 0.67s`
+
+**Next:** D3 explorer-grade hints and D4 contract handoff polish.
+
+---
+
+## D3: explorer-grade hints and task boundaries — COMPLETE
+
+**Built:**
+- Added deterministic subsystem inference from code-bearing directories plus workspace and pyproject tooling signals.
+- Added grounded work-surface hints, next-step explorer suggestions, and risk flags for missing tests, missing context files, and unclear script surfaces.
+- Kept heuristics explainable and fully local, with no hidden LLM dependency.
+
+**Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py` -> `17 passed in 0.67s`
+
+**Next:** D4 contract workflow bridge and docs.
+
+---
+
+## D4: contract integration surface — COMPLETE
+
+**Built:**
+- Added a deterministic `contract_handoff` block to the repo-map schema plus rendered markdown/text sections for manual `map -> contract` handoff.
+- Updated README with a supported `agentkit map` workflow that saves the explorer artifact before drafting a build contract.
+- Added coverage that asserts the rendered map includes the contract-handoff section and prompt seed.
+
+**Tests:** `uv run pytest -q tests/test_map.py tests/test_main.py tests/test_landing_d5.py tests/test_user_scorecard_d5.py` -> `28 passed in 0.86s`
+
+**Next:** D5 versioning, reports, required validation scripts, and full-suite verification.

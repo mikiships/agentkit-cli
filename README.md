@@ -204,6 +204,36 @@ agentkit init --init-source --source-title "My Project" --project-targets claude
 agentkit init --promote-source --project-targets all --write-projections
 ```
 
+## `agentkit map` — deterministic repo explorer for agent work
+
+Use `agentkit map` when you need an explorer artifact before writing a build contract or assigning work in an unfamiliar repo.
+
+```bash
+# Map a local checkout with rich terminal output
+agentkit map .
+
+# Save a deterministic markdown explorer artifact
+agentkit map ./path/to/repo --format markdown --output repo-map.md
+
+# Emit stable JSON for downstream tooling or contract prep
+agentkit map github:tiangolo/fastapi --json > repo-map.json
+```
+
+The map surfaces:
+- repo summary, languages, and important paths
+- entrypoints, scripts, tests, and likely build surfaces
+- inferred subsystem boundaries and concrete next-task hints
+- risky gaps like missing tests or missing context files
+- a deterministic contract handoff block you can paste into a build-contract workflow
+
+Recommended flow:
+
+```bash
+agentkit map . --format markdown --output repo-map.md
+agentkit source --init
+# Use repo-map.md as the explorer artifact when drafting your build contract
+```
+
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
 [llms.txt](https://llmstxt.org/) is a standard that tells LLMs how to consume a project's documentation and API surface — making your repo accessible to AI-powered tools beyond just coding agents.

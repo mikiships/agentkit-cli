@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0] - 2026-04-19
+
+### Added
+- `agentkit map` for deterministic repo architecture mapping across local checkouts and GitHub shorthand targets.
+- Stable map schema covering repo summary, languages, important paths, entrypoints, scripts, tests, subsystem candidates, risks, and contract handoff guidance.
+- Explorer-grade hints for likely work surfaces, missing context files, weak test coverage signals, and subsystem-first next steps.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated for the v1.3.0 repo-map release.
+
 ## [1.1.0] - 2026-04-19
 
 ### Fixed

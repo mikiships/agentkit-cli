@@ -54,6 +54,10 @@ LANGUAGE_BY_SUFFIX = {
 
 class RepoMapEngine:
     def map_target(self, target: str) -> RepoMap:
+        direct_path = Path(target).expanduser()
+        if direct_path.exists() and direct_path.is_dir():
+            return self.map_local_path(direct_path)
+
         resolved, _name = parse_target(target)
         if target.startswith(('.', '/', '~')):
             return self.map_local_path(Path(resolved))
