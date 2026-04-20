@@ -1,5 +1,17 @@
 # Progress Log — agentkit-cli v1.10.0 dispatch lanes
 
+## v1.10.0 D2: dispatch CLI + packet directory — COMPLETE
+
+**Built:**
+- Wired `agentkit dispatch` into `agentkit_cli/main.py` and added `agentkit_cli/commands/dispatch_cmd.py` with `--target`, `--json`, `--output`, and `--output-dir` support.
+- Emitted portable packet directories with `dispatch.md`, `dispatch.json`, and per-lane packet files under `lanes/`.
+- Added CLI and help coverage in `tests/test_dispatch.py` plus workflow coverage in `tests/test_dispatch_workflow.py`.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_main.py` -> `15 passed`
+
+**Next:** D3 target-aware lane guidance, D4 regression coverage, and release-surface updates.
+
 ## v1.10.0 D1: deterministic dispatch planning engine — COMPLETE
 
 **Built:**

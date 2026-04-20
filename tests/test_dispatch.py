@@ -136,3 +136,10 @@ def test_dispatch_command_requires_saved_resolve_packet(tmp_path):
 
     assert result.exit_code == 2
     assert "No resolve.json artifact found" in result.output
+
+
+def test_dispatch_help():
+    result = runner.invoke(app, ["dispatch", "--help"])
+    assert result.exit_code == 0
+    assert "--output-dir" in result.output
+    assert "--target" in result.output
