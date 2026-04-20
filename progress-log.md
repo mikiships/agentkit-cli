@@ -1,5 +1,22 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 release completion D4: PyPI publish and registry verification — COMPLETE
+
+**Built and published:**
+- Built fresh `1.8.0` wheel and sdist from the clean tagged release state at `3ed7f140394711e5822616dbe7006a9146d92465`.
+- Published both artifacts to PyPI through the authenticated `uv run --with twine twine upload ...` path.
+- Verified both the version-specific and top-level PyPI JSON endpoints directly after upload.
+
+**Build + registry proof:**
+- `uv build` -> built `dist/agentkit_cli-1.8.0.tar.gz` and `dist/agentkit_cli-1.8.0-py3-none-any.whl`
+- `uv run --with twine twine upload dist/agentkit_cli-1.8.0.tar.gz dist/agentkit_cli-1.8.0-py3-none-any.whl` -> success, with PyPI project page link returned for `1.8.0`
+- `https://pypi.org/pypi/agentkit-cli/1.8.0/json` -> live with:
+  - `agentkit_cli-1.8.0-py3-none-any.whl` (`bdist_wheel`, `613519` bytes)
+  - `agentkit_cli-1.8.0.tar.gz` (`sdist`, `1100491` bytes)
+- `https://pypi.org/pypi/agentkit-cli/json` -> top-level project JSON now reports `1.8.0`
+
+**Next:** D5 final chronology reconciliation.
+
 ## v1.8.0 release completion D3: git release surfaces — COMPLETE
 
 **Published refs:**
