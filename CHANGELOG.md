@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.16.0] - 2026-04-20
+
+### Added
+- Added `agentkit reconcile` for deterministic post-observe and post-supervise lane closeout from saved `launch.json`, observe artifacts, supervise artifacts, and local dependency state.
+- Added stable reconcile markdown and JSON rendering, `--output`, `--output-dir`, per-lane reconciliation packets, next-execution ordering, and newly unblocked lane reporting.
+- Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile`, dirty-lane review handling, launched-without-stable-evidence review handling, missing observe or supervise artifacts, and serialized lane unblocking.
+
+### Docs
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `reconcile` after `supervise`, with `v1.16.0` left in truthful local release-ready state only.
+
 ## [1.15.0] - 2026-04-20
 
 ### Added

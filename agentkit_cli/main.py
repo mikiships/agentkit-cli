@@ -103,6 +103,7 @@ from agentkit_cli.commands.materialize_cmd import materialize_command
 from agentkit_cli.commands.launch_cmd import launch_command
 from agentkit_cli.commands.observe_cmd import observe_command
 from agentkit_cli.commands.supervise_cmd import supervise_command
+from agentkit_cli.commands.reconcile_cmd import reconcile_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1483,6 +1484,26 @@ def supervise(
 ) -> None:
     """Summarize local lane progress from saved launch artifacts and worktree state."""
     supervise_command(
+        path=path,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        launch_path=launch_path,
+        format=format,
+    )
+
+
+@app.command("reconcile")
+def reconcile(
+    path: str = typer.Argument(..., help="Project directory to reconcile after observe and supervise"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered reconciliation summary to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write reconcile.md, reconcile.json, and per-lane reconciliation packets to this directory"),
+    launch_path: Optional[Path] = typer.Option(None, "--launch-path", help="Optional path to a saved launch.json artifact"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Reconcile launch, observe, and supervise state into the next safe execution order."""
+    reconcile_command(
         path=path,
         json_output=json_output,
         output=output,

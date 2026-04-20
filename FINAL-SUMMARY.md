@@ -1,26 +1,26 @@
-# Final Summary — agentkit-cli v1.15.0 supervise restack
+# Final Summary — agentkit-cli v1.16.0 reconcile lane state
 
-Status: SHIPPED
+Status: RELEASE-READY
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.15.0-supervise-restack.md
+Contract: all-day-build-contract-agentkit-cli-v1.16.0-reconcile-lanes.md
 
 ## What completed in this pass
 
-- Restacked `agentkit supervise` cleanly onto the already shipped `v1.14.0` observe chronology instead of reusing the blocked `v1.14.0` supervise branch as release truth.
-- Added schema-backed local supervision with stable lane states, explicit reasons, next actions, and reusable top-level plus per-lane supervision packets.
-- Extended workflow coverage through `supervise`, while keeping shipped observe surfaces intact.
-- Shipped `v1.15.0` across the four release surfaces, then reconciled the branch-head docs so the shipped tag target and later docs-only branch head are explicit.
+- Inspected the inherited partial reconcile work and confirmed it was salvageable instead of forcing a restart from the shipped `v1.15.0` supervise line.
+- Finished `agentkit reconcile` as a deterministic post-`observe` and post-`supervise` lane closeout step with stable markdown/JSON output, packet-directory writing, dependency-aware next ordering, and relaunch-vs-review classification.
+- Updated README, CHANGELOG, version metadata, build-report surfaces, and the progress log so they match the actual `v1.16.0` reconcile branch state.
+- Repaired the stale `BUILD-REPORT.md` contradiction that was blocking the full suite, then reran validation from the repo-local `.venv` and from the parent session environment that can exercise the previously blocked doctor and socket-bind paths.
 
-## Release truth
+## Current truth
 
-- Branch: `feat/v1.15.0-supervise-restack`
-- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise`
-- Base shipped chronology: `v1.14.0` is already shipped from the observe line
-- Shipped release commit: `123eb095a7221a105fc5f46c4689a4954f04949a` (`v1.15.0` tag target, remote branch release commit, and PyPI payload)
-- Branch head now carries a later docs-only chronology reconciliation commit on `feat/v1.15.0-supervise-restack`
-- PyPI live: `agentkit-cli==1.15.0`
-- Final validation and publish details are recorded in `BUILD-REPORT.md` and `progress-log.md`
+- Branch: `feat/v1.16.0-reconcile-lanes`
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile`
+- Base shipped chronology: `v1.15.0` is already shipped from the supervise line
+- Local version surfaces now target `1.16.0`
+- Validation status: focused reconcile slice passed, the adjacent workflow slice passed, the previously blocked doctor/socket subset passed from the parent session, and the full suite now passes cleanly (`4949 passed, 1 warning`)
+- Closeout commit: `feat: add reconcile lane closeout`
+- Working tree state: clean after commit
 
-## Remaining blockers
+## Remaining blocker
 
-- None. Final validation, git release surfaces, and PyPI publish are all verified.
+- None. This repo is now truthfully local `RELEASE-READY`; the earlier sandbox-only blocker is preserved in `blocker-report-v1.16.0-reconcile-lanes.md` as resolved history rather than current state.

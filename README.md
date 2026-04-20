@@ -512,9 +512,9 @@ The launch packet surfaces:
 - reusable helper command files for local execution targets and manual handoff targets
 - local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
 
-## `agentkit observe` + `agentkit supervise` — deterministic post-launch observation and local lane supervision
+## `agentkit observe` + `agentkit supervise` + `agentkit reconcile` — deterministic post-launch lane closeout
 
-Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed.
+Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed. Finish with `agentkit reconcile` when you want one deterministic next-step packet that combines launch, observe, supervise, and dependency state into the next safe execution order.
 
 ```bash
 # Print a human-readable observe summary
@@ -531,6 +531,12 @@ agentkit supervise . --json > supervise.json
 
 # Write supervise.md, supervise.json, and per-lane supervision packets
 agentkit supervise . --output-dir ./supervise
+
+# Reconcile launch, observe, and supervise into the next safe execution order
+agentkit reconcile . --json > reconcile.json
+
+# Write reconcile.md, reconcile.json, and per-lane reconciliation packets
+agentkit reconcile . --output-dir ./reconcile
 ```
 
 The observe packet surfaces:
@@ -545,6 +551,12 @@ The supervision packet surfaces:
 - deterministic `supervise.md` and `supervise.json` plus per-lane supervision packets under `lanes/<lane-id>/`
 - newly unblocked serialized lanes surfaced clearly so the next safe local launch is obvious
 - local-only observational behavior, with no launch, kill, push, tag, publish, or remote mutation side effects
+
+The reconcile packet surfaces:
+- stable reconciliation buckets: `complete`, `relaunch-ready`, `still-running`, `blocked`, `drifted`, `waiting`, and `needs-human-review`
+- explicit lane-by-lane reasons, next actions, and dependency context pulled from saved launch, observe, and supervise evidence
+- deterministic `reconcile.md` and `reconcile.json` plus per-lane reconciliation packets under `lanes/<lane-id>/`
+- top-level `next_execution_order`, `newly_unblocked_lane_ids`, and relaunch-vs-review distinctions so orchestration can move forward without manual restitching
 
 Recommended full handoff lane:
 
@@ -567,6 +579,7 @@ agentkit launch . --target codex --output-dir ./launch
 cp ./launch/launch.json ./launch.json
 agentkit observe . --target codex --output-dir ./observe
 agentkit supervise . --output-dir ./supervise
+agentkit reconcile . --output-dir ./reconcile
 ```
 
 Recommended full dispatch lane:

@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v1.16.0 reconcile lane state
+# BUILD-REPORT-v1.16.0.md — agentkit-cli v1.16.0 reconcile lane state
 
 Status: RELEASE-READY
 Date: 2026-04-20
@@ -12,14 +12,13 @@ Contract: all-day-build-contract-agentkit-cli-v1.16.0-reconcile-lanes.md
 | D1 | ✅ Complete | Finished `agentkit_cli/reconcile.py` with deterministic reconciliation buckets, dependency satisfaction, relaunch-vs-review handling, next-execution ordering, and packet rendering |
 | D2 | ✅ Complete | Added `agentkit reconcile`, CLI wiring, stable markdown/JSON output, `--output`, `--output-dir`, and `--launch-path` support |
 | D3 | ✅ Complete | Added focused engine, command, and workflow coverage for `launch -> observe -> supervise -> reconcile`, including dirty, drifted, missing-artifact, relaunch-ready, and launched-without-evidence cases |
-| D4 | ✅ Complete | Updated README, CHANGELOG, version metadata, and created truthful `v1.16.0` local closeout surfaces plus `BUILD-REPORT-v1.16.0.md` |
+| D4 | ✅ Complete | Updated README, CHANGELOG, version metadata, and created truthful `v1.16.0` local closeout surfaces plus this versioned build report copy |
 | D5 | ✅ Complete | Re-ran the blocked validation and closeout from the parent session environment, where loopback socket binds and worktree git metadata writes both succeeded |
 
 ## Validation
 
 - Focused reconcile slice: `./.venv/bin/python -m pytest -q tests/test_reconcile_engine.py tests/test_reconcile_cmd.py tests/test_reconcile_workflow.py tests/test_main.py` -> `17 passed in 4.13s`
 - Adjacent workflow slice: `./.venv/bin/python -m pytest -q tests/test_reconcile_engine.py tests/test_reconcile_cmd.py tests/test_reconcile_workflow.py tests/test_supervise_engine.py tests/test_supervise_cmd.py tests/test_supervise_workflow.py tests/test_observe_engine.py tests/test_observe_cmd.py tests/test_observe_packets.py tests/test_observe_workflow.py tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `99 passed in 18.79s`
-- Full suite baseline before report fix: `./.venv/bin/python -m pytest -q tests/ -x` -> `1 failed, 830 passed in 19.62s` because `BUILD-REPORT.md` still advertised `v1.15.0`
 - Full suite baseline before report fix: `./.venv/bin/python -m pytest -q tests/ -x` -> `1 failed, 830 passed in 19.62s` because `BUILD-REPORT.md` still advertised `v1.15.0`
 - Sandbox-only rerun after report fix with repo-local `.venv`: `./.venv/bin/python -m pytest -q tests/` -> `19 failed, 4930 passed, 1 warning in 154.04s (0:02:34)`; failures were environment-specific home-write and loopback-bind restrictions plus 6 doctor assertion failures
 - Sandbox best-effort rerun with redirected home data paths: `env HOME=/tmp/agentkit-home XDG_DATA_HOME=/tmp/agentkit-home/.local/share ./.venv/bin/python -m pytest -q tests/` -> `14 failed, 4935 passed, 1 warning in 393.15s (0:06:33)`; this isolated the remaining environment-specific doctor and socket-bind failures
@@ -38,5 +37,4 @@ Contract: all-day-build-contract-agentkit-cli-v1.16.0-reconcile-lanes.md
 - Local build truth: the reconcile feature now validates cleanly on the focused slice, adjacent workflow slice, previously blocked doctor/socket subset, and the full suite from the parent session environment, so the repo is truthfully local `RELEASE-READY`
 - Closeout commit: `feat: add reconcile lane closeout`
 - Working tree state: clean after commit
-- Versioned build report copy: `BUILD-REPORT-v1.16.0.md`
 - Historical blocker note: `blocker-report-v1.16.0-reconcile-lanes.md` records the earlier sandbox-only failure that was resolved in the parent session

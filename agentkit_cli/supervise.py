@@ -396,7 +396,13 @@ class SuperviseEngine:
         branch = self._git_stdout(worktree_path, ["symbolic-ref", "--short", "-q", "HEAD"], allow_failure=True)
         status = self._git_stdout(worktree_path, ["status", "--short"], allow_failure=True) or ""
         files = [line[3:] if len(line) > 3 else line for line in status.splitlines() if line.strip()]
-        files = [item for item in files if not item.startswith('.agentkit/materialize')]
+        files = [
+            item
+            for item in files
+            if not item.startswith('.agentkit/materialize')
+            and not item.startswith('.agentkit/observe')
+            and not item.startswith('.agentkit/supervise')
+        ]
         detached = branch in {None, ""}
         branch_mismatch = bool(branch and expected_branch and branch != expected_branch)
         return GitSummary(
