@@ -111,6 +111,18 @@ def test_stage_command_writes_stage_directory(tmp_path):
     assert "Wrote stage directory" in result.output
 
 
+def test_stage_command_supports_output_file(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_dispatch(project)
+    output = tmp_path / "stage.md"
+
+    result = runner.invoke(app, ["stage", str(project), "--target", "codex", "--output", str(output)])
+
+    assert result.exit_code == 0, result.output
+    assert output.exists()
+    assert "# Stage plan:" in output.read_text(encoding="utf-8")
+
+
 def test_stage_command_requires_saved_dispatch_packet(tmp_path):
     project = _make_repo(tmp_path)
 
@@ -128,6 +140,23 @@ def test_stage_command_validates_target_against_dispatch(tmp_path):
 
     assert result.exit_code == 2
     assert "does not match saved dispatch target" in result.output
+
+
+def test_stage_target_notes_cover_all_supported_runners(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_dispatch(project, target="generic")
+
+    generic = StageEngine().build(project, target="generic", output_dir=tmp_path / "stage-generic")
+    assert any("Create the suggested worktree or branch manually" in note for note in generic.lanes[0].stage_notes)
+
+    payload = json.loads((project / "dispatch.json").read_text(encoding="utf-8"))
+    payload["target"] = "claude-code"
+    payload["lanes"][0]["packet"]["runner"] = "claude --print --permission-mode bypassPermissions"
+    payload["lanes"][1]["packet"]["runner"] = "claude --print --permission-mode bypassPermissions"
+    (project / "dispatch.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+    claude = StageEngine().build(project, target="claude-code", output_dir=tmp_path / "stage-claude")
+    assert any("run Claude Code" in note for note in claude.lanes[0].stage_notes)
 
 
 def test_stage_help():

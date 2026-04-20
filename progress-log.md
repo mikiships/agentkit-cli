@@ -1,5 +1,40 @@
 # Progress Log — agentkit-cli v1.11.0 stage worktrees
 
+## v1.11.0 D4: regression + edge-case coverage — COMPLETE
+
+**Built:**
+- Added end-to-end workflow coverage for `resolve -> dispatch -> stage`, plus explicit checks for default output roots, schema-stable JSON fields, serialized wait preservation, missing dispatch artifacts, and target mismatch failures.
+- Verified stage planning stays deterministic across single-lane and multi-lane inputs without creating fake worktrees.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed`
+
+**Next:** D5 docs, version surfaces, reports, and full release-readiness validation.
+
+## v1.11.0 D3: lane staging packets — COMPLETE
+
+**Built:**
+- Added per-lane stage packets with suggested branch names, worktree names, worktree paths, owned paths, dependencies, and dispatch packet references.
+- Added target-aware stage notes for `generic`, `codex`, and `claude-code`, plus explicit phase wait notes when serialized lanes must wait on overlapping ownership.
+- Kept single-lane stage output clean without inventing extra parallel scaffolding.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed`
+
+**Next:** D4 regression and edge-case coverage.
+
+## v1.11.0 D2: stage CLI + artifact writing — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/stage_cmd.py` and wired `agentkit stage` into `agentkit_cli/main.py` with `--target`, `--json`, `--output`, and `--output-dir` support.
+- Wrote portable stage directories with `stage.md`, `stage.json`, and lane-specific stage packets under `lanes/<lane-id>/`.
+- Preserved stable field names and deterministic ordering in markdown and JSON output.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_stage.py tests/test_stage_workflow.py tests/test_main.py` -> `18 passed`
+
+**Next:** D3 lane staging packet polish and D4 workflow regression coverage.
+
 ## v1.11.0 D1: deterministic stage planning engine — COMPLETE
 
 **Built:**

@@ -80,6 +80,38 @@ def test_source_to_resolve_to_dispatch_to_stage_workflow(tmp_path):
     assert payload["lanes"][0]["worktree_path"].endswith(payload["lanes"][0]["worktree_name"])
 
 
+def test_stage_default_output_root_is_stable(tmp_path):
+    project = tmp_path / "stable-root-repo"
+    _write_repo(project)
+    (project / "dispatch.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "agentkit.dispatch.v1",
+                "project_path": str(project),
+                "target": "generic",
+                "execution_recommendation": "proceed",
+                "recommendation_reason": "Ready.",
+                "worktree_guidance": ["Single-lane plan, so no fake parallelism is claimed."],
+                "phases": [{"phase_id": "phase-01", "index": 1, "execution_mode": "parallel", "lane_ids": ["lane-01"], "rationale": "single"}],
+                "lanes": [{"lane_id": "lane-01", "title": "repo-wide fallback lane", "phase_id": "phase-01", "phase_index": 1, "ownership_mode": "exclusive", "owned_paths": ["."], "subsystem_hints": [], "dependencies": [], "packet": {"objective": "fallback", "runner": "generic coding agent", "execution_notes": [], "stop_conditions": []}}],
+                "ownership_conflicts": [],
+                "source_resolve": {},
+                "source_taskpack": {},
+                "source_bundle": {},
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(app, ["stage", str(project), "--target", "generic", "--json"])
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["output_root"] == str(project / "stage")
+    assert payload["lanes"][0]["worktree_path"] == str(project / "stage" / "worktrees" / payload["lanes"][0]["worktree_name"])
+
+
 def test_stage_json_output_is_schema_stable(tmp_path):
     project = tmp_path / "stable-repo"
     _write_repo(project)
