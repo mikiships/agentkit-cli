@@ -96,6 +96,7 @@ from agentkit_cli.commands.map_cmd import map_command
 from agentkit_cli.commands.bundle_cmd import bundle_command
 from agentkit_cli.commands.taskpack_cmd import taskpack_command
 from agentkit_cli.commands.clarify_cmd import clarify_command
+from agentkit_cli.commands.resolve_cmd import resolve_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1357,6 +1358,20 @@ def clarify(
 ) -> None:
     """Generate a clarification brief for the source -> audit -> map -> contract -> bundle -> taskpack lane."""
     clarify_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
+@app.command("resolve")
+def resolve(
+    path: str = typer.Argument(..., help="Project directory to resolve after clarify"),
+    answers: Path = typer.Option(..., "--answers", help="JSON answers file for clarify items and assumptions"),
+    target: str = typer.Option("generic", "--target", help="Target agent: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered resolved packet to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write resolve.md and resolve.json to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Resolve clarify answers into an execution-ready packet."""
+    resolve_command(path=path, answers=answers, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
 @app.command("contract")
