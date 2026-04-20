@@ -229,10 +229,34 @@ The map surfaces:
 Recommended flow:
 
 ```bash
-agentkit map . --format markdown --output repo-map.md
-agentkit source --init
-# Use repo-map.md as the explorer artifact when drafting your build contract
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next repo-understanding increment" --map repo-map.json
 ```
+
+## `agentkit contract` — deterministic build contracts with repo-map handoff
+
+Use `agentkit contract` when you want an explicit execution contract after analysis and repo exploration.
+
+```bash
+# Draft a contract directly from a live local repo map
+agentkit contract "Ship a better onboarding flow" --path . --map .
+
+# Draft from a saved explorer artifact
+agentkit map . --json > repo-map.json
+agentkit contract "Ship a better onboarding flow" --path . --map repo-map.json
+
+# Add explicit deliverables or test requirements
+agentkit contract "Ship a better onboarding flow" \
+  --deliverable "Wire the CLI" \
+  --test-requirement "Run focused pytest slices"
+```
+
+The contract surfaces:
+- deterministic markdown and JSON output
+- canonical-source context when available
+- repo command hints and boundaries
+- optional repo-map explorer context, mapped subsystems, and handoff hints
+- deliverable and validation checklists ready for agent execution
 
 ## `agentkit llmstxt` — AI-Accessible Documentation
 

@@ -62,6 +62,7 @@ from agentkit_cli.commands.migrate_cmd import migrate_command
 from agentkit_cli.commands.sync_cmd import sync_command
 from agentkit_cli.commands.project_cmd import project_command
 from agentkit_cli.commands.source_cmd import source_command
+from agentkit_cli.commands.contract_cmd import contract_command
 from agentkit_cli.commands.search_cmd import search_command
 from agentkit_cli.commands.benchmark_cmd import benchmark_command
 from agentkit_cli.commands.daily_cmd import daily_command
@@ -1304,6 +1305,30 @@ def source(
 ) -> None:
     """Manage agentkit's dedicated canonical source file."""
     source_command(path=path, init=init, promote=promote, from_format=from_format, title=title, force=force, json_output=json_output)
+
+
+@app.command("contract")
+def contract(
+    objective: str = typer.Argument(..., help="Project objective to turn into a build contract"),
+    path: Optional[str] = typer.Option(None, "--path", help="Project directory (default: .)"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Write contract to this file"),
+    title: Optional[str] = typer.Option(None, "--title", help="Override contract title"),
+    deliverable: Optional[List[str]] = typer.Option(None, "--deliverable", help="Repeatable deliverable checklist item"),
+    test_requirement: Optional[List[str]] = typer.Option(None, "--test-requirement", help="Repeatable test requirement"),
+    map_input: Optional[str] = typer.Option(None, "--map", help="Repo map JSON artifact or target to map before drafting the contract"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON metadata"),
+) -> None:
+    """Generate a deterministic build contract for the chosen objective."""
+    contract_command(
+        objective=objective,
+        path=path,
+        output=output,
+        title=title,
+        deliverable=deliverable,
+        test_requirement=test_requirement,
+        map_input=map_input,
+        json_output=json_output,
+    )
 
 
 @app.command("project")
