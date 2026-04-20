@@ -85,6 +85,30 @@ def test_bundle_command_markdown_contains_required_sections(tmp_path):
     assert "## Open gaps" in result.output
 
 
+def test_source_to_bundle_workflow(tmp_path):
+    project = _make_repo(tmp_path)
+    contract = runner.invoke(
+        app,
+        [
+            "contract",
+            "Ship the next increment",
+            "--path",
+            str(project),
+            "--map",
+            str(project),
+        ],
+    )
+    assert contract.exit_code == 0, contract.output
+
+    bundle = runner.invoke(app, ["bundle", str(project), "--json"])
+    assert bundle.exit_code == 0, bundle.output
+    payload = json.loads(bundle.output)
+    assert payload["source_audit"]["readiness"]["ready_for_contract"] is True
+    assert payload["architecture_map"]["summary"]["name"] == "demo-repo"
+    assert payload["contract"]["missing"] is False
+    assert payload["gaps"] == []
+
+
 def test_bundle_help():
     result = runner.invoke(app, ["bundle", "--help"])
     assert result.exit_code == 0

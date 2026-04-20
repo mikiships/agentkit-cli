@@ -516,3 +516,21 @@
 **Tests:** `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `29 passed in 6.32s`
 
 **Next:** D3 docs, versioning, reports, and final validation.
+
+---
+
+## D3: docs, workflow narrative, and validation — COMPLETE
+
+**Built:**
+- Updated README so the repo-understanding story is now `source -> audit -> map -> contract -> bundle`, with a first-class `agentkit bundle` section and end-to-end handoff examples.
+- Added the v1.6.0 changelog entry, bumped package metadata to `1.6.0`, and rewrote `BUILD-REPORT.md` plus `BUILD-REPORT-v1.6.0.md` for this branch state.
+- Extended bundle coverage with a realistic `source -> contract -> bundle` workflow assertion and reconciled the version test to the new release line.
+- Ran the required release contradiction scan and hygiene check from the shared workspace script path because the contract's repo-local script paths are absent in this worktree.
+
+**Tests and checks:**
+- `python3 -m pytest -q tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `30 passed in 1.38s`
+- `python3 -m pytest -q tests/test_bundle.py tests/test_source_cmd.py tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `40 passed in 1.66s`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> no contradictory success/blocker narratives found
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.6.0-handoff-bundle` -> `Total findings: 0`
+
+**Next:** final commit and release-readiness check.

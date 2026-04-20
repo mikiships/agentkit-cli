@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.6.0] - 2026-04-20
+
+### Added
+- `agentkit bundle` for deterministic handoff packaging across canonical source, source-audit findings, repo map context, contract artifacts, and explicit gap reporting.
+- Stable markdown and JSON bundle rendering so one portable artifact can drive coding-agent handoff without re-stitching intermediate outputs.
+- Focused workflow coverage for the full `source -> audit -> map -> contract -> bundle` lane, including partial-upstream and missing-contract cases.
+
+### Docs
+- README, BUILD-REPORT, and progress log updated to make the repo-understanding story `source -> audit -> map -> contract -> bundle`.
+
 ## [1.5.0] - 2026-04-20
 
 ### Added

@@ -232,6 +232,7 @@ agentkit source --promote
 agentkit source-audit .
 agentkit map . --json > repo-map.json
 agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
 ```
 
 ## `agentkit map` — deterministic repo explorer for agent work
@@ -288,6 +289,38 @@ The contract surfaces:
 - repo command hints and boundaries
 - optional repo-map explorer context, mapped subsystems, and handoff hints
 - deliverable and validation checklists ready for agent execution
+
+## `agentkit bundle` — portable repo-understanding handoff artifact
+
+Use `agentkit bundle` when you want one deterministic handoff artifact that packages the current source, source-audit, map, and contract surfaces for a coding agent.
+
+```bash
+# Print a portable markdown handoff bundle
+agentkit bundle .
+
+# Save the markdown bundle for sharing
+agentkit bundle . --output handoff-bundle.md
+
+# Emit stable JSON for automation
+agentkit bundle . --json > handoff-bundle.json
+```
+
+The bundle surfaces:
+- canonical source preview and source format metadata
+- current source-audit readiness and findings
+- repo architecture summary, subsystem hints, and execution surfaces
+- either a saved all-day contract artifact or the deterministic repo-map handoff fallback
+- explicit open gaps instead of silently dropping missing upstream surfaces
+
+Recommended full lane:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+```
 
 ## `agentkit llmstxt` — AI-Accessible Documentation
 
