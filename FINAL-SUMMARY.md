@@ -11,7 +11,8 @@ Built:
 Validation:
 - focused resolve workflow slice at release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`: `52 passed in 2.11s`
 - full pytest suite at release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`: `4870 passed, 1 warning in 141.11s (0:02:21)`
-- origin branch `origin/feat/v1.9.0-resolve-loop`: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- release commit: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
+- current branch head `origin/feat/v1.9.0-resolve-loop`: `fb6de180085338d6bacf61d071781632c565d5d0` (docs-only follow-up after ship)
 - peeled tag `v1.9.0`: `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
 - PyPI JSON for `agentkit-cli==1.9.0` lists `agentkit_cli-1.9.0.tar.gz` and `agentkit_cli-1.9.0-py3-none-any.whl`
 

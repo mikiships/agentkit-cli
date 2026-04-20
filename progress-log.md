@@ -58,7 +58,8 @@
 - `git ls-remote --tags origin refs/tags/v1.9.0^{}` -> `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`
 
 **Current truth:**
-- Origin branch and annotated tag both point to the tested release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`.
+- At release time, the origin branch and annotated tag both pointed to the tested release commit `8a2c7197cfc0e4199aa2a7f18c9f1b3092932c84`.
+- After final shipped-proof docs were committed, the branch head advanced to docs-only follow-up commit `fb6de180085338d6bacf61d071781632c565d5d0` while the `v1.9.0` tag remained pinned to the tested release commit.
 - Git release surfaces are externally verified.
 - PyPI publish is the only remaining irreversible surface.
 
