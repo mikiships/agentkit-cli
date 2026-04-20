@@ -28,7 +28,7 @@ Added a deterministic `agentkit taskpack` lane that turns the shipped repo-under
 
 ## Release proof
 
-- origin branch head after final chronology reconciliation: `origin/feat/v1.7.0-taskpack-handoff` -> pending final push verification from this repo state
+- origin branch head after final chronology reconciliation: `origin/feat/v1.7.0-taskpack-handoff` -> `2d3f6db66f6dc053633cc59ab49ba09bf377dc48`
 - annotated tag `v1.7.0` object `b1ea22d0cbea23e5548f41bc964eee344be4fca1`, peeled commit `a32b143422481591206511ec17ef810de29e0c4b`
 - PyPI version JSON: `agentkit-cli==1.7.0` live with:
   - `agentkit_cli-1.7.0-py3-none-any.whl` (`bdist_wheel`, `608441` bytes)
