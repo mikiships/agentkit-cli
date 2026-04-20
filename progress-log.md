@@ -47,6 +47,31 @@
 
 **Next:** D3 git release surfaces.
 
+## v1.13.0 release completion D3: git release surfaces — COMPLETE
+
+**Reconciled:**
+- Verified origin had neither the release branch nor the `v1.13.0` tag before mutating remote state.
+- Pushed `feat/v1.13.0-launch-lanes` to origin at the tested release commit `20502b4c4a3f2b36dc47a7754226d8b746e28a81`.
+- Created and pushed annotated tag `v1.13.0` on that same tested release commit, then verified both remote surfaces directly.
+- Recorded the chronology split explicitly: later docs-only chronology cleanup is needed because local branch head `68fbfade10121882771b94745855ab82af03e00c` is already ahead of the shipped tag target.
+
+**Validation:**
+- `git ls-remote --heads origin feat/v1.13.0-launch-lanes` before push -> no remote branch present
+- `git ls-remote --tags origin refs/tags/v1.13.0 refs/tags/v1.13.0^{}` before tag push -> no remote tag present
+- `git push origin 20502b4c4a3f2b36dc47a7754226d8b746e28a81:refs/heads/feat/v1.13.0-launch-lanes` -> success
+- `git tag -a v1.13.0 20502b4c4a3f2b36dc47a7754226d8b746e28a81 -m "agentkit-cli v1.13.0"` -> created locally
+- `git push origin v1.13.0` -> success
+- `git ls-remote --heads origin feat/v1.13.0-launch-lanes` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- `git ls-remote --tags origin refs/tags/v1.13.0^{}` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- `git rev-parse v1.13.0^{}` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+
+**Current truth:**
+- Git release surfaces are externally verified.
+- The shipped tag and the remote branch currently both point at the tested release commit `20502b4c4a3f2b36dc47a7754226d8b746e28a81`.
+- PyPI publish is the only remaining irreversible release surface.
+
+**Next:** D4 registry release surface.
+
 ## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
 
 **Blocker:**
