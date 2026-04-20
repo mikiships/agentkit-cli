@@ -1,4 +1,25 @@
-# Progress Log — agentkit-cli v1.1.0 burn observability
+# Progress Log — agentkit-cli release chronology
+
+## Release completion D1: release-state audit and repo cleanup — COMPLETE
+
+**Audited:**
+- Read the strict release contract plus the current release surfaces: `BUILD-REPORT.md`, `BUILD-REPORT-v1.3.0.md`, `progress-log.md`, `CHANGELOG.md`, git status, branch state, and tag state.
+- Ran the required release recall and contradiction scan before trusting repo-local prose.
+- Confirmed the intended release line is `1.3.0` in both `pyproject.toml` and `agentkit_cli/__init__.py`, with current release head `c7cf350` on `feat/v1.3.0-map` and no existing local `v1.3.0` tag.
+
+**Reconciled:**
+- Reverted `.agentkit-last-run.json` as generated noise, so release truth is not tied to a transient local run artifact.
+- Staged the previously uncommitted `uv.lock` version drift so the lockfile matches the `1.3.0` package metadata.
+- Promoted the v1.3.0 feature and release contract files into tracked repo history so the release handoff state is explicit instead of untracked noise.
+
+**Checks:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> completed
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.3.0-map` -> `No contradictory success/blocker narratives found.`
+- `git status --short --branch` reviewed before and after cleanup reconciliation
+
+**Next:** D2 validation baseline.
+
+---
 
 ## D1: transcript adapters + normalized burn schema — COMPLETE
 
