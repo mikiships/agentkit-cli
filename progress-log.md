@@ -71,6 +71,27 @@
 
 **Next:** D3 git release surfaces.
 
+## v1.12.0 release completion D3: git release surfaces — COMPLETE
+
+**Reconciled:**
+- Pushed `feat/v1.12.0-materialize-worktrees` to origin from the current chronology head `f623639ebc3536eacd6a907c7ebe662ec321d63f`.
+- Verified that annotated tag `v1.12.0` had already been created locally and on origin before this pass completed D3, so I treated the existing tag as source-of-truth instead of assuming it was missing.
+- Verified the peeled remote tag target directly and recorded the chronology split: the shipped tag remains pinned to tested release commit `9e1e1440f01e557857c84b4ac00a405f3e51f505`, while the branch head is now later docs-only chronology commit `f623639ebc3536eacd6a907c7ebe662ec321d63f`.
+
+**Validation:**
+- `git push -u origin feat/v1.12.0-materialize-worktrees` -> success, remote head advanced to `f623639ebc3536eacd6a907c7ebe662ec321d63f`
+- `git tag -a v1.12.0 -m "agentkit-cli v1.12.0"` -> refused because local tag already existed; existing local peeled tag target verified instead of recreating it
+- `git rev-parse v1.12.0^{}` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+- `git ls-remote --heads origin feat/v1.12.0-materialize-worktrees` -> `f623639ebc3536eacd6a907c7ebe662ec321d63f`
+- `git ls-remote --tags origin refs/tags/v1.12.0^{}` -> `9e1e1440f01e557857c84b4ac00a405f3e51f505`
+
+**Current truth:**
+- Git release surfaces are externally verified.
+- Later docs-only chronology cleanup is needed and now exists: branch head `f623639ebc3536eacd6a907c7ebe662ec321d63f` differs from shipped tag target `9e1e1440f01e557857c84b4ac00a405f3e51f505`.
+- PyPI publish is the only remaining irreversible release surface.
+
+**Next:** D4 registry release surface.
+
 ## v1.12.0 D5: docs, reports, and local release-readiness surfaces — COMPLETE
 
 **Built:**
