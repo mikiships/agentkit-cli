@@ -1,40 +1,35 @@
-# BUILD-REPORT.md — agentkit-cli v1.8.0 clarify ambiguity loop
+# BUILD-REPORT.md — agentkit-cli v1.9.0 resolve loop
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Contract: all-day-build-contract-agentkit-cli-v1.8.0-clarify-loop.md
-Status: SHIPPED
+Contract: all-day-build-contract-agentkit-cli-v1.9.0-resolve-loop.md
+Status: RELEASE-READY, LOCAL-ONLY
 
 ## Summary
 
-Added a deterministic `agentkit clarify` lane that composes the shipped `source -> source-audit -> map -> contract -> bundle -> taskpack` workflow into a pre-execution clarification brief with blocking questions, follow-up questions, assumptions, contradictions, and a stable execution recommendation.
+Added a deterministic `agentkit resolve` lane that consumes the shipped `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify` workflow plus an answers file, then emits one stable resolved packet with answered questions folded in, remaining blockers called out, assumption updates recorded, and an updated execution recommendation.
 
 ## Deliverables
 
 | # | Deliverable | Status | Notes |
 |---|-------------|--------|-------|
-| D1 | Deterministic clarify engine + schema | ✅ Complete | Added `agentkit_cli/clarify.py` with stable markdown/JSON rendering and deterministic ordering |
-| D2 | CLI workflow + actionable rendering | ✅ Complete | Added `agentkit clarify <path>` with `--json`, `--output`, and `--output-dir` support |
-| D3 | End-to-end ambiguity loop validation | ✅ Complete | Added focused workflow coverage for full-lane clarify, missing-source pauses, and contradictory-input pauses |
-| D4 | Release-readiness pass | ✅ Complete | Bumped version metadata to `1.8.0`, reconciled reports, and re-ran final contradiction + hygiene checks |
+| D1 | Deterministic resolve engine + schema | ✅ Complete | Added `agentkit_cli/resolve.py` with stable markdown/JSON rendering and deterministic ordering for answers, blockers, follow-ups, and assumption updates |
+| D2 | CLI workflow + actionable rendering | ✅ Complete | Added `agentkit resolve <path> --answers <file>` with `--json`, `--output`, and `--output-dir` support |
+| D3 | End-to-end resolution loop validation | ✅ Complete | Added focused workflow coverage for full-lane resolve success plus incomplete-answer and contradiction pause paths |
+| D4 | Release-readiness pass | ✅ Complete | Bumped version metadata to `1.9.0`, reconciled local docs/report surfaces, and re-ran final contradiction and hygiene checks |
 
 ## Validation
 
-- focused clarify workflow slice: `python3 -m pytest -q tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `32 passed in 1.68s`
-- full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4863 passed, 1 warning in 144.09s (0:02:24)`
-- release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> no contradictory success/blocker narratives found, with recall confirming `v1.7.0` as the last shipped line and `v1.8.0` as the active local build
-- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> `Total findings: 0`
+- focused resolve workflow slice: `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.10s`
+- full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 136.62s (0:02:16)`
+- release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> no contradictory success or blocker narratives found
+- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> passed with no findings
 
 ## Current release truth
 
-- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` agree on `1.8.0`
-- The required release recall and contradiction scan were re-run from this repo state before validation and found no contradictory success or blocker narratives
-- Focused clarify validation passed: `32 passed in 1.72s`
-- Full supported suite passed: `4863 passed, 1 warning in 141.80s (0:02:21)`
-- The shipped release commit is `3ed7f140394711e5822616dbe7006a9146d92465`
-- Annotated tag `v1.8.0` on origin peels to that shipped release commit
-- PyPI `agentkit-cli==1.8.0` is live with both artifacts verified directly:
-  - `agentkit_cli-1.8.0-py3-none-any.whl` (`bdist_wheel`, `613519` bytes)
-  - `agentkit_cli-1.8.0.tar.gz` (`sdist`, `1100491` bytes)
-- The top-level PyPI project JSON reports `1.8.0`
-- The branch chronology continues past the shipped tag with later docs-only reconciliation commits so the repo reports match the external release truth
+- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` agree on `1.9.0`
+- The supported handoff lane is now `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve`
+- Focused resolve validation is green on the local `feat/v1.9.0-resolve-loop` branch state
+- Full supported pytest validation is green on the same local repo state: `4870 passed, 1 warning in 136.62s (0:02:16)`
+- This pass stopped at truthful local `RELEASE-READY`
+- No push, tag, or PyPI publish was attempted in this pass

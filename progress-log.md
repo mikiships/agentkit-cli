@@ -9,8 +9,8 @@
 
 **Validation:**
 - `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> no contradictory success or blocker narratives found
-- `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py` -> focused resolve slice passed on the final repo state
-- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> full suite passed on the same final repo state
+- `python3 -m pytest -q tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py tests/test_daily_d5.py` -> `52 passed in 2.10s` on the final repo state
+- `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4870 passed, 1 warning in 136.62s (0:02:16)` on the same final repo state
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.9.0-resolve-loop` -> passed with zero findings
 
 **Current truth:**
