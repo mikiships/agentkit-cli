@@ -307,7 +307,52 @@ class LaunchEngine:
         out.mkdir(parents=True, exist_ok=True)
         (out / "launch.md").write_text(self.render_markdown(plan), encoding="utf-8")
         (out / "launch.json").write_text(plan.to_json(), encoding="utf-8")
+        lanes_dir = out / "lanes"
+        for action in plan.actions:
+            lane_dir = lanes_dir / action.lane_id
+            lane_dir.mkdir(parents=True, exist_ok=True)
+            lane_payload = json.dumps(action.to_dict(), indent=2, sort_keys=True) + "\n"
+            (lane_dir / "launch.json").write_text(lane_payload, encoding="utf-8")
+            (lane_dir / "launch.md").write_text(self._render_lane_markdown(action), encoding="utf-8")
+            helper = lane_dir / self._helper_filename(plan.target)
+            helper.write_text(self._render_helper_script(action, plan.target), encoding="utf-8")
+            if plan.target != "generic":
+                helper.chmod(0o755)
         return out
+
+    def _render_lane_markdown(self, action: LaunchAction) -> str:
+        lines = [
+            f"# Launch lane: {action.lane_id}",
+            "",
+            f"- Title: {action.title}",
+            f"- State: `{action.state}`",
+            f"- Reason: {action.state_reason or 'n/a'}",
+            f"- Worktree path: `{action.worktree_path}`",
+            f"- Handoff path: `{action.packet_paths.handoff_markdown_path if action.packet_paths else '(missing)'}`",
+            f"- Command: `{action.display_command}`",
+            f"- Execution mode: `{action.execution_mode}`",
+        ]
+        if action.dependencies:
+            lines.append(
+                f"- Dependencies: {', '.join(f'{item.lane_id} ({item.reason})' for item in action.dependencies)}"
+            )
+        else:
+            lines.append("- Dependencies: none")
+        if action.launch_notes:
+            lines.extend(["", "## Launch notes", ""])
+            for note in action.launch_notes:
+                lines.append(f"- {note}")
+        return "\n".join(lines).rstrip() + "\n"
+
+    def _helper_filename(self, target: str) -> str:
+        if target == "generic":
+            return "command.txt"
+        return "launch.sh"
+
+    def _render_helper_script(self, action: LaunchAction, target: str) -> str:
+        if target == "generic":
+            return action.display_command + "\n"
+        return "#!/usr/bin/env bash\nset -euo pipefail\n" + action.display_command + "\n"
 
     def _build_actions(self, *, materialize: dict[str, Any], target: str) -> list[LaunchAction]:
         actions: list[LaunchAction] = []

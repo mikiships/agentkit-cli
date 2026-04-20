@@ -551,3 +551,19 @@
 - `python3 -m pytest -q tests/test_resolve.py` -> engine coverage passed
 
 **Next:** D2 CLI workflow + actionable rendering.
+
+## v1.13.0 D2: launch CLI surface — COMPLETE
+
+**Built:**
+- Added `agentkit_cli/commands/launch_cmd.py` and wired `agentkit launch` into `agentkit_cli/main.py` with `--target`, `--json`, `--output`, `--output-dir`, and explicit `--execute` support.
+- Kept dry-run planning as the default path by calling the launch planner unless `--execute` is explicitly requested.
+- Added CLI coverage for saved artifact validation, target mismatch handling, output writing, and help surface behavior.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `67 passed in 7.02s`
+
+**Next:**
+- D3 launch packet directory artifacts and reusable helper command surfaces.
+
+**Blockers:**
+- None.

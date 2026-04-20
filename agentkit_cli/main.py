@@ -100,6 +100,7 @@ from agentkit_cli.commands.resolve_cmd import resolve_command
 from agentkit_cli.commands.dispatch_cmd import dispatch_command
 from agentkit_cli.commands.stage_cmd import stage_command
 from agentkit_cli.commands.materialize_cmd import materialize_command
+from agentkit_cli.commands.launch_cmd import launch_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1423,6 +1424,28 @@ def materialize(
         output_dir=output_dir,
         worktree_root=worktree_root,
         dry_run=dry_run,
+        format=format,
+    )
+
+
+@app.command("launch")
+def launch(
+    path: str = typer.Argument(..., help="Project directory to launch after materialize"),
+    target: Optional[str] = typer.Option(None, "--target", help="Optional target validation override: generic, codex, or claude-code"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered launch plan to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write launch.md, launch.json, and per-lane launch packets to this directory"),
+    execute: bool = typer.Option(False, "--execute", help="Explicitly run eligible local builder commands for supported targets"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Plan or explicitly launch deterministic local builder commands from saved materialize artifacts."""
+    launch_command(
+        path=path,
+        target=target,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        execute=execute,
         format=format,
     )
 
