@@ -1,3 +1,19 @@
+# Progress Log — agentkit-cli v1.15.0 supervise restack
+
+## D1 complete: supervise engine restacked onto shipped v1.14.0 observe base
+
+**What changed:**
+- Restacked `agentkit_cli/supervise.py` onto the shipped observe chronology instead of the blocked pre-ship `v1.14.0` supervise branch.
+- Preserved deterministic local-only supervision states: `ready`, `running`, `waiting`, `blocked`, `completed`, and `drifted`.
+- Preserved packet rendering, git-backed local drift detection, and serialized dependency unblocking without disturbing shipped observe surfaces.
+
+**Validation:**
+- Pending targeted supervise test run after D2 wiring lands.
+
+**Next:** restack the `agentkit supervise` CLI surface.
+
+---
+
 # Progress Log — agentkit-cli v1.14.0 observe lane outcomes
 
 ## v1.14.0 build kickoff: observe-lanes execution pass — IN PROGRESS
