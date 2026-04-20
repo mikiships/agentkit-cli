@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.0] - 2026-04-20
+
+### Added
+- `agentkit clarify` for turning the `source -> source-audit -> map -> contract -> bundle -> taskpack` lane into a deterministic clarification brief before coding-agent execution.
+- Stable clarify markdown and JSON rendering with explicit blocking questions, follow-up questions, assumptions, contradictions, and execution recommendations.
+- Focused workflow coverage for end-to-end clarify handoff, missing upstream surfaces, and contradictory source guidance.
+
+### Docs
+- README and progress/build surfaces updated so the supported handoff story is now `source -> audit -> map -> contract -> bundle -> taskpack -> clarify`.
+
 ## [1.7.0] - 2026-04-20
 
 ### Added

@@ -1,5 +1,17 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.8.0 D3: end-to-end ambiguity loop validation — COMPLETE
+
+**Built:**
+- Added `tests/test_clarify_workflow.py` to validate the full `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify` lane.
+- Added explicit gap-path coverage for missing canonical source and contradictory source guidance so clarify fails clearly with `pause` when upstream inputs are not ready.
+- Updated README and CHANGELOG so the handoff story now ends with a deterministic clarify step before coding-agent execution.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py` -> `18 passed`
+
+**Next:** D4 release-readiness pass.
+
 ## v1.8.0 D2: clarify CLI workflow + actionable rendering — COMPLETE
 
 **Built:**

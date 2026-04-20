@@ -347,6 +347,41 @@ agentkit map . --json > repo-map.json
 agentkit contract "Ship the next increment" --path . --map repo-map.json
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
+```
+
+## `agentkit clarify` — deterministic ambiguity loop before execution
+
+Use `agentkit clarify` after `taskpack` when you want the exact unresolved questions and assumption gates surfaced before a coding agent starts executing.
+
+```bash
+# Print a human-readable clarification brief
+agentkit clarify .
+
+# Emit stable JSON for orchestration or CI
+agentkit clarify . --target codex --json > clarify.json
+
+# Write both markdown + JSON artifacts into one directory
+agentkit clarify . --target claude-code --output-dir ./clarify
+```
+
+The clarify brief surfaces:
+- blocking questions that should pause execution
+- follow-up questions worth resolving soon but not necessarily blocking
+- explicit assumptions with confidence labels
+- contradiction findings carried forward from upstream surfaces
+- a deterministic recommendation: `proceed`, `proceed-with-assumptions`, or `pause`
+
+Recommended ambiguity loop:
+
+```bash
+agentkit source --promote
+agentkit source-audit . --json > source-audit.json
+agentkit map . --json > repo-map.json
+agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit bundle . --output handoff-bundle.md
+agentkit taskpack . --target codex --output-dir ./taskpack
+agentkit clarify . --target codex --output-dir ./clarify
 ```
 
 ## `agentkit llmstxt` — AI-Accessible Documentation
