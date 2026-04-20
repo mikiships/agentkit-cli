@@ -1,40 +1,33 @@
-# BUILD-REPORT.md — agentkit-cli v1.7.0 taskpack handoff
+# BUILD-REPORT.md — agentkit-cli v1.8.0 clarify ambiguity loop
 
 Date: 2026-04-20
 Builder: OpenClaw subagent execution pass
-Contract: all-day-build-contract-agentkit-cli-v1.7.0-release.md
-Status: SHIPPED, VERIFIED
+Contract: all-day-build-contract-agentkit-cli-v1.8.0-clarify-loop.md
+Status: RELEASE-READY, LOCAL-ONLY
 
 ## Summary
 
-Added a deterministic `agentkit taskpack` lane that turns the shipped repo-understanding bundle into an execution-ready coding-agent packet with durable context, task brief, execution checklist, target-aware runner notes, and explicit gap reporting.
+Added a deterministic `agentkit clarify` lane that composes the shipped `source -> source-audit -> map -> contract -> bundle -> taskpack` workflow into a pre-execution clarification brief with blocking questions, follow-up questions, assumptions, contradictions, and a stable execution recommendation.
 
 ## Deliverables
 
 | # | Deliverable | Status | Notes |
 |---|-------------|--------|-------|
-| D1 | Release-state audit and repo cleanup | ✅ Complete | Re-ran release recall and contradiction checks, reconciled transient local noise, and tracked the explicit release-completion contract in repo history |
-| D2 | Validation baseline | ✅ Complete | Re-ran the focused taskpack slice and the full supported pytest suite on the audited release state |
-| D3 | Git release surfaces | ✅ Complete | Pushed `origin/feat/v1.7.0-taskpack-handoff` and annotated tag `v1.7.0`, then verified both refs directly from `origin` |
-| D4 | PyPI publish and registry verification | ✅ Complete | Built wheel + sdist from the tagged release commit, published `agentkit-cli==1.7.0`, and verified the live registry state directly |
-| D5 | Final chronology reconciliation | ✅ Complete | Reconciled the build reports and progress log to one shipped chronology, then re-ran final status-conflict and hygiene checks |
+| D1 | Deterministic clarify engine + schema | ✅ Complete | Added `agentkit_cli/clarify.py` with stable markdown/JSON rendering and deterministic ordering |
+| D2 | CLI workflow + actionable rendering | ✅ Complete | Added `agentkit clarify <path>` with `--json`, `--output`, and `--output-dir` support |
+| D3 | End-to-end ambiguity loop validation | ✅ Complete | Added focused workflow coverage for full-lane clarify, missing-source pauses, and contradictory-input pauses |
+| D4 | Release-readiness pass | ✅ Complete | Bumped version metadata to `1.8.0`, reconciled reports, and re-ran final contradiction + hygiene checks |
 
 ## Validation
 
-- focused taskpack slice plus D5 guardrails on the tagged release commit: `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_taskpack.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `49 passed in 1.24s`
-- full supported suite on the tagged release commit: `uv run --python 3.11 --with pytest pytest -q` -> `4857 passed, 1 warning in 136.28s (0:02:16)`
-- release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> no contradictory success/blocker narratives found
-- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.7.0-taskpack-handoff` -> `Total findings: 0`
+- focused clarify workflow slice: `python3 -m pytest -q tests/test_clarify.py tests/test_clarify_cmd.py tests/test_clarify_workflow.py tests/test_bundle.py tests/test_taskpack.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `32 passed in 1.68s`
+- full suite: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q` -> `4863 passed, 1 warning in 144.09s (0:02:24)`
+- release contradiction scan: `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop && bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> no contradictory success/blocker narratives found, with recall confirming `v1.7.0` as the last shipped line and `v1.8.0` as the active local build
+- hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.8.0-clarify-loop` -> `Total findings: 0`
 
-## Release proof
+## Local release-ready truth
 
-- origin branch head after final chronology reconciliation: `origin/feat/v1.7.0-taskpack-handoff` carries the post-release chronology commits and is intentionally later than the shipped tag
-- annotated tag `v1.7.0` object `b1ea22d0cbea23e5548f41bc964eee344be4fca1`, peeled commit `a32b143422481591206511ec17ef810de29e0c4b`
-- PyPI version JSON: `agentkit-cli==1.7.0` live with:
-  - `agentkit_cli-1.7.0-py3-none-any.whl` (`bdist_wheel`, `608441` bytes)
-  - `agentkit_cli-1.7.0.tar.gz` (`sdist`, `1091373` bytes)
-- PyPI top-level project JSON reports `1.7.0`
-
-## Notes
-
-The repo-local contract referenced helper scripts that do not exist inside this worktree, so the required release checks were run from the shared workspace script path used by earlier release branches. The shipped release tag and PyPI package resolve to tested commit `a32b143422481591206511ec17ef810de29e0c4b`; later branch commits only reconcile chronology after the irreversible release steps.
+- `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock` now agree on `1.8.0`
+- README, CHANGELOG, `BUILD-REPORT.md`, `BUILD-REPORT-v1.8.0.md`, and `progress-log.md` all describe the same local clarify release-ready state
+- No push, tag, or PyPI publish was attempted in this pass
+- The repo is ready for a truthful local `RELEASE-READY` handoff, not a shipped/public claim

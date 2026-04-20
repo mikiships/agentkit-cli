@@ -1,9 +1,19 @@
-# Final Summary — site freshness
+# Final Summary — agentkit-cli v1.8.0 clarify loop
 
-Completed the GitHub Pages front-door freshness fix.
+Completed D1-D4 for the local `1.8.0` clarify pass.
 
-- `docs/index.html` and `docs/data.json` now share one canonical `frontdoor` payload.
-- `agentkit pages-refresh` is now the supported path for both full Pages refreshes and front-door-only refreshes (`--from-existing-data`).
-- `daily-pages-refresh.yml` and `update-pages.yml` now route through that same command path.
-- Checked-in docs artifacts were regenerated from the supported refresh flow.
-- Validation passed, including the full test suite.
+Built:
+- deterministic clarify engine and schema
+- `agentkit clarify <path>` CLI with markdown, JSON, and output-directory flows
+- end-to-end ambiguity-loop coverage for full-lane success, missing-source pauses, and contradiction pauses
+- reconciled local release-ready docs, reports, and version metadata
+
+Validation:
+- focused clarify workflow slice: 26 passed
+- full pytest suite: 4863 passed
+- status-conflict scan: clean
+- post-agent hygiene check: clean
+
+Truthful state:
+- repo is local `RELEASE-READY`
+- no push, tag, or PyPI publish was attempted
