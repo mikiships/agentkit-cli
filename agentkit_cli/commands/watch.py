@@ -42,7 +42,11 @@ class _ChangeHandler:
         self._timer: Optional[threading.Timer] = None
         self._lock = threading.Lock()
         self._last_file: Optional[str] = None
+        self._last_event_at: float = 0.0
         self._generation: int = 0
+        # Small grace window absorbs timer jitter under load so one rapid burst
+        # does not accidentally produce multiple reruns.
+        self._debounce_grace: float = min(0.1, max(0.02, debounce / 2))
 
     def on_modified(self, path: str) -> None:
         ext = Path(path).suffix.lstrip(".")
@@ -50,6 +54,7 @@ class _ChangeHandler:
             return
         with self._lock:
             self._last_file = path
+            self._last_event_at = time.monotonic()
             if self._timer is not None:
                 self._timer.cancel()
             self._generation += 1
@@ -60,9 +65,17 @@ class _ChangeHandler:
                     if expected_gen != self._generation:
                         # Stale timer — a newer event superseded this one.
                         return
+                    remaining = (
+                        self.debounce + self._debounce_grace
+                    ) - (time.monotonic() - self._last_event_at)
+                    if remaining > 0:
+                        self._timer = threading.Timer(remaining, _guarded_fire)
+                        self._timer.daemon = True
+                        self._timer.start()
+                        return
                 self._fire()
 
-            self._timer = threading.Timer(self.debounce, _guarded_fire)
+            self._timer = threading.Timer(self.debounce + self._debounce_grace, _guarded_fire)
             self._timer.daemon = True
             self._timer.start()
 
