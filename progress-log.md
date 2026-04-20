@@ -1,5 +1,18 @@
 # Progress Log — agentkit-cli release chronology
 
+## v1.7.0 release completion D2: validation baseline — COMPLETE
+
+**Validated:**
+- Re-ran the focused `agentkit taskpack` release slice from the audited `feat/v1.7.0-taskpack-handoff` repo state.
+- Re-ran the full supported pytest suite from the same repo state.
+- Confirmed the tested release baseline moved forward to the audited D1 commit `d914d92` because the release-completion contract and chronology are now tracked in repo history.
+
+**Tests:**
+- `uv run --python 3.11 --with pytest pytest -q tests/test_daily_d5.py tests/test_taskpack.py tests/test_bundle.py tests/test_source_audit_workflow.py tests/test_contract_d2.py tests/test_map.py tests/test_main.py` -> `49 passed in 1.24s`
+- `uv run --python 3.11 --with pytest pytest -q` -> `4857 passed, 1 warning in 136.18s (0:02:16)`
+
+**Next:** D3 git release surfaces.
+
 ## v1.7.0 release completion D1: release-state audit and repo cleanup — COMPLETE
 
 **Audited source-of-truth first:**
