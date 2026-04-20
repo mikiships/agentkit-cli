@@ -96,6 +96,26 @@
 
 **Next:** D5 shipped chronology reconciliation.
 
+## v1.13.0 release completion D5: shipped release reconciliation — COMPLETE
+
+**Reconciled:**
+- Updated `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, `CHANGELOG.md`, and this progress log so the shipped story now distinguishes the tested release commit, the shipped tag, the remote branch chronology, and the live PyPI registry surface.
+- Preserved the chronology split explicitly: the shipped artifact is pinned by annotated tag `v1.13.0` at `20502b4c4a3f2b36dc47a7754226d8b746e28a81`, while any later branch movement in this pass is docs-only chronology cleanup.
+- Final cleanup removed the temporary tag-build worktree so the repo can finish with a clean status apart from the intentional untracked release contract file.
+
+**Validation:**
+- `git rev-parse v1.13.0^{}` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- `https://pypi.org/pypi/agentkit-cli/1.13.0/json` -> `200`, version `1.13.0`, files `agentkit_cli-1.13.0-py3-none-any.whl`, `agentkit_cli-1.13.0.tar.gz`
+- `https://pypi.org/project/agentkit-cli/1.13.0/` -> `200`
+- final branch head later than the shipped tag, if present, is docs-only chronology cleanup from this release-completion pass
+
+**Current truth:**
+- `agentkit-cli v1.13.0` is shipped.
+- The tested release commit remains `20502b4c4a3f2b36dc47a7754226d8b746e28a81`.
+- Any branch head later than that tag is docs-only chronology cleanup, not a different shipped artifact.
+
+**Next:** done.
+
 ## v1.13.0 blocker: commit gate blocked by linked-worktree git metadata sandbox — STOPPED
 
 **Blocker:**

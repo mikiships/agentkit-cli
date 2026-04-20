@@ -9,7 +9,7 @@
 - Added regression coverage for `resolve -> dispatch -> stage -> materialize -> launch`, serialized waiting lanes, missing artifacts, unsupported execute targets, and missing-tool failures.
 
 ### Docs
-- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `launch` after `materialize`, with the pass kept local release-ready only.
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported handoff lane now ends with `launch` after `materialize`, with shipped `v1.13.0` chronology reconciled across the tested tag, remote branch history, and live PyPI truth.
 
 ## [1.12.0] - 2026-04-20
 

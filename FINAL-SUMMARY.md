@@ -1,34 +1,37 @@
 # Final Summary — agentkit-cli v1.13.0 launch lanes
 
-Status: RELEASE-READY
+Status: SHIPPED
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.13.0-launch-lanes.md
+Contract: all-day-build-contract-agentkit-cli-v1.13.0-release.md
 
 ## What shipped in this pass
 
 - Added `agentkit launch` as the deterministic post-materialize step for launch planning and optional explicit local execution.
 - Added schema-backed launch planning with waiting-lane preservation, artifact validation, target-aware commands, and reusable per-lane launch packets.
 - Added explicit local `--execute` support for eligible `codex` and `claude-code` lanes while keeping dry-run planning as the default path.
-- Updated docs and report surfaces so the supported handoff lane now ends with `launch` after `materialize`, with this pass kept local release-ready only.
+- Reconciled repo report surfaces so the shipped tag, remote branch chronology, and live PyPI state now tell one truthful `v1.13.0` story.
 
-## Local release-ready truth
+## Shipped truth
 
 - Branch: `feat/v1.13.0-launch-lanes`
-- Local deliverable commits in this rescue pass: `7218ac1`, `a142883`, `4c91fad`, `bf6ed13`, `235e6ab`
+- Tested release commit: `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- Shipped tag: `v1.13.0` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch`
-- Linked-worktree commit blocker: resolved for this pass, local commits succeeded from the linked worktree
-- Remote state: intentionally unchanged, no push, tag, or publish attempted
+- Branch head later than the shipped tag, if present, is docs-only chronology cleanup from this release-completion pass.
+- PyPI is live at `https://pypi.org/project/agentkit-cli/1.13.0/`
 
-## Validation surfaces used for release-ready truth
+## Validation surfaces used for shipped truth
 
-- Focused launch slice: `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_main.py` -> `24 passed in 3.80s`
-- Cross-lane workflow slice: `python3 -m pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.30s`
-- Full suite with runtime deps present: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4920 passed in 155.55s (0:02:35)`
-- Recall + contradiction scan: required scripts completed with no contradictory success/blocker narratives found
-- Hygiene check: required script passed with `Total findings: 0`
+- Focused launch slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_main.py` -> `24 passed in 3.84s`
+- Cross-lane workflow slice: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest -q tests/test_launch_engine.py tests/test_launch_cmd.py tests/test_launch_workflow.py tests/test_materialize_engine.py tests/test_materialize_cmd.py tests/test_materialize_workflow.py tests/test_stage.py tests/test_stage_workflow.py tests/test_dispatch.py tests/test_dispatch_workflow.py tests/test_resolve.py tests/test_resolve_cmd.py tests/test_resolve_workflow.py tests/test_taskpack.py tests/test_main.py` -> `70 passed in 7.50s`
+- Full suite with runtime deps present: `uv run --python 3.11 --with pytest --with fastapi --with uvicorn --with httpx pytest tests/ -x` -> `4920 passed, 1 warning in 148.68s (0:02:28)`
+- Remote branch proof: `git ls-remote --heads origin feat/v1.13.0-launch-lanes` -> verified directly during release completion
+- Remote tag proof: `git ls-remote --tags origin refs/tags/v1.13.0^{}` -> `20502b4c4a3f2b36dc47a7754226d8b746e28a81`
+- Registry proof: `https://pypi.org/pypi/agentkit-cli/1.13.0/json` -> `1.13.0` live with `agentkit_cli-1.13.0-py3-none-any.whl` and `agentkit_cli-1.13.0.tar.gz`
+- Hygiene check: passed after cleanup with `Total findings: 0`
 
 ## Final state
 
-- D1 through D5 are complete.
-- Repo state is local `RELEASE-READY`.
-- Remaining blocker: none for the scoped launch-lanes feature pass.
+- D1 through D5 release-completion work is complete.
+- `agentkit-cli v1.13.0` is shipped.
+- Remaining blocker: none.
