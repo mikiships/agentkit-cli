@@ -1,5 +1,20 @@
 # Progress Log — agentkit-cli v1.18.0 relaunch lanes
 
+## D2 complete: first-class `agentkit relaunch` CLI landed
+
+**What changed:**
+- Added `agentkit_cli/commands/relaunch_cmd.py` and wired `agentkit relaunch` into `agentkit_cli/main.py`.
+- Added deterministic CLI flows for `--json`, `--output-dir`, `--resume-path`, and `--packet-dir` so saved resume artifacts can be turned into relaunch reports and packet directories without mutating git state.
+- Added focused command coverage for relaunch output writing, explicit resume directory loading, and command help surfaces.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py` -> `13 passed in 1.89s`
+
+**Current truth:**
+- D1 and D2 are complete.
+- D3 and D4 remain in progress.
+- The repo is still local-only and not yet release-ready for `v1.18.0`.
+
 ## D1 complete: schema-backed relaunch planning landed
 
 **What changed:**

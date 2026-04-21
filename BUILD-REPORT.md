@@ -9,13 +9,14 @@ Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 | Deliverable | Status | Notes |
 | --- | --- | --- |
 | D1 | ✅ Complete | Added schema-backed relaunch planning, resume/reconcile/launch contradiction checks, per-lane eligibility metadata, and focused relaunch engine coverage |
-| D2 | ⏳ In progress | CLI wiring and deterministic artifact writing are in the worktree and still need their own validation/report pass |
+| D2 | ✅ Complete | Added first-class `agentkit relaunch` wiring, deterministic stdout behavior, `--json`, `--output-dir`, `--resume-path`, and per-lane packet directory coverage |
 | D3 | ⏳ In progress | Fresh relaunch handoff packets are in the worktree and still need dedicated workflow validation/report pass |
 | D4 | ⏳ Pending | Docs, version surfaces, release/status checks, and final release-ready reporting remain |
 
 ## Validation
 
 - Focused engine slice: `python3 -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py` -> `14 passed in 3.79s`
+- Focused CLI slice: `python3 -m pytest -q tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py` -> `13 passed in 1.89s`
 
 ## Repo state
 

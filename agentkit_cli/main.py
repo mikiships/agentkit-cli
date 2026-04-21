@@ -105,6 +105,7 @@ from agentkit_cli.commands.observe_cmd import observe_command
 from agentkit_cli.commands.supervise_cmd import supervise_command
 from agentkit_cli.commands.reconcile_cmd import reconcile_command
 from agentkit_cli.commands.resume_cmd import resume_command
+from agentkit_cli.commands.relaunch_cmd import relaunch_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1531,6 +1532,28 @@ def resume(
         output=output,
         output_dir=output_dir,
         reconcile_path=reconcile_path,
+        packet_dir=packet_dir,
+        format=format,
+    )
+
+
+@app.command("relaunch")
+def relaunch(
+    path: str = typer.Argument(..., help="Project directory to relaunch after resume"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered relaunch summary to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write relaunch.md, relaunch.json, and per-lane relaunch packets to this directory"),
+    resume_path: Optional[Path] = typer.Option(None, "--resume-path", help="Optional path to a saved resume.json artifact or resume packet directory"),
+    packet_dir: Optional[Path] = typer.Option(None, "--packet-dir", help="Optional directory for per-lane relaunch packets"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Build fresh relaunch-ready packets from a saved resume artifact."""
+    relaunch_command(
+        path=path,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        resume_path=resume_path,
         packet_dir=packet_dir,
         format=format,
     )
