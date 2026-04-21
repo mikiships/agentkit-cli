@@ -1,5 +1,25 @@
 # Progress Log — agentkit-cli v1.22.0 spec release prep
 
+## D4 complete: final closeout revalidated from the current tree
+
+**What changed:**
+- Replaced the stale finisher notes that still claimed `uv run` was blocked in this sandbox with the actual green full-suite result from this repo.
+- Kept `BUILD-REPORT.md`, `BUILD-REPORT-v1.22.0.md`, and `FINAL-SUMMARY.md` aligned on the same final state: `RELEASE-READY (LOCAL-ONLY)` for `v1.22.0`.
+- Preserved the cleaned local tree stance: `.agent-relay/` and `.agentkit-last-run.json` remain ignored, and no push, tag, publish, or remote mutation happened.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_map.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `37 passed`
+- `uv run python -m pytest -q` -> `5003 passed, 1 warning`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `Total findings: 0`
+
+**Current truth:**
+- D4 is complete.
+- The repo is truthfully `RELEASE-READY (LOCAL-ONLY)` for `v1.22.0`.
+- `v1.21.0` remains the last shipped release.
+
+---
+
 ## D3 complete: spec engine, CLI flow, and workflow coverage landed
 
 **What changed:**
