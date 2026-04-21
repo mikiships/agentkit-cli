@@ -1,32 +1,41 @@
 # BUILD-REPORT.md — agentkit-cli v1.19.0 closeout lanes
 
-Status: RELEASE-READY (LOCAL-ONLY)
-Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.19.0-closeout-lanes.md
+Status: SHIPPED
+Date: 2026-04-21
+Contract: all-day-build-contract-agentkit-cli-v1.19.0-release.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Added schema-backed closeout planning from saved relaunch, resume, reconcile, and launch artifacts plus local worktree evidence |
-| D2 | ✅ Complete | Added first-class `agentkit closeout` wiring with deterministic stdout plus `--json`, `--output-dir`, `--relaunch-path`, and per-lane packet directory support |
-| D3 | ✅ Complete | Added per-lane closeout packets, follow-on unblock notes, and coverage for dirty worktrees, stale paths, already-closed lanes, contradictory saved state, and the full relaunch-to-closeout workflow |
-| D4 | ✅ Complete | Updated README, CHANGELOG, version surfaces, build report, final summary, and progress log for truthful local release readiness at `1.19.0` |
+| D1 | ✅ Complete | Re-ran recall and contradiction hygiene, revalidated the closeout slice, and confirmed the tracked tree was clean before release actions |
+| D2 | ✅ Complete | Pushed `feat/v1.19.0-closeout-lanes`, created annotated tag `v1.19.0`, built `1.19.0` wheel and sdist, published them to PyPI, and re-verified all three release surfaces directly |
+| D3 | ✅ Complete | Reconciled this report, `BUILD-REPORT-v1.19.0.md`, `FINAL-SUMMARY.md`, and `progress-log.md` so the shipped release commit stays distinct from the later docs-only chronology head |
 
 ## Validation
 
-- Focused closeout continuation slice: `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `36 passed in 9.08s`
-- Final full suite from branch head: `uv run python -m pytest -q` -> `4978 passed, 1 warning in 224.91s (0:03:44)`
-- Verified test count recorded in this report: `4978`
+- Recall and contradiction hygiene: `/Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.19.0-closeout-lanes` and `/Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.19.0-closeout-lanes`
+- Focused closeout continuation slice from the candidate tree: `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `36 passed in 9.08s`
+- Release-confidence validation pass from the candidate tree: `uv run python -m pytest -q` -> `4978 passed, 1 warning in 169.53s (0:02:49)`
+- Build command used: `uv build` (fallback because `python3 -m build` was unavailable in this environment)
 
-## Local release truth
+## Source-of-truth release evidence
 
-- Branch: `feat/v1.19.0-closeout-lanes`
-- Version surfaces reflect `1.19.0`
-- Release posture is local-only: no push, tag, publish, or remote mutation was performed in this pass
-- Supported handoff lane target: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout`
+- Release commit: `6ca258f6bf4550fc2ae0fb86eed9cc2618695776` (`chore: prepare v1.19.0 closeout release surfaces`)
+- Origin branch proof: `git ls-remote --heads origin feat/v1.19.0-closeout-lanes` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776 refs/heads/feat/v1.19.0-closeout-lanes`
+- Annotated tag proof: `git ls-remote --tags origin v1.19.0` -> `825d0e8ffc1ecdabe5b8de3ac64d240d468a4995 refs/tags/v1.19.0`
+- Tag peel proof: `git ls-remote --tags origin v1.19.0^{}` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776 refs/tags/v1.19.0^{}`
+- PyPI proof: `https://pypi.org/project/agentkit-cli/1.19.0/` and `https://pypi.org/pypi/agentkit-cli/1.19.0/json` are live for `agentkit-cli==1.19.0`
+- PyPI artifacts: `agentkit_cli-1.19.0-py3-none-any.whl` (`682342` bytes) and `agentkit_cli-1.19.0.tar.gz` (`1201482` bytes)
+
+## Chronology truth
+
+- The shipped public artifact is pinned to `v1.19.0` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776`.
+- Any later branch-head movement after that tag is docs-only chronology reconciliation and does not change the shipped release artifact.
+- Supported handoff lane target remains `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout`.
 
 ## Notes
 
-- `scripts/pre-action-recall.sh`, `scripts/check-status-conflicts.sh`, and `scripts/post-agent-hygiene-check.sh` were referenced by the contract but are not present in this repo snapshot, so equivalent manual consistency checks were used instead.
-- Branch-head full test suite now passes locally, so this repo state is truthfully `RELEASE-READY (LOCAL-ONLY)`.
+- All three workspace scripts referenced by the contract were present and were run.
+- PyPI accepted the upload immediately; the version-specific project page and version-specific JSON endpoint were used as direct proof because the package-level JSON endpoint briefly lagged at `1.18.0` during propagation.
+- Intentional untracked contract artifacts remain in the worktree: `all-day-build-contract-agentkit-cli-v1.19.0-closeout-lanes.md` and `all-day-build-contract-agentkit-cli-v1.19.0-release.md`.

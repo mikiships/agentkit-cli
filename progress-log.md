@@ -1,5 +1,27 @@
 # Progress Log — agentkit-cli v1.19.0 closeout lanes
 
+## D3 complete: four-surface release checklist finished, v1.19.0 shipped
+
+**What changed:**
+- Re-ran `/Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh` and `check-status-conflicts.sh`, then revalidated the focused closeout slice and full release-confidence pass from the `v1.19.0` candidate tree.
+- Pushed `feat/v1.19.0-closeout-lanes` to origin, created and pushed annotated tag `v1.19.0`, built the release artifacts with `uv build` after `python3 -m build` proved unavailable, and published both files with `twine upload`.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.19.0.md`, `FINAL-SUMMARY.md`, and this progress log so the shipped release commit remains explicit if the branch later advances for docs-only chronology cleanup.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `36 passed in 9.08s`
+- `uv run python -m pytest -q` -> `4978 passed, 1 warning in 169.53s (0:02:49)`
+- `git ls-remote --heads origin feat/v1.19.0-closeout-lanes` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776 refs/heads/feat/v1.19.0-closeout-lanes`
+- `git ls-remote --tags origin v1.19.0` -> `825d0e8ffc1ecdabe5b8de3ac64d240d468a4995 refs/tags/v1.19.0`
+- `git ls-remote --tags origin v1.19.0^{}` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776 refs/tags/v1.19.0^{}`
+- PyPI proof: `https://pypi.org/project/agentkit-cli/1.19.0/` and `https://pypi.org/pypi/agentkit-cli/1.19.0/json` live with `agentkit_cli-1.19.0-py3-none-any.whl` (`682342` bytes) and `agentkit_cli-1.19.0.tar.gz` (`1201482` bytes)
+
+**Current truth:**
+- D1 through D3 in the release contract are complete.
+- `agentkit-cli v1.19.0` is truthfully SHIPPED.
+- The shipped artifact is pinned to `v1.19.0` -> `6ca258f6bf4550fc2ae0fb86eed9cc2618695776`; any later branch-head advance is docs-only chronology reconciliation.
+- Intentional untracked contract artifacts remain: `all-day-build-contract-agentkit-cli-v1.19.0-closeout-lanes.md` and `all-day-build-contract-agentkit-cli-v1.19.0-release.md`.
+
+
 ## D4 complete: docs and local release-readiness surfaces landed
 
 **What changed:**
