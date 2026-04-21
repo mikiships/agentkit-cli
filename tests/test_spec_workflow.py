@@ -31,7 +31,7 @@ def _write_repo(
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
     if post_shipped_truth_objective:
-        objective = "Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work."
+        objective = "Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync instead of falling back to the generic subsystem-next-step recommendation."
     (project / ".agentkit" / "source.md").write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -83,7 +83,7 @@ def _write_repo(
         changelog = (
             "# Changelog\n\n"
             "## [0.4.0] - 2026-04-21\n\n"
-            "- Refreshed the flagship source objective so `agentkit spec` advances from current shipped repo evidence.\n"
+            "- Refreshed the flagship source objective so `agentkit spec` targets a concrete adjacent build after shipped-truth sync.\n"
             "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
         )
     (project / "CHANGELOG.md").write_text(changelog, encoding="utf-8")

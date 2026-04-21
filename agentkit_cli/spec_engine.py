@@ -638,7 +638,14 @@ class SpecEngine:
         if not objective_summary:
             return None
         objective_lower = objective_summary.lower()
-        if "self-spec truthful" not in objective_lower or "shipped repo evidence" not in objective_lower:
+        has_legacy_flagship_trigger = "self-spec truthful" in objective_lower and "shipped repo evidence" in objective_lower
+        has_current_flagship_trigger = (
+            "teach the flagship self-spec flow" in objective_lower
+            and "concrete adjacent build recommendation" in objective_lower
+            and "contract seed" in objective_lower
+            and "shipped-truth sync" in objective_lower
+        )
+        if not has_legacy_flagship_trigger and not has_current_flagship_trigger:
             return None
         if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
             return None

@@ -13,7 +13,7 @@ def _write_repo(project: Path) -> None:
     (project / ".agentkit" / "source.md").write_text(
         "# Demo Repo\n\n"
         "## Objective\n"
-        "Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work.\n\n"
+        "Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync instead of falling back to the generic subsystem-next-step recommendation.\n\n"
         "## Scope & Boundaries\nWork only inside this repo.\n\n"
         "## Rules\n- Keep output deterministic.\n\n"
         "## Validation\nRun uv run pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py\n\n"
@@ -38,7 +38,7 @@ def _write_repo(project: Path) -> None:
     (project / "CHANGELOG.md").write_text(
         "# Changelog\n\n"
         "## [0.4.0] - 2026-04-21\n\n"
-        "- Refreshed the flagship source objective so `agentkit spec` advances from current shipped repo evidence.\n",
+        "- Refreshed the flagship source objective so `agentkit spec` targets a concrete adjacent build after shipped-truth sync.\n",
         encoding="utf-8",
     )
     (project / "BUILD-REPORT.md").write_text(
