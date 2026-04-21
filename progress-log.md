@@ -1,5 +1,21 @@
 # Progress Log — agentkit-cli v1.20.0 land lanes
 
+## D4 complete: docs and local release-readiness surfaces landed
+
+**What changed:**
+- Updated `README.md`, `CHANGELOG.md`, `agentkit_cli/__init__.py`, `pyproject.toml`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.20.0.md`, and `FINAL-SUMMARY.md` for `agentkit land` and `v1.20.0` local release truth.
+- Ran the required workspace recall and contradiction scan before final status writing, then validated both the focused continuation slice and the full local suite.
+- Left the repo in a coherent local-only `RELEASE-READY` state with no push, tag, publish, remote mutation, or automatic merge execution.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `45 passed in 14.55s`
+- `uv run python -m pytest -q` -> `4987 passed, 1 warning in 438.26s (0:07:18)`
+
+**Current truth:**
+- D1 through D4 are complete.
+- The repo is truthfully `RELEASE-READY (LOCAL-ONLY)` for `v1.20.0`.
+- No blockers remain.
+
 ## D3 complete: landing packets and merge-order guidance landed
 
 **What changed:**

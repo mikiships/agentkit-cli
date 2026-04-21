@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.20.0] - 2026-04-21
+
+- Added `agentkit land`, a local-only landing workflow that consumes saved `closeout`, `relaunch`, `resume`, and `reconcile` artifacts plus local git/worktree evidence.
+- Added deterministic landing markdown and JSON reports, per-lane `packet.md` landing packets, likely target-branch context, and explicit landing-order guidance for merge-ready lanes.
+- Preserved review-required, waiting, and already-closed lanes explicitly so operators can turn closeout state into one truthful local landing plan without mutating git state.
+
 ## [1.19.0] - 2026-04-20
 
 - Added `agentkit closeout`, a local-only closeout workflow that consumes saved `relaunch`, `resume`, and `reconcile` artifacts plus local worktree evidence.
