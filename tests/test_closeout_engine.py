@@ -84,6 +84,45 @@ def test_closeout_engine_surfaces_follow_on_notes_for_unblocked_waiting_lane(tmp
     assert lane.follow_on_notes
 
 
+def test_closeout_engine_marks_stale_completed_worktree_for_review(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_launch(project, target="codex", single_lane=True)
+
+    lane1 = project / "stage" / "worktrees" / "demo-repo-phase-01-lane-01"
+    (lane1 / "src" / "api" / "handlers.py").write_text("def handler():\n    return 'done'\n", encoding="utf-8")
+    _git(lane1, "add", "src/api/handlers.py")
+    _git(lane1, "commit", "-m", "finish lane-01")
+    _write_observe_result(project, "lane-01", "success", "API lane passed tests.")
+    _save_closeout_chain(project)
+
+    launch_payload = json.loads((project / "launch.json").read_text(encoding="utf-8"))
+    launch_payload["actions"][0]["worktree_path"] = str(project / "stage" / "worktrees" / "missing-lane-01")
+    (project / "launch.json").write_text(json.dumps(launch_payload, indent=2, sort_keys=True), encoding="utf-8")
+
+    plan = CloseoutEngine().build(project)
+
+    assert plan.review_required_lane_ids == ["lane-01"]
+    assert "stale or missing" in plan.lanes[0].human_checks[0]
+
+
+def test_closeout_engine_preserves_already_closed_lanes(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_launch(project, target="codex", single_lane=True)
+    _write_observe_result(project, "lane-01", "failure", "Retry lane 01.")
+    _save_closeout_chain(project)
+
+    relaunch_payload = json.loads((project / "relaunch.json").read_text(encoding="utf-8"))
+    relaunch_payload["lanes"][0]["relaunch_bucket"] = "already-closed"
+    relaunch_payload["already_closed_lane_ids"] = ["lane-01"]
+    relaunch_payload["relaunch_now_lane_ids"] = []
+    (project / "relaunch.json").write_text(json.dumps(relaunch_payload, indent=2, sort_keys=True), encoding="utf-8")
+
+    plan = CloseoutEngine().build(project)
+
+    assert plan.already_closed_lane_ids == ["lane-01"]
+    assert plan.lanes[0].closeout_bucket == "already-closed"
+
+
 def test_closeout_engine_rejects_missing_resume_artifact(tmp_path):
     project = _make_repo(tmp_path)
     _write_launch(project, target="codex", single_lane=True)
@@ -95,4 +134,18 @@ def test_closeout_engine_rejects_missing_resume_artifact(tmp_path):
     (project / "relaunch.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
     with pytest.raises(CloseoutError, match="missing resume packet"):
+        CloseoutEngine().build(project)
+
+
+def test_closeout_engine_rejects_contradictory_relaunch_summary_membership(tmp_path):
+    project = _make_repo(tmp_path)
+    _write_launch(project, target="codex", single_lane=True)
+    _write_observe_result(project, "lane-01", "failure", "Retry lane 01.")
+    _save_closeout_chain(project)
+
+    payload = json.loads((project / "relaunch.json").read_text(encoding="utf-8"))
+    payload["relaunch_now_lane_ids"] = []
+    (project / "relaunch.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+    with pytest.raises(CloseoutError, match="disagrees with summary ids"):
         CloseoutEngine().build(project)

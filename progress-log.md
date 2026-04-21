@@ -1,5 +1,35 @@
 # Progress Log — agentkit-cli v1.19.0 closeout lanes
 
+## D3 complete: merge and follow-on closeout packets landed
+
+**What changed:**
+- Added deterministic per-lane `packet.md` closeout packets with source artifact chains, branch and worktree evidence, merge-readiness reasons, human verification steps, and follow-on unblock notes.
+- Covered stale completed worktrees, already-closed lanes, contradictory relaunch summaries, and full `launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout` workflow output.
+- Kept waiting and review-required lanes visible in closeout output instead of silently dropping them.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py` -> `11 passed in 3.77s`
+
+**Current truth:**
+- D1 through D3 are complete.
+- D4 remains in progress.
+- The repo is local-only and not yet release-ready for `v1.19.0`.
+
+## D2 complete: first-class `agentkit closeout` CLI landed
+
+**What changed:**
+- Added `agentkit_cli/commands/closeout_cmd.py` and wired `agentkit closeout` into `agentkit_cli/main.py`.
+- Added deterministic CLI flows for `--json`, `--output-dir`, `--relaunch-path`, and `--packet-dir` so saved relaunch artifacts can be turned into closeout reports and per-lane packets without mutating git state.
+- Added focused command coverage for closeout output writing, explicit relaunch directory loading, and command help surfaces.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_closeout_cmd.py tests/test_closeout_workflow.py` -> `7 passed in 2.47s`
+
+**Current truth:**
+- D1 and D2 are complete.
+- D3 and D4 remain in progress.
+- The repo is local-only and not yet release-ready for `v1.19.0`.
+
 ## D1 complete: schema-backed closeout planning landed
 
 **What changed:**
