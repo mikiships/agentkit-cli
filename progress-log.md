@@ -59,3 +59,20 @@
 - `agentkit-cli v1.23.0` is blocked after branch push + tag push, before registry live.
 - The last shipped line remains `v1.22.0`.
 - The exact failing path is PyPI upload auth: `uv publish --keyring-provider subprocess` -> `Missing credentials for https://upload.pypi.org/legacy/`.
+
+## 2026-04-21 release completion closeout: registry proof recovered and `v1.23.0` shipped
+
+**What changed:**
+- Verified the earlier blocker was tool-path-specific, not a true auth absence: this machine has a usable `.pypirc` entry for `pypi` with both username and password set.
+- Built the tagged release commit `d6aceff` from detached temp worktrees instead of the later chronology-only branch head.
+- First `uvx twine upload dist/*` pass proved the auth path worked but was too broad because the worktree carried old artifacts in `dist/`; it uploaded the `1.23.0` wheel before tripping a `400 Bad Request` on unrelated legacy files.
+- Clean rerun from a fresh tagged worktree with `rm -rf dist`, `uv build`, and `uvx twine upload --skip-existing dist/agentkit_cli-1.23.0-py3-none-any.whl dist/agentkit_cli-1.23.0.tar.gz` completed the release surface and left PyPI serving both artifacts.
+
+**Registry proof:**
+- `https://pypi.org/pypi/agentkit-cli/1.23.0/json` -> `info.version=1.23.0`, files: `agentkit_cli-1.23.0-py3-none-any.whl`, `agentkit_cli-1.23.0.tar.gz`
+- `https://pypi.org/pypi/agentkit-cli/json` -> `info.version=1.23.0`, same two artifacts live
+
+**Current truth:**
+- `agentkit-cli v1.23.0` is shipped.
+- The tested shipped commit is still tag target `d6aceff`; later branch-head commits remain chronology-only.
+- Tooling lesson: `uv publish --keyring-provider subprocess` can miss a working local `.pypirc` auth path, so a missing-credentials error there does not by itself prove PyPI access is absent on this machine.

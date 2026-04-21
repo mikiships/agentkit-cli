@@ -1,18 +1,18 @@
 # Final Summary — agentkit-cli v1.23.0 release completion
 
-Status: BLOCKED
+Status: SHIPPED
 Date: 2026-04-21
 Contract: all-day-build-contract-agentkit-cli-v1.23.0-release.md
 
 ## Outcome
 
-BLOCKED
+SHIPPED
 
 - The tested release candidate was pushed successfully to origin at `d6aceff`.
 - The annotated release tag exists on origin: `v1.23.0` object `b592b7d` peels to `d6aceff`.
-- The publish step failed: `uv publish --keyring-provider subprocess <built artifacts>` -> `Missing credentials for https://upload.pypi.org/legacy/`.
-- PyPI proof after the failure still shows `agentkit-cli==1.22.0` live and no `1.23.0` release.
-- Shipped truth therefore stays on `v1.22.0`, even though the `v1.23.0` branch and tag now exist remotely.
+- The publish surface closed via the machine's existing `.pypirc` auth path: a tagged temp worktree built `1.23.0`, then `uvx twine upload --skip-existing` completed the live upload.
+- PyPI now serves `agentkit-cli==1.23.0` live with both the wheel and sdist artifacts.
+- Shipped truth therefore advances to `v1.23.0`.
 
 ## Validation anchor
 
