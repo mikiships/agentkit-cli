@@ -1,27 +1,30 @@
-# Final Summary — agentkit-cli v1.21.0 merge lanes
+# Final Summary — agentkit-cli v1.21.0 merge release completion
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.21.0-merge-lanes.md
+Contract: all-day-build-contract-agentkit-cli-v1.21.0-release.md
 
 ## What completed in this pass
 
-- Added `agentkit merge` as a deterministic local merge planner and optional local merge executor on top of saved `land` artifacts.
-- Added schema-backed merge plans, first-class CLI wiring, per-lane merge packets, explicit `merge-now`, `blocked`, `waiting`, and `already-landed` visibility, plus dry-run-by-default `--apply` behavior.
-- Updated README, changelog, version surfaces, progress/build reports, and kept the branch truthfully local release-ready rather than falsely claiming shipment.
+- Re-validated the `v1.21.0` release candidate at shipped commit `1eb3e17`.
+- Pushed `feat/v1.21.0-merge-lanes`, built wheel and sdist artifacts in `dist-release-v1.21.0/`, created and pushed annotated tag `v1.21.0`, and published `agentkit-cli==1.21.0` to PyPI.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.21.0.md`, and `progress-log.md` so later docs-only chronology does not blur the shipped tag truth.
 
 ## Validation
 
-- Recall and contradiction hygiene ran before final status writing.
-- Focused merge continuation slice: `python3 -m pytest -q tests/test_merge_cmd.py tests/test_merge_engine.py tests/test_merge_workflow.py tests/test_main.py` -> `15 passed in 5.36s`.
-- Final full suite: `uv run python -m pytest -q` -> `4995 passed, 1 warning in 341.61s (0:05:41)`.
-- Build-report release surface checks passed after adding `BUILD-REPORT-v1.21.0.md` and recording the verified suite count in `BUILD-REPORT.md`.
-- Post-agent hygiene check: `/Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.21.0-merge-lanes` -> `Total findings: 0` after removing non-intentional `.agentkit-last-run.json`.
+- Recall and contradiction hygiene ran before shipping; the recall output correctly showed `v1.20.0` as the previous shipped line and the local status-conflict scan reported no contradictory success or blocker narratives.
+- Focused merge continuation slice from the shipped candidate: `python3 -m pytest -q tests/test_merge_cmd.py tests/test_merge_engine.py tests/test_merge_workflow.py tests/test_main.py` -> `15 passed in 4.48s`.
+- Release-confidence validation pass from the shipped candidate: `uv run python -m pytest -q` -> `4995 passed, 1 warning in 179.64s (0:02:59)`.
+- Branch proof: `git ls-remote --heads origin feat/v1.21.0-merge-lanes` now shows a later docs-only chronology head than the shipped release commit.
+- Tag proof: `git ls-remote --tags origin v1.21.0` -> annotated tag object `72dbfad314869cb4f49e9cb78db7a5c5214e06dd`.
+- Peeled tag proof: `git ls-remote --tags origin v1.21.0^{}` -> shipped release commit `1eb3e1700118b68292958c9fa8394f095cf03baf`.
+- PyPI proof: `https://pypi.org/project/agentkit-cli/1.21.0/` and `https://pypi.org/pypi/agentkit-cli/1.21.0/json` are live with both release artifacts.
+- Post-agent hygiene: `/Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.21.0-merge-lanes` -> `Total findings: 0`.
 
 ## Final truth
 
-- All deliverables D1 through D4 in the merge-lanes contract are complete.
-- `agentkit-cli v1.21.0` is truthfully `RELEASE-READY (LOCAL-ONLY)`.
-- The supported continuation lane now ends with `merge` after `land`.
-- No push, tag, publish, or remote mutation happened in this pass.
-- Intentional untracked contract artifact remains in the worktree: `all-day-build-contract-agentkit-cli-v1.21.0-merge-lanes.md`.
+- All deliverables D1 through D3 in the release contract are complete.
+- `agentkit-cli v1.21.0` is truthfully SHIPPED.
+- The shipped artifact line is pinned to `v1.21.0` -> `1eb3e1700118b68292958c9fa8394f095cf03baf`.
+- The current branch head is a later docs-only chronology commit on `origin/feat/v1.21.0-merge-lanes`.
+- Intentional untracked contract artifacts remain in the worktree: `all-day-build-contract-agentkit-cli-v1.21.0-merge-finisher.md`, `all-day-build-contract-agentkit-cli-v1.21.0-merge-lanes.md`, and `all-day-build-contract-agentkit-cli-v1.21.0-release.md`.

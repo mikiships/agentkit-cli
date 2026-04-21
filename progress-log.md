@@ -1,4 +1,31 @@
-# Progress Log — agentkit-cli v1.21.0 merge lanes
+# Progress Log — agentkit-cli v1.21.0 merge release completion
+
+## D3 complete: four-surface release completion and chronology reconciliation finished, v1.21.0 shipped
+
+**What changed:**
+- Re-ran release recall and contradiction hygiene, then revalidated the `v1.21.0` candidate with the focused merge continuation slice and a full release-confidence test pass.
+- Pushed `feat/v1.21.0-merge-lanes`, built `agentkit_cli-1.21.0-py3-none-any.whl` and `agentkit_cli-1.21.0.tar.gz` into `dist-release-v1.21.0/`, created and pushed annotated tag `v1.21.0`, and published both artifacts with `twine upload dist-release-v1.21.0/*`.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.21.0.md`, and `FINAL-SUMMARY.md` so they now record shipped truth, direct ref proofs, and PyPI evidence without blurring the shipped tag line.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.21.0-merge-lanes` -> previous shipped line correctly surfaced as `v1.20.0` before this release
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.21.0-merge-lanes` -> `No contradictory success/blocker narratives found.`
+- `python3 -m pytest -q tests/test_merge_cmd.py tests/test_merge_engine.py tests/test_merge_workflow.py tests/test_main.py` -> `15 passed in 4.48s`
+- `uv run python -m pytest -q` -> `4995 passed, 1 warning in 179.64s (0:02:59)`
+- `uv build --out-dir dist-release-v1.21.0 --sdist --wheel --clear` -> built both release artifacts successfully
+- `git ls-remote --heads origin feat/v1.21.0-merge-lanes` -> branch on origin now at a later docs-only chronology head after shipped commit `1eb3e1700118b68292958c9fa8394f095cf03baf`
+- `git ls-remote --tags origin v1.21.0` -> `72dbfad314869cb4f49e9cb78db7a5c5214e06dd refs/tags/v1.21.0`
+- `git ls-remote --tags origin v1.21.0^{}` -> `1eb3e1700118b68292958c9fa8394f095cf03baf refs/tags/v1.21.0^{}`
+- `https://pypi.org/pypi/agentkit-cli/1.21.0/json` -> live with wheel `695609` bytes and sdist `1218832` bytes
+
+**Current truth:**
+- Deliverables D1 through D3 in the release contract are complete.
+- `agentkit-cli v1.21.0` is truthfully SHIPPED.
+- The shipped artifact is pinned to `v1.21.0` -> `1eb3e1700118b68292958c9fa8394f095cf03baf`, while the branch head is now a later docs-only chronology commit.
+
+---
+
+# Historical log (pre-v1.21.0)
 
 ## D4 complete: docs and local release-readiness surfaces landed
 
