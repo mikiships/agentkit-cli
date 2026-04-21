@@ -38,3 +38,15 @@ This tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: the focused suite passed, 
 - Re-ran the full suite once more and it closed cleanly at `5011 passed, 1 warning`.
 - Final contradiction scan passed with `No contradictory success/blocker narratives found.`
 - Final hygiene scan passed with `Total findings: 0`.
+
+## 2026-04-21 release-completion pass
+
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` and confirmed the active build is `agentkit-cli v1.27.0 release completion`, `last_shipped` is still `v1.26.0`, and `pending_publish` is `agentkit-cli v1.27.0`.
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` before irreversible work; it reported `No contradictory success/blocker narratives found.`
+- Re-ran the focused release slice: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 10.85s`.
+- Re-proved the flagship command path from this release tree: `uv run python -m agentkit_cli.main spec . --json` now exposes `primary_recommendation.kind = flagship-concrete-next-step`, title `Emit a concrete next flagship lane after shipped-truth sync`, and contract seed title `All-Day Build Contract: agentkit-cli-v1.27.0-spec-concrete-next-step spec concrete next step`.
+- The first full-suite rerun exposed one remaining release-consistency gap: `CHANGELOG.md` still started at `v1.26.0`, so changelog/version assertions failed even though the flagship command path and focused release slice were already green.
+- Added the missing `v1.27.0` changelog entry, then re-ran the affected release-consistency test cluster and it passed cleanly.
+- Re-ran the full suite from this tree after the changelog fix: `uv run python -m pytest -q` -> `5011 passed, 1 warning in 1030.73s (0:17:10)`.
+- Re-ran deterministic hygiene after the fix: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `Total findings: 0`.
+- Validation is now back to truthful `RELEASE-READY` for the irreversible release surfaces: push branch, create/push tag `v1.27.0`, publish `agentkit-cli==1.27.0`, then verify PyPI live truth.

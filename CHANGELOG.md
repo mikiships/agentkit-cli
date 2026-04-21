@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.27.0] - 2026-04-21
+
+### Fixed
+- Taught the flagship `agentkit spec` flow to emit a concrete next lane after shipped-truth sync, so the primary recommendation now resolves to `flagship-concrete-next-step` for the repo's own flagship case.
+- Added focused regression coverage across engine, command, workflow, and CLI entry paths for the concrete-next-step recommendation.
+
+### Docs
+- Reconciled local release surfaces for truthful `v1.27.0` status, including the changelog entry required by the release consistency checks.
+
 ## [1.26.0] - 2026-04-21
 
 ### Fixed
