@@ -22,7 +22,7 @@ Completed the spec-grounding pass that fixes the flagship repo's stale next-buil
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
 - Local repo truth reproduces the fixed result: `agentkit spec . --json` returns `adjacent-grounding` as the primary recommendation.
-- `git push -u origin feat/v1.25.0-spec-grounding` created the remote branch and left docs-only chronology head `853a648` on origin.
+- `git push -u origin feat/v1.25.0-spec-grounding` created the remote branch, and the later chronology reconciliation push advanced docs-only head `035ce8a` on origin.
 - Annotated tag `v1.25.0` was created and pushed, peeling to tested release commit `ecf1f46`.
 - `uvx twine upload --skip-existing dist/agentkit_cli-1.25.0.tar.gz dist/agentkit_cli-1.25.0-py3-none-any.whl` succeeded.
 - PyPI verification after propagation: both `https://pypi.org/pypi/agentkit-cli/1.25.0/json` and `https://pypi.org/pypi/agentkit-cli/json` show `1.25.0` live with `agentkit_cli-1.25.0-py3-none-any.whl` and `agentkit_cli-1.25.0.tar.gz`, and the exact version page returns HTTP `200`.

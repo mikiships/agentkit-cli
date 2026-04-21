@@ -144,7 +144,7 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 ## 2026-04-21 v1.25.0 release completion — Deliverables D3 and D4 complete
 
 ### Remote mutation that succeeded
-- `git push -u origin feat/v1.25.0-spec-grounding` -> remote branch `origin/feat/v1.25.0-spec-grounding` now exists at docs-only chronology head `853a648`
+- `git push -u origin feat/v1.25.0-spec-grounding` -> remote branch created for the lane, and the later chronology reconciliation push advanced `origin/feat/v1.25.0-spec-grounding` to docs-only head `035ce8a`
 - `git tag -a v1.25.0 -m "agentkit-cli v1.25.0" ecf1f46` -> annotated tag `v1.25.0` now peels to tested release commit `ecf1f46`
 - `git push origin v1.25.0` -> remote annotated tag now present on origin
 
@@ -159,7 +159,7 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 
 ### Current truth
 - `agentkit-cli v1.25.0` is shipped.
-- The tested shipped commit is tag target `ecf1f46`; later branch head `853a648` remains docs-only chronology.
+- The tested shipped commit is tag target `ecf1f46`; later branch head `035ce8a` remains docs-only chronology.
 - The flagship repo now self-specs the honest next adjacent build instead of recycling the already-satisfied self-hosting/source-readiness objective.
 
 ### Blockers

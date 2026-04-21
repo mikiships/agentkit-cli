@@ -21,7 +21,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.25.0-spec-grounding.md
 - `uv run python -m pytest -q` -> `5006 passed, 1 warning in 863.10s (0:14:23)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
-- `git push -u origin feat/v1.25.0-spec-grounding` -> remote branch now exists at docs-only chronology head `853a648`
+- `git push -u origin feat/v1.25.0-spec-grounding` and later chronology reconciliation push -> remote branch now sits at docs-only chronology head `035ce8a`
 - `git tag -a v1.25.0 -m "agentkit-cli v1.25.0" ecf1f46 && git push origin v1.25.0` -> remote annotated tag `v1.25.0` peels to tested release commit `ecf1f46`
 - `uvx twine upload --skip-existing dist/agentkit_cli-1.25.0.tar.gz dist/agentkit_cli-1.25.0-py3-none-any.whl` completed successfully from detached release commit `ecf1f46`
 - `https://pypi.org/pypi/agentkit-cli/1.25.0/json` and `https://pypi.org/pypi/agentkit-cli/json` both report `info.version=1.25.0` with wheel plus sdist live, and `https://pypi.org/project/agentkit-cli/1.25.0/` returns HTTP `200`
@@ -30,5 +30,5 @@ Contract: all-day-build-contract-agentkit-cli-v1.25.0-spec-grounding.md
 
 - `agentkit-cli v1.25.0` is shipped.
 - Tested shipped release commit: `ecf1f46` (`chore: close out v1.25.0 local release state`).
-- Later branch head `853a648` remains docs-only chronology after the shipped tag.
+- Later branch head `035ce8a` remains docs-only chronology after the shipped tag.
 - The flagship repo now self-specs the honest next adjacent build instead of recycling the already-satisfied self-hosting/source-readiness objective.

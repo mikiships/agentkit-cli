@@ -14,7 +14,7 @@ SHIPPED
 - Upgraded the primary recommendation and contract seed so the next build is the honest adjacent spec-grounding increment.
 - Pushed `feat/v1.25.0-spec-grounding`, tagged tested release commit `ecf1f46` as annotated `v1.25.0`, and published `agentkit-cli==1.25.0`.
 - Verified PyPI version JSON, package-root JSON, and the exact version page all show `1.25.0` live with wheel plus sdist.
-- Kept shipped tag truth separate from later docs-only chronology head `853a648`.
+- Kept shipped tag truth separate from later docs-only chronology head `035ce8a`.
 
 ## Validation anchor
 
