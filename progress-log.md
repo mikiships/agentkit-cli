@@ -1,6 +1,6 @@
-# Progress Log — agentkit-cli v1.24.0 clean JSON stdout
+# Progress Log — agentkit-cli v1.25.0 spec grounding shipped chronology
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
 
 ## Why this lane exists
@@ -123,6 +123,44 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 
 ### Result
 - Current truth is still `RELEASE-READY (LOCAL-ONLY)` pending fresh validation, branch push, tag, and PyPI publish proof.
+
+### Blockers
+- None.
+
+## 2026-04-21 v1.25.0 release completion — Deliverable D2 complete
+
+### Validation rerun from the release tree
+- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 9.80s`
+- Direct command-path proof from the current tree confirmed `uv run python -m agentkit_cli.main spec . --json` returns `primary_recommendation.kind=adjacent-grounding`.
+- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 863.10s (0:14:23)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
+
+### Result
+- The current release tree still validates cleanly and is ready for irreversible release steps.
+
+### Blockers
+- None.
+
+## 2026-04-21 v1.25.0 release completion — Deliverables D3 and D4 complete
+
+### Remote mutation that succeeded
+- `git push -u origin feat/v1.25.0-spec-grounding` -> remote branch `origin/feat/v1.25.0-spec-grounding` now exists at docs-only chronology head `853a648`
+- `git tag -a v1.25.0 -m "agentkit-cli v1.25.0" ecf1f46` -> annotated tag `v1.25.0` now peels to tested release commit `ecf1f46`
+- `git push origin v1.25.0` -> remote annotated tag now present on origin
+
+### Publish proof
+- Built from detached release commit `ecf1f46`: `uv build` produced `dist/agentkit_cli-1.25.0-py3-none-any.whl` and `dist/agentkit_cli-1.25.0.tar.gz`
+- `uvx twine upload --skip-existing dist/agentkit_cli-1.25.0.tar.gz dist/agentkit_cli-1.25.0-py3-none-any.whl` completed successfully
+
+### Registry verification after publish
+- `https://pypi.org/pypi/agentkit-cli/1.25.0/json` -> `info.version=1.25.0`, files: `agentkit_cli-1.25.0-py3-none-any.whl`, `agentkit_cli-1.25.0.tar.gz`
+- `https://pypi.org/pypi/agentkit-cli/json` -> `info.version=1.25.0`, same two artifacts live after propagation
+- `https://pypi.org/project/agentkit-cli/1.25.0/` -> HTTP `200` at the exact version page
+
+### Current truth
+- `agentkit-cli v1.25.0` is shipped.
+- The tested shipped commit is tag target `ecf1f46`; later branch head `853a648` remains docs-only chronology.
+- The flagship repo now self-specs the honest next adjacent build instead of recycling the already-satisfied self-hosting/source-readiness objective.
 
 ### Blockers
 - None.

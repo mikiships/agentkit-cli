@@ -1,6 +1,6 @@
 # BUILD-REPORT.md — agentkit-cli v1.25.0 spec grounding
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
 Contract: all-day-build-contract-agentkit-cli-v1.25.0-spec-grounding.md
 
@@ -13,17 +13,20 @@ Completed the spec-grounding pass that fixes the flagship repo's stale next-buil
 - D1: Added stale-self-hosting regression coverage in the spec command and workflow tests.
 - D2: Added planner evidence gathering and ranking for already-satisfied prerequisite detection.
 - D3: Emitted a concrete `adjacent-grounding` recommendation with tighter why-now, scope, validation, evidence, and contract-seed fields.
-- D4: Updated local version and report surfaces for truthful `v1.25.0` closeout.
+- D4: Pushed the branch, tagged tested release commit `ecf1f46` as `v1.25.0`, published `agentkit-cli==1.25.0`, and reconciled shipped chronology surfaces.
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.85s`
-- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 762.73s (0:12:42)`
+- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 9.80s`
+- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 863.10s (0:14:23)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
-- Full-suite closeout also preserved the existing daily build-report guard by keeping a verified test-count number in `BUILD-REPORT.md`.
-- Local repo truth now reproduces the fixed result: `agentkit spec . --json` returns `adjacent-grounding` as the primary recommendation.
+- Local repo truth reproduces the fixed result: `agentkit spec . --json` returns `adjacent-grounding` as the primary recommendation.
+- `git push -u origin feat/v1.25.0-spec-grounding` created the remote branch and left docs-only chronology head `853a648` on origin.
+- Annotated tag `v1.25.0` was created and pushed, peeling to tested release commit `ecf1f46`.
+- `uvx twine upload --skip-existing dist/agentkit_cli-1.25.0.tar.gz dist/agentkit_cli-1.25.0-py3-none-any.whl` succeeded.
+- PyPI verification after propagation: both `https://pypi.org/pypi/agentkit-cli/1.25.0/json` and `https://pypi.org/pypi/agentkit-cli/json` show `1.25.0` live with `agentkit_cli-1.25.0-py3-none-any.whl` and `agentkit_cli-1.25.0.tar.gz`, and the exact version page returns HTTP `200`.
 
 ## Status
 
-`RELEASE-READY (LOCAL-ONLY)`
+`SHIPPED`
