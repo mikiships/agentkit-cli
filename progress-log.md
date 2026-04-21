@@ -1,5 +1,28 @@
 # Progress Log — agentkit-cli v1.22.0 spec release prep
 
+## D4 complete: v1.22.0 shipped and chronology reconciled
+
+**What changed:**
+- Pushed `feat/v1.22.0-spec` to origin, created annotated tag `v1.22.0` on tested release commit `2c2b89f`, pushed the tag, built release artifacts, and published `agentkit-cli==1.22.0`.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.22.0.md`, and `FINAL-SUMMARY.md` so they now record shipped truth while keeping the later docs-only branch head `471958c` separate from the shipped tag target.
+- Prepared the workspace chronology update so future sessions inherit `v1.22.0` as the current shipped line instead of the older `v1.21.0` entry.
+
+**Validation:**
+- `git ls-remote --heads origin feat/v1.22.0-spec` -> branch live on origin at `471958c`
+- `git ls-remote --tags origin v1.22.0` -> annotated tag object `9932e71`
+- `git ls-remote --tags origin v1.22.0^{}` -> shipped release commit `2c2b89f`
+- `uv build --out-dir dist-release-v1.22.0 --sdist --wheel --clear` -> built both release artifacts successfully
+- `uvx twine upload dist-release-v1.22.0/*` -> publish succeeded and returned the `https://pypi.org/project/agentkit-cli/1.22.0/` release URL
+- PyPI JSON verification -> `agentkit_cli-1.22.0-py3-none-any.whl` (`704554` bytes) and `agentkit_cli-1.22.0.tar.gz` (`1231351` bytes)
+
+**Current truth:**
+- D1 through D4 are complete.
+- `agentkit-cli v1.22.0` is truthfully SHIPPED.
+- Shipped tag truth is `v1.22.0` -> `2c2b89f`; the branch later advanced to docs-only chronology head `471958c`.
+
+---
+
+
 ## D2 complete: validation rerun from the release tree is green
 
 **What changed:**

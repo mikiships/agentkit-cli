@@ -1,20 +1,21 @@
-# Final Summary — agentkit-cli v1.22.0 spec local release readiness
+# Final Summary — agentkit-cli v1.22.0 release completion
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
 Contract: all-day-build-contract-agentkit-cli-v1.22.0-release.md
 
 ## Outcome
 
-- `agentkit spec` is landed as the deterministic planning step between `map` and `contract`, with direct contract seeding through `agentkit contract --spec`.
-- Active repo surfaces now agree that the supported lane is `source -> audit -> map -> spec -> contract`.
-- `v1.22.0` is truthfully `RELEASE-READY (LOCAL-ONLY)` from this repo state; `v1.21.0` remains the last shipped release.
-- No push, tag, publish, or other remote mutation happened in this pass.
+SHIPPED
 
-## Validation
+- `agentkit-cli v1.22.0` is live.
+- `agentkit spec` is now shipped as the deterministic planning step between `map` and `contract`, with direct contract seeding through `agentkit contract --spec`.
+- The shipped tag is `v1.22.0` -> `2c2b89f`, while `origin/feat/v1.22.0-spec` later advanced to docs-only chronology head `471958c`.
+- Active repo and workspace chronology surfaces were reconciled to that exact split.
 
-- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` surfaced the expected current handoff cues (`v1.21.0` shipped, `v1.22.0 spec` active locally) plus a stale external temporal-ledger cue still mentioning `v1.1.0`.
-- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `No contradictory success/blocker narratives found.`
-- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_map.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `37 passed`
-- `uv run python -m pytest -q` -> `5003 passed, 1 warning`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `Total findings: 0`
+## Four surfaces proven
+
+- Tests: focused release slice passed at `37 passed in 2.31s`, and full suite passed at `5003 passed, 1 warning in 187.11s (0:03:07)`.
+- Branch/tag: `origin/feat/v1.22.0-spec` exists at `471958c`; annotated tag `v1.22.0` exists on origin and peels to shipped release commit `2c2b89f`.
+- PyPI publish: build produced both `agentkit_cli-1.22.0-py3-none-any.whl` and `agentkit_cli-1.22.0.tar.gz`, and publish succeeded via `uvx twine upload` after the base interpreter lacked `twine`.
+- Registry verification: PyPI version JSON for `agentkit-cli/1.22.0` returns `200` and lists both wheel (`704554` bytes) and sdist (`1231351` bytes); the project page URL for `1.22.0` was also returned by the successful publish flow.
