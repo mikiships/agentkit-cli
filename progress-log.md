@@ -60,4 +60,6 @@ The current tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: focused validation 
 ### D4. Post-release chronology reconciliation
 
 - Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.26.0.md`, and `FINAL-SUMMARY.md` from local-only language to shipped truth while keeping the shipped tag commit distinct from the later docs-only chronology branch head.
-- Pending final branch-head commit/push plus workspace chronology sync for `WORKING.md` and `temporal-facts.md`.
+- Recorded the docs-only chronology reconciliation on branch head `6ce56ecce14ae1fa60df0ef039286e2776154931` (`docs: reconcile v1.26.0 shipped chronology`) and pushed it to `origin/feat/v1.26.0-spec-shipped-truth`.
+- Updated workspace chronology surfaces: `/Users/mordecai/.openclaw/workspace/memory/WORKING.md` and `/Users/mordecai/.openclaw/workspace/memory/temporal-facts.md` now both reflect shipped `v1.26.0` truth.
+- Result: shipped tag truth, later docs-only branch chronology, and workspace memory surfaces now tell one coherent `v1.26.0` shipped story.
