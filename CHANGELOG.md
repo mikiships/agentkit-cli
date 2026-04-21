@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.24.0] - 2026-04-21
+
+### Fixed
+- Kept `agentkit spec --json` stdout machine-readable when `--output-dir` is used by routing the human `Wrote spec directory: ...` notice to stderr instead of stdout.
+- Added regression coverage for deterministic JSON stdout in the spec command and preserved the full `source -> audit -> map -> spec -> contract` workflow validation.
+
+### Docs
+- Updated the active build, summary, and progress surfaces so this lane truthfully records `v1.24.0` as a local release candidate until the external release surfaces are proven.
+
 ## [1.23.0] - 2026-04-21
 
 ### Added

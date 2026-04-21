@@ -28,5 +28,5 @@ Work only inside this repository. Keep changes narrowly focused on deterministic
 ## Deliverables
 - Canonical `.agentkit/source.md` ready for the contract lane.
 - Successful self-spec output for this repo with a deterministic next-build recommendation.
-- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.23.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
+- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.24.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
 - One local completion commit after validation passes.

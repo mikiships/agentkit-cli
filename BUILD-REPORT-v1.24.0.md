@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v1.24.0 clean JSON stdout
+# BUILD-REPORT-v1.24.0.md — agentkit-cli v1.24.0 clean JSON stdout
 
 Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
