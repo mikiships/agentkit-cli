@@ -1,3 +1,21 @@
+# Progress Log — agentkit-cli v1.17.0 resume lanes
+
+## D1 complete: resume engine and schema-backed plan classification landed
+
+**What changed:**
+- Added `agentkit_cli/schemas.py` with deterministic resume plan dataclasses and JSON rendering helpers.
+- Added `agentkit_cli/resume.py` with a saved-reconcile loader, contradiction checks, dependency validation, and resume bucket classification.
+- Mapped reconcile state into four resume outcomes: `relaunch-now`, `waiting`, `review-only`, and `completed`.
+- Preserved serialization-group safety by allowing only the earliest safe lane in a serialization group to relaunch in a single resume pass.
+
+**Validation:**
+- `pytest -q tests/test_resume_engine.py tests/test_reconcile_engine.py` -> passed
+
+**Current truth:**
+- D1 is complete.
+- D2 through D4 remain in progress.
+- Required workspace helper scripts for recall/conflict scans are not present inside this worktree, so repo-local validation currently uses direct artifact checks and targeted tests instead.
+
 # Progress Log — agentkit-cli v1.16.0 reconcile lane state
 
 ## D6 shipped: parent session completed release promotion and verified all four surfaces
