@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.21.0] - 2026-04-21
+
+- Added `agentkit merge`, a local-only merge workflow that consumes saved `land` artifacts plus local git and worktree evidence.
+- Added deterministic merge markdown and JSON reports, per-lane merge packets, explicit `merge-now`, `blocked`, `waiting`, and `already-landed` visibility, and dry-run-by-default local apply support behind `--apply`.
+- Added conflict-aware local merge execution that stops on dirty-state blockers or merge conflicts and writes truthful result status instead of continuing blindly.
+
 ## [1.20.0] - 2026-04-21
 
 - Added `agentkit land`, a local-only landing workflow that consumes saved `closeout`, `relaunch`, `resume`, and `reconcile` artifacts plus local git/worktree evidence.

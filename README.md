@@ -512,9 +512,9 @@ The launch packet surfaces:
 - reusable helper command files for local execution targets and manual handoff targets
 - local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
 
-## `agentkit observe` + `agentkit supervise` + `agentkit reconcile` + `agentkit resume` + `agentkit relaunch` + `agentkit closeout` + `agentkit land` — deterministic post-launch recovery, continuation, closeout, and local landing guidance
+## `agentkit observe` + `agentkit supervise` + `agentkit reconcile` + `agentkit resume` + `agentkit relaunch` + `agentkit closeout` + `agentkit land` + `agentkit merge` — deterministic post-launch recovery through local merge execution
 
-Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed. Finish with `agentkit reconcile` when you want one deterministic next-step packet that combines launch, observe, supervise, and dependency state into the next safe execution order. When an operator needs to continue after interruption or drift, run `agentkit resume` on the saved reconcile packet to decide which lanes should relaunch now, which must keep waiting, which require human review, and which should stay completed. Then run `agentkit relaunch` when you want fresh relaunch-ready packets for eligible lanes without manually restitching the saved launch context. After relaunch planning, run `agentkit closeout` when you want one local-only packet that keeps merge-ready, review-required, waiting, and already-closed lanes visible while generating deterministic per-lane closeout packets. Finish with `agentkit land` when you want one truthful local landing plan that turns closeout state into stable markdown and JSON landing artifacts, per-lane landing packets, and explicit merge-order guidance without mutating git state.
+Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed. Finish with `agentkit reconcile` when you want one deterministic next-step packet that combines launch, observe, supervise, and dependency state into the next safe execution order. When an operator needs to continue after interruption or drift, run `agentkit resume` on the saved reconcile packet to decide which lanes should relaunch now, which must keep waiting, which require human review, and which should stay completed. Then run `agentkit relaunch` when you want fresh relaunch-ready packets for eligible lanes without manually restitching the saved launch context. After relaunch planning, run `agentkit closeout` when you want one local-only packet that keeps merge-ready, review-required, waiting, and already-closed lanes visible while generating deterministic per-lane closeout packets. Run `agentkit land` when you want one truthful local landing plan that turns closeout state into stable markdown and JSON landing artifacts, per-lane landing packets, and explicit merge-order guidance without mutating git state. Finish with `agentkit merge` when you want to turn the saved landing plan into deterministic merge packets or, with explicit `--apply`, safe local merge execution that stays dry-run by default and stops truthfully on dirty-state blockers or merge conflicts.
 
 ```bash
 # Print a human-readable observe summary
@@ -561,6 +561,15 @@ agentkit land . --json > land.json
 
 # Write land.md, land.json, and per-lane landing packets
 agentkit land . --output-dir ./land
+
+# Build a deterministic local merge plan from the saved landing artifact
+agentkit merge . --json > merge.json
+
+# Write merge.md, merge.json, and per-lane merge packets
+agentkit merge . --output-dir ./merge
+
+# Explicitly execute only eligible local merges, still using the saved landing plan
+agentkit merge . --apply --output-dir ./merge-applied
 ```
 
 The observe packet surfaces:
@@ -601,6 +610,18 @@ The closeout packet surfaces:
 - explicit human verification notes for dirty worktrees, stale paths, relaunch-needed lanes, and already-closed archival context
 - deterministic `closeout.md` and `closeout.json` plus per-lane closeout packets under `lanes/<lane-id>/`
 
+The land packet surfaces:
+- stable land buckets that preserve `land-now`, `review-required`, `waiting`, and `already-closed` lanes explicitly
+- deterministic landing-order guidance, likely target-branch context, and per-lane landing packets for follow-on local merge preparation
+- local-only planning behavior, with no branch merge, push, tag, publish, or remote mutation side effects
+
+The merge packet surfaces:
+- stable merge buckets: `merge-now`, `blocked`, `waiting`, and `already-landed`
+- deterministic `merge.md` and `merge.json` plus per-lane `merge.json`, `merge.md`, and `packet.md` artifacts under `lanes/<lane-id>/`
+- explicit preflight checks, source artifact chains, target branch context, readiness reasons, and next operator actions for every lane
+- dry-run by default, with explicit `--apply` required before any local `git merge` execution starts
+- conflict-aware local apply behavior that stops on the first dirty-state blocker or merge conflict and records truthful lane results instead of continuing blindly
+
 Recommended full handoff lane:
 
 ```bash
@@ -626,6 +647,8 @@ agentkit reconcile . --output-dir ./reconcile
 agentkit resume . --output-dir ./resume
 agentkit relaunch . --output-dir ./relaunch
 agentkit closeout . --output-dir ./closeout
+agentkit land . --output-dir ./land
+agentkit merge . --output-dir ./merge
 ```
 
 Recommended full dispatch lane:

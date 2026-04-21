@@ -1,30 +1,27 @@
-# Final Summary — agentkit-cli v1.20.0 land lanes
+# Final Summary — agentkit-cli v1.21.0 merge lanes
 
-Status: SHIPPED
+Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.20.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.21.0-merge-lanes.md
 
 ## What completed in this pass
 
-- Added `agentkit land` as a deterministic local landing planner that consumes saved `closeout`, `relaunch`, `resume`, `reconcile`, and `launch` artifacts plus local git/worktree evidence.
-- Added schema-backed landing plans, first-class CLI wiring, per-lane landing packets, likely target-branch context, explicit `land-now` ordering, and preservation of review-required, waiting, and already-closed lanes.
-- Updated README, changelog, version surfaces, progress/build reports, and validated the focused continuation slice plus the full local test suite.
+- Added `agentkit merge` as a deterministic local merge planner and optional local merge executor on top of saved `land` artifacts.
+- Added schema-backed merge plans, first-class CLI wiring, per-lane merge packets, explicit `merge-now`, `blocked`, `waiting`, and `already-landed` visibility, plus dry-run-by-default `--apply` behavior.
+- Updated README, changelog, version surfaces, progress/build reports, and kept the branch truthfully local release-ready rather than falsely claiming shipment.
 
 ## Validation
 
-- `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `45 passed in 45.48s`
-- `uv run python -m pytest -q` -> `4987 passed, 1 warning in 291.76s (0:04:51)`
-- `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> current docs-only chronology head on `origin/feat/v1.20.0-land-lanes`, later than the shipped tag commit `5baec07b5fb2f2be35559edbef2a10081b850910`
-- `git ls-remote --tags origin v1.20.0` -> `1ac306c4426cd644bb537a8b75e5c9fec4ad0081 refs/tags/v1.20.0`
-- `git ls-remote --tags origin v1.20.0^{}` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/tags/v1.20.0^{}`
-- PyPI proof: `https://pypi.org/project/agentkit-cli/1.20.0/` and `https://pypi.org/pypi/agentkit-cli/1.20.0/json` live with `agentkit_cli-1.20.0-py3-none-any.whl` (`689640` bytes) and `agentkit_cli-1.20.0.tar.gz` (`1211626` bytes)
-- Recall and contradiction hygiene ran before release execution and final status writing.
+- Recall and contradiction hygiene ran before final status writing.
+- Focused merge continuation slice: `python3 -m pytest -q tests/test_merge_cmd.py tests/test_merge_engine.py tests/test_merge_workflow.py tests/test_main.py` -> `15 passed in 5.36s`.
+- Final full suite: `uv run python -m pytest -q` -> `4995 passed, 1 warning in 341.61s (0:05:41)`.
+- Build-report release surface checks passed after adding `BUILD-REPORT-v1.21.0.md` and recording the verified suite count in `BUILD-REPORT.md`.
+- Post-agent hygiene check: `/Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.21.0-merge-lanes` -> `Total findings: 0` after removing non-intentional `.agentkit-last-run.json`.
 
 ## Final truth
 
-- All deliverables D1 through D3 in the release contract are complete.
-- `agentkit-cli v1.20.0` is truthfully SHIPPED.
-- The shipped release commit is `5baec07b5fb2f2be35559edbef2a10081b850910`.
-- The current branch head is a later docs-only chronology commit on `origin/feat/v1.20.0-land-lanes`, while annotated tag `v1.20.0` still peels to the shipped release commit.
-- PyPI `agentkit-cli==1.20.0` is live with both release artifacts.
-- Intentional untracked contract artifacts remain in the worktree: `all-day-build-contract-agentkit-cli-v1.20.0-land-lanes.md` and `all-day-build-contract-agentkit-cli-v1.20.0-release.md`.
+- All deliverables D1 through D4 in the merge-lanes contract are complete.
+- `agentkit-cli v1.21.0` is truthfully `RELEASE-READY (LOCAL-ONLY)`.
+- The supported continuation lane now ends with `merge` after `land`.
+- No push, tag, publish, or remote mutation happened in this pass.
+- Intentional untracked contract artifact remains in the worktree: `all-day-build-contract-agentkit-cli-v1.21.0-merge-lanes.md`.
