@@ -340,6 +340,9 @@ class SpecEngine:
         fallback = self._fallback_source_candidate(root, audit_result, map_context, repo_hints)
         if fallback is not None:
             candidates.append(fallback)
+        adjacent_grounding = self._adjacent_grounding_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if adjacent_grounding is not None:
+            candidates.append(adjacent_grounding)
         coverage = self._coverage_candidate(root, map_context, repo_hints)
         if coverage is not None:
             candidates.append(coverage)
@@ -449,6 +452,90 @@ class SpecEngine:
                 test_requirements=[
                     "Re-run `agentkit source-audit . --json` and confirm the fallback warning or blocker disappears truthfully.",
                     "Run the most relevant focused tests for source/project/sync surfaces after the promotion.",
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
+    def _adjacent_grounding_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        if "self-hosted" not in objective_lower and "canonical source" not in objective_lower:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+
+        shipped_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if artifact.kind in {"build-report", "final-summary", "progress-log"}
+                and artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+            ),
+            None,
+        )
+        lane_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if any("source -> audit -> map -> spec -> contract" in lane for lane in artifact.lanes)
+            ),
+            None,
+        )
+        if shipped_artifact is None or lane_artifact is None:
+            return None
+
+        objective = "Ground `agentkit spec` in current repo truth so the flagship repo recommends the next honest adjacent build instead of recycling already-satisfied source-readiness work."
+        evidence = [
+            f"Source objective is stale relative to current repo truth: {objective_summary}",
+            f"Current readiness already passes canonically: {audit_result.readiness.summary}",
+            f"Recent shipped artifacts already document `{lane_artifact.lanes[0]}`.",
+        ]
+        if shipped_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact version: {shipped_artifact.version}.")
+        return SpecRecommendation(
+            slug="adjacent-spec-grounding",
+            kind="adjacent-grounding",
+            score=91,
+            title="Ground spec recommendations in current repo truth",
+            objective=objective,
+            why_now=[
+                "The repo already ships the canonical source and passes `agentkit source-audit` without fallback.",
+                "Recent shipped workflow artifacts already show the `source -> audit -> map -> spec -> contract` lane, so re-proposing self-hosting is stale.",
+                "The next honest increment is to make `agentkit spec` reason from current shipped evidence instead of repeating a completed prerequisite.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to spec-planner grounding, recommendation ranking, and the user-visible explanation fields that seed the next contract.",
+                "Do not reopen canonical-source or source-audit implementation work that current repo truth already satisfies.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Reproduce the stale recommendation from the current flagship repo truth before changing planner logic.",
+                "Add regression coverage for already-satisfied prerequisite suppression plus markdown/JSON explanation output.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} spec grounding",
+                deliverables=[
+                    "Teach the spec planner to ingest current canonical-source readiness and recent shipped workflow evidence before ranking objectives.",
+                    "Suppress or down-rank stale prerequisite recommendations that the repo already satisfies locally.",
+                    "Emit a concrete adjacent-build explanation and contract seed for the honest next increment instead of a generic subsystem fallback.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, and spec workflow regression tests for the flagship stale-objective case.",
+                    *list(repo_hints.command_hints[:2]),
                 ],
                 map_input=str(map_context.source or map_context.generated_from or root),
             ),

@@ -75,3 +75,20 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 
 ### Blockers
 - None.
+
+## 2026-04-21 v1.25.0 spec grounding — Deliverables D2 and D3 complete
+
+### What was built
+- Added planner grounding in `agentkit_cli/spec_engine.py` for flagship stale-objective cases where source-readiness and shipped workflow evidence already satisfy the old prerequisite.
+- Introduced an `adjacent-grounding` recommendation that points the repo at improving `agentkit spec` itself when current repo truth shows the self-hosting/source-readiness work is already done.
+- Upgraded the emitted why-now, scope, validation, evidence, and contract-seed fields so markdown and JSON output explain the honest next increment instead of falling back to the generic subsystem recommendation.
+- Reproduced the flagship repo truth locally and verified `agentkit spec . --json` now returns `adjacent-grounding` with a contract seed focused on spec grounding.
+
+### Tests passing
+- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `18 passed in 1.10s`
+
+### Next
+- Update build/report surfaces for `v1.25.0`, run the required conflict and hygiene checks, then close out with full-suite truth.
+
+### Blockers
+- None.
