@@ -1,5 +1,20 @@
 # Progress Log — agentkit-cli v1.17.0 resume lanes
 
+## D3 complete: workflow integration and resume guardrails landed
+
+**What changed:**
+- Added explicit resume integration coverage for the full saved artifact chain, including `launch -> observe -> supervise -> reconcile -> resume`.
+- Added guardrails for contradictory reconcile summaries, missing upstream launch artifacts, required supervise evidence, and serialization-group conflicts.
+- Verified that resume is planning-only and does not mutate the repo or lane worktrees while building its plan.
+
+**Validation:**
+- `pytest -q tests/test_resume_engine.py tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_resume_integration.py tests/test_reconcile_workflow.py` -> passed
+
+**Current truth:**
+- D1 through D3 are complete.
+- D4 remains in progress.
+- Required workspace helper scripts for recall/conflict scans are not present inside this worktree, so repo-local contradiction checks currently use direct reconcile-shape validation plus targeted integration tests instead.
+
 ## D2 complete: first-class `agentkit resume` CLI and packet output landed
 
 **What changed:**
