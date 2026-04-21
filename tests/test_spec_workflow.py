@@ -10,7 +10,14 @@ from agentkit_cli.main import app
 runner = CliRunner()
 
 
-def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adjacent_grounding: bool = False) -> None:
+def _write_repo(
+    project: Path,
+    *,
+    stale_self_hosting: bool = False,
+    shipped_adjacent_grounding: bool = False,
+    post_shipped_truth_objective: bool = False,
+    shipped_truth_sync: bool = False,
+) -> None:
     (project / ".agentkit").mkdir(parents=True)
     (project / "src").mkdir()
     (project / "tests").mkdir()
@@ -23,6 +30,8 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adja
     objective = "Ship the next repo-understanding increment."
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
+    if post_shipped_truth_objective:
+        objective = "Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work."
     (project / ".agentkit" / "source.md").write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -38,7 +47,7 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adja
     )
     (project / "src" / "main.py").write_text("def main():\n    return 'ok'\n", encoding="utf-8")
     (project / "tests" / "test_main.py").write_text("def test_ok():\n    assert True\n", encoding="utf-8")
-    (project / "README.md").write_text(
+    readme = (
         "# Demo Repo\n\n"
         "Supported lane: `source -> source-audit -> map -> contract`\n\n"
         "Recommended flow:\n\n"
@@ -46,9 +55,21 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adja
         "agentkit source-audit .\n"
         "agentkit map . --json > repo-map.json\n"
         "agentkit contract \"Ship the next increment\" --path . --map repo-map.json\n"
-        "```\n",
-        encoding="utf-8",
+        "```\n"
     )
+    if stale_self_hosting or post_shipped_truth_objective:
+        readme = (
+            "# Demo Repo\n\n"
+            "Supported lane: `source -> audit -> map -> spec -> contract`\n\n"
+            "Recommended flow:\n\n"
+            "```bash\n"
+            "agentkit source-audit .\n"
+            "agentkit map . --json > repo-map.json\n"
+            "agentkit spec . --json > repo-spec.json\n"
+            "agentkit contract --spec repo-spec.json --path .\n"
+            "```\n"
+        )
+    (project / "README.md").write_text(readme, encoding="utf-8")
     changelog = "# Changelog\n\n## [0.3.0] - 2026-04-21\n\n- Added deterministic workflow docs.\n"
     if stale_self_hosting:
         changelog = (
@@ -57,6 +78,13 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adja
             "- Added deterministic workflow docs.\n"
             "- Added a real repo-local `.agentkit/source.md` for the flagship repo so source-audit and spec no longer fall back to legacy context.\n"
             "- Supported repo-understanding lane is `source -> audit -> map -> spec -> contract`.\n"
+        )
+    if post_shipped_truth_objective:
+        changelog = (
+            "# Changelog\n\n"
+            "## [0.4.0] - 2026-04-21\n\n"
+            "- Refreshed the flagship source objective so `agentkit spec` advances from current shipped repo evidence.\n"
+            "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
         )
     (project / "CHANGELOG.md").write_text(changelog, encoding="utf-8")
     (project / "BUILD-REPORT.md").write_text(
@@ -74,6 +102,15 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adja
             "Date: 2026-04-21\n\n"
             "- Introduced an `adjacent-grounding` recommendation for stale self-hosting source objectives.\n"
             "- Verified `agentkit spec . --json` returns `adjacent-grounding` with a contract seed focused on spec grounding.\n",
+            encoding="utf-8",
+        )
+    if shipped_truth_sync:
+        (project / "progress-log.md").write_text(
+            "# Progress Log — demo-repo v0.5.0 spec shipped truth sync\n\n"
+            "Status: RELEASE-READY (LOCAL-ONLY)\n"
+            "Date: 2026-04-21\n\n"
+            "- Introduced a `shipped-truth-sync` recommendation after shipped adjacent grounding.\n"
+            "- Verified `agentkit spec . --json` no longer repeats shipped adjacent grounding work.\n",
             encoding="utf-8",
         )
 
@@ -146,3 +183,25 @@ def test_spec_workflow_moves_to_shipped_truth_sync_after_adjacent_grounding_ship
     contract_payload = json.loads(contract.output)
     assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
     assert contract_payload["output_path"].endswith("all-day-build-contract-refresh-the-flagship-source-objective-and-closeout-surfaces-so-agentkit-spec-starts-from-current-shipped-repo-truth-instead-of-re-proposing-the-already-shipped-spec-grounding-increment.md")
+
+
+def test_spec_workflow_emits_concrete_flagship_follow_up_after_shipped_truth_sync(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, post_shipped_truth_objective=True, shipped_truth_sync=True)
+
+    audit = runner.invoke(app, ["source-audit", str(project), "--json"])
+    assert audit.exit_code == 0, audit.output
+    assert json.loads(audit.output)["readiness"]["ready_for_contract"] is True
+
+    spec_dir = tmp_path / "spec-artifacts"
+    spec_run = runner.invoke(app, ["spec", str(project), "--output-dir", str(spec_dir), "--json"])
+    assert spec_run.exit_code == 0, spec_run.output
+    spec_payload = json.loads((spec_dir / "spec.json").read_text(encoding="utf-8"))
+    assert spec_payload["primary_recommendation"]["kind"] == "flagship-concrete-next-step"
+    assert spec_payload["contract_seed"]["title"].endswith("spec concrete next step")
+
+    contract = runner.invoke(app, ["contract", "--spec", str(spec_dir / "spec.json"), "--path", str(project), "--json"])
+    assert contract.exit_code == 0, contract.output
+    contract_payload = json.loads(contract.output)
+    assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
+    assert contract_payload["output_path"].endswith("all-day-build-contract-teach-the-flagship-self-spec-flow-to-emit-a-concrete-adjacent-build-recommendation-and-contract-seed-after-shipped-truth-sync-instead-of-falling-back-to-the-generic-subsystem-next-step-recommendation-for-agentkit-cli.md")

@@ -343,6 +343,9 @@ class SpecEngine:
         shipped_truth_sync = self._shipped_truth_sync_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if shipped_truth_sync is not None:
             candidates.append(shipped_truth_sync)
+        flagship_concrete_next = self._flagship_concrete_next_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if flagship_concrete_next is not None:
+            candidates.append(flagship_concrete_next)
         adjacent_grounding = self._adjacent_grounding_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if adjacent_grounding is not None:
             candidates.append(adjacent_grounding)
@@ -622,6 +625,81 @@ class SpecEngine:
             ),
         )
 
+    def _flagship_concrete_next_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        if "self-spec truthful" not in objective_lower or "shipped repo evidence" not in objective_lower:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+        shipped_truth_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+                and self._artifact_mentions_shipped_truth_sync(artifact)
+            ),
+            None,
+        )
+        if shipped_truth_artifact is None:
+            return None
+
+        objective = "Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync, instead of falling back to the generic subsystem-next-step recommendation for `agentkit_cli`."
+        evidence = [
+            f"Canonical source objective already targets post-shipped-truth self-spec behavior: {objective_summary}",
+            "Recent shipped/local-ready artifacts already record the shipped-truth-sync increment as done.",
+            "Current flagship command-path still falls through to the generic `subsystem-next-step` recommendation instead of naming the next bounded lane.",
+        ]
+        if shipped_truth_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact version carrying that closeout: {shipped_truth_artifact.version}.")
+        return SpecRecommendation(
+            slug="flagship-concrete-next-step",
+            kind="flagship-concrete-next-step",
+            score=89,
+            title="Emit a concrete next flagship lane after shipped-truth sync",
+            objective=objective,
+            why_now=[
+                "The flagship repo already finished canonical-source sync, adjacent grounding, and shipped-truth sync, so the generic subsystem fallback is now the remaining truth gap.",
+                "The next honest increment is planner specificity: recommend one bounded adjacent build with enough detail to open the next lane directly.",
+                "This keeps the self-spec flow actionable without reopening already-shipped prerequisite work.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to spec-planner logic, recommendation text, contract seeding, and the nearest regression tests or truthful local surfaces.",
+                "Do not reopen the already-shipped canonical-source, adjacent-grounding, or shipped-truth-sync implementation work.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Reproduce the current flagship fallback where `agentkit spec . --json` returns `subsystem-next-step` before changing planner logic.",
+                "Add regression coverage across engine, command, and workflow paths for the post-shipped-truth flagship case.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} spec concrete next step",
+                deliverables=[
+                    "Add planner logic that detects when the flagship repo has already completed shipped-truth sync and should advance to a concrete next build recommendation instead of the generic subsystem fallback.",
+                    "Emit a concrete recommendation title, objective, why-now reasoning, scope boundaries, and contract seed that are specific enough to open the next lane without human reinterpretation.",
+                    "Add or update focused regression coverage for the post-shipped-truth flagship case across engine, command, and workflow paths.",
+                ],
+                test_requirements=[
+                    "Run `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py`.",
+                    *list(repo_hints.command_hints[:1]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
     def _coverage_candidate(self, root: Path, map_context: MapContext, repo_hints) -> Optional[SpecRecommendation]:
         risks = list(map_context.hints) + ([] if map_context.summary is None else [])
         risk = next((item for item in map_context.hints if item.kind == "risk"), None)
@@ -769,6 +847,11 @@ class SpecEngine:
         haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
         joined = "\n".join(haystacks).lower()
         return "adjacent-grounding" in joined or "spec grounding" in joined
+
+    def _artifact_mentions_shipped_truth_sync(self, artifact: SpecWorkflowArtifact) -> bool:
+        haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
+        joined = "\n".join(haystacks).lower()
+        return "shipped truth sync" in joined or "shipped-truth-sync" in joined
 
     def _has_shipped_adjacent_grounding(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(

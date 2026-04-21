@@ -1,29 +1,29 @@
-# BUILD-REPORT.md — agentkit-cli v1.26.0 spec shipped truth sync
+# BUILD-REPORT.md — agentkit-cli v1.27.0 spec concrete next step
 
-Status: SHIPPED
+Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.26.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.27.0-spec-concrete-next-step-finisher.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Reproduced the flagship repo case where `agentkit spec . --json` still recommended the already-shipped `adjacent-grounding` increment from v1.25.0. |
-| D2 | ✅ Complete | Taught `agentkit_cli/spec_engine.py` to detect shipped or local-release-ready adjacent spec-grounding evidence and suppress that same recommendation on the next run. |
-| D3 | ✅ Complete | Added shipped-adjacent command and workflow regressions that require a `shipped-truth-sync` follow-up instead of `adjacent-grounding`. |
-| D4 | ✅ Complete | Refreshed `.agentkit/source.md`, version surfaces, changelog, and local closeout artifacts for truthful `v1.26.0` status. |
+| D1 | ✅ Complete | Grounded the in-progress tree and kept the bounded planner/test changes aimed at a concrete post-shipped-truth flagship recommendation. |
+| D2 | ✅ Complete | Proved `agentkit spec . --json` now returns a concrete flagship recommendation instead of the generic `subsystem-next-step` fallback. |
+| D3 | ✅ Complete | Refreshed local-only source and closeout surfaces to match the `v1.27.0 spec concrete next step` truth. |
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `20 passed in 4.03s`
-- `uv run python -m agentkit_cli.main spec . --json` now advances past the shipped v1.25.0 increment and returns primary recommendation kind `subsystem-next-step` from refreshed source truth.
-- `uv run python -m pytest -q` -> `5008 passed, 1 warning in 768.47s (0:12:48)`
-- Verified test-count floor recorded in this report: `5008 passed`.
+- `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 2.09s`
+- `uv run python -m agentkit_cli.main spec . --json` -> primary recommendation kind `flagship-concrete-next-step`
+- `uv run python -m pytest -q` -> `5011 passed, 1 warning in 887.08s (0:14:47)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `Total findings: 0`
+- Verified test-count floor remains satisfied by repo evidence: previous clean-tree full-suite proof recorded `5008 passed`, and the final closeout rerun passed at `5011 passed`.
 
 ## Current truth
 
-- `agentkit-cli v1.26.0` is shipped.
-- The shipped release tag is `v1.26.0`, and it peels to tested release commit `ba813b0836d8baa0cd6d1e5c27d42872c5fff555`.
-- `origin/feat/v1.26.0-spec-shipped-truth` now carries this later docs-only chronology head, which preserves shipped tag truth separately from post-release reporting reconciliation.
-- PyPI `agentkit-cli==1.26.0` is live with both wheel and sdist artifacts verified directly.
-- The repo now self-specs past the already-shipped v1.25.0 adjacent-grounding increment.
+- This repo is local-only for the `v1.27.0 spec concrete next step` lane.
+- The published package version in this tree remains `agentkit-cli v1.26.0`, and this local report intentionally documents the next unreleased lane on top of that shipped baseline.
+- The planner now emits a concrete flagship follow-up after shipped-truth sync.
+- Final full-suite, contradiction, and hygiene checks all passed from this same tree.

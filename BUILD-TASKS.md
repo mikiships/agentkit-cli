@@ -1,8 +1,10 @@
-# BUILD-TASKS.md — agentkit-cli v1.26.0 spec shipped truth sync
+# BUILD-TASKS.md — agentkit-cli v1.27.0 spec concrete next step
 
-- [x] Reproduce the flagship repo case where `agentkit spec . --json` still re-proposes the already-shipped `adjacent-grounding` increment
-- [x] Teach the planner to recognize shipped or local-release-ready adjacent spec-grounding evidence
-- [x] Add focused regression coverage for shipped-adjacent command and workflow paths
-- [x] Refresh `.agentkit/source.md` and nearby local report surfaces so the repo objective matches current shipped truth
-- [x] Run focused validation plus a full-suite confidence pass
-- [x] Leave the tree in truthful local release-ready state only
+- [x] Reproduce the current flagship post-v1.26.0 behavior where `agentkit spec . --json` falls through to the generic `subsystem-next-step` recommendation
+- [x] Identify the exact shipped-truth evidence pattern that should unlock a concrete next recommendation for the flagship repo
+- [x] Implement bounded planner logic in `agentkit_cli/spec_engine.py` for the post-shipped-truth flagship case
+- [x] Add focused regressions in `tests/test_spec_cmd.py`, `tests/test_spec_workflow.py`, and nearby engine coverage as needed
+- [x] Verify the new primary recommendation and contract seed are concrete enough to open the next lane without manual reinterpretation
+- [x] Refresh `.agentkit/source.md` and local report surfaces only if the new planner behavior changes the truthful active objective
+- [x] Run focused validation, then `uv run python -m pytest -q`
+- [x] Leave the tree in truthful local-only state

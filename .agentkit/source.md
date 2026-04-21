@@ -1,7 +1,7 @@
 # agentkit-cli
 
 ## Objective
-Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work.
+Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync instead of falling back to the generic subsystem-next-step recommendation.
 
 ## Commands
 - `python3 -m agentkit_cli.main source-audit . --json`
@@ -27,6 +27,6 @@ Work only inside this repository. Keep changes narrowly focused on deterministic
 
 ## Deliverables
 - Canonical `.agentkit/source.md` aligned with the repo's shipped local truth.
-- Successful self-spec output for this repo with a deterministic next-build recommendation that does not re-propose shipped adjacent work.
-- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.26.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
+- Successful self-spec output for this repo with a deterministic concrete next-build recommendation after shipped-truth sync.
+- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.27.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
 - One local completion commit after validation passes.

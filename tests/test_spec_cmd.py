@@ -18,6 +18,8 @@ def _write_repo(
     contradictory: bool = False,
     stale_self_hosting: bool = False,
     shipped_adjacent_grounding: bool = False,
+    post_shipped_truth_objective: bool = False,
+    shipped_truth_sync: bool = False,
 ) -> None:
     if canonical:
         (project / ".agentkit").mkdir(parents=True)
@@ -39,6 +41,8 @@ def _write_repo(
     objective = "Ship the next repo-understanding increment."
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
+    if post_shipped_truth_objective:
+        objective = "Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work."
     source_path.write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -55,7 +59,7 @@ def _write_repo(
     (project / "src" / "main.py").write_text("def main():\n    return 'ok'\n", encoding="utf-8")
     (project / "tests" / "test_main.py").write_text("def test_ok():\n    assert True\n", encoding="utf-8")
     if workflow_lane:
-        (project / "README.md").write_text(
+        readme = (
             "# Demo Repo\n\n"
             "Supported lane: `source -> source-audit -> map -> contract`\n\n"
             "Recommended flow:\n\n"
@@ -63,9 +67,21 @@ def _write_repo(
             "agentkit source-audit .\n"
             "agentkit map . --json > repo-map.json\n"
             "agentkit contract \"Ship the next increment\" --path . --map repo-map.json\n"
-            "```\n",
-            encoding="utf-8",
+            "```\n"
         )
+        if stale_self_hosting or post_shipped_truth_objective:
+            readme = (
+                "# Demo Repo\n\n"
+                "Supported lane: `source -> audit -> map -> spec -> contract`\n\n"
+                "Recommended flow:\n\n"
+                "```bash\n"
+                "agentkit source-audit .\n"
+                "agentkit map . --json > repo-map.json\n"
+                "agentkit spec . --json > repo-spec.json\n"
+                "agentkit contract --spec repo-spec.json --path .\n"
+                "```\n"
+            )
+        (project / "README.md").write_text(readme, encoding="utf-8")
         changelog = "# Changelog\n\n## [0.3.0] - 2026-04-21\n\n- Added deterministic workflow docs.\n"
         if stale_self_hosting:
             changelog = (
@@ -74,6 +90,13 @@ def _write_repo(
                 "- Added deterministic workflow docs.\n"
                 "- Added a real repo-local `.agentkit/source.md` for the flagship repo so source-audit and spec no longer fall back to legacy context.\n"
                 "- Supported repo-understanding lane is `source -> audit -> map -> spec -> contract`.\n"
+            )
+        if post_shipped_truth_objective:
+            changelog = (
+                "# Changelog\n\n"
+                "## [0.4.0] - 2026-04-21\n\n"
+                "- Refreshed the flagship source objective so `agentkit spec` advances from current shipped repo evidence.\n"
+                "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
             )
         (project / "CHANGELOG.md").write_text(changelog, encoding="utf-8")
         (project / "BUILD-REPORT.md").write_text(
@@ -91,6 +114,15 @@ def _write_repo(
                 "Date: 2026-04-21\n\n"
                 "- Introduced an `adjacent-grounding` recommendation for stale self-hosting source objectives.\n"
                 "- Verified `agentkit spec . --json` returns `adjacent-grounding` with a contract seed focused on spec grounding.\n",
+                encoding="utf-8",
+            )
+        if shipped_truth_sync:
+            (project / "progress-log.md").write_text(
+                "# Progress Log — demo-repo v0.5.0 spec shipped truth sync\n\n"
+                "Status: RELEASE-READY (LOCAL-ONLY)\n"
+                "Date: 2026-04-21\n\n"
+                "- Introduced a `shipped-truth-sync` recommendation after shipped adjacent grounding.\n"
+                "- Verified `agentkit spec . --json` no longer repeats shipped adjacent grounding work.\n",
                 encoding="utf-8",
             )
 
@@ -203,6 +235,22 @@ def test_spec_moves_past_adjacent_grounding_once_that_increment_is_already_shipp
     assert recommendation["contract_seed"]["title"].endswith("shipped truth sync")
     assert any("adjacent spec-grounding increment" in item for item in recommendation["why_now"])
     assert any("Recent shipped/local-ready artifacts already record" in item for item in recommendation["evidence"])
+
+
+def test_spec_emits_concrete_flagship_next_step_after_shipped_truth_sync(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, post_shipped_truth_objective=True, shipped_truth_sync=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    recommendation = payload["primary_recommendation"]
+    assert recommendation["kind"] == "flagship-concrete-next-step"
+    assert recommendation["title"] == "Emit a concrete next flagship lane after shipped-truth sync"
+    assert recommendation["contract_seed"]["title"].endswith("spec concrete next step")
+    assert "generic subsystem-next-step" in recommendation["objective"]
+    assert any("shipped-truth-sync increment as done" in item for item in recommendation["evidence"])
 
 
 def test_spec_help():

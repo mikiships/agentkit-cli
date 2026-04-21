@@ -336,11 +336,13 @@ class TestGetSetValue:
 # ---------------------------------------------------------------------------
 
 class TestConfigInitCLI:
-    def test_init_creates_toml(self, tmp_project: Path):
+    def test_init_creates_toml(self, tmp_project: Path, monkeypatch):
+        monkeypatch.chdir(tmp_project)
         result = runner.invoke(app, ["config", "init"], catch_exceptions=False,
                                env={"HOME": str(tmp_project)})
-        # Check file created in a findable location (may be in cwd for runner)
-        assert result.exit_code == 0 or TOML_FILENAME in result.output or "Created" in result.output
+        assert result.exit_code == 0
+        assert "Created" in result.output
+        assert (tmp_project / TOML_FILENAME).exists()
 
     def test_init_output_contains_created(self, tmp_project: Path, monkeypatch):
         monkeypatch.chdir(tmp_project)
