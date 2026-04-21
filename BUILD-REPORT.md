@@ -1,8 +1,8 @@
 # BUILD-REPORT.md — agentkit-cli v1.26.0 spec shipped truth sync
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.26.0-spec-shipped-truth-sync.md
+Contract: all-day-build-contract-agentkit-cli-v1.26.0-release.md
 
 ## Deliverables
 
@@ -22,6 +22,8 @@ Contract: all-day-build-contract-agentkit-cli-v1.26.0-spec-shipped-truth-sync.md
 
 ## Current truth
 
-- `agentkit-cli v1.26.0` is release-ready from this local tree only.
-- No push, tag, or publish was attempted in this pass.
+- `agentkit-cli v1.26.0` is shipped.
+- The shipped release tag is `v1.26.0`, and it peels to tested release commit `ba813b0836d8baa0cd6d1e5c27d42872c5fff555`.
+- `origin/feat/v1.26.0-spec-shipped-truth` now carries this later docs-only chronology head, which preserves shipped tag truth separately from post-release reporting reconciliation.
+- PyPI `agentkit-cli==1.26.0` is live with both wheel and sdist artifacts verified directly.
 - The repo now self-specs past the already-shipped v1.25.0 adjacent-grounding increment.
