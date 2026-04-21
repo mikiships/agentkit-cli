@@ -1,4 +1,20 @@
-# Progress Log — agentkit-cli v1.19.0 closeout lanes
+# Progress Log — agentkit-cli v1.20.0 land lanes
+
+## D3 complete: landing packets and merge-order guidance landed
+
+**What changed:**
+- Added `agentkit_cli/land.py` with deterministic local landing-plan assembly from saved `closeout.json` plus upstream `relaunch`, `resume`, `reconcile`, and `launch` evidence.
+- Added stable landing-order guidance, per-lane `packet.md` landing packets, likely target-branch context, serialization-aware waiting behavior, and explicit preservation of review-required, waiting, and already-closed lanes.
+- Added focused land engine, CLI, and workflow coverage for the full `launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout -> land` continuation loop.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_main.py` -> `16 passed in 3.87s`
+
+**Current truth:**
+- D1 through D3 are complete.
+- D4 remains in progress.
+- The repo is local-only and not yet release-ready for `v1.20.0`.
+
 
 ## D3 complete: four-surface release checklist finished, v1.19.0 shipped
 

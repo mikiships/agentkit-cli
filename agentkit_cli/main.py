@@ -107,6 +107,7 @@ from agentkit_cli.commands.reconcile_cmd import reconcile_command
 from agentkit_cli.commands.resume_cmd import resume_command
 from agentkit_cli.commands.relaunch_cmd import relaunch_command
 from agentkit_cli.commands.closeout_cmd import closeout_command
+from agentkit_cli.commands.land_cmd import land_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1577,6 +1578,28 @@ def closeout(
         output=output,
         output_dir=output_dir,
         relaunch_path=relaunch_path,
+        packet_dir=packet_dir,
+        format=format,
+    )
+
+
+@app.command("land")
+def land(
+    path: str = typer.Argument(..., help="Project directory to plan local landing after closeout"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered land summary to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write land.md, land.json, and per-lane landing packets to this directory"),
+    closeout_path: Optional[Path] = typer.Option(None, "--closeout-path", help="Optional path to a saved closeout.json artifact or closeout packet directory"),
+    packet_dir: Optional[Path] = typer.Option(None, "--packet-dir", help="Optional directory for per-lane landing packets"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Build deterministic local landing packets from saved closeout artifacts."""
+    land_command(
+        path=path,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        closeout_path=closeout_path,
         packet_dir=packet_dir,
         format=format,
     )
