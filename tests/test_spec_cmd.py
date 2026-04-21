@@ -10,7 +10,14 @@ from agentkit_cli.main import app
 runner = CliRunner()
 
 
-def _write_repo(project: Path, *, canonical: bool = True, workflow_lane: bool = True, contradictory: bool = False) -> None:
+def _write_repo(
+    project: Path,
+    *,
+    canonical: bool = True,
+    workflow_lane: bool = True,
+    contradictory: bool = False,
+    stale_self_hosting: bool = False,
+) -> None:
     if canonical:
         (project / ".agentkit").mkdir(parents=True)
         source_path = project / ".agentkit" / "source.md"
@@ -19,12 +26,21 @@ def _write_repo(project: Path, *, canonical: bool = True, workflow_lane: bool = 
     project.mkdir(parents=True, exist_ok=True)
     (project / "src").mkdir(exist_ok=True)
     (project / "tests").mkdir(exist_ok=True)
+    if stale_self_hosting:
+        (project / "agentkit_cli" / "commands").mkdir(parents=True, exist_ok=True)
+        (project / "agentkit_cli" / "main.py").write_text(
+            'from agentkit_cli.commands.spec_cmd import spec_command\n@app.command("spec")\ndef spec():\n    pass\n',
+            encoding="utf-8",
+        )
     rules = "- Keep output deterministic.\n"
     if contradictory:
         rules = "- Always update docs.\n- Do not update docs.\n"
+    objective = "Ship the next repo-understanding increment."
+    if stale_self_hosting:
+        objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
     source_path.write_text(
         "# Demo Repo\n\n"
-        "## Objective\nShip the next repo-understanding increment.\n\n"
+        f"## Objective\n{objective}\n\n"
         "## Scope & Boundaries\nWork only inside this repo.\n\n"
         f"## Rules\n{rules}\n"
         "## Validation\nRun uv run pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py\n\n"
@@ -49,16 +65,22 @@ def _write_repo(project: Path, *, canonical: bool = True, workflow_lane: bool = 
             "```\n",
             encoding="utf-8",
         )
-        (project / "CHANGELOG.md").write_text(
-            "# Changelog\n\n## [0.3.0] - 2026-04-21\n\n- Added deterministic workflow docs.\n",
-            encoding="utf-8",
-        )
+        changelog = "# Changelog\n\n## [0.3.0] - 2026-04-21\n\n- Added deterministic workflow docs.\n"
+        if stale_self_hosting:
+            changelog = (
+                "# Changelog\n\n"
+                "## [0.3.0] - 2026-04-21\n\n"
+                "- Added deterministic workflow docs.\n"
+                "- Added a real repo-local `.agentkit/source.md` for the flagship repo so source-audit and spec no longer fall back to legacy context.\n"
+                "- Supported repo-understanding lane is `source -> audit -> map -> spec -> contract`.\n"
+            )
+        (project / "CHANGELOG.md").write_text(changelog, encoding="utf-8")
         (project / "BUILD-REPORT.md").write_text(
-            "# BUILD-REPORT.md — demo-repo v0.3.0\n\nStatus: RELEASE-READY (LOCAL-ONLY)\n",
+            "# BUILD-REPORT.md — demo-repo v0.3.0\n\nStatus: SHIPPED\n",
             encoding="utf-8",
         )
         (project / "FINAL-SUMMARY.md").write_text(
-            "# Final Summary — demo-repo v0.3.0\n\nStatus: RELEASE-READY (LOCAL-ONLY)\n",
+            "# Final Summary — demo-repo v0.3.0\n\nStatus: SHIPPED\n",
             encoding="utf-8",
         )
 
@@ -139,6 +161,22 @@ def test_spec_command_truthfully_handles_fallback_without_workflow_artifacts(tmp
     payload = json.loads(result.output)
     assert payload["recent_workflow_artifacts"] == []
     assert payload["primary_recommendation"]["kind"] == "fallback-hardening"
+
+
+def test_spec_suppresses_stale_self_hosting_objective_when_repo_truth_already_satisfies_it(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, stale_self_hosting=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    recommendation = payload["primary_recommendation"]
+    assert recommendation["kind"] == "adjacent-grounding"
+    assert "self-hosted" not in recommendation["objective"]
+    assert recommendation["contract_seed"]["objective"].startswith("Ground `agentkit spec` in current repo truth")
+    assert any("already ships the canonical source" in item for item in recommendation["why_now"])
+    assert any("source -> audit -> map -> spec -> contract" in item for item in recommendation["evidence"])
 
 
 def test_spec_help():

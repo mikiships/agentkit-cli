@@ -59,3 +59,19 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 **Current truth:**
 - `agentkit-cli v1.24.0` is shipped.
 - The tested shipped commit is still tag target `6790e96`; any later branch-head commit remains chronology-only.
+
+## 2026-04-21 v1.25.0 spec grounding — Deliverable D1 complete
+
+### What was built
+- Added stale-self-hosting regression coverage in `tests/test_spec_cmd.py` and `tests/test_spec_workflow.py`.
+- Pinned the flagship failure mode where canonical source readiness and shipped workflow artifacts already prove the self-hosting prerequisite is done, but `agentkit spec` still recycles that old objective.
+- Defined the planner evidence required to suppress the stale recommendation: canonical `.agentkit/source.md`, `source-audit` ready without fallback, shipped/local-ready workflow artifacts, and explicit `source -> audit -> map -> spec -> contract` lane evidence.
+
+### Tests passing
+- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py` -> `10 passed in 2.06s`
+
+### Next
+- Ground planner ranking in current repo truth and upgrade the emitted recommendation and contract seed so the flagship repo points at the honest adjacent build.
+
+### Blockers
+- None.
