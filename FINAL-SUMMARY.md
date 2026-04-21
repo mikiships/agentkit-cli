@@ -1,18 +1,20 @@
-# Final Summary — agentkit-cli v1.24.0 clean JSON stdout
+# Final Summary — agentkit-cli v1.24.0 release completion
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.24.0-json-clean-stdout.md
+Contract: all-day-build-contract-agentkit-cli-v1.24.0-release.md
 
 ## Outcome
 
-RELEASE-READY (LOCAL-ONLY)
+SHIPPED
 
-- Fixed the `agentkit spec --json` stdout contract so JSON mode emits pure JSON.
-- Preserved human reporting by sending `Wrote spec directory: ...` to stderr in JSON mode and keeping it on stdout for human-mode runs.
-- Added a regression test that fails if stdout is contaminated during `--json --output-dir` runs.
-- Revalidated the focused spec slice, proved direct `json.loads()` parsing on command stdout artifacts, and passed the full suite.
+- The tested release candidate was pushed successfully to origin at `6790e96`.
+- The annotated release tag exists on origin: `v1.24.0` object `1f86c659` peels to `6790e96`.
+- The publish surface closed via the machine's working `.pypirc` path: exact `1.24.0` artifacts were built with `uv build`, then uploaded with `uvx twine upload --skip-existing`.
+- PyPI now serves `agentkit-cli==1.24.0` live with both the wheel and sdist artifacts.
+- Shipped truth therefore advances to `v1.24.0`.
 
 ## Validation anchor
 
-- Exact validation details and command-path proof are recorded in `BUILD-REPORT.md` and `progress-log.md`.
+- Exact rerun validation plus the push, tag, publish, and PyPI verification trail are recorded in `progress-log.md`.
+- Versioned companion report: `BUILD-REPORT-v1.24.0.md`.

@@ -1,20 +1,17 @@
-# BUILD-REPORT.md — agentkit-cli v1.24.0 clean JSON stdout
+# BUILD-REPORT.md — agentkit-cli v1.24.0 release completion
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.24.0-json-clean-stdout.md
+Contract: all-day-build-contract-agentkit-cli-v1.24.0-release.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | `agentkit spec --json` now keeps stdout machine-readable and routes the human write notice to stderr when `--output-dir` is used. |
-| D2 | ✅ Complete | Added regression coverage for the broken JSON stdout contract and preserved human-facing reporting in non-JSON mode. |
-| D3 | ✅ Complete | Local status surfaces now reflect the truthful lane state: `RELEASE-READY (LOCAL-ONLY)`. |
-
-## Root cause
-
-`agentkit_cli/commands/spec_cmd.py` always emitted `Wrote spec directory: ...` to stdout after writing `--output-dir`, even when `--json` selected machine-readable output. That unconditional human preamble contaminated stdout before the JSON payload.
+| D1 | ✅ Complete | Re-grounded the dirty partial-release tree, removed stale `.release-check/` temp evidence, and landed the truthful tested release candidate at `6790e96`. |
+| D2 | ✅ Complete | Re-ran the focused JSON-stdout slice, direct stdout/stderr proof, full suite, and hygiene checks from the current tree. |
+| D3 | ✅ Complete | Branch push, annotated tag, PyPI publish, and post-publish verification all succeeded for `v1.24.0`. |
+| D4 | ✅ Complete | Repo and workspace chronology surfaces distinguish the shipped tag truth from the later docs-only branch head. |
 
 ## Validation
 
@@ -24,18 +21,18 @@ Contract: all-day-build-contract-agentkit-cli-v1.24.0-json-clean-stdout.md
   - `python3 - <<'PY' "$tmpdir/spec.json" "$tmpdir/spec.stderr" ... json.loads(...) ... PY` -> `parsed schema_version=agentkit.spec.v1 primary_kind=None`
   - stderr contained `Wrote spec directory: ...`
 - `uv run python -m pytest -q` -> `5004 passed, 1 warning in 196.61s (0:03:16)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.24.0-json-clean-stdout` -> `Total findings: 0`
 
-## Files changed
+## Release-surface results
 
-- `agentkit_cli/commands/spec_cmd.py`
-- `tests/test_spec_cmd.py`
-- `BUILD-REPORT.md`
-- `FINAL-SUMMARY.md`
-- `BUILD-TASKS.md`
-- `progress-log.md`
+- Branch push proof: the tested release candidate was pushed to origin at `6790e96` before later chronology-only reconciliation.
+- Annotated tag: `v1.24.0` object `1f86c6593ba308bf004ac67cacb3e35ddaa9ebbe` peels to tested release commit `6790e964cfb654fef87e7cbae55695aeb3e268ea`.
+- Publish proof: built exact `1.24.0` artifacts with `uv build`, then uploaded `dist/agentkit_cli-1.24.0.tar.gz` and `dist/agentkit_cli-1.24.0-py3-none-any.whl` using `uvx twine upload --skip-existing`.
+- PyPI verification after publish: both `https://pypi.org/pypi/agentkit-cli/json` and `https://pypi.org/pypi/agentkit-cli/1.24.0/json` report `info.version = 1.24.0`, and the live files are the wheel plus sdist for `1.24.0`. The exact project page URL `https://pypi.org/project/agentkit-cli/1.24.0/` returns `200`, though non-browser fetches still see PyPI's client-challenge HTML.
 
 ## Current truth
 
-- This lane fixes a real stdout JSON contract bug locally.
-- Validation is clean, including the full suite.
-- The lane is `RELEASE-READY (LOCAL-ONLY)`.
+- `agentkit-cli v1.24.0` is **shipped**.
+- The last shipped line is now `v1.24.0`.
+- The tested release candidate commit is still `6790e96`, and the pushed tag points there.
+- Any later branch head on `feat/v1.24.0-json-clean-stdout` is chronology-only and must not be confused with shipped registry truth.

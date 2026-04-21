@@ -39,3 +39,23 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 - Re-ran `uv run python -m pytest -q` -> `5004 passed, 1 warning in 196.61s (0:03:16)`.
 - Re-ran `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.24.0-json-clean-stdout` -> `Total findings: 0`.
 - Current truth before any irreversible step: `v1.24.0` is release-ready from this tree, but not shipped until push, tag, and PyPI are directly proven.
+
+## 2026-04-21 release completion result: push, tag, publish, and verification succeeded
+
+**Remote mutation that succeeded:**
+- `git push -u origin feat/v1.24.0-json-clean-stdout` -> new remote branch `origin/feat/v1.24.0-json-clean-stdout` at `6790e96`
+- `git tag -a v1.24.0 -m "agentkit-cli v1.24.0"` -> tag object `1f86c6593ba308bf004ac67cacb3e35ddaa9ebbe`, peel `6790e964cfb654fef87e7cbae55695aeb3e268ea`
+- `git push origin v1.24.0` -> remote annotated tag now present and peeling to `6790e96`
+
+**Publish proof:**
+- `uv build` produced `dist/agentkit_cli-1.24.0-py3-none-any.whl` and `dist/agentkit_cli-1.24.0.tar.gz`
+- `uvx twine upload --skip-existing dist/agentkit_cli-1.24.0.tar.gz dist/agentkit_cli-1.24.0-py3-none-any.whl` completed successfully
+
+**Registry verification after publish:**
+- `https://pypi.org/pypi/agentkit-cli/1.24.0/json` -> `info.version=1.24.0`, files: `agentkit_cli-1.24.0-py3-none-any.whl`, `agentkit_cli-1.24.0.tar.gz`
+- `https://pypi.org/pypi/agentkit-cli/json` -> `info.version=1.24.0`, same two artifacts live after propagation
+- `https://pypi.org/project/agentkit-cli/1.24.0/` -> HTTP `200` at the exact version page, though non-browser fetches still receive PyPI's client-challenge HTML
+
+**Current truth:**
+- `agentkit-cli v1.24.0` is shipped.
+- The tested shipped commit is still tag target `6790e96`; any later branch-head commit remains chronology-only.

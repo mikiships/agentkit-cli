@@ -1,41 +1,18 @@
-# BUILD-REPORT-v1.24.0.md — agentkit-cli v1.24.0 clean JSON stdout
+# BUILD-REPORT-v1.24.0.md — agentkit-cli release completion
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.24.0-json-clean-stdout.md
+Contract: all-day-build-contract-agentkit-cli-v1.24.0-release.md
 
-## Deliverables
+## Objective
 
-| Deliverable | Status | Notes |
-| --- | --- | --- |
-| D1 | ✅ Complete | `agentkit spec --json` now keeps stdout machine-readable and routes the human write notice to stderr when `--output-dir` is used. |
-| D2 | ✅ Complete | Added regression coverage for the broken JSON stdout contract and preserved human-facing reporting in non-JSON mode. |
-| D3 | ✅ Complete | Local status surfaces now reflect the truthful lane state: `RELEASE-READY (LOCAL-ONLY)`. |
-
-## Root cause
-
-`agentkit_cli/commands/spec_cmd.py` always emitted `Wrote spec directory: ...` to stdout after writing `--output-dir`, even when `--json` selected machine-readable output. That unconditional human preamble contaminated stdout before the JSON payload.
-
-## Validation
-
-- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py` -> `8 passed in 0.94s`
-- Direct command-path proof:
-  - `uv run python -m agentkit_cli.main spec . --output-dir "$tmpdir/specdir" --json > "$tmpdir/spec.json" 2> "$tmpdir/spec.stderr"`
-  - `python3 - <<'PY' "$tmpdir/spec.json" "$tmpdir/spec.stderr" ... json.loads(...) ... PY` -> `parsed schema_version=agentkit.spec.v1 primary_kind=None`
-  - stderr contained `Wrote spec directory: ...`
-- `uv run python -m pytest -q` -> `5004 passed, 1 warning in 196.61s (0:03:16)`
-
-## Files changed
-
-- `agentkit_cli/commands/spec_cmd.py`
-- `tests/test_spec_cmd.py`
-- `BUILD-REPORT.md`
-- `FINAL-SUMMARY.md`
-- `BUILD-TASKS.md`
-- `progress-log.md`
+Take the tested `v1.24.0` clean-JSON-stdout tree from truthful local `RELEASE-READY` to fully shipped truth.
 
 ## Current truth
 
-- This lane fixes a real stdout JSON contract bug locally.
-- Validation is clean, including the full suite.
-- The lane is `RELEASE-READY (LOCAL-ONLY)`.
+- Release validation reran cleanly from `6790e96`.
+- The tested release candidate was pushed successfully to origin at `6790e96`, and annotated tag `v1.24.0` object `1f86c659` peels to `6790e96`.
+- The registry surface closed via the known-good local `.pypirc` path: exact `1.24.0` wheel and sdist artifacts were built from the tested release tree, then uploaded with `uvx twine upload --skip-existing`.
+- PyPI now shows `agentkit-cli==1.24.0` live. Both `https://pypi.org/pypi/agentkit-cli/json` and `https://pypi.org/pypi/agentkit-cli/1.24.0/json` report `info.version = 1.24.0` and serve the wheel plus sdist for `1.24.0`.
+- The exact project page URL `https://pypi.org/project/agentkit-cli/1.24.0/` now responds `200`, even though simple non-browser fetches still hit PyPI's client-challenge HTML.
+- Therefore `v1.24.0` is shipped, and it is now the last shipped release.
