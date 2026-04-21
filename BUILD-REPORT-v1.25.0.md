@@ -17,8 +17,10 @@ Completed the spec-grounding pass that fixes the flagship repo's stale next-buil
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.08s`
-- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 542.29s (0:09:02)`
+- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.85s`
+- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 762.73s (0:12:42)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
 - Full-suite closeout also preserved the existing daily build-report guard by keeping a verified test-count number in `BUILD-REPORT.md`.
 - Local repo truth now reproduces the fixed result: `agentkit spec . --json` returns `adjacent-grounding` as the primary recommendation.
 

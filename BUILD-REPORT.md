@@ -16,11 +16,11 @@ Contract: all-day-build-contract-agentkit-cli-v1.25.0-spec-grounding.md
 ## Validation
 
 - `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `18 passed in 1.10s`
-- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.08s`
+- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.85s`
 - `uv run python -m agentkit_cli.main spec . --json` now returns primary recommendation kind `adjacent-grounding` with a contract seed focused on grounding `agentkit spec` in current repo truth.
-- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 542.29s (0:09:02)`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding`
+- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 762.73s (0:12:42)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
 
 ## Current truth
 

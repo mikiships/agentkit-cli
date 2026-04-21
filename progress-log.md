@@ -92,3 +92,37 @@ This lane is `RELEASE-READY (LOCAL-ONLY)`.
 
 ### Blockers
 - None.
+
+## 2026-04-21 v1.25.0 spec grounding — Deliverable D4 complete
+
+### What was built
+- Updated `BUILD-REPORT.md`, added `BUILD-REPORT-v1.25.0.md`, and rewrote `FINAL-SUMMARY.md` for truthful local closeout.
+- Added the `v1.25.0` changelog entry and bumped local version surfaces in `pyproject.toml` and `agentkit_cli/__init__.py`.
+- Updated `tests/test_main.py` so the version flag matches the new local version surface.
+- Re-ran the repo truth checks required by contract, including conflict detection, full-suite validation, and post-agent hygiene.
+
+### Tests passing
+- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.85s`
+- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 762.73s (0:12:42)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
+
+### Next
+- None. This pass is `RELEASE-READY (LOCAL-ONLY)`.
+
+### Blockers
+- None.
+
+## 2026-04-21 v1.25.0 release completion — Deliverable D1 complete
+
+### Re-grounded release-ready truth
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` before any irreversible release step.
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` from the current tree.
+- Re-checked repo truth directly instead of trusting prior summaries: branch `feat/v1.25.0-spec-grounding`, head `ecf1f46`, remote `origin`, and no existing `v1.25.0` tag.
+- Noted current tree noise before release work: modified `BUILD-REPORT.md`, plus untracked contract files for this lane.
+
+### Result
+- Current truth is still `RELEASE-READY (LOCAL-ONLY)` pending fresh validation, branch push, tag, and PyPI publish proof.
+
+### Blockers
+- None.
