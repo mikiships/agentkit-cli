@@ -108,6 +108,7 @@ from agentkit_cli.commands.resume_cmd import resume_command
 from agentkit_cli.commands.relaunch_cmd import relaunch_command
 from agentkit_cli.commands.closeout_cmd import closeout_command
 from agentkit_cli.commands.land_cmd import land_command
+from agentkit_cli.commands.merge_cmd import merge_command
 from agentkit_cli.serve import DEFAULT_PORT
 
 app = typer.Typer(
@@ -1601,6 +1602,28 @@ def land(
         output_dir=output_dir,
         closeout_path=closeout_path,
         packet_dir=packet_dir,
+        format=format,
+    )
+
+
+@app.command("merge")
+def merge(
+    path: str = typer.Argument(..., help="Project directory to merge after land planning"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered merge summary to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write merge.md, merge.json, and per-lane merge packets to this directory"),
+    closeout_path: Optional[Path] = typer.Option(None, "--closeout-path", help="Optional path to a saved closeout.json artifact or closeout packet directory"),
+    apply: bool = typer.Option(False, "--apply", help="Explicitly execute eligible local merges. Dry-run remains the default."),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Build deterministic local merge packets from saved land and closeout artifacts."""
+    merge_command(
+        path=path,
+        json_output=json_output,
+        output=output,
+        output_dir=output_dir,
+        closeout_path=closeout_path,
+        apply=apply,
         format=format,
     )
 

@@ -282,3 +282,82 @@ class LandPlan:
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), indent=2, sort_keys=True)
+
+
+@dataclass(frozen=True)
+class MergeDependency:
+    lane_id: str
+    reason: str
+    satisfied: bool
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class MergeLane:
+    lane_id: str
+    title: str
+    phase_id: str
+    phase_index: int
+    serialization_group: str
+    source_branch: str
+    target_branch: str
+    worktree_path: str
+    merge_bucket: str
+    readiness_reason: str
+    next_action: str
+    readiness: str
+    preflight_checks: list[str] = field(default_factory=list)
+    dependencies: list[MergeDependency] = field(default_factory=list)
+    upstream_evidence_paths: list[str] = field(default_factory=list)
+    source_land_bucket: str = ""
+    worktree_exists: bool = False
+    worktree_dirty: bool = False
+    branch_matches: bool = False
+    branch_conflict: bool = False
+    head_oid: str | None = None
+    packet_path: str | None = None
+    merge_packet_path: str | None = None
+    result: str = "planned"
+
+    def to_dict(self) -> dict[str, object]:
+        payload = asdict(self)
+        payload["dependencies"] = [item.to_dict() for item in self.dependencies]
+        return payload
+
+
+@dataclass(frozen=True)
+class MergePlan:
+    schema_version: str
+    project_path: str
+    target: str
+    closeout_path: str
+    relaunch_path: str
+    resume_path: str
+    reconcile_path: str
+    launch_path: str
+    land_path: str | None
+    observe_path: str | None
+    supervise_path: str | None
+    target_branch: str
+    apply_requested: bool = False
+    merge_now_lane_ids: list[str] = field(default_factory=list)
+    blocked_lane_ids: list[str] = field(default_factory=list)
+    waiting_lane_ids: list[str] = field(default_factory=list)
+    already_landed_lane_ids: list[str] = field(default_factory=list)
+    applied_lane_ids: list[str] = field(default_factory=list)
+    packet_dir: str | None = None
+    next_actions: list[str] = field(default_factory=list)
+    stopped_on_lane_id: str | None = None
+    stop_reason: str | None = None
+    merge_started: bool = False
+    lanes: list[MergeLane] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        payload = asdict(self)
+        payload["lanes"] = [item.to_dict() for item in self.lanes]
+        return payload
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), indent=2, sort_keys=True)
