@@ -1,5 +1,22 @@
 # Progress Log — agentkit-cli v1.17.0 resume lanes
 
+## D4 complete: docs, versioning, and release-ready surfaces reconciled for v1.17.0
+
+**What changed:**
+- Bumped local version surfaces to `1.17.0`.
+- Updated README and CHANGELOG so the documented handoff lane now ends with `resume` after `reconcile`.
+- Rewrote `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, and added `BUILD-REPORT-v1.17.0.md` so the branch truthfully reports local-only `RELEASE-READY` state.
+- Kept the repo narrative explicit that no push, tag, publish, or other remote mutation happened in this pass.
+
+**Validation:**
+- `pytest -q tests/` -> passed
+- `git status --short` -> clean except for the intentional contract file
+
+**Current truth:**
+- D1 through D4 are complete.
+- The repo is now truthfully LOCAL RELEASE-READY for `v1.17.0`.
+- Required workspace helper scripts named in the contract are not present inside this worktree, so this pass used repo-local equivalents: direct reconcile contradiction validation, targeted integration tests, and `git status` hygiene checks.
+
 ## D3 complete: workflow integration and resume guardrails landed
 
 **What changed:**

@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.17.0] - 2026-04-20
+
+### Added
+- Added `agentkit resume` as a deterministic continuation step after `reconcile`, with stable markdown and JSON output plus per-lane resume packet directories.
+- Added schema-backed resume plan structures and dependency-aware resume classification for `relaunch-now`, `waiting`, `review-only`, and `completed` outcomes.
+- Added contradiction checks for malformed reconcile summaries, missing upstream artifacts, incomplete saved state, and serialization-group conflicts before any resume plan is emitted.
+- Added focused resume engine, CLI, integration, and workflow tests covering `launch -> observe -> supervise -> reconcile -> resume`.
+
+### Changed
+- Extended the documented handoff lane so the supported local continuation flow now ends with `resume` after `reconcile`.
+- Bumped local version surfaces from `1.16.0` to `1.17.0` for this branch.
+
 ## [1.16.0] - 2026-04-20
 
 ### Added
