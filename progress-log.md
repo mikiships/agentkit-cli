@@ -1,5 +1,21 @@
 # Progress Log — agentkit-cli v1.19.0 closeout lanes
 
+## D4 complete: docs and local release-readiness surfaces landed
+
+**What changed:**
+- Updated `README.md`, `CHANGELOG.md`, `agentkit_cli/__init__.py`, `pyproject.toml`, `BUILD-REPORT.md`, `BUILD-REPORT-v1.19.0.md`, and `FINAL-SUMMARY.md` for `agentkit closeout` and `v1.19.0` local release truth.
+- Recorded the final full-suite result, added the required versioned build report copy, and aligned the version flag test with `1.19.0`.
+- Left the repo in a coherent local-only `RELEASE-READY` state with no push, tag, publish, or remote mutation.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `36 passed in 9.08s`
+- `uv run python -m pytest -q` -> `4978 passed, 1 warning in 224.91s (0:03:44)`
+
+**Current truth:**
+- D1 through D4 are complete.
+- The repo is truthfully `RELEASE-READY (LOCAL-ONLY)` for `v1.19.0`.
+- No blockers remain.
+
 ## D3 complete: merge and follow-on closeout packets landed
 
 **What changed:**

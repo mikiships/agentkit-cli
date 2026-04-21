@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.19.0] - 2026-04-20
+
+- Added `agentkit closeout`, a local-only closeout workflow that consumes saved `relaunch`, `resume`, and `reconcile` artifacts plus local worktree evidence.
+- Added deterministic closeout markdown and JSON reports, plus per-lane `packet.md` closeout packets with merge-readiness reasons, human verification notes, and follow-on unblock notes.
+- Preserved waiting, review-required, and already-closed lanes explicitly so operators can close out a relaunch lane set without manual restitching.
+
 ## [1.18.0] - 2026-04-20
 
 ### Added

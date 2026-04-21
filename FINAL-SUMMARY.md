@@ -1,35 +1,23 @@
-# Final Summary — agentkit-cli v1.18.0 relaunch lanes
+# Final Summary — agentkit-cli v1.19.0 closeout lanes
 
-Status: SHIPPED
+Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
+Contract: all-day-build-contract-agentkit-cli-v1.19.0-closeout-lanes.md
 
 ## What completed in this pass
 
-- Committed the release-ready `v1.18.0` surfaces at shipped commit `6e8f193`.
-- Re-ran the source-of-truth relaunch release slice and smoke slice from that exact commit in the supported `uv` Python environment.
-- Pushed branch `feat/v1.18.0-relaunch-lanes` to origin.
-- Created and pushed annotated tag `v1.18.0` on the tested release commit.
-- Built and published `agentkit-cli==1.18.0` to PyPI, then verified both release artifacts directly from the version-specific PyPI JSON.
-- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.18.0.md`, `FINAL-SUMMARY.md`, and `progress-log.md` so the repo tells the truthful shipped chronology.
-
-## Release truth
-
-- Release branch on origin: `feat/v1.18.0-relaunch-lanes` is pushed and now carries docs-only chronology reconciliation commits after shipment.
-- Shipped annotated tag: `v1.18.0` -> tag object `7554645331a8712cd6a7f6cd0cd84dd09df8abdf`, peeled commit `6e8f193708cd7dd30a2d827d952e78802cbd598a`
-- PyPI live: `https://pypi.org/project/agentkit-cli/1.18.0/`
-- PyPI artifacts: `agentkit_cli-1.18.0-py3-none-any.whl` (`675725` bytes), `agentkit_cli-1.18.0.tar.gz` (`1191256` bytes)
+- Added the schema-backed closeout engine and `agentkit.closeout.v1` plan and lane surfaces.
+- Added first-class `agentkit closeout` CLI wiring and deterministic directory output.
+- Added per-lane closeout packets with merge-readiness reasons, human verification notes, and serialized follow-on unblock notes.
+- Updated README, CHANGELOG, version surfaces, build report, and progress log for `v1.19.0` local closeout support.
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py tests/test_relaunch_workflow.py tests/test_resume_workflow.py tests/test_launch_workflow.py` -> `32 passed in 32.04s`
-- `uv run python -m pytest -m smoke -q --tb=short` -> `9 passed, 4958 deselected in 18.44s`
+- `python3 -m pytest -q tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `36 passed in 9.08s`
+- `uv run python -m pytest -q` -> `4978 passed, 1 warning in 224.91s (0:03:44)`
 
-## Chronology note
+## Final truth
 
-- The shipped artifact is pinned to tag target `6e8f193`.
-- The branch later advanced only for docs-only chronology reconciliation after shipment.
-
-## Blocker
-
-- None. `agentkit-cli v1.18.0` is truthfully SHIPPED.
+- All deliverables D1 through D4 are complete.
+- The branch is truthfully `RELEASE-READY (LOCAL-ONLY)` for `v1.19.0`.
+- No push, tag, publish, or other remote mutation was performed.

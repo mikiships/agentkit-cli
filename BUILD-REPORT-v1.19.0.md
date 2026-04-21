@@ -1,4 +1,4 @@
-# BUILD-REPORT.md — agentkit-cli v1.19.0 closeout lanes
+# BUILD-REPORT-v1.19.0.md — agentkit-cli v1.19.0 closeout lanes
 
 Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-20
@@ -25,8 +25,3 @@ Contract: all-day-build-contract-agentkit-cli-v1.19.0-closeout-lanes.md
 - Version surfaces reflect `1.19.0`
 - Release posture is local-only: no push, tag, publish, or remote mutation was performed in this pass
 - Supported handoff lane target: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout`
-
-## Notes
-
-- `scripts/pre-action-recall.sh`, `scripts/check-status-conflicts.sh`, and `scripts/post-agent-hygiene-check.sh` were referenced by the contract but are not present in this repo snapshot, so equivalent manual consistency checks were used instead.
-- Branch-head full test suite now passes locally, so this repo state is truthfully `RELEASE-READY (LOCAL-ONLY)`.
