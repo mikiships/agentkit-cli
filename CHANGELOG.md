@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.18.0] - 2026-04-20
+
+### Added
+- Added `agentkit relaunch` as a deterministic continuation step after `resume`, with stable markdown and JSON output plus per-lane relaunch packet directories.
+- Added schema-backed relaunch plan structures that validate saved `resume`, `reconcile`, and `launch` evidence before surfacing fresh relaunch-ready packets.
+- Added fresh per-lane `handoff.md` relaunch packets, helper command files, stale-worktree review notes, and preserved `waiting`, `review-only`, and `completed` visibility alongside eligible `relaunch-now` lanes.
+- Added focused relaunch engine, CLI, and workflow tests covering `launch -> observe -> supervise -> reconcile -> resume -> relaunch`.
+
+### Changed
+- Extended the documented handoff lane so the supported local continuation flow now ends with `relaunch` after `resume`.
+- Bumped local version surfaces from `1.17.0` to `1.18.0` for this branch.
+
 ## [1.17.0] - 2026-04-20
 
 ### Added

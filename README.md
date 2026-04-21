@@ -512,9 +512,9 @@ The launch packet surfaces:
 - reusable helper command files for local execution targets and manual handoff targets
 - local-only behavior, with execution remaining opt-in and refusing missing tool or artifact states clearly
 
-## `agentkit observe` + `agentkit supervise` + `agentkit reconcile` + `agentkit resume` — deterministic post-launch recovery and continuation
+## `agentkit observe` + `agentkit supervise` + `agentkit reconcile` + `agentkit resume` + `agentkit relaunch` — deterministic post-launch recovery and continuation
 
-Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed. Finish with `agentkit reconcile` when you want one deterministic next-step packet that combines launch, observe, supervise, and dependency state into the next safe execution order. When an operator needs to continue after interruption or drift, run `agentkit resume` on the saved reconcile packet to decide which lanes should relaunch now, which must keep waiting, which require human review, and which should stay completed.
+Use `agentkit observe` after `launch` when you want one stable markdown or JSON packet that summarizes which lanes succeeded, failed, are still running, are waiting, remain blocked, or still have no explicit saved result. Then use `agentkit supervise` when you want a local worktree-state view that tells you which launched lanes are ready to start next, still running, drifted, blocked, or completed. Finish with `agentkit reconcile` when you want one deterministic next-step packet that combines launch, observe, supervise, and dependency state into the next safe execution order. When an operator needs to continue after interruption or drift, run `agentkit resume` on the saved reconcile packet to decide which lanes should relaunch now, which must keep waiting, which require human review, and which should stay completed. Then run `agentkit relaunch` when you want fresh relaunch-ready packets for eligible lanes without manually restitching the saved launch context.
 
 ```bash
 # Print a human-readable observe summary
@@ -543,6 +543,12 @@ agentkit resume . --json > resume.json
 
 # Write resume.md, resume.json, and per-lane resume packets
 agentkit resume . --output-dir ./resume
+
+# Build fresh relaunch packets from the saved resume artifact
+agentkit relaunch . --json > relaunch.json
+
+# Write relaunch.md, relaunch.json, fresh handoff.md packets, and per-lane helper commands
+agentkit relaunch . --output-dir ./relaunch
 ```
 
 The observe packet surfaces:
@@ -570,6 +576,12 @@ The resume packet surfaces:
 - serialization-group safety so only the earliest safe lane in a serialized group reopens during the same resume pass
 - deterministic `resume.md` and `resume.json` plus per-lane resume packets under `lanes/<lane-id>/`
 
+The relaunch packet surfaces:
+- stable relaunch buckets that preserve `relaunch-now`, `waiting`, `review-only`, and `completed` lanes explicitly
+- fresh per-lane `handoff.md` packets and helper command files for eligible relaunches so operators do not need to reconstruct the prior launch context manually
+- upstream evidence paths, resume and reconcile reasons, and review notes for stale worktrees or unresolved human-review lanes
+- deterministic `relaunch.md` and `relaunch.json` plus per-lane relaunch packets under `lanes/<lane-id>/`
+
 Recommended full handoff lane:
 
 ```bash
@@ -592,6 +604,8 @@ cp ./launch/launch.json ./launch.json
 agentkit observe . --target codex --output-dir ./observe
 agentkit supervise . --output-dir ./supervise
 agentkit reconcile . --output-dir ./reconcile
+agentkit resume . --output-dir ./resume
+agentkit relaunch . --output-dir ./relaunch
 ```
 
 Recommended full dispatch lane:

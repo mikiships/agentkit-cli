@@ -1,29 +1,27 @@
-# Final Summary — agentkit-cli v1.17.0 resume lanes
+# Final Summary — agentkit-cli v1.18.0 relaunch lanes
 
-Status: SHIPPED
+Status: LOCAL RELEASE-READY
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.17.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 
 ## What completed in this pass
 
-- Re-verified the release from this repo with fresh recall, conflict scan, focused resume/reconcile validation, and a full green test suite.
-- Pushed `feat/v1.17.0-resume-lanes` to origin.
-- Created and pushed annotated tag `v1.17.0`.
-- Built and published `agentkit-cli==1.17.0` to PyPI.
-- Reconciled the report surfaces so the release commit and any later docs-only chronology head are kept distinct.
+- Completed D4 for the local `v1.18.0` relaunch-lanes branch.
+- Reconciled version surfaces to `1.18.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, `README.md`, and `CHANGELOG.md`.
+- Replaced the stale `v1.17.0` shipped summary with truthful local-only `v1.18.0` closeout reporting.
+- Added the missing versioned build report for `v1.18.0` and aligned `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, and `progress-log.md` to the same local release-ready story.
+- Re-ran the strongest relevant local validation for relaunch lanes in the supported `uv` Python environment, including smoke coverage, and fixed the stale version assertion in `tests/test_main.py`.
 
 ## Current truth
 
-- Branch: `feat/v1.17.0-resume-lanes`
-- Shipped release commit: `533354a9e9074c9bf26923c28f7eedce0a8c8339` (`chore: refresh v1.17.0 release verification`)
-- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume`
-- Version surfaces target `1.17.0`
-- Validation status: `21 passed` focused slice, `4959 passed, 1 warning` full suite
-- Remote branch: `origin/feat/v1.17.0-resume-lanes` at `533354a9e9074c9bf26923c28f7eedce0a8c8339`
-- Remote tag: `v1.17.0` peels to `533354a9e9074c9bf26923c28f7eedce0a8c8339`
-- Registry state: PyPI serves live wheel and sdist artifacts for `agentkit-cli==1.17.0`
-- Working tree state: clean except for intentional untracked release-contract artifacts
+- Branch: `feat/v1.18.0-relaunch-lanes`
+- Local head: `18eea61` (`test: cover relaunch workflow packets`)
+- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch`
+- Version surfaces target `1.18.0`
+- Validation status: focused relaunch slice green, `32 passed`; smoke slice green, `9 passed`
+- Working tree state: local docs/version/report updates plus the intentional contract file
+- Remote/tag/registry state: not touched in this pass by design
 
 ## Blocker
 
-- None. `agentkit-cli v1.17.0` is truthfully SHIPPED.
+- None for local release readiness. `agentkit-cli v1.18.0` is truthfully LOCAL RELEASE-READY and still unshipped.
