@@ -1,5 +1,22 @@
 # Progress Log — agentkit-cli v1.20.0 land lanes
 
+## D1 complete: release-truth refresh revalidated from the v1.20.0 candidate tree
+
+**What changed:**
+- Re-ran the required workspace recall and contradiction hygiene scripts before trusting any local release prose.
+- Revalidated the focused land continuation slice and the full release-confidence suite from the current `v1.20.0` candidate commit `f6c411abf24bc15d65ed1a66858c553734a388e9`.
+- Confirmed the repo remains truthfully local release-ready, then identified one non-intentional untracked runtime artifact (`.agentkit-last-run.json`) alongside the two intentional contract artifacts.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `45 passed in 45.48s`
+- `uv run python -m pytest -q` -> `4987 passed, 1 warning in 291.76s (0:04:51)`
+- `git status --short` -> `?? .agentkit-last-run.json`, `?? all-day-build-contract-agentkit-cli-v1.20.0-land-lanes.md`, `?? all-day-build-contract-agentkit-cli-v1.20.0-release.md`
+
+**Current truth:**
+- Release deliverable D1 in the release contract is complete.
+- The repo is still truthfully `RELEASE-READY (LOCAL-ONLY)` for `v1.20.0`, pending release execution and chronology reconciliation.
+- One non-intentional runtime artifact should be removed before any shipped claim.
+
 ## D4 complete: docs and local release-readiness surfaces landed
 
 **What changed:**
