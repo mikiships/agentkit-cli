@@ -1,36 +1,41 @@
-# BUILD-REPORT.md — agentkit-cli v1.23.0 release completion
+# BUILD-REPORT.md — agentkit-cli v1.24.0 clean JSON stdout
 
-Status: SHIPPED
+Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.23.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.24.0-json-clean-stdout.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Re-ran release truth sweep from `d6aceff` and confirmed no contradictory success or blocker narratives. |
-| D2 | ✅ Complete | Re-ran the focused self-spec slice, full suite, and hygiene checks from the current tree. |
-| D3 | ✅ Complete | Branch push and annotated tag succeeded, and PyPI went live once the release used the working `.pypirc` auth path via `uvx twine upload` from the tagged release tree. |
-| D4 | ✅ Complete | Repo and workspace chronology surfaces now distinguish the shipped tag truth from later docs-only chronology commits. |
+| D1 | ✅ Complete | `agentkit spec --json` now keeps stdout machine-readable and routes the human write notice to stderr when `--output-dir` is used. |
+| D2 | ✅ Complete | Added regression coverage for the broken JSON stdout contract and preserved human-facing reporting in non-JSON mode. |
+| D3 | ✅ Complete | Local status surfaces now reflect the truthful lane state: `RELEASE-READY (LOCAL-ONLY)`. |
+
+## Root cause
+
+`agentkit_cli/commands/spec_cmd.py` always emitted `Wrote spec directory: ...` to stdout after writing `--output-dir`, even when `--json` selected machine-readable output. That unconditional human preamble contaminated stdout before the JSON payload.
 
 ## Validation
 
-- `python3 -m agentkit_cli.main source-audit . --json` -> `ready_for_contract: true`, `blocker_count: 0`, `used_fallback: false`
-- `python3 -m agentkit_cli.main spec . --output-dir <temp-dir> --json` -> succeeded and wrote deterministic artifacts
-- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py tests/test_daily_d5.py` -> `34 passed in 1.47s`
-- `uv run python -m pytest -q` -> `5003 passed, 1 warning in 184.76s (0:03:04)`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.23.0-self-spec-source` -> `Total findings: 0`
+- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py` -> `8 passed in 9.20s`
+- Direct command-path proof:
+  - `uv run python -m agentkit_cli.main spec . --output-dir "$tmpdir/specdir" --json > "$tmpdir/spec.json" 2> "$tmpdir/spec.stderr"`
+  - `uv run python - <<'PY' "$tmpdir/spec.json" ... json.loads(...) ... PY` -> `parsed schema_version=agentkit.spec.v1 primary_kind=subsystem-next-step`
+  - `cat "$tmpdir/spec.stderr"` -> `Wrote spec directory: ...`
+- `uv run python -m pytest -q` -> `5004 passed, 1 warning in 565.34s (0:09:25)`
 
-## Release-surface results
+## Files changed
 
-- Branch push proof: the tested release candidate was pushed to origin at `d6aceff` before later chronology-only reconciliation.
-- Annotated tag: `v1.23.0` object `b592b7d` peels to tested release commit `d6aceff`.
-- Publish proof: the tagged release commit was built from a detached temp worktree, then uploaded with `uvx twine upload --skip-existing` using the existing `.pypirc` auth path.
-- PyPI verification after publish: both `https://pypi.org/pypi/agentkit-cli/1.23.0/json` and `https://pypi.org/pypi/agentkit-cli/json` report `info.version = 1.23.0`, and the live files are the wheel plus sdist for `1.23.0`.
+- `agentkit_cli/commands/spec_cmd.py`
+- `tests/test_spec_cmd.py`
+- `BUILD-REPORT.md`
+- `FINAL-SUMMARY.md`
+- `BUILD-TASKS.md`
+- `progress-log.md`
 
 ## Current truth
 
-- `agentkit-cli v1.23.0` is **shipped**.
-- The last shipped line is now `v1.23.0`.
-- The tested release candidate commit is still `d6aceff`, and the pushed tag points there.
-- Any later branch head on `feat/v1.23.0-self-spec-source` is chronology-only and must not be confused with shipped registry truth.
+- This lane fixes a real stdout JSON contract bug locally.
+- Validation is clean, including the full suite.
+- The lane is `RELEASE-READY (LOCAL-ONLY)`.

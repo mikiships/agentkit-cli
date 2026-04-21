@@ -89,7 +89,24 @@ def test_spec_command_output_dir_writes_markdown_and_json(tmp_path):
     assert result.exit_code == 0, result.output
     assert (out / "spec.md").exists()
     assert (out / "spec.json").exists()
+    assert "Wrote spec directory:" in result.output
     assert "Primary recommendation" in (out / "spec.md").read_text(encoding="utf-8")
+
+
+def test_spec_command_json_stdout_stays_clean_when_output_dir_is_used(tmp_path):
+    project = tmp_path / "demo-repo"
+    out = tmp_path / "out"
+    _write_repo(project)
+
+    result = runner.invoke(app, ["spec", str(project), "--output-dir", str(out), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert payload["schema_version"] == "agentkit.spec.v1"
+    assert "Wrote spec directory:" not in result.stdout
+    assert "Wrote spec directory:" in result.stderr
+    assert (out / "spec.md").exists()
+    assert (out / "spec.json").exists()
 
 
 def test_spec_command_fails_when_required_upstream_source_is_missing(tmp_path):

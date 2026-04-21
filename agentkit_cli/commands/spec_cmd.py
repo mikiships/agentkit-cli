@@ -44,5 +44,5 @@ def spec_command(
         output.write_text(rendered, encoding="utf-8")
     if output_dir is not None:
         written = engine.write_directory(spec, output_dir)
-        typer.echo(f"Wrote spec directory: {written}")
+        typer.echo(f"Wrote spec directory: {written}", err=fmt == "json")
     typer.echo(rendered)
