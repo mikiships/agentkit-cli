@@ -17,6 +17,7 @@ def _write_repo(
     workflow_lane: bool = True,
     contradictory: bool = False,
     stale_self_hosting: bool = False,
+    shipped_adjacent_grounding: bool = False,
 ) -> None:
     if canonical:
         (project / ".agentkit").mkdir(parents=True)
@@ -83,6 +84,15 @@ def _write_repo(
             "# Final Summary — demo-repo v0.3.0\n\nStatus: SHIPPED\n",
             encoding="utf-8",
         )
+        if shipped_adjacent_grounding:
+            (project / "progress-log.md").write_text(
+                "# Progress Log — demo-repo v0.4.0 spec grounding\n\n"
+                "Status: RELEASE-READY (LOCAL-ONLY)\n"
+                "Date: 2026-04-21\n\n"
+                "- Introduced an `adjacent-grounding` recommendation for stale self-hosting source objectives.\n"
+                "- Verified `agentkit spec . --json` returns `adjacent-grounding` with a contract seed focused on spec grounding.\n",
+                encoding="utf-8",
+            )
 
 
 def test_spec_command_json_output_is_deterministic(tmp_path):
@@ -177,6 +187,22 @@ def test_spec_suppresses_stale_self_hosting_objective_when_repo_truth_already_sa
     assert recommendation["contract_seed"]["objective"].startswith("Ground `agentkit spec` in current repo truth")
     assert any("already ships the canonical source" in item for item in recommendation["why_now"])
     assert any("source -> audit -> map -> spec -> contract" in item for item in recommendation["evidence"])
+
+
+def test_spec_moves_past_adjacent_grounding_once_that_increment_is_already_shipped(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, stale_self_hosting=True, shipped_adjacent_grounding=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    recommendation = payload["primary_recommendation"]
+    assert recommendation["kind"] == "shipped-truth-sync"
+    assert "already-shipped spec-grounding increment" in recommendation["objective"]
+    assert recommendation["contract_seed"]["title"].endswith("shipped truth sync")
+    assert any("adjacent spec-grounding increment" in item for item in recommendation["why_now"])
+    assert any("Recent shipped/local-ready artifacts already record" in item for item in recommendation["evidence"])
 
 
 def test_spec_help():

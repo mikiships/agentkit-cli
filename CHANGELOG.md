@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.26.0] - 2026-04-21
+
+### Fixed
+- Taught `agentkit spec` to recognize when the adjacent `spec grounding` increment is already shipped or local release-ready, so it no longer re-proposes the v1.25.0 work.
+- Added shipped-adjacent regression coverage across command and workflow paths, and promoted a `shipped-truth-sync` recommendation when the next honest step is refreshing stale flagship source truth.
+
+### Docs
+- Refreshed `.agentkit/source.md`, BUILD-TASKS, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces for truthful `v1.26.0` local closeout.
+
 ## [1.25.0] - 2026-04-21
 
 ### Fixed

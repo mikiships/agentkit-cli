@@ -1,29 +1,27 @@
-# BUILD-REPORT.md — agentkit-cli v1.25.0 spec grounding
+# BUILD-REPORT.md — agentkit-cli v1.26.0 spec shipped truth sync
 
 Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.25.0-spec-grounding.md
+Contract: all-day-build-contract-agentkit-cli-v1.26.0-spec-shipped-truth-sync.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Added deterministic stale-self-hosting regressions that pin the flagship failure where `agentkit spec` re-proposes already-satisfied self-hosting work. |
-| D2 | ✅ Complete | Grounded recommendation ranking in canonical-source readiness plus recent shipped/local-ready workflow evidence so stale prerequisites no longer outrank the next adjacent build. |
-| D3 | ✅ Complete | Tightened the primary recommendation and contract seed so markdown and JSON output explain the concrete adjacent spec-grounding increment. |
-| D4 | ✅ Complete | Updated changelog, version, and report surfaces for truthful `v1.25.0` local closeout without claiming push, tag, or publish. |
+| D1 | ✅ Complete | Reproduced the flagship repo case where `agentkit spec . --json` still recommended the already-shipped `adjacent-grounding` increment from v1.25.0. |
+| D2 | ✅ Complete | Taught `agentkit_cli/spec_engine.py` to detect shipped or local-release-ready adjacent spec-grounding evidence and suppress that same recommendation on the next run. |
+| D3 | ✅ Complete | Added shipped-adjacent command and workflow regressions that require a `shipped-truth-sync` follow-up instead of `adjacent-grounding`. |
+| D4 | ✅ Complete | Refreshed `.agentkit/source.md`, version surfaces, changelog, and local closeout artifacts for truthful `v1.26.0` status. |
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `18 passed in 1.10s`
-- `uv run python -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `24 passed in 4.85s`
-- `uv run python -m agentkit_cli.main spec . --json` now returns primary recommendation kind `adjacent-grounding` with a contract seed focused on grounding `agentkit spec` in current repo truth.
-- `uv run python -m pytest -q` -> `5006 passed, 1 warning in 762.73s (0:12:42)`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `No contradictory success/blocker narratives found.`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.25.0-spec-grounding` -> `Total findings: 0`
+- `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `20 passed in 4.03s`
+- `uv run python -m agentkit_cli.main spec . --json` now advances past the shipped v1.25.0 increment and returns primary recommendation kind `subsystem-next-step` from refreshed source truth.
+- `uv run python -m pytest -q` -> `5008 passed, 1 warning in 768.47s (0:12:48)`
+- Verified test-count floor recorded in this report: `5008 passed`.
 
 ## Current truth
 
-- `agentkit-cli v1.25.0` is release-ready from this local tree only.
+- `agentkit-cli v1.26.0` is release-ready from this local tree only.
 - No push, tag, or publish was attempted in this pass.
-- The flagship repo now self-specs the honest next adjacent build instead of recycling the already-satisfied self-hosting/source-readiness objective.
+- The repo now self-specs past the already-shipped v1.25.0 adjacent-grounding increment.

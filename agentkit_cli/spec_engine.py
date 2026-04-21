@@ -340,6 +340,9 @@ class SpecEngine:
         fallback = self._fallback_source_candidate(root, audit_result, map_context, repo_hints)
         if fallback is not None:
             candidates.append(fallback)
+        shipped_truth_sync = self._shipped_truth_sync_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if shipped_truth_sync is not None:
+            candidates.append(shipped_truth_sync)
         adjacent_grounding = self._adjacent_grounding_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if adjacent_grounding is not None:
             candidates.append(adjacent_grounding)
@@ -474,6 +477,8 @@ class SpecEngine:
             return None
         if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
             return None
+        if self._has_shipped_adjacent_grounding(workflow_artifacts):
+            return None
 
         shipped_artifact = next(
             (
@@ -535,6 +540,82 @@ class SpecEngine:
                 ],
                 test_requirements=[
                     "Run focused spec-engine, spec command, and spec workflow regression tests for the flagship stale-objective case.",
+                    *list(repo_hints.command_hints[:2]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
+    def _shipped_truth_sync_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        if "self-hosted" not in objective_lower and "canonical source" not in objective_lower:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+        if not self._has_shipped_adjacent_grounding(workflow_artifacts):
+            return None
+
+        shipped_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if artifact.kind in {"build-report", "final-summary", "progress-log", "changelog"}
+                and artifact.status in {None, "SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+                and self._artifact_mentions_adjacent_grounding(artifact)
+            ),
+            None,
+        )
+        objective = "Refresh the flagship source objective and closeout surfaces so `agentkit spec` starts from current shipped repo truth instead of re-proposing the already-shipped spec-grounding increment."
+        evidence = [
+            f"Canonical source objective is now behind shipped repo truth: {objective_summary}",
+            f"Current readiness already passes canonically: {audit_result.readiness.summary}",
+            "Recent shipped/local-ready artifacts already record the adjacent spec-grounding increment as done.",
+        ]
+        if shipped_artifact is not None and shipped_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact version carrying that closeout: {shipped_artifact.version}.")
+        return SpecRecommendation(
+            slug="shipped-truth-sync",
+            kind="shipped-truth-sync",
+            score=93,
+            title="Sync the flagship source objective to shipped spec truth",
+            objective=objective,
+            why_now=[
+                "The repo already ships canonical-source readiness and the adjacent spec-grounding increment, so the old self-hosting objective is doubly stale.",
+                "Refreshing the canonical objective and local closeout surfaces is the smallest honest step that prevents `agentkit spec` from recycling the just-shipped recommendation.",
+                "Once the source narrative matches shipped truth, the next recommendation can move on to a genuinely new adjacent build.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to canonical source truth, spec-planner ranking for shipped adjacent work, and the local build/report surfaces that describe the active lane.",
+                "Do not reopen the already-shipped canonical-source or adjacent-grounding implementation work.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Reproduce the shipped-adjacent stale recommendation from current flagship repo truth before changing planner logic.",
+                "Add regression coverage proving shipped adjacent-grounding evidence suppresses that same recommendation and yields a source-truth-sync follow-up.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} shipped truth sync",
+                deliverables=[
+                    "Teach the spec planner to recognize when adjacent spec grounding is already shipped or release-ready in local workflow artifacts.",
+                    "Refresh `.agentkit/source.md` and nearby local closeout/build surfaces so the flagship repo objective matches current shipped repo truth.",
+                    "Emit a concrete follow-up recommendation and contract seed that advances from the refreshed source truth instead of reusing the shipped adjacent-grounding step.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, and spec workflow regression tests for the shipped-adjacent stale-objective case.",
                     *list(repo_hints.command_hints[:2]),
                 ],
                 map_input=str(map_context.source or map_context.generated_from or root),
@@ -683,6 +764,18 @@ class SpecEngine:
             if normalized.count("->") >= 1:
                 lanes.append(normalized)
         return self._ordered_unique(lanes)
+
+    def _artifact_mentions_adjacent_grounding(self, artifact: SpecWorkflowArtifact) -> bool:
+        haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
+        joined = "\n".join(haystacks).lower()
+        return "adjacent-grounding" in joined or "spec grounding" in joined
+
+    def _has_shipped_adjacent_grounding(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
+        return any(
+            artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+            and self._artifact_mentions_adjacent_grounding(artifact)
+            for artifact in workflow_artifacts
+        )
 
     def _normalize_lane(self, lane: str) -> str:
         parts = [part.strip().lower() for part in lane.split("->")]

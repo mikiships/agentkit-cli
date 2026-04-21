@@ -10,7 +10,7 @@ from agentkit_cli.main import app
 runner = CliRunner()
 
 
-def _write_repo(project: Path, *, stale_self_hosting: bool = False) -> None:
+def _write_repo(project: Path, *, stale_self_hosting: bool = False, shipped_adjacent_grounding: bool = False) -> None:
     (project / ".agentkit").mkdir(parents=True)
     (project / "src").mkdir()
     (project / "tests").mkdir()
@@ -67,6 +67,15 @@ def _write_repo(project: Path, *, stale_self_hosting: bool = False) -> None:
         "# Final Summary — demo-repo v0.3.0\n\nStatus: SHIPPED\n",
         encoding="utf-8",
     )
+    if shipped_adjacent_grounding:
+        (project / "progress-log.md").write_text(
+            "# Progress Log — demo-repo v0.4.0 spec grounding\n\n"
+            "Status: RELEASE-READY (LOCAL-ONLY)\n"
+            "Date: 2026-04-21\n\n"
+            "- Introduced an `adjacent-grounding` recommendation for stale self-hosting source objectives.\n"
+            "- Verified `agentkit spec . --json` returns `adjacent-grounding` with a contract seed focused on spec grounding.\n",
+            encoding="utf-8",
+        )
 
 
 def test_source_audit_to_map_to_spec_to_contract_workflow(tmp_path):
@@ -115,3 +124,25 @@ def test_spec_workflow_grounds_next_build_from_current_repo_truth(tmp_path):
     contract_payload = json.loads(contract.output)
     assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
     assert contract_payload["output_path"].endswith("all-day-build-contract-ground-agentkit-spec-in-current-repo-truth-so-the-flagship-repo-recommends-the-next-honest-adjacent-build-instead-of-recycling-already-satisfied-source-readiness-work.md")
+
+
+def test_spec_workflow_moves_to_shipped_truth_sync_after_adjacent_grounding_ships(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, stale_self_hosting=True, shipped_adjacent_grounding=True)
+
+    audit = runner.invoke(app, ["source-audit", str(project), "--json"])
+    assert audit.exit_code == 0, audit.output
+    assert json.loads(audit.output)["readiness"]["ready_for_contract"] is True
+
+    spec_dir = tmp_path / "spec-artifacts"
+    spec_run = runner.invoke(app, ["spec", str(project), "--output-dir", str(spec_dir), "--json"])
+    assert spec_run.exit_code == 0, spec_run.output
+    spec_payload = json.loads((spec_dir / "spec.json").read_text(encoding="utf-8"))
+    assert spec_payload["primary_recommendation"]["kind"] == "shipped-truth-sync"
+    assert spec_payload["contract_seed"]["objective"].startswith("Refresh the flagship source objective")
+
+    contract = runner.invoke(app, ["contract", "--spec", str(spec_dir / "spec.json"), "--path", str(project), "--json"])
+    assert contract.exit_code == 0, contract.output
+    contract_payload = json.loads(contract.output)
+    assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
+    assert contract_payload["output_path"].endswith("all-day-build-contract-refresh-the-flagship-source-objective-and-closeout-surfaces-so-agentkit-spec-starts-from-current-shipped-repo-truth-instead-of-re-proposing-the-already-shipped-spec-grounding-increment.md")

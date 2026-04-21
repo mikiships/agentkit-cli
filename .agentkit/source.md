@@ -1,7 +1,7 @@
 # agentkit-cli
 
 ## Objective
-Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source.
+Keep this repo self-spec truthful so `agentkit spec` advances from current shipped repo evidence instead of recycling already-shipped adjacent work.
 
 ## Commands
 - `python3 -m agentkit_cli.main source-audit . --json`
@@ -26,7 +26,7 @@ Work only inside this repository. Keep changes narrowly focused on deterministic
 - Run `uv run python -m pytest -q` for the full-suite confidence pass.
 
 ## Deliverables
-- Canonical `.agentkit/source.md` ready for the contract lane.
-- Successful self-spec output for this repo with a deterministic next-build recommendation.
-- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.24.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
+- Canonical `.agentkit/source.md` aligned with the repo's shipped local truth.
+- Successful self-spec output for this repo with a deterministic next-build recommendation that does not re-propose shipped adjacent work.
+- Truthful local report surfaces in `BUILD-REPORT.md`, `BUILD-REPORT-v1.26.0.md`, `FINAL-SUMMARY.md`, `progress-log.md`, and `BUILD-TASKS.md`.
 - One local completion commit after validation passes.
