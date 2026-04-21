@@ -1,25 +1,22 @@
 # Progress Log — agentkit-cli v1.18.0 relaunch lanes
 
-## D4 complete: docs, version surfaces, and release-ready reporting reconciled
+## D4 complete: four-surface release checklist finished, v1.18.0 shipped
 
 **What changed:**
-- Reconciled the local version surfaces to `1.18.0` across `pyproject.toml`, `agentkit_cli/__init__.py`, `README.md`, `CHANGELOG.md`, and `uv.lock`.
-- Replaced stale shipped-release prose with truthful local-only `v1.18.0` closeout reporting in `BUILD-REPORT.md`, `BUILD-REPORT-v1.18.0.md`, and `FINAL-SUMMARY.md`.
-- Refreshed the focused relaunch validation slice in the supported `uv` Python environment, ran smoke coverage, ran the full suite, and fixed the stale CLI version assertion in `tests/test_main.py` so the versioned surface is test-consistent.
-- Ran the required recall and contradiction checks before trusting release/status prose, then ran the required hygiene check and cleaned the transient `.agentkit-last-run.json` artifact.
+- Committed the release-ready `v1.18.0` surfaces at `6e8f193` and re-ran the source-of-truth focused relaunch slice plus smoke slice from that exact commit.
+- Pushed `feat/v1.18.0-relaunch-lanes` to origin, then created and pushed annotated tag `v1.18.0` peeling to the same shipped commit `6e8f193708cd7dd30a2d827d952e78802cbd598a`.
+- Built release artifacts in `dist-release-v1.18.0/`, published them to PyPI via `twine upload`, and verified `agentkit-cli==1.18.0` live with both the wheel and sdist.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.18.0.md`, `FINAL-SUMMARY.md`, and this progress log so later branch-head movement is explicitly documented as post-ship chronology cleanup only.
 
 **Validation:**
-- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.18.0-relaunch-lanes`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.18.0-relaunch-lanes` -> `No contradictory success/blocker narratives found.`
-- `uv run python -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py tests/test_relaunch_workflow.py tests/test_resume_workflow.py tests/test_launch_workflow.py` -> `32 passed in 13.60s`
-- `uv run python -m pytest -m smoke -q --tb=short` -> `9 passed, 4958 deselected in 10.87s`
-- `uv run python -m pytest -q tests` -> `4967 passed, 1 warning in 434.55s (0:07:14)`
-- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.18.0-relaunch-lanes` -> clean after removing transient `.agentkit-last-run.json`
+- `uv run python -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py tests/test_relaunch_workflow.py tests/test_resume_workflow.py tests/test_launch_workflow.py` -> `32 passed in 32.04s`
+- `uv run python -m pytest -m smoke -q --tb=short` -> `9 passed, 4958 deselected in 18.44s`
+- PyPI JSON proof: `agentkit_cli-1.18.0-py3-none-any.whl` (`675725` bytes) and `agentkit_cli-1.18.0.tar.gz` (`1191256` bytes)
 
 **Current truth:**
 - D1 through D4 are complete.
-- The repo is now truthfully LOCAL RELEASE-READY for `v1.18.0`.
-- This branch remains local-only and unshipped in this pass.
+- `agentkit-cli v1.18.0` is truthfully SHIPPED.
+- The shipped artifact is pinned to `v1.18.0` -> `6e8f193`; any later branch-head advance is docs-only chronology reconciliation.
 
 ## D3 complete: relaunch-ready handoff packets landed
 

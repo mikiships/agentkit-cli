@@ -1,25 +1,35 @@
 # Final Summary — agentkit-cli v1.18.0 relaunch lanes
 
-Status: LOCAL RELEASE-READY
+Status: SHIPPED
 Date: 2026-04-20
 Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 
 ## What completed in this pass
 
-- Built a deterministic `agentkit relaunch` flow that consumes saved `resume` state plus upstream `reconcile` and `launch` evidence, then emits stable markdown and JSON relaunch plans.
-- Added first-class CLI support for `agentkit relaunch`, including `--json`, `--output-dir`, `--resume-path`, deterministic stdout, and per-lane packet generation for eligible relaunch lanes.
-- Added relaunch-ready per-lane handoff packets and helper command files while preserving `waiting`, `review-only`, and `completed` lanes explicitly in the output.
-- Updated docs, changelog, version surfaces, and local reporting so the branch truthfully closes as local `v1.18.0` release-ready rather than shipped.
-- Re-ran recall, contradiction, focused relaunch validation, smoke coverage, full-suite validation, and hygiene in the supported `uv` environment.
+- Committed the release-ready `v1.18.0` surfaces at shipped commit `6e8f193`.
+- Re-ran the source-of-truth relaunch release slice and smoke slice from that exact commit in the supported `uv` Python environment.
+- Pushed branch `feat/v1.18.0-relaunch-lanes` to origin.
+- Created and pushed annotated tag `v1.18.0` on the tested release commit.
+- Built and published `agentkit-cli==1.18.0` to PyPI, then verified both release artifacts directly from the version-specific PyPI JSON.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.18.0.md`, `FINAL-SUMMARY.md`, and `progress-log.md` so the repo tells the truthful shipped chronology.
 
-## Current truth
+## Release truth
 
-- Branch: `feat/v1.18.0-relaunch-lanes`
-- Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch`
-- Version surfaces target `1.18.0`
-- Validation status: focused relaunch slice green, `32 passed`; smoke slice green, `9 passed`; full suite green, `4967 passed, 1 warning`
-- State is local-only by design: no push, tag, publish, or remote mutation happened in this pass
+- Release branch on origin: `feat/v1.18.0-relaunch-lanes` is pushed and now carries docs-only chronology reconciliation commits after shipment.
+- Shipped annotated tag: `v1.18.0` -> tag object `7554645331a8712cd6a7f6cd0cd84dd09df8abdf`, peeled commit `6e8f193708cd7dd30a2d827d952e78802cbd598a`
+- PyPI live: `https://pypi.org/project/agentkit-cli/1.18.0/`
+- PyPI artifacts: `agentkit_cli-1.18.0-py3-none-any.whl` (`675725` bytes), `agentkit_cli-1.18.0.tar.gz` (`1191256` bytes)
+
+## Validation
+
+- `uv run python -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_relaunch_cmd.py tests/test_resume_cmd.py tests/test_main.py tests/test_relaunch_workflow.py tests/test_resume_workflow.py tests/test_launch_workflow.py` -> `32 passed in 32.04s`
+- `uv run python -m pytest -m smoke -q --tb=short` -> `9 passed, 4958 deselected in 18.44s`
+
+## Chronology note
+
+- The shipped artifact is pinned to tag target `6e8f193`.
+- The branch later advanced only for docs-only chronology reconciliation after shipment.
 
 ## Blocker
 
-- None. `agentkit-cli v1.18.0` is truthfully LOCAL RELEASE-READY and still unshipped.
+- None. `agentkit-cli v1.18.0` is truthfully SHIPPED.
