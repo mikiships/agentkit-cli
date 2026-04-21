@@ -15,7 +15,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 
 ## Release truth
 
-- Branch on origin: `feat/v1.18.0-relaunch-lanes` -> `6e8f193708cd7dd30a2d827d952e78802cbd598a`
+- Branch on origin: `feat/v1.18.0-relaunch-lanes` -> `9b320aee3f9396e404f6316f527212328d3f0088`
 - Shipped annotated tag: `v1.18.0` -> tag object `7554645331a8712cd6a7f6cd0cd84dd09df8abdf`, peeled commit `6e8f193708cd7dd30a2d827d952e78802cbd598a`
 - PyPI live: `https://pypi.org/project/agentkit-cli/1.18.0/`
 - PyPI artifacts: `agentkit_cli-1.18.0-py3-none-any.whl` (`675725` bytes), `agentkit_cli-1.18.0.tar.gz` (`1191256` bytes)
@@ -28,7 +28,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 ## Chronology note
 
 - The shipped artifact is pinned to tag target `6e8f193`.
-- Any later branch-head movement after this point is docs-only chronology reconciliation and does not change the shipped package payload.
+- The branch later advanced to `9b320ae` for docs-only chronology reconciliation after shipment.
 
 ## Blocker
 
