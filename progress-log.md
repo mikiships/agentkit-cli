@@ -1,4 +1,19 @@
-# Progress Log — agentkit-cli v1.17.0 resume lanes
+# Progress Log — agentkit-cli v1.18.0 relaunch lanes
+
+## D1 complete: schema-backed relaunch planning landed
+
+**What changed:**
+- Added `agentkit_cli/relaunch.py` with deterministic relaunch plan assembly from saved `resume.json` plus upstream `reconcile.json` and `launch.json` evidence.
+- Extended `agentkit_cli/schemas.py` with `agentkit.relaunch.v1` plan and lane dataclasses so markdown and JSON outputs stay schema-backed.
+- Added focused relaunch engine coverage for eligible-lane packet planning, preserved review buckets, contradiction checks for unsatisfied relaunch dependencies, and stale worktree notes.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_relaunch_engine.py tests/test_resume_engine.py tests/test_reconcile_engine.py` -> `14 passed in 3.79s`
+
+**Current truth:**
+- D1 is complete.
+- D2 through D4 remain in progress.
+- The repo is still local-only and not yet release-ready for `v1.18.0`.
 
 ## D5 complete: shipped chronology reconciled after verified release
 
