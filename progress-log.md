@@ -1,4 +1,20 @@
-# Progress Log — agentkit-cli v1.18.0 relaunch lanes
+# Progress Log — agentkit-cli v1.19.0 closeout lanes
+
+## D1 complete: schema-backed closeout planning landed
+
+**What changed:**
+- Added `agentkit_cli/closeout.py` with deterministic closeout plan assembly from saved `relaunch.json`, `resume.json`, `reconcile.json`, and `launch.json` evidence plus local worktree checks.
+- Extended `agentkit_cli/schemas.py` with `agentkit.closeout.v1` plan and lane dataclasses so closeout markdown and JSON outputs stay schema-backed.
+- Added focused closeout engine coverage for merge-ready classification, dirty completed worktrees, follow-on unblock notes, and missing upstream artifact failures.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_closeout_engine.py` -> `4 passed in 1.30s`
+
+**Current truth:**
+- D1 is complete.
+- D2 through D4 remain in progress.
+- The repo is local-only and not yet release-ready for `v1.19.0`.
+
 
 ## D4 complete: four-surface release checklist finished, v1.18.0 shipped
 
