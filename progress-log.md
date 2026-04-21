@@ -1,5 +1,24 @@
 # Progress Log — agentkit-cli v1.22.0 spec release prep
 
+## D2 complete: validation rerun from the release tree is green
+
+**What changed:**
+- Re-ran the required focused spec slice, full suite, and deterministic hygiene pass from the current `feat/v1.22.0-spec` tree.
+- Confirmed the release candidate stayed green without introducing new repo noise.
+- Preserved the truthful local-only state ahead of push, tag, and publish.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_map.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `37 passed in 2.31s`
+- `uv run python -m pytest -q` -> `5003 passed, 1 warning in 187.11s (0:03:07)`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `Total findings: 0`
+
+**Current truth:**
+- D1 and D2 are complete.
+- `agentkit-cli v1.22.0` remains truthfully `RELEASE-READY (LOCAL-ONLY)` from this repo state.
+- No push, tag, publish, or remote mutation has happened yet in this pass.
+
+---
+
 ## D1 complete: pre-release truth sweep refreshed for the active release contract
 
 **What changed:**
