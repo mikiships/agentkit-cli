@@ -1,5 +1,24 @@
 # Progress Log — agentkit-cli v1.17.0 resume lanes
 
+## D2 rerun complete: release-ready truth re-verified from this repo
+
+**What changed:**
+- Re-ran the required release recall and status-conflict scan from this worktree before any irreversible release action.
+- Verified the branch was still truthfully local-only `RELEASE-READY` at `469814b24f86f2ab1ba69426f0b509b24e0a21d7` on `feat/v1.17.0-resume-lanes`.
+- Confirmed version surfaces target `1.17.0` in `pyproject.toml` and `agentkit_cli/__init__.py`.
+- Re-ran the focused resume plus adjacent reconcile slice and then the full test suite from this repo.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.17.0-resume-lanes` -> refreshed current cues, including shipped `v1.16.0` chronology and active `v1.17.0` release contract
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.17.0-resume-lanes` -> `No contradictory success/blocker narratives found.`
+- `uv run python -m pytest -q tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_main.py` -> `21 passed in 6.46s`
+- `uv run python -m pytest -q tests/` -> `4959 passed, 1 warning in 338.18s (0:05:38)`
+
+**Current truth:**
+- D1 and D2 are freshly complete from this repo.
+- The branch remains local-only and unshipped at this point.
+- The working tree needs release-cleanup before any truthful clean-tree claim because `uv run` refreshed `uv.lock` to `1.17.0` and created transient agent noise.
+
 ## D4 complete: docs, versioning, and release-ready surfaces reconciled for v1.17.0
 
 **What changed:**
