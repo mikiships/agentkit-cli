@@ -28,6 +28,25 @@ The freshly shipped flagship repo still let `agentkit spec . --json` recommend t
 
 The current tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: focused validation passed, the repo now self-specs to `subsystem-next-step`, and the full pytest suite passed from this tree.
 
+## 2026-04-21 release completion re-ground
+
+- Ran pre-action recall and contradiction scan before any irreversible step.
+- Reconfirmed release tree head `ba813b0` on branch `feat/v1.26.0-spec-shipped-truth`.
+- Re-ran focused validation: `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `20 passed in 5.83s`.
+- Re-proved flagship command-path behavior: `uv run python -m agentkit_cli.main spec . --json` -> primary recommendation kind `subsystem-next-step`.
+- Ran hygiene check: `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.26.0-spec-shipped-truth` -> `Total findings: 0`.
+- First full-suite rerun hit two smoke-test timeouts (`test_smoke_compare`, `test_smoke_summary`), so I rechecked the failing slice directly: `2 passed in 22.27s`.
+- Second full-suite rerun from the same tree passed cleanly: `5008 passed, 1 warning in 1008.07s (0:16:48)`.
+
+## 2026-04-21 direct shipped-proof sweep
+
+- Verified current branch chronology directly: `origin/feat/v1.26.0-spec-shipped-truth` points at docs-only chronology head `21bf5e2461e29476f5ced4ef5a5c767930b416ba`.
+- Verified annotated tag truth directly: remote tag object `v1.26.0` is `37a948c4376cc0130afbed8042b3e4d72ed44b4c` and peels to tested release commit `ba813b0836d8baa0cd6d1e5c27d42872c5fff555`.
+- Verified PyPI project/version JSON directly: `https://pypi.org/pypi/agentkit-cli/json` and `https://pypi.org/pypi/agentkit-cli/1.26.0/json` both report version `1.26.0` live.
+- Verified release artifacts directly from version JSON: wheel `agentkit_cli-1.26.0-py3-none-any.whl` and sdist `agentkit_cli-1.26.0.tar.gz` are both present.
+- Verified PyPI project page HTTP surface directly: `curl -I -L https://pypi.org/project/agentkit-cli/1.26.0/` -> `HTTP/2 200`.
+- Current shipped chronology truth: shipped artifact is the tagged release commit `ba813b0`; branch head `21bf5e2` is later docs-only reporting reconciliation.
+
 ## 2026-04-21 release completion pass
 
 ### D1. Re-grounded local release-ready state
