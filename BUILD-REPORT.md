@@ -25,7 +25,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.18.0-relaunch-lanes.md
 ## Repo state
 
 - Branch: `feat/v1.18.0-relaunch-lanes`
-- Local head at report time: `18eea61` (`test: cover relaunch workflow packets`), with final docs/version/report updates still unpushed in the working tree until the closing commit
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume -> relaunch`
+- Closeout state: final docs, version, and report updates are local-only in this repo and were not pushed, tagged, or published
 - Version surfaces target `1.18.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
 - State is local-only: no push, tag, publish, or remote mutation happened in this pass
