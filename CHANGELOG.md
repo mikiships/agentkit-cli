@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.23.0] - 2026-04-21
+
+### Added
+- Added a real repo-local `.agentkit/source.md` for the flagship `agentkit-cli` repo so source-audit and spec no longer fall back to legacy `AGENTS.md`.
+- Added explicit self-hosting guidance for objective, scope, constraints, validation, and deliverables in the canonical source surface.
+
+### Docs
+- Updated the active build, summary, and progress surfaces so `v1.23.0` truthfully records local self-spec source readiness while `v1.22.0` remains the last shipped release.
+
 ## [1.22.0] - 2026-04-21
 
 ### Added
