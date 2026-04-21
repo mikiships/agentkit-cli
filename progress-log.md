@@ -1,5 +1,20 @@
 # Progress Log — agentkit-cli v1.18.0 relaunch lanes
 
+## D3 complete: relaunch-ready handoff packets landed
+
+**What changed:**
+- Finished the per-lane relaunch packet shape with fresh `handoff.md`, launch helper files, upstream evidence paths, and explicit review notes for stale worktrees or unresolved review lanes.
+- Kept waiting, review-only, and completed lanes visible in the relaunch plan while generating fresh launch-ready packets only for `relaunch-now` lanes.
+- Added end-to-end workflow coverage for `launch -> observe -> supervise -> reconcile -> resume -> relaunch` and packet writing assertions.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_relaunch_engine.py tests/test_relaunch_workflow.py tests/test_resume_workflow.py tests/test_launch_workflow.py` -> `9 passed in 3.09s`
+
+**Current truth:**
+- D1 through D3 are complete.
+- D4 remains in progress.
+- The repo is still local-only and not yet release-ready for `v1.18.0`.
+
 ## D2 complete: first-class `agentkit relaunch` CLI landed
 
 **What changed:**
