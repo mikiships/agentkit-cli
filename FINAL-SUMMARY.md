@@ -14,7 +14,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.20.0-release.md
 
 - `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `45 passed in 45.48s`
 - `uv run python -m pytest -q` -> `4987 passed, 1 warning in 291.76s (0:04:51)`
-- `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/heads/feat/v1.20.0-land-lanes`
+- `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> `4faa88c5181f960037b29d00fa1f7f2ecb2ce3bc refs/heads/feat/v1.20.0-land-lanes`
 - `git ls-remote --tags origin v1.20.0` -> `1ac306c4426cd644bb537a8b75e5c9fec4ad0081 refs/tags/v1.20.0`
 - `git ls-remote --tags origin v1.20.0^{}` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/tags/v1.20.0^{}`
 - PyPI proof: `https://pypi.org/project/agentkit-cli/1.20.0/` and `https://pypi.org/pypi/agentkit-cli/1.20.0/json` live with `agentkit_cli-1.20.0-py3-none-any.whl` (`689640` bytes) and `agentkit_cli-1.20.0.tar.gz` (`1211626` bytes)
@@ -24,6 +24,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.20.0-release.md
 
 - All deliverables D1 through D3 in the release contract are complete.
 - `agentkit-cli v1.20.0` is truthfully SHIPPED.
-- The shipped release commit is `5baec07b5fb2f2be35559edbef2a10081b850910`, branch `origin/feat/v1.20.0-land-lanes` points to that commit, and annotated tag `v1.20.0` peels to the same commit.
+- The shipped release commit is `5baec07b5fb2f2be35559edbef2a10081b850910`.
+- The current branch head is docs-only chronology commit `4faa88c5181f960037b29d00fa1f7f2ecb2ce3bc`, while annotated tag `v1.20.0` still peels to the shipped release commit.
 - PyPI `agentkit-cli==1.20.0` is live with both release artifacts.
 - Intentional untracked contract artifacts remain in the worktree: `all-day-build-contract-agentkit-cli-v1.20.0-land-lanes.md` and `all-day-build-contract-agentkit-cli-v1.20.0-release.md`.

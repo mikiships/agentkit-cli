@@ -18,7 +18,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.20.0-release.md
 - Recall and contradiction hygiene: `/Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.20.0-land-lanes` and `/Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.20.0-land-lanes`
 - Focused land continuation slice from the shipped candidate: `python3 -m pytest -q tests/test_land_engine.py tests/test_land_cmd.py tests/test_land_workflow.py tests/test_closeout_engine.py tests/test_closeout_cmd.py tests/test_closeout_workflow.py tests/test_relaunch_engine.py tests/test_relaunch_cmd.py tests/test_relaunch_workflow.py tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_main.py` -> `45 passed in 45.48s`
 - Release-confidence validation pass: `uv run python -m pytest -q` -> `4987 passed, 1 warning in 291.76s (0:04:51)`
-- Branch proof: `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/heads/feat/v1.20.0-land-lanes`
+- Branch proof: `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> `4faa88c5181f960037b29d00fa1f7f2ecb2ce3bc refs/heads/feat/v1.20.0-land-lanes`
 - Tag proof: `git ls-remote --tags origin v1.20.0` -> `1ac306c4426cd644bb537a8b75e5c9fec4ad0081 refs/tags/v1.20.0`
 - Peeled tag proof: `git ls-remote --tags origin v1.20.0^{}` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/tags/v1.20.0^{}`
 - PyPI proof: `https://pypi.org/project/agentkit-cli/1.20.0/` and `https://pypi.org/pypi/agentkit-cli/1.20.0/json` live with `agentkit_cli-1.20.0-py3-none-any.whl` (`689640` bytes) and `agentkit_cli-1.20.0.tar.gz` (`1211626` bytes)
@@ -26,8 +26,9 @@ Contract: all-day-build-contract-agentkit-cli-v1.20.0-release.md
 ## Release truth
 
 - `agentkit-cli v1.20.0` is truthfully SHIPPED.
-- The shipped release commit is `5baec07b5fb2f2be35559edbef2a10081b850910` (`chore: docs: log v1.20.0 release refresh validation`).
-- Annotated tag `v1.20.0` peels to the same shipped commit.
+- The shipped release commit is `5baec07b5fb2f2be35559edbef2a10081b850910` (`docs: log v1.20.0 release refresh validation`).
+- The current branch head is docs-only chronology commit `4faa88c5181f960037b29d00fa1f7f2ecb2ce3bc` (`docs: finalize v1.20.0 shipped release truth`).
+- Annotated tag `v1.20.0` peels to the shipped release commit `5baec07b5fb2f2be35559edbef2a10081b850910`.
 - Supported continuation lane is now `launch -> observe -> supervise -> reconcile -> resume -> relaunch -> closeout -> land`.
 - The landing workflow remains planning-only: it emits deterministic markdown and JSON plus per-lane packets, but does not merge branches or mutate git state.
 
