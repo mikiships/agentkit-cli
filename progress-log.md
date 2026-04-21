@@ -1,5 +1,24 @@
 # Progress Log — agentkit-cli v1.22.0 spec release prep
 
+## D1 complete: pre-release truth sweep refreshed for the active release contract
+
+**What changed:**
+- Re-ran release recall and contradiction scanning from the current `feat/v1.22.0-spec` tree before any irreversible release step.
+- Confirmed the repo still matched the parent handoff truth: clean local `v1.22.0` release candidate at `2c2b89f`, with only the untracked release contract in scope.
+- Updated `BUILD-REPORT.md`, `BUILD-REPORT-v1.22.0.md`, and `FINAL-SUMMARY.md` so their contract pointer now names `all-day-build-contract-agentkit-cli-v1.22.0-release.md` instead of the stale finisher handoff.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> surfaced the expected handoff cues (`v1.21.0` shipped, `v1.22.0` active locally) plus the known stale external temporal cue still mentioning `v1.1.0`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `No contradictory success/blocker narratives found.`
+- `git status --short --branch` -> `## feat/v1.22.0-spec` with only `?? all-day-build-contract-agentkit-cli-v1.22.0-release.md` before the contract-pointer refresh
+
+**Current truth:**
+- D1 is complete.
+- `agentkit-cli v1.22.0` remains truthfully `RELEASE-READY (LOCAL-ONLY)` from this repo state.
+- No push, tag, publish, or remote mutation has happened yet in this pass.
+
+---
+
 ## D4 complete: final closeout revalidated from the current tree
 
 **What changed:**

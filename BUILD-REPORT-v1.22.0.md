@@ -2,7 +2,7 @@
 
 Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.22.0-spec-finisher.md
+Contract: all-day-build-contract-agentkit-cli-v1.22.0-release.md
 
 ## Scope
 
