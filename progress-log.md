@@ -1,5 +1,20 @@
 # Progress Log — agentkit-cli v1.17.0 resume lanes
 
+## D2 complete: first-class `agentkit resume` CLI and packet output landed
+
+**What changed:**
+- Added `agentkit_cli/commands/resume_cmd.py` and wired `agentkit resume` into `agentkit_cli/main.py`.
+- Added deterministic markdown/JSON output plus per-lane packet directory writing for resume packets.
+- Added focused CLI and workflow coverage for explicit reconcile-path loading, packet output, and end-to-end `launch -> observe -> supervise -> reconcile -> resume` flow.
+
+**Validation:**
+- `pytest -q tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_main.py` -> passed
+
+**Current truth:**
+- D1 and D2 are complete.
+- D3 and D4 remain in progress.
+- Required workspace helper scripts for recall/conflict scans are not present inside this worktree, so repo-local validation currently uses direct artifact checks and targeted tests instead.
+
 ## D1 complete: resume engine and schema-backed plan classification landed
 
 **What changed:**
