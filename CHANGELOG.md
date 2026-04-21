@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.25.0] - 2026-04-21
+
+### Fixed
+- Grounded `agentkit spec` in current repo truth so the flagship repo no longer recommends the already-satisfied self-hosting/source-readiness objective.
+- Added regression coverage for canonical-source-ready repos with shipped/local-ready workflow artifacts, and promoted an `adjacent-grounding` recommendation when the honest next increment is improving spec grounding itself.
+
+### Docs
+- Updated BUILD-REPORT, FINAL-SUMMARY, and progress surfaces for truthful `v1.25.0` local closeout.
+
 ## [1.24.0] - 2026-04-21
 
 ### Fixed
