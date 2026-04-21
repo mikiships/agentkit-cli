@@ -1,32 +1,32 @@
 # BUILD-REPORT.md — agentkit-cli v1.17.0 resume lanes
 
-Status: LOCAL RELEASE-READY
+Status: SHIPPED
 Date: 2026-04-20
-Contract: all-day-build-contract-agentkit-cli-v1.17.0-resume-lanes.md
+Contract: all-day-build-contract-agentkit-cli-v1.17.0-release.md
 
 ## Deliverables
 
 | Deliverable | Status | Notes |
 | --- | --- | --- |
-| D1 | ✅ Complete | Added `agentkit_cli/resume.py` and `agentkit_cli/schemas.py` with schema-backed resume planning, contradiction checks, dependency validation, and deterministic JSON rendering |
-| D2 | ✅ Complete | Added `agentkit resume`, CLI wiring, stable markdown/JSON output, `--reconcile-path`, `--packet-dir`, and packet-directory writing |
-| D3 | ✅ Complete | Added integration and safeguard coverage for contradictory reconcile state, missing upstream artifacts, serialization-group conflicts, completed lanes, and planning-only behavior |
-| D4 | ✅ Complete | Updated README, CHANGELOG, version surfaces, build/report summaries, and progress log so the branch truthfully reflects local-only `v1.17.0` resume readiness |
+| D1 | ✅ Complete | Recalled release context, ran the status-conflict scan, confirmed `1.17.0` version surfaces, and recorded the exact pre-release truth from this repo |
+| D2 | ✅ Complete | Re-ran the focused resume plus adjacent reconcile slice and the full suite from this repo, both passing |
+| D3 | ✅ Complete | Pushed `feat/v1.17.0-resume-lanes`, created annotated tag `v1.17.0`, pushed the tag, and verified both remote refs explicitly |
+| D4 | ✅ Complete | Built `agentkit_cli-1.17.0.tar.gz` and `agentkit_cli-1.17.0-py3-none-any.whl`, published them to PyPI, and verified live registry JSON |
+| D5 | ✅ Complete | Reconciled the shipped narrative so the repo now distinguishes the shipped release commit from the later docs-only chronology head |
 
 ## Validation
 
-- Resume engine plus reconcile slice: `pytest -q tests/test_resume_engine.py tests/test_reconcile_engine.py` -> passed
-- Resume CLI and workflow slice: `pytest -q tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_main.py` -> passed
-- Resume integration safeguards: `pytest -q tests/test_resume_engine.py tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_resume_integration.py tests/test_reconcile_workflow.py` -> `11 passed in 4.16s`
-- Full suite: `pytest -q tests/` -> `4959 passed, 13 warnings in 197.54s (0:03:17)`
-- Repo-local contradiction scan replacement: resume reconcile-shape validation plus focused integration tests passed
-- Repo-local hygiene checks: `git status --short` clean except for the intentional contract file
+- Focused release slice: `uv run python -m pytest -q tests/test_resume_engine.py tests/test_reconcile_engine.py tests/test_resume_cmd.py tests/test_resume_workflow.py tests/test_main.py` -> `21 passed in 6.46s`
+- Full suite: `uv run python -m pytest -q tests/` -> `4959 passed, 1 warning in 338.18s (0:05:38)`
+- Remote branch verification: `git ls-remote --heads origin feat/v1.17.0-resume-lanes` -> `533354a9e9074c9bf26923c28f7eedce0a8c8339`
+- Remote tag verification: `git ls-remote --tags origin v1.17.0^{}` -> `533354a9e9074c9bf26923c28f7eedce0a8c8339`
+- Registry verification: `https://pypi.org/pypi/agentkit-cli/1.17.0/json` -> live with `agentkit_cli-1.17.0.tar.gz` and `agentkit_cli-1.17.0-py3-none-any.whl`
 
 ## Repo state
 
 - Branch: `feat/v1.17.0-resume-lanes`
+- Shipped release commit: `533354a9e9074c9bf26923c28f7eedce0a8c8339` (`chore: refresh v1.17.0 release verification`)
 - Supported handoff lane: `source -> source-audit -> map -> contract -> bundle -> taskpack -> clarify -> resolve -> dispatch -> stage -> materialize -> launch -> observe -> supervise -> reconcile -> resume`
-- Version surfaces target `1.17.0` in `pyproject.toml` and `agentkit_cli/__init__.py`
-- Required workspace helper scripts named in the contract are not present inside this worktree, so this pass used repo-local equivalents: direct reconcile contradiction validation, targeted integration tests, and `git status` hygiene checks
-- Working tree state is clean except for `all-day-build-contract-agentkit-cli-v1.17.0-resume-lanes.md`
-- This branch is local-only. No push, tag, publish, or remote mutation was performed in this pass.
+- Version surfaces target `1.17.0` in `pyproject.toml`, `agentkit_cli/__init__.py`, and `uv.lock`
+- Branch chronology may advance beyond the shipped tag only for docs-only release narration cleanup
+- Working tree is clean except for the intentional untracked release-contract artifacts

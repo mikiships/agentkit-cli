@@ -1,5 +1,58 @@
 # Progress Log — agentkit-cli v1.17.0 resume lanes
 
+## D5 complete: shipped chronology reconciled after verified release
+
+**What changed:**
+- Updated `BUILD-REPORT.md`, `BUILD-REPORT-v1.17.0.md`, and `FINAL-SUMMARY.md` from local-only `RELEASE-READY` to truthful `SHIPPED`.
+- Recorded the exact shipped release commit `533354a9e9074c9bf26923c28f7eedce0a8c8339` and kept room for a later docs-only chronology head if this branch advances.
+- Preserved the narrative that the release tag and shipped branch state point to the same commit, while any later branch movement is docs-only chronology cleanup.
+
+**Validation:**
+- Shipped commit verified on both remote branch and release tag before report updates
+- PyPI JSON for `agentkit-cli==1.17.0` verified live before any `SHIPPED` prose landed
+
+**Current truth:**
+- All four release surfaces are true: tests green, branch pushed, tag pushed, registry live.
+- `agentkit-cli v1.17.0` is shipped.
+- Branch chronology head may diverge later only for docs-only narrative cleanup.
+
+## D4 complete: PyPI publish verified for agentkit-cli 1.17.0
+
+**What changed:**
+- Built fresh `1.17.0` wheel and sdist artifacts into `dist-release-v1.17.0`.
+- First publish attempt via `python3 -m twine` failed because `twine` was not installed in the system interpreter.
+- Retried with `uvx twine upload`, which succeeded using the supported local auth path on this machine.
+- Verified the live registry JSON and artifact filenames directly from PyPI.
+
+**Validation:**
+- `uv build --out-dir dist-release-v1.17.0` -> built `agentkit_cli-1.17.0.tar.gz` and `agentkit_cli-1.17.0-py3-none-any.whl`
+- `uvx twine upload dist-release-v1.17.0/*` -> uploaded successfully, PyPI project page for `1.17.0` returned
+- `curl -sSf https://pypi.org/pypi/agentkit-cli/1.17.0/json | python3 -c '...'` -> `1.17.0` with both artifact filenames present
+
+**Current truth:**
+- D4 is complete.
+- PyPI `agentkit-cli==1.17.0` is live with wheel and sdist artifacts.
+- The shipped release commit remains `533354a9e9074c9bf26923c28f7eedce0a8c8339`.
+
+## D3 complete: git release surfaces promoted and verified
+
+**What changed:**
+- Committed the fresh release-verification log and `uv.lock` alignment as `533354a` (`chore: refresh v1.17.0 release verification`).
+- Pushed `feat/v1.17.0-resume-lanes` to origin.
+- Created annotated tag `v1.17.0` and pushed it to origin.
+- Verified the remote branch head and remote tag target explicitly.
+
+**Validation:**
+- `git push -u origin feat/v1.17.0-resume-lanes` -> remote branch created and tracking set
+- `git tag -a v1.17.0 -m "agentkit-cli v1.17.0" && git push origin v1.17.0` -> annotated tag pushed successfully
+- `git ls-remote --heads origin feat/v1.17.0-resume-lanes` -> `533354a9e9074c9bf26923c28f7eedce0a8c8339`
+- `git ls-remote --tags origin v1.17.0^{}` -> `533354a9e9074c9bf26923c28f7eedce0a8c8339`
+
+**Current truth:**
+- D3 is complete.
+- The shipped release commit is `533354a9e9074c9bf26923c28f7eedce0a8c8339`.
+- Branch-head and tag-target chronology are identical at ship time; any later branch head would be docs-only.
+
 ## D2 rerun complete: release-ready truth re-verified from this repo
 
 **What changed:**
