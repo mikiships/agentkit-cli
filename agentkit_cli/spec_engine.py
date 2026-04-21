@@ -813,7 +813,7 @@ class SpecEngine:
                     status=self._extract_status(text),
                     version=self._extract_version(text),
                     lanes=self._extract_lanes(text),
-                    evidence=lines[:3],
+                    evidence=lines[:12],
                 )
             )
         return artifacts

@@ -6,14 +6,14 @@ Contract: all-day-build-contract-agentkit-cli-v1.27.0-spec-concrete-next-step-fi
 
 ## Summary
 
-- Added a concrete `flagship-concrete-next-step` planner recommendation for the post-shipped-truth flagship repo case.
-- Added regression coverage across engine, command, and workflow paths.
-- Refreshed local-only source and closeout surfaces for truthful `v1.27.0` status.
+- Repaired the real flagship planner mismatch: the post-shipped-truth rule now recognizes the current flagship objective wording and enough local closeout evidence to fire from the live repo.
+- Updated regression coverage across engine, command, and workflow paths to use the same flagship wording as the real repo.
+- Refreshed local-only closeout surfaces for truthful `v1.27.0` status.
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 2.09s`
-- `uv run python -m agentkit_cli.main spec . --json` -> primary recommendation kind `flagship-concrete-next-step`
-- `uv run python -m pytest -q` -> `5011 passed, 1 warning in 887.08s (0:14:47)`
+- `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 2.63s`
+- `uv run python -m agentkit_cli.main spec . --json` -> `kind=flagship-concrete-next-step`; title `Emit a concrete next flagship lane after shipped-truth sync`
+- `uv run python -m pytest -q` -> `5011 passed, 1 warning in 824.00s (0:13:44)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `No contradictory success/blocker narratives found.`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `Total findings: 0`

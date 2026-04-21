@@ -14,14 +14,15 @@ After the v1.26.0 shipped-truth-sync closeout, the flagship repo still let `agen
 ## What changed
 
 - Tightened the existing `flagship-concrete-next-step` trigger in `agentkit_cli/spec_engine.py` so it accepts the current flagship objective wording instead of only the older demo-fixture phrasing.
+- Expanded workflow-artifact evidence capture enough for the planner to see the shipped-truth-sync closeout text already recorded in the local flagship reports.
 - Updated focused engine, command, and workflow regressions to use the same flagship objective wording as the real repo, so this false-green case cannot recur.
 - Updated local closeout surfaces so they describe the active `v1.27.0 spec concrete next step` lane truthfully.
 
 ## Validation
 
-- `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 2.07s`
-- `uv run python -m agentkit_cli.main spec . --json` -> pending refreshed live proof after repairing the flagship trigger mismatch
-- `uv run python -m pytest -q` -> `5011 passed, 1 warning in 820.15s (0:13:40)`
+- `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `23 passed in 2.63s`
+- `uv run python -m agentkit_cli.main spec . --json` -> `kind=flagship-concrete-next-step`; title `Emit a concrete next flagship lane after shipped-truth sync`; contract seed title `All-Day Build Contract: agentkit-cli-v1.27.0-spec-concrete-next-step spec concrete next step`
+- `uv run python -m pytest -q` -> `5011 passed, 1 warning in 824.00s (0:13:44)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `No contradictory success/blocker narratives found.`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.27.0-spec-concrete-next-step` -> `Total findings: 0`
 
