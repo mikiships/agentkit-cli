@@ -1,5 +1,23 @@
 # Progress Log — agentkit-cli v1.20.0 land lanes
 
+## D3 complete: four-surface release completion and chronology reconciliation finished, v1.20.0 shipped
+
+**What changed:**
+- Pushed `feat/v1.20.0-land-lanes` to origin at `5baec07b5fb2f2be35559edbef2a10081b850910`, created annotated tag `v1.20.0`, and pushed the tag so it peels to the same shipped commit.
+- Built `agentkit_cli-1.20.0-py3-none-any.whl` and `agentkit_cli-1.20.0.tar.gz` in `dist-release-v1.20.0/`, then published both with `twine upload`.
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.20.0.md`, and `FINAL-SUMMARY.md` so they now record shipped truth, direct ref proofs, and the exact PyPI evidence without blurring the shipped tag line.
+
+**Validation:**
+- `git ls-remote --heads origin feat/v1.20.0-land-lanes` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/heads/feat/v1.20.0-land-lanes`
+- `git ls-remote --tags origin v1.20.0` -> `1ac306c4426cd644bb537a8b75e5c9fec4ad0081 refs/tags/v1.20.0`
+- `git ls-remote --tags origin v1.20.0^{}` -> `5baec07b5fb2f2be35559edbef2a10081b850910 refs/tags/v1.20.0^{}`
+- PyPI proof: `https://pypi.org/project/agentkit-cli/1.20.0/` and `https://pypi.org/pypi/agentkit-cli/1.20.0/json` live with `agentkit_cli-1.20.0-py3-none-any.whl` (`689640` bytes) and `agentkit_cli-1.20.0.tar.gz` (`1211626` bytes)
+
+**Current truth:**
+- Deliverables D1 through D3 in the release contract are complete.
+- `agentkit-cli v1.20.0` is truthfully SHIPPED.
+- The shipped artifact is pinned to `v1.20.0` -> `5baec07b5fb2f2be35559edbef2a10081b850910`.
+
 ## D1 complete: release-truth refresh revalidated from the v1.20.0 candidate tree
 
 **What changed:**
