@@ -1,0 +1,130 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from typer.testing import CliRunner
+
+from agentkit_cli.main import app
+
+runner = CliRunner()
+
+
+def _write_repo(project: Path, *, canonical: bool = True, workflow_lane: bool = True, contradictory: bool = False) -> None:
+    if canonical:
+        (project / ".agentkit").mkdir(parents=True)
+        source_path = project / ".agentkit" / "source.md"
+    else:
+        source_path = project / "AGENTS.md"
+    project.mkdir(parents=True, exist_ok=True)
+    (project / "src").mkdir(exist_ok=True)
+    (project / "tests").mkdir(exist_ok=True)
+    rules = "- Keep output deterministic.\n"
+    if contradictory:
+        rules = "- Always update docs.\n- Do not update docs.\n"
+    source_path.write_text(
+        "# Demo Repo\n\n"
+        "## Objective\nShip the next repo-understanding increment.\n\n"
+        "## Scope & Boundaries\nWork only inside this repo.\n\n"
+        f"## Rules\n{rules}\n"
+        "## Validation\nRun uv run pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py\n\n"
+        "## Deliverables\nLeave markdown and JSON handoff artifacts.\n",
+        encoding="utf-8",
+    )
+    (project / "pyproject.toml").write_text(
+        "[project]\nname='demo-repo'\nversion='0.1.0'\n\n[project.scripts]\ndemo='src.main:main'\n",
+        encoding="utf-8",
+    )
+    (project / "src" / "main.py").write_text("def main():\n    return 'ok'\n", encoding="utf-8")
+    (project / "tests" / "test_main.py").write_text("def test_ok():\n    assert True\n", encoding="utf-8")
+    if workflow_lane:
+        (project / "README.md").write_text(
+            "# Demo Repo\n\n"
+            "Supported lane: `source -> source-audit -> map -> contract`\n\n"
+            "Recommended flow:\n\n"
+            "```bash\n"
+            "agentkit source-audit .\n"
+            "agentkit map . --json > repo-map.json\n"
+            "agentkit contract \"Ship the next increment\" --path . --map repo-map.json\n"
+            "```\n",
+            encoding="utf-8",
+        )
+        (project / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## [0.3.0] - 2026-04-21\n\n- Added deterministic workflow docs.\n",
+            encoding="utf-8",
+        )
+        (project / "BUILD-REPORT.md").write_text(
+            "# BUILD-REPORT.md — demo-repo v0.3.0\n\nStatus: RELEASE-READY (LOCAL-ONLY)\n",
+            encoding="utf-8",
+        )
+        (project / "FINAL-SUMMARY.md").write_text(
+            "# Final Summary — demo-repo v0.3.0\n\nStatus: RELEASE-READY (LOCAL-ONLY)\n",
+            encoding="utf-8",
+        )
+
+
+def test_spec_command_json_output_is_deterministic(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project)
+
+    first = runner.invoke(app, ["spec", str(project), "--json"])
+    second = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    assert first.output == second.output
+    payload = json.loads(first.output)
+    assert payload["schema_version"] == "agentkit.spec.v1"
+    assert payload["primary_recommendation"]["kind"] == "workflow-gap"
+    assert payload["contract_seed"]["objective"].startswith("Add a deterministic `agentkit spec` step")
+
+
+def test_spec_command_output_dir_writes_markdown_and_json(tmp_path):
+    project = tmp_path / "demo-repo"
+    out = tmp_path / "out"
+    _write_repo(project)
+
+    result = runner.invoke(app, ["spec", str(project), "--output-dir", str(out)])
+
+    assert result.exit_code == 0, result.output
+    assert (out / "spec.md").exists()
+    assert (out / "spec.json").exists()
+    assert "Primary recommendation" in (out / "spec.md").read_text(encoding="utf-8")
+
+
+def test_spec_command_fails_when_required_upstream_source_is_missing(tmp_path):
+    project = tmp_path / "demo-repo"
+    project.mkdir()
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code != 0
+    assert "canonical or legacy source" in result.output.lower()
+
+
+def test_spec_command_fails_on_contradictory_source_guidance(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, contradictory=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code != 0
+    assert "contradictory upstream source guidance" in result.output.lower()
+
+
+def test_spec_command_truthfully_handles_fallback_without_workflow_artifacts(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, canonical=False, workflow_lane=False)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["recent_workflow_artifacts"] == []
+    assert payload["primary_recommendation"]["kind"] == "fallback-hardening"
+
+
+def test_spec_help():
+    result = runner.invoke(app, ["spec", "--help"])
+    assert result.exit_code == 0
+    assert "--output-dir" in result.output

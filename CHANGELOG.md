@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.22.0] - 2026-04-21
+
+### Added
+- Added `agentkit spec`, a deterministic next-build planning step that turns source context, source-audit readiness, repo-map context, and recent workflow artifacts into one primary adjacent-build recommendation plus bounded alternates.
+- Added stable spec markdown and JSON rendering, `--output`, `--output-dir`, and direct contract seeding through `agentkit contract --spec`.
+- Added focused coverage for happy-path, missing-upstream, contradictory-upstream, fallback, and `source -> audit -> map -> spec -> contract` workflow behavior.
+
+### Docs
+- README, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces updated so the supported repo-understanding lane now becomes `source -> audit -> map -> spec -> contract`, with `v1.22.0` left in truthful local release-ready state only.
+
 ## [1.21.0] - 2026-04-21
 
 - Added `agentkit merge`, a local-only merge workflow that consumes saved `land` artifacts plus local git and worktree evidence.

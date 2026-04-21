@@ -231,7 +231,8 @@ Recommended handoff lane:
 agentkit source --promote
 agentkit source-audit .
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 ```
 
@@ -262,7 +263,38 @@ Recommended flow:
 ```bash
 agentkit source-audit .
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next repo-understanding increment" --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
+```
+
+## `agentkit spec` — deterministic next-build planning between map and contract
+
+Use `agentkit spec` when you want the repo-understanding surfaces turned into one stable next-build recommendation before writing a contract.
+
+```bash
+# Recommend the next build directly from the local repo
+agentkit spec .
+
+# Save markdown + JSON artifacts for review or downstream tooling
+agentkit spec . --map repo-map.json --output-dir ./spec
+
+# Emit stable JSON only
+agentkit spec . --json > spec.json
+```
+
+The spec surfaces:
+- one primary recommended next build plus bounded alternates
+- explicit why-now reasoning, scope boundaries, and validation hints
+- recent workflow-artifact grounding when README, changelog, or release surfaces exist
+- deterministic contract-seeding data that feeds directly into `agentkit contract --spec`
+
+Recommended flow:
+
+```bash
+agentkit source-audit .
+agentkit map . --json > repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 ```
 
 ## `agentkit contract` — deterministic build contracts with repo-map handoff
@@ -271,14 +303,16 @@ Use `agentkit contract` when you want an explicit execution contract after sourc
 
 ```bash
 # Draft a contract directly from a live local repo map
-agentkit contract "Ship a better onboarding flow" --path . --map .
+agentkit spec . --map . --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 
 # Draft from a saved explorer artifact
 agentkit map . --json > repo-map.json
-agentkit contract "Ship a better onboarding flow" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 
-# Add explicit deliverables or test requirements
-agentkit contract "Ship a better onboarding flow" \
+# Override seeded details when you want to tighten the contract manually
+agentkit contract --spec ./spec/spec.json \
   --deliverable "Wire the CLI" \
   --test-requirement "Run focused pytest slices"
 ```
@@ -288,6 +322,7 @@ The contract surfaces:
 - canonical-source context when available
 - repo command hints and boundaries
 - optional repo-map explorer context, mapped subsystems, and handoff hints
+- direct seeding from `agentkit spec --output-dir ./spec` via `agentkit contract --spec ./spec/spec.json`
 - deliverable and validation checklists ready for agent execution
 
 ## `agentkit bundle` — portable repo-understanding handoff artifact
@@ -344,7 +379,8 @@ Recommended full lane:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
@@ -378,7 +414,8 @@ Recommended ambiguity loop:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
@@ -412,7 +449,8 @@ Recommended full resolution loop:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
@@ -628,7 +666,8 @@ Recommended full handoff lane:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
@@ -657,7 +696,8 @@ Recommended full dispatch lane:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify
@@ -672,7 +712,8 @@ Recommended full stage lane:
 agentkit source --promote
 agentkit source-audit . --json > source-audit.json
 agentkit map . --json > repo-map.json
-agentkit contract "Ship the next increment" --path . --map repo-map.json
+agentkit spec . --map repo-map.json --output-dir ./spec
+agentkit contract --spec ./spec/spec.json --path .
 agentkit bundle . --output handoff-bundle.md
 agentkit taskpack . --target codex --output-dir ./taskpack
 agentkit clarify . --target codex --output-dir ./clarify

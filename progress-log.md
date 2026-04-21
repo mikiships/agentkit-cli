@@ -1,3 +1,83 @@
+# Progress Log — agentkit-cli v1.22.0 spec release prep
+
+## D3 complete: spec engine, CLI flow, and workflow coverage landed
+
+**What changed:**
+- Added `agentkit_cli/spec_engine.py` plus `agentkit_cli/commands/spec_cmd.py` for deterministic next-build planning between `map` and `contract`.
+- Added stable markdown/JSON spec output, `--output`, `--output-dir`, and direct contract seeding through `agentkit contract --spec`.
+- Added focused spec command and workflow coverage for the happy path, missing-upstream, contradictory-upstream, and fallback cases, plus updated CLI wiring and version surfaces to `1.22.0`.
+
+**Validation:**
+- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_map.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `37 passed in 2.01s`
+- `python3 -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `20 passed in 1.31s`
+
+**Current truth:**
+- Deliverables D1 through D3 are complete.
+- D4 docs finalization and release-readiness validation were still pending after this step.
+- `agentkit spec` now exists locally and `agentkit contract --spec` seeds contracts from saved `spec.json` artifacts.
+
+---
+
+## Finisher D1 complete: release surfaces reconciled to v1.22.0 truth
+
+**What changed:**
+- Replaced stale `v1.21.0` shipped-state prose in `BUILD-REPORT.md`, `BUILD-REPORT-v1.22.0.md`, and `FINAL-SUMMARY.md` with truthful `v1.22.0` local-only release-readiness language.
+- Kept the active docs surfaces aligned on the supported lane `source -> audit -> map -> spec -> contract`.
+- Preserved explicit local-only language: no push, tag, publish, or remote mutation happened in this pass.
+
+**Validation:**
+- Reconciled all active release surfaces to the same final status: `RELEASE-READY (LOCAL-ONLY)`.
+- Expanded `BUILD-REPORT-v1.22.0.md` from a pointer stub into a real versioned release-readiness surface.
+
+**Current truth:**
+- The active status surfaces now describe the current repo state instead of the prior `v1.21.0` shipped line.
+
+## Finisher D2 complete: real validation rerun from the current tree
+
+**What changed:**
+- Re-ran release recall, contradiction scanning, the focused spec validation slice, and the full-suite confidence pass from the current repo state.
+- Recorded the exact `uv` environment failures instead of pretending the requested command succeeded.
+- Used the repo-local Python 3.11 environment as the direct equivalent verification path the contract allows when `uv` fails for environmental reasons.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> current handoff cues surfaced, plus a stale external temporal-ledger cue still mentioning `v1.1.0`
+- `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `No contradictory success/blocker narratives found.`
+- `python3 -m pytest -q tests/test_source_audit.py tests/test_source_audit_workflow.py tests/test_map.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_contract_d2.py tests/test_main.py` -> `37 passed in 2.09s`
+- `uv run python -m pytest -q` -> failed first on `/Users/mordecai/.cache/uv/sdists-v9/.git` permission and then panicked with `Attempted to create a NULL object` after redirecting `UV_CACHE_DIR` to `/tmp`
+- `.venv/bin/python -m pytest -q` -> `4995 passed, 8 skipped, 1 warning in 159.76s (0:02:39)`
+
+**Current truth:**
+- The repo is honestly green from its local Python 3.11 environment.
+- The required `uv run` command remains an environment issue in this sandbox, not a product failure in the repo.
+
+## Finisher D3 complete: truthful local closeout and hygiene
+
+**What changed:**
+- Added ignore coverage for `.agent-relay/` and `.agentkit-last-run.json` so active runner artifacts do not dirty the release-ready worktree.
+- Removed transient relay snippets from tracked context files and verified the remaining worktree noise was gone.
+- Kept the `v1.22.0` spec and finisher contract artifacts in-repo for this local closeout pass.
+
+**Validation:**
+- `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `Total findings: 0`
+
+**Current truth:**
+- `agentkit-cli v1.22.0` is truthfully `RELEASE-READY (LOCAL-ONLY)`.
+- Supported lane: `source -> audit -> map -> spec -> contract`.
+
+## Parent closeout complete: sandbox-only commit blocker cleared
+
+**What happened:**
+- The child finisher reached truthful local-ready state but could not write the parent worktree git metadata from inside its sandbox.
+- The parent session then performed the final local commit closeout directly from outside that sandbox, which cleared the blocker without changing product scope or validation truth.
+
+**Current truth:**
+- `agentkit-cli v1.22.0` is truthfully `RELEASE-READY (LOCAL-ONLY)`.
+- No push, tag, publish, or remote mutation happened.
+
+---
+
+# Historical log (pre-v1.22.0)
+
 # Progress Log — agentkit-cli v1.21.0 merge release completion
 
 ## D3 complete: four-surface release completion and chronology reconciliation finished, v1.21.0 shipped

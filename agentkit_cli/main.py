@@ -93,6 +93,7 @@ from agentkit_cli.commands.site_cmd import site_command
 from agentkit_cli.commands.populate_cmd import populate_command
 from agentkit_cli.commands.burn import burn_command
 from agentkit_cli.commands.map_cmd import map_command
+from agentkit_cli.commands.spec_cmd import spec_command
 from agentkit_cli.commands.bundle_cmd import bundle_command
 from agentkit_cli.commands.taskpack_cmd import taskpack_command
 from agentkit_cli.commands.clarify_cmd import clarify_command
@@ -1335,6 +1336,19 @@ def source_audit(
     source_audit_command(path=path, json_output=json_output, output=output, format=format)
 
 
+@app.command("spec")
+def spec(
+    path: str = typer.Argument(..., help="Project directory to spec before contract drafting"),
+    map_input: Optional[str] = typer.Option(None, "--map", help="Repo map JSON artifact or target to use while drafting the spec"),
+    json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON output"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Write the rendered spec to this file"),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write spec.md and spec.json to this directory"),
+    format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
+) -> None:
+    """Recommend the next deterministic build between map and contract."""
+    spec_command(path=path, map_input=map_input, json_output=json_output, output=output, output_dir=output_dir, format=format)
+
+
 @app.command("bundle")
 def bundle(
     path: str = typer.Argument(..., help="Project directory to bundle for handoff"),
@@ -1368,7 +1382,7 @@ def clarify(
     output_dir: Optional[Path] = typer.Option(None, "--output-dir", help="Write clarify.md and clarify.json to this directory"),
     format: str = typer.Option("markdown", "--format", help="Output format: markdown, text, or json"),
 ) -> None:
-    """Generate a clarification brief for the source -> audit -> map -> contract -> bundle -> taskpack lane."""
+    """Generate a clarification brief for the source -> audit -> map -> spec -> contract -> bundle -> taskpack lane."""
     clarify_command(path=path, target=target, json_output=json_output, output=output, output_dir=output_dir, format=format)
 
 
@@ -1630,13 +1644,14 @@ def merge(
 
 @app.command("contract")
 def contract(
-    objective: str = typer.Argument(..., help="Project objective to turn into a build contract"),
+    objective: Optional[str] = typer.Argument(None, help="Project objective to turn into a build contract"),
     path: Optional[str] = typer.Option(None, "--path", help="Project directory (default: .)"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Write contract to this file"),
     title: Optional[str] = typer.Option(None, "--title", help="Override contract title"),
     deliverable: Optional[List[str]] = typer.Option(None, "--deliverable", help="Repeatable deliverable checklist item"),
     test_requirement: Optional[List[str]] = typer.Option(None, "--test-requirement", help="Repeatable test requirement"),
     map_input: Optional[str] = typer.Option(None, "--map", help="Repo map JSON artifact or target to map before drafting the contract"),
+    spec_input: Optional[str] = typer.Option(None, "--spec", help="Saved spec.json artifact to seed the contract directly"),
     json_output: bool = typer.Option(False, "--json", help="Emit deterministic JSON metadata"),
 ) -> None:
     """Generate a deterministic build contract for the chosen objective."""
@@ -1648,6 +1663,7 @@ def contract(
         deliverable=deliverable,
         test_requirement=test_requirement,
         map_input=map_input,
+        spec_input=spec_input,
         json_output=json_output,
     )
 

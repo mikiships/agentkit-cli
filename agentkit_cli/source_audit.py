@@ -286,7 +286,7 @@ class SourceAuditEngine:
         warning_count = sum(1 for item in findings if item.severity == "warning")
         ready = blocker_count == 0 and not used_fallback
         if ready:
-            summary = "Ready: source has the required structure for the map -> contract lane."
+            summary = "Ready: source has the required structure for the map -> spec -> contract lane."
         elif blocker_count:
             summary = f"Blocked: fix {blocker_count} structural issue(s) before drafting a contract."
         else:

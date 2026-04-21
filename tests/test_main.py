@@ -13,7 +13,7 @@ def test_version_flag():
     """--version prints version."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "1.21.0" in result.output
+    assert "1.22.0" in result.output
 
 
 def test_no_args_shows_help():
@@ -42,6 +42,11 @@ def test_run_subcommand_help():
 
 def test_status_subcommand_help():
     result = runner.invoke(app, ["status", "--help"])
+    assert result.exit_code == 0
+
+
+def test_spec_subcommand_help():
+    result = runner.invoke(app, ["spec", "--help"])
     assert result.exit_code == 0
 
 

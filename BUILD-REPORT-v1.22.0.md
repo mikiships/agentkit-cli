@@ -1,15 +1,15 @@
-# Final Summary — agentkit-cli v1.22.0 spec local release readiness
+# BUILD-REPORT-v1.22.0.md — agentkit-cli v1.22.0 spec local release readiness
 
 Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-21
 Contract: all-day-build-contract-agentkit-cli-v1.22.0-spec-finisher.md
 
-## Outcome
+## Scope
 
-- `agentkit spec` is landed as the deterministic planning step between `map` and `contract`, with direct contract seeding through `agentkit contract --spec`.
-- Active repo surfaces now agree that the supported lane is `source -> audit -> map -> spec -> contract`.
-- `v1.22.0` is truthfully `RELEASE-READY (LOCAL-ONLY)` from this repo state; `v1.21.0` remains the last shipped release.
-- No push, tag, publish, or other remote mutation happened in this pass.
+- `agentkit spec` is now the deterministic next-build planning step between `map` and `contract`.
+- Direct contract seeding now flows through saved `spec.json` artifacts via `agentkit contract --spec`.
+- Supported repo-understanding lane is `source -> audit -> map -> spec -> contract`.
+- `v1.22.0` remains local-only; no push, tag, publish, or remote mutation happened in this pass.
 
 ## Validation
 
@@ -19,4 +19,9 @@ Contract: all-day-build-contract-agentkit-cli-v1.22.0-spec-finisher.md
 - `uv run python -m pytest -q` could not complete in this sandbox because `uv` first hit a cache-permission error and then panicked when redirected to `/tmp`.
 - `.venv/bin/python -m pytest -q` -> `4995 passed, 8 skipped, 1 warning in 159.76s (0:02:39)`
 - `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.22.0-spec` -> `Total findings: 0`
-- The child finisher hit a sandbox-only git metadata blocker in the parent worktree gitdir, but the parent session completed the local commit closeout directly from outside that sandbox.
+
+## Repo truth
+
+- The `agentkit spec` work is truthfully `RELEASE-READY (LOCAL-ONLY)` from this repo state.
+- The child finisher hit a sandbox-only git metadata blocker, but the parent session completed the required local commit step outside that sandbox.
+- `v1.21.0` remains the last shipped release.
