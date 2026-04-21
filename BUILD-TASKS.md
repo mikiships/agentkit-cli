@@ -1,8 +1,8 @@
-# BUILD-TASKS.md — agentkit-cli v1.23.0 self-spec source readiness
+# BUILD-TASKS.md — agentkit-cli v1.24.0 clean JSON stdout
 
-- [x] Promote the repo to a real `.agentkit/source.md` canonical source instead of legacy `AGENTS.md` fallback
-- [x] Add the required source sections so `agentkit source-audit` reports ready for contract
-- [x] Make `agentkit spec` succeed on the flagship repo and emit a next-build recommendation
-- [x] Reconcile reports and summary surfaces for truthful local build status
-- [x] Run focused validation plus a full-suite confidence pass
-- [x] Commit the completed local build state
+- [ ] Make `agentkit spec --json` emit pure JSON on stdout with no human preamble
+- [ ] Preserve human progress/reporting without polluting JSON mode, preferably via stderr or suppressed text
+- [ ] Add focused regression coverage for the broken `--json` contract
+- [ ] Reconcile local status surfaces truthfully after the fix and validation
+- [ ] Run focused validation plus a full-suite confidence pass
+- [ ] Commit the completed local build state
