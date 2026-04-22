@@ -22,6 +22,9 @@ _FRONTDOOR_VERSION = "1.2.0"
 _FRONTDOOR_TEST_COUNT = 4824
 _FRONTDOOR_VERSION_COUNT = 111
 _FRONTDOOR_PACKAGE_COUNT = 6
+_FRONTDOOR_PYPI_TOTAL = 51075
+_FRONTDOOR_PYPI_MONTH = 5089
+_FRONTDOOR_PYPI_UPDATED = "2026-04-21"
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -68,6 +71,9 @@ def _released_frontdoor_defaults() -> dict[str, int | str]:
         "tests": _released_test_count(version),
         "versions": _version_stat_from_version(version),
         "packages": _FRONTDOOR_PACKAGE_COUNT,
+        "pypi_total": _FRONTDOOR_PYPI_TOTAL,
+        "pypi_month": _FRONTDOOR_PYPI_MONTH,
+        "pypi_updated": _FRONTDOOR_PYPI_UPDATED,
     }
 
 
@@ -78,6 +84,9 @@ def build_frontdoor_stats(
     tests: Optional[int] = None,
     versions: Optional[int] = None,
     packages: Optional[int] = None,
+    pypi_total: Optional[int] = None,
+    pypi_month: Optional[int] = None,
+    pypi_updated: Optional[str] = None,
     refreshed_at: Optional[str] = None,
     prefer_existing: bool = True,
 ) -> dict[str, Any]:
@@ -89,11 +98,17 @@ def build_frontdoor_stats(
     inferred_versions = _version_stat_from_version(str(resolved_version))
     resolved_versions = versions if versions is not None else (existing.get("versions") if prefer_existing else None) or inferred_versions
     resolved_packages = packages if packages is not None else (existing.get("packages") if prefer_existing else None) or int(released["packages"])
+    resolved_pypi_total = pypi_total if pypi_total is not None else (existing.get("pypi_total") if prefer_existing else None) or int(released["pypi_total"])
+    resolved_pypi_month = pypi_month if pypi_month is not None else (existing.get("pypi_month") if prefer_existing else None) or int(released["pypi_month"])
+    resolved_pypi_updated = pypi_updated or (existing.get("pypi_updated") if prefer_existing else None) or str(released["pypi_updated"])
     return {
         "version": str(resolved_version),
         "tests": int(resolved_tests),
         "versions": int(resolved_versions),
         "packages": int(resolved_packages),
+        "pypi_total": int(resolved_pypi_total),
+        "pypi_month": int(resolved_pypi_month),
+        "pypi_updated": str(resolved_pypi_updated),
         "refreshed_at": refreshed_at or existing.get("refreshed_at") or datetime.now(timezone.utc).isoformat(),
     }
 
@@ -105,6 +120,14 @@ def _version_stat_from_version(version: str) -> int:
     major = int(match.group(1))
     minor = int(match.group(2))
     return major * 100 + minor
+
+
+def _compact_count(value: int) -> str:
+    if value >= 1000000:
+        return f"{value / 1000000:.1f}m".replace(".0m", "m")
+    if value >= 1000:
+        return f"{value / 1000:.1f}k".replace(".0k", "k")
+    return str(value)
 
 # ---------------------------------------------------------------------------
 # Data models
@@ -946,8 +969,10 @@ class SiteEngine:
             total_repos = self._count_unique_repos()
             community_repos = 0
             ecosystem_count = len(self.config.topics)
-        trust_stat_value = community_repos if community_repos > 0 else ecosystem_count
-        trust_stat_label = "Community Scored" if community_repos > 0 else "Ecosystems"
+        pypi_month_display = _compact_count(int(frontdoor["pypi_month"]))
+        pypi_total_display = _compact_count(int(frontdoor["pypi_total"]))
+        trust_stat_value = community_repos if community_repos > 0 else pypi_month_display
+        trust_stat_label = "Community Scored" if community_repos > 0 else "PyPI 30d Downloads"
         rows_html = "".join(
             f"<tr>"
             f'<td class="repo-name"><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
@@ -970,7 +995,7 @@ class SiteEngine:
 
         body = f"""
         <div class="hero">
-          <div class="hero-badge">v{frontdoor['version']} &middot; {total_repos} public repos scored &middot; open source workflow kit</div>
+          <div class="hero-badge">v{frontdoor['version']} &middot; {pypi_total_display} PyPI downloads &middot; canonical-source workflow</div>
           <h1>Keep <em>one canonical source</em><br>for every AI coding agent</h1>
           <p class="hero-sub">If you landed here from HN, the pitch is simple: agentkit-cli is not another prompt pack. It gives your repo one source of truth for agent instructions, projects that into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, adds an <code>agentkit contract</code> when work needs shared guardrails, then scores what actually ships.</p>
           <div class="hero-actions">
@@ -996,8 +1021,8 @@ class SiteEngine:
             </div>
             <div class="proof-item">
               <span class="proof-kicker">Proof</span>
-              <strong>{frontdoor['tests']} tests, {frontdoor['versions']} shipped versions, {total_repos} public scored repos.</strong>
-              <p>Real release cadence, real scored examples, and a workflow that extends past the install command.</p>
+              <strong>{pypi_total_display} PyPI downloads, {frontdoor['versions']} shipped versions, {total_repos} public scored repos.</strong>
+              <p>Real installs, real scored examples, and a workflow that extends past the install command.</p>
             </div>
           </div>
         </div>
@@ -1009,6 +1034,7 @@ class SiteEngine:
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">{trust_stat_value}</div><div class="stat-label">{trust_stat_label}</div></div>
         </div>
+        <p class="section-note" style="text-align:center;margin-top:0.85rem;">PyPI stats source: pypistats.org, updated {frontdoor['pypi_updated']}.</p>
 
         <section class="workflow-section">
           <div class="container section-frame">
@@ -1083,9 +1109,9 @@ agentkit score</code></pre>
               </div>
             </div>
             <div class="trust-grid" style="margin-bottom:1rem">
-              <div class="trust-card"><h3>Shipped repeatedly</h3><p><strong>{frontdoor['versions']} released versions</strong> and <strong>{frontdoor['tests']} tests</strong> signal ongoing iteration, not a landing page built ahead of the product.</p></div>
+              <div class="trust-card"><h3>Shipped and installed</h3><p><strong>{frontdoor['versions']} released versions</strong> and about <strong>{pypi_total_display} PyPI downloads</strong> show this is a real shipped toolchain, not a one-weekend demo.</p></div>
               <div class="trust-card"><h3>Public examples, not mockups</h3><p><strong>{total_repos} public repositories</strong> are already scored on this site across <strong>{ecosystem_count}</strong> ecosystems, so visitors can inspect what the workflow measures.</p></div>
-              <div class="trust-card"><h3>More than one command</h3><p>The toolkit already spans source management, projection, scoring, linting, benchmarking, transcript review, and MCP access across <strong>{frontdoor['packages']} packages</strong>.</p></div>
+              <div class="trust-card"><h3>More than one command</h3><p>The toolkit already spans source management, projection, scoring, linting, benchmarking, transcript review, and MCP access across <strong>{frontdoor['packages']} packages</strong>, with <strong>{pypi_month_display}</strong> downloads in the last 30 days alone.</p></div>
             </div>
             <div class="section-header">
               <div>

@@ -1,10 +1,13 @@
 {
-  "generated_at": "2026-04-22T14:58:20.875013+00:00",
+  "generated_at": "2026-04-22T15:02:12.976635+00:00",
   "frontdoor": {
     "version": "1.31.0",
     "tests": 36,
     "versions": 131,
     "packages": 6,
+    "pypi_total": 51075,
+    "pypi_month": 5089,
+    "pypi_updated": "2026-04-21",
     "refreshed_at": "2026-04-19T22:41:55.008322+00:00"
   },
   "repos": [
