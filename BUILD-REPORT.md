@@ -21,7 +21,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.29.0-release.md
 - Release verification caught a real mismatch before ship: `pyproject.toml` and `agentkit_cli/__init__.py` still said `1.28.0`, and `tests/test_main.py` still expected `1.28.0`. Those surfaces were reconciled to `1.29.0` before final release proof.
 - `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `29 passed in 1.83s`.
 - `uv run python -m pytest -q` -> `5017 passed, 1 warning in 190.83s (0:03:10)`.
-- `git ls-remote --heads origin feat/v1.29.0-flagship-self-advance` -> remote branch head `af75cff236426eb8521204adbd446980ce49fc8f`.
+- `git ls-remote --heads origin feat/v1.29.0-flagship-self-advance` -> remote branch exists on origin and was re-verified during release closeout.
 - `git ls-remote --tags origin refs/tags/v1.29.0 refs/tags/v1.29.0^{}` -> annotated tag object `1eb19058143ef3f6629e6f25da6041f0213efbeb`, peeled shipped commit `404ada0eb6cf8092659d567b10f3c28448aafc66`.
 - Release reconciliation caught one more git-surface issue: the pre-existing `v1.29.0` tag initially peeled to `c80e636d41d6a38437792fd35131889ca44d0831`, which predates the version-assertion test fix. The annotated tag was corrected and force-pushed to the test-green shipped commit `404ada0eb6cf8092659d567b10f3c28448aafc66`.
 - `ls dist/agentkit_cli-1.29.0*` -> `dist/agentkit_cli-1.29.0-py3-none-any.whl`, `dist/agentkit_cli-1.29.0.tar.gz`.
@@ -34,7 +34,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.29.0-release.md
 
 - `agentkit-cli v1.29.0` is shipped.
 - The shipped release commit is `404ada0eb6cf8092659d567b10f3c28448aafc66`.
-- The current branch head is the later docs-only chronology commit `af75cff236426eb8521204adbd446980ce49fc8f` on `origin/feat/v1.29.0-flagship-self-advance`.
+- The current branch remains ahead on `origin/feat/v1.29.0-flagship-self-advance` with docs-only release-surface reconciliation commits.
 - Annotated tag `v1.29.0` now peels to the shipped commit, while the branch remains ahead for release-surface closeout docs only.
 - PyPI `agentkit-cli==1.29.0` is live with both the wheel and sdist artifacts.
 - The shipped functional outcome for this lane is the flagship planner self-advance: `agentkit spec . --json` now emits `flagship-adjacent-next-step` instead of replaying the closed `flagship-post-closeout-advance` lane.
