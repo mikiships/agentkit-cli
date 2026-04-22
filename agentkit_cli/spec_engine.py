@@ -343,9 +343,15 @@ class SpecEngine:
         shipped_truth_sync = self._shipped_truth_sync_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if shipped_truth_sync is not None:
             candidates.append(shipped_truth_sync)
+        flagship_post_closeout = self._flagship_post_closeout_advance_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if flagship_post_closeout is not None:
+            candidates.append(flagship_post_closeout)
         flagship_concrete_next = self._flagship_concrete_next_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if flagship_concrete_next is not None:
             candidates.append(flagship_concrete_next)
+        flagship_post_closeout = self._flagship_post_closeout_advance_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if flagship_post_closeout is not None:
+            candidates.append(flagship_post_closeout)
         adjacent_grounding = self._adjacent_grounding_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if adjacent_grounding is not None:
             candidates.append(adjacent_grounding)
@@ -625,6 +631,87 @@ class SpecEngine:
             ),
         )
 
+    def _flagship_post_closeout_advance_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        has_current_flagship_trigger = (
+            "teach the flagship self-spec flow" in objective_lower
+            and "concrete adjacent build recommendation" in objective_lower
+            and "contract seed" in objective_lower
+            and "shipped-truth sync" in objective_lower
+        )
+        if not has_current_flagship_trigger:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+        flagship_next_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+                and self._artifact_mentions_flagship_concrete_next(artifact)
+            ),
+            None,
+        )
+        if flagship_next_artifact is None:
+            return None
+
+        objective = "Teach the flagship self-spec flow to detect that the shipped `flagship-concrete-next-step` lane is already complete, suppress replay of the just-shipped v1.27.0 work, and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        evidence = [
+            f"Canonical source objective still names the already-closed flagship lane: {objective_summary}",
+            "Recent shipped/local-ready artifacts already record the `flagship-concrete-next-step` increment as done.",
+            "Without replay suppression, the live flagship command path keeps recommending the just-finished concrete-next lane instead of advancing to a fresh adjacent build.",
+        ]
+        if flagship_next_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact version carrying that closeout: {flagship_next_artifact.version}.")
+        return SpecRecommendation(
+            slug="flagship-post-closeout-advance",
+            kind="flagship-post-closeout-advance",
+            score=90,
+            title="Advance the flagship planner past the closed concrete-next-step lane",
+            objective=objective,
+            why_now=[
+                "The flagship repo already completed shipped-truth sync and the concrete-next-step increment, so replaying that same lane is now the main self-spec truth gap.",
+                "The next honest increment is planner self-advancement: detect the closed lane, suppress replay, and emit one fresh adjacent flagship recommendation.",
+                "Updating the flagship source objective in the same pass keeps repo truth aligned with the new recommendation.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to spec-planner replay detection, the new flagship recommendation/contract seed, and truthful local source or closeout surfaces.",
+                "Do not reopen already-shipped shipped-truth-sync or concrete-next-step implementation work except as evidence for replay suppression.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Reproduce the replay where `agentkit spec . --json` still returns `flagship-concrete-next-step` from current flagship repo truth before changing planner logic.",
+                "Add regression coverage for shipped-vs-local-ready concrete-next closeout evidence and the promoted post-closeout recommendation.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} flagship post-closeout advance",
+                deliverables=[
+                    "Detect when the flagship repo has already closed the active `flagship-concrete-next-step` lane through shipped or truthful local-release-ready artifacts.",
+                    "Suppress replay of that completed lane and emit one new bounded flagship recommendation with contract-seed detail specific enough to open the next build directly.",
+                    "Refresh `.agentkit/source.md` and nearby local closeout surfaces so the active flagship objective no longer names the already-finished concrete-next-step lane.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, spec workflow, and CLI entry regressions for the post-v1.27.0 replay case.",
+                    *list(repo_hints.command_hints[:1]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
     def _flagship_concrete_next_candidate(
         self,
         root: Path,
@@ -649,6 +736,12 @@ class SpecEngine:
             return None
         if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
             return None
+        if any(
+            artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+            and self._artifact_mentions_flagship_concrete_next(artifact)
+            for artifact in workflow_artifacts
+        ):
+            return None
         shipped_truth_artifact = next(
             (
                 artifact
@@ -659,6 +752,8 @@ class SpecEngine:
             None,
         )
         if shipped_truth_artifact is None:
+            return None
+        if self._has_completed_flagship_concrete_next_step(workflow_artifacts):
             return None
 
         objective = "Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync, instead of falling back to the generic subsystem-next-step recommendation for `agentkit_cli`."
@@ -701,6 +796,92 @@ class SpecEngine:
                 ],
                 test_requirements=[
                     "Run `uv run python -m pytest -q tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py`.",
+                    *list(repo_hints.command_hints[:1]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
+    def _flagship_post_closeout_advance_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        has_current_flagship_trigger = (
+            "teach the flagship self-spec flow" in objective_lower
+            and "concrete adjacent build recommendation" in objective_lower
+            and "contract seed" in objective_lower
+            and "shipped-truth sync" in objective_lower
+        )
+        has_replay_suppression_trigger = (
+            "detect that the shipped `flagship-concrete-next-step` lane is already complete" in objective_lower
+            or "stop recommending the just-shipped v1.27.0 work" in objective_lower
+            or "advance to one fresh adjacent recommendation" in objective_lower
+        )
+        if not has_current_flagship_trigger and not has_replay_suppression_trigger:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+        if not self._has_completed_flagship_concrete_next_step(workflow_artifacts):
+            return None
+
+        completed_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+                and self._artifact_mentions_flagship_concrete_next_step(artifact)
+            ),
+            None,
+        )
+        objective = "Teach the flagship self-spec flow to suppress replay of the already-completed `flagship-concrete-next-step` lane and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        evidence = [
+            f"Canonical source objective is still anchored in the already-completed flagship-next-step lane: {objective_summary}",
+            "Recent shipped/local-ready artifacts already record the `flagship-concrete-next-step` increment as done.",
+            "The planner must now suppress replay of that shipped lane and advance to one fresh adjacent flagship recommendation.",
+        ]
+        if completed_artifact is not None and completed_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact carrying the closed lane: {completed_artifact.version}.")
+        return SpecRecommendation(
+            slug="flagship-post-closeout-advance",
+            kind="flagship-post-closeout-advance",
+            score=92,
+            title="Advance the flagship planner past the closed concrete-next-step lane",
+            objective=objective,
+            why_now=[
+                "The flagship repo already shipped or reached local release-ready truth for `flagship-concrete-next-step`, so replaying that lane is now stale.",
+                "The next honest increment is replay suppression plus one fresh adjacent recommendation and contract seed.",
+                "This keeps the self-spec flow truthful and actionable after local closeout surfaces move ahead of the old objective.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to replay detection, recommendation ranking, contract seed advancement, and the nearest truthful local surfaces.",
+                "Do not reopen the already-completed `flagship-concrete-next-step` implementation lane.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Prove the current repo truth already includes shipped or local release-ready evidence for `flagship-concrete-next-step`.",
+                "Add regression coverage showing that replay is suppressed and a fresh adjacent recommendation wins deterministically.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} flagship post-closeout advance",
+                deliverables=[
+                    "Detect when the active `flagship-concrete-next-step` lane is already shipped or truthfully local release-ready in current repo artifacts.",
+                    "Suppress replay of the closed lane and emit one fresh adjacent flagship recommendation with concrete why-now, scope, and validation fields.",
+                    "Refresh the flagship source objective and local closeout surfaces so they name the new adjacent lane truthfully.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, and spec workflow regressions for the post-closeout replay case.",
                     *list(repo_hints.command_hints[:1]),
                 ],
                 map_input=str(map_context.source or map_context.generated_from or root),
@@ -860,10 +1041,22 @@ class SpecEngine:
         joined = "\n".join(haystacks).lower()
         return "shipped truth sync" in joined or "shipped-truth-sync" in joined
 
+    def _artifact_mentions_flagship_concrete_next_step(self, artifact: SpecWorkflowArtifact) -> bool:
+        haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
+        joined = "\n".join(haystacks).lower()
+        return "flagship-concrete-next-step" in joined or "concrete next lane after shipped-truth sync" in joined or "spec concrete next step" in joined
+
     def _has_shipped_adjacent_grounding(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
             artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
             and self._artifact_mentions_adjacent_grounding(artifact)
+            for artifact in workflow_artifacts
+        )
+
+    def _has_completed_flagship_concrete_next_step(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
+        return any(
+            artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
+            and self._artifact_mentions_flagship_concrete_next_step(artifact)
             for artifact in workflow_artifacts
         )
 
