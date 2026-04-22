@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.30.0] - 2026-04-21
+
+### Fixed
+- Taught the flagship `agentkit spec` flow to recognize when `flagship-adjacent-next-step` is already shipped or truthfully local release-ready in current repo truth, suppress replay of that finished lane, and promote the fresh `flagship-adjacent-closeout-advance` recommendation instead of stalling on the newly closed adjacent lane.
+- Added focused regression coverage across spec engine, command, workflow, and CLI entry paths for the adjacent-next replay case.
+
+### Docs
+- Advanced `.agentkit/source.md`, `BUILD-TASKS.md`, and `progress-log.md` to truthful `v1.30.0` release-ready status before release completion.
+- Began strict release proof for `v1.30.0`: current-tree validation is re-grounded and the stale package/test version surfaces were reconciled before any git tag or registry claim.
+
 ## [1.29.0] - 2026-04-21
 
 ### Fixed
