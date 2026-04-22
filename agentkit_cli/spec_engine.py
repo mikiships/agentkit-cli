@@ -659,14 +659,14 @@ class SpecEngine:
                 artifact
                 for artifact in workflow_artifacts
                 if artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
-                and self._artifact_mentions_flagship_concrete_next(artifact)
+                and self._artifact_mentions_flagship_concrete_next_step(artifact)
             ),
             None,
         )
         if flagship_next_artifact is None:
             return None
 
-        objective = "Teach the flagship self-spec flow to detect that the shipped `flagship-concrete-next-step` lane is already complete, suppress replay of the just-shipped v1.27.0 work, and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        objective = "Teach the flagship self-spec flow to suppress replay of the closed `flagship-concrete-next-step` lane from the just-shipped v1.27.0 work and advance to one fresh adjacent recommendation with an updated flagship contract seed."
         evidence = [
             f"Canonical source objective still names the already-closed flagship lane: {objective_summary}",
             "Recent shipped/local-ready artifacts already record the `flagship-concrete-next-step` increment as done.",
@@ -728,9 +728,22 @@ class SpecEngine:
         has_legacy_flagship_trigger = "self-spec truthful" in objective_lower and "shipped repo evidence" in objective_lower
         has_current_flagship_trigger = (
             "teach the flagship self-spec flow" in objective_lower
-            and "concrete adjacent build recommendation" in objective_lower
-            and "contract seed" in objective_lower
-            and "shipped-truth sync" in objective_lower
+            and (
+                (
+                    "concrete adjacent build recommendation" in objective_lower
+                    and "contract seed" in objective_lower
+                    and "shipped-truth sync" in objective_lower
+                )
+                or (
+                    "suppress replay" in objective_lower
+                    and "flagship-concrete-next-step" in objective_lower
+                    and (
+                        "contract seed" in objective_lower
+                        or "updated flagship source truth" in objective_lower
+                        or "fresh adjacent recommendation" in objective_lower
+                    )
+                )
+            )
         )
         if not has_legacy_flagship_trigger and not has_current_flagship_trigger:
             return None
@@ -738,7 +751,7 @@ class SpecEngine:
             return None
         if any(
             artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
-            and self._artifact_mentions_flagship_concrete_next(artifact)
+            and self._artifact_mentions_flagship_concrete_next_step(artifact)
             for artifact in workflow_artifacts
         ):
             return None
@@ -817,14 +830,28 @@ class SpecEngine:
         objective_lower = objective_summary.lower()
         has_current_flagship_trigger = (
             "teach the flagship self-spec flow" in objective_lower
-            and "concrete adjacent build recommendation" in objective_lower
-            and "contract seed" in objective_lower
-            and "shipped-truth sync" in objective_lower
+            and (
+                (
+                    "concrete adjacent build recommendation" in objective_lower
+                    and "contract seed" in objective_lower
+                    and "shipped-truth sync" in objective_lower
+                )
+                or (
+                    "suppress replay" in objective_lower
+                    and "flagship-concrete-next-step" in objective_lower
+                    and (
+                        "contract seed" in objective_lower
+                        or "updated flagship source truth" in objective_lower
+                        or "fresh adjacent recommendation" in objective_lower
+                    )
+                )
+            )
         )
         has_replay_suppression_trigger = (
             "detect that the shipped `flagship-concrete-next-step` lane is already complete" in objective_lower
             or "stop recommending the just-shipped v1.27.0 work" in objective_lower
             or "advance to one fresh adjacent recommendation" in objective_lower
+            or "suppress replay of the already-completed `flagship-concrete-next-step` lane" in objective_lower
         )
         if not has_current_flagship_trigger and not has_replay_suppression_trigger:
             return None
@@ -837,12 +864,11 @@ class SpecEngine:
             (
                 artifact
                 for artifact in workflow_artifacts
-                if artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
-                and self._artifact_mentions_flagship_concrete_next_step(artifact)
+                if self._artifact_closes_flagship_concrete_next_step(artifact)
             ),
             None,
         )
-        objective = "Teach the flagship self-spec flow to suppress replay of the already-completed `flagship-concrete-next-step` lane and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        objective = "Teach the flagship self-spec flow to suppress replay of the closed `flagship-concrete-next-step` lane from the just-shipped v1.27.0 work and advance to one fresh adjacent recommendation with an updated flagship contract seed."
         evidence = [
             f"Canonical source objective is still anchored in the already-completed flagship-next-step lane: {objective_summary}",
             "Recent shipped/local-ready artifacts already record the `flagship-concrete-next-step` increment as done.",
@@ -1053,10 +1079,14 @@ class SpecEngine:
             for artifact in workflow_artifacts
         )
 
+    def _artifact_closes_flagship_concrete_next_step(self, artifact: SpecWorkflowArtifact) -> bool:
+        if not self._artifact_mentions_flagship_concrete_next_step(artifact):
+            return False
+        return artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"} or artifact.kind == "changelog"
+
     def _has_completed_flagship_concrete_next_step(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
-            artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
-            and self._artifact_mentions_flagship_concrete_next_step(artifact)
+            self._artifact_closes_flagship_concrete_next_step(artifact)
             for artifact in workflow_artifacts
         )
 

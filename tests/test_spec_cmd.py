@@ -44,7 +44,7 @@ def _write_repo(
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
     if post_shipped_truth_objective:
-        objective = "Teach the flagship self-spec flow to suppress replay of the already-completed `flagship-concrete-next-step` lane and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        objective = "Teach the flagship self-spec flow to detect that the shipped `flagship-concrete-next-step` lane is already complete, suppress replay of the closed `flagship-concrete-next-step` lane, and advance to one fresh adjacent recommendation with an updated flagship contract seed."
     source_path.write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -100,7 +100,7 @@ def _write_repo(
                 "- Refreshed the flagship source objective so `agentkit spec` targets a concrete adjacent build after shipped-truth sync.\n"
                 "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
             )
-        if concrete_next_closed:
+        if concrete_next_closed or shipped_flagship_concrete_next_step:
             changelog = (
                 "# Changelog\n\n"
                 "## [0.5.0] - 2026-04-21\n\n"
@@ -134,7 +134,7 @@ def _write_repo(
                 "- Verified `agentkit spec . --json` no longer repeats shipped adjacent grounding work.\n",
                 encoding="utf-8",
             )
-        if concrete_next_closed:
+        if concrete_next_closed or shipped_flagship_concrete_next_step:
             (project / "progress-log.md").write_text(
                 "# Progress Log — demo-repo v0.6.0 flagship concrete next step\n\n"
                 "Status: RELEASE-READY (LOCAL-ONLY)\n"
@@ -267,7 +267,7 @@ def test_spec_advances_past_closed_flagship_concrete_next_step_lane(tmp_path):
     assert recommendation["kind"] == "flagship-post-closeout-advance"
     assert recommendation["title"] == "Advance the flagship planner past the closed concrete-next-step lane"
     assert recommendation["contract_seed"]["title"].endswith("flagship post-closeout advance")
-    assert "suppress replay of the already-completed `flagship-concrete-next-step` lane" in recommendation["objective"]
+    assert "suppress replay of the closed `flagship-concrete-next-step` lane" in recommendation["objective"]
     assert any("`flagship-concrete-next-step` increment as done" in item for item in recommendation["evidence"])
 
 

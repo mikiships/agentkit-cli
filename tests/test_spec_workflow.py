@@ -33,7 +33,7 @@ def _write_repo(
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
     if post_shipped_truth_objective:
-        objective = "Teach the flagship self-spec flow to suppress replay of the already-completed `flagship-concrete-next-step` lane and advance to one fresh adjacent recommendation with an updated flagship contract seed."
+        objective = "Teach the flagship self-spec flow to detect that the shipped `flagship-concrete-next-step` lane is already complete, suppress replay of the just-shipped v1.27.0 work, and advance to one fresh adjacent recommendation with an updated flagship contract seed."
     (project / ".agentkit" / "source.md").write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -88,7 +88,7 @@ def _write_repo(
             "- Refreshed the flagship source objective so `agentkit spec` targets a concrete adjacent build after shipped-truth sync.\n"
             "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
         )
-    if concrete_next_closed:
+    if concrete_next_closed or shipped_flagship_concrete_next_step:
         changelog = (
             "# Changelog\n\n"
             "## [0.5.0] - 2026-04-21\n\n"
@@ -239,7 +239,7 @@ def test_spec_workflow_advances_past_closed_flagship_concrete_next_lane(tmp_path
     assert contract.exit_code == 0, contract.output
     contract_payload = json.loads(contract.output)
     assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
-    assert contract_payload["output_path"].endswith("all-day-build-contract-teach-the-flagship-self-spec-flow-to-suppress-replay-of-the-already-completed-flagship-concrete-next-step-lane-and-advance-to-one-fresh-adjacent-recommendation-with-an-updated-flagship-contract-seed.md")
+    assert contract_payload["output_path"].endswith("all-day-build-contract-teach-the-flagship-self-spec-flow-to-suppress-replay-of-the-closed-flagship-concrete-next-step-lane-from-the-just-shipped-v1-27-0-work-and-advance-to-one-fresh-adjacent-recommendation-with-an-updated-flagship-contract-seed.md")
 
 
 def test_spec_workflow_advances_past_closed_flagship_concrete_next_step_lane(tmp_path):
@@ -261,4 +261,4 @@ def test_spec_workflow_advances_past_closed_flagship_concrete_next_step_lane(tmp
     assert contract.exit_code == 0, contract.output
     contract_payload = json.loads(contract.output)
     assert contract_payload["objective"] == spec_payload["contract_seed"]["objective"]
-    assert contract_payload["output_path"].endswith("all-day-build-contract-teach-the-flagship-self-spec-flow-to-suppress-replay-of-the-already-completed-flagship-concrete-next-step-lane-and-advance-to-one-fresh-adjacent-recommendation-with-an-updated-flagship-contract-seed.md")
+    assert contract_payload["output_path"].endswith("all-day-build-contract-teach-the-flagship-self-spec-flow-to-suppress-replay-of-the-closed-flagship-concrete-next-step-lane-from-the-just-shipped-v1-27-0-work-and-advance-to-one-fresh-adjacent-recommendation-with-an-updated-flagship-contract-seed.md")
