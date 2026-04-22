@@ -40,3 +40,11 @@ Validation has not been run yet from this worktree, so the tree is not ready to 
 - Added command-path and workflow-path regressions proving the new flagship recommendation outranks truthful alternates once replay suppression activates.
 - Validation for D2: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `26 passed`.
 - Next: finish truth-syncing the repo-local source and closeout surfaces for v1.28.0 local-only release readiness.
+
+
+## D3 update
+
+- Advanced `.agentkit/source.md` so the flagship objective now names replay suppression and post-closeout advancement instead of the already-finished v1.27.0 lane.
+- Reconciled local closeout and version surfaces to truthful `v1.28.0` local-only language across `CHANGELOG.md`, `BUILD-REPORT.md`, `FINAL-SUMMARY.md`, `BUILD-TASKS.md`, `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py`.
+- Validation note for D3: repo-local surfaces now consistently describe this tree as `IN PROGRESS` and local-only until D4 closes with final verification.
+- Next: run the focused and full validation passes, then update the closeout surfaces from in-progress to truthful release-ready state if they pass.

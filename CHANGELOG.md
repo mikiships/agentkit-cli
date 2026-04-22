@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.28.0] - 2026-04-21
+
+### Fixed
+- Taught the flagship `agentkit spec` flow to detect when `flagship-concrete-next-step` is already closed out in repo truth and suppress replay of that finished lane.
+- Promoted a fresh `flagship-post-closeout-advance` recommendation and contract seed so the self-spec flow advances past the just-finished v1.27.0 lane.
+- Added focused regression coverage across engine, command, workflow, and CLI entry paths for the post-closeout flagship replay case.
+
+### Docs
+- Advanced `.agentkit/source.md`, BUILD-TASKS, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces to truthful `v1.28.0` local-only status.
+
 ## [1.27.0] - 2026-04-21
 
 ### Fixed

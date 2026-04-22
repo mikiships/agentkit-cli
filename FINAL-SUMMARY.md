@@ -1,17 +1,14 @@
-# Final Summary — agentkit-cli v1.27.0 spec concrete next step
+# Final Summary — agentkit-cli v1.28.0 flagship post-closeout advance
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: IN PROGRESS
 Date: 2026-04-21
-Contract: all-day-build-contract-agentkit-cli-v1.27.0-spec-concrete-next-step-finisher.md
+Contract: all-day-build-contract-agentkit-cli-v1.28.0-flagship-post-closeout-advance.md
 
 ## Outcome
 
-RELEASE-READY (LOCAL-ONLY)
+IN PROGRESS
 
-- Fixed the parent-verified contradiction where the live flagship command path still fell back to the generic `subsystem-next-step` recommendation after shipped-truth sync.
-- Repaired the real mismatch: the flagship rule was still keyed to older demo-fixture objective text and too-thin local workflow-artifact evidence.
-- Added focused engine, command, and workflow regressions for the post-shipped-truth flagship case using the current flagship objective wording.
-- Refreshed local report surfaces so the active objective and closeout text match `v1.27.0` truth.
-- Final release-ready evidence is anchored in `progress-log.md` and `BUILD-REPORT-v1.27.0.md`.
-- Live flagship proof from this tree: `uv run python -m agentkit_cli.main spec . --json` now returns `kind=flagship-concrete-next-step` with title `Emit a concrete next flagship lane after shipped-truth sync`.
-- Clean closeout validation from this tree: focused spec slice `23 passed`, full suite `5011 passed, 1 warning`, contradiction scan clean, hygiene scan `Total findings: 0`.
+- Added planner logic that recognizes when the flagship `flagship-concrete-next-step` lane is already closed out in shipped or local-release-ready artifacts.
+- Promoted a fresh `flagship-post-closeout-advance` recommendation instead of replaying the finished v1.27.0 lane.
+- Advanced the flagship source objective and local report surfaces to the new v1.28.0 local-only lane.
+- Validation has not been completed yet from this worktree, so this tree is not locally release-ready yet.
