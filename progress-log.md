@@ -80,3 +80,13 @@ This tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: the flagship command path 
 - Pushed `v1.28.0` to origin and verified both remote refs directly: branch head `refs/heads/feat/v1.28.0-flagship-post-closeout-advance` and peeled tag `refs/tags/v1.28.0^{}` both resolve to `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`.
 - Chronology note: the shipped tag commit is now the documentation-backed verification commit `1a6a8a3`, not the earlier local-only closeout commit `8ac518b`.
 - Next: build fresh `1.28.0` wheel and sdist from a cleaned `dist/`, publish only those two artifacts, then verify PyPI project and version endpoints plus filenames.
+
+## Release completion D3 update
+
+- Cleared prior `dist/` payload files, built fresh `1.28.0` artifacts, and published only `dist/agentkit_cli-1.28.0.tar.gz` and `dist/agentkit_cli-1.28.0-py3-none-any.whl`.
+- Build-path note: `python3 -m build` was unavailable in this shell (`No module named build`), so the successful fresh build used `uv build`.
+- Publish path used the existing local `.pypirc` configuration with `uvx twine upload --repository pypi ...`; no trusted-publishing shell flow was required.
+- Immediate post-upload verification showed the version endpoint live before the project endpoint cache flipped, so I re-queried directly and confirmed both source-of-truth surfaces now report `1.28.0` live.
+- Verified PyPI project JSON: `info.version == 1.28.0` and the release list now includes `1.28.0`.
+- Verified PyPI version JSON: `https://pypi.org/pypi/agentkit-cli/1.28.0/json` returns version `1.28.0` with artifacts `agentkit_cli-1.28.0-py3-none-any.whl` and `agentkit_cli-1.28.0.tar.gz`.
+- Next: reconcile shipped tag commit versus later docs-only branch-head commits across the release reports, rerun the conflict/hygiene checks against final prose, and leave the repo clean.
