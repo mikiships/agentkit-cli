@@ -32,3 +32,11 @@ Validation has not been run yet from this worktree, so the tree is not ready to 
 - Added focused engine coverage for the closed-lane detection path.
 - Validation for D1: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `26 passed`.
 - Next: keep the fresh adjacent recommendation and local closeout surfaces aligned through the remaining deliverables.
+
+
+## D2 update
+
+- Locked the fresh adjacent recommendation to `flagship-post-closeout-advance`, with deterministic title, slug, why-now reasoning, scope boundaries, validation hints, and contract-seed output.
+- Added command-path and workflow-path regressions proving the new flagship recommendation outranks truthful alternates once replay suppression activates.
+- Validation for D2: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `26 passed`.
+- Next: finish truth-syncing the repo-local source and closeout surfaces for v1.28.0 local-only release readiness.

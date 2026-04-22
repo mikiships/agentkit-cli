@@ -20,6 +20,8 @@ def _write_repo(
     shipped_adjacent_grounding: bool = False,
     post_shipped_truth_objective: bool = False,
     shipped_truth_sync: bool = False,
+    shipped_flagship_concrete_next_step: bool = False,
+    concrete_next_closed: bool = False,
 ) -> None:
     if canonical:
         (project / ".agentkit").mkdir(parents=True)
@@ -42,7 +44,7 @@ def _write_repo(
     if stale_self_hosting:
         objective = "Make this repo self-hosted for the repo-understanding lane so `agentkit source-audit`, `agentkit spec`, and the next contract step work cleanly from the repo's own canonical source."
     if post_shipped_truth_objective:
-        objective = "Teach the flagship self-spec flow to emit a concrete adjacent build recommendation and contract seed after shipped-truth sync instead of falling back to the generic subsystem-next-step recommendation."
+        objective = "Teach the flagship self-spec flow to suppress replay of the already-completed `flagship-concrete-next-step` lane and advance to one fresh adjacent recommendation with an updated flagship contract seed."
     source_path.write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -98,6 +100,13 @@ def _write_repo(
                 "- Refreshed the flagship source objective so `agentkit spec` targets a concrete adjacent build after shipped-truth sync.\n"
                 "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
             )
+        if concrete_next_closed:
+            changelog = (
+                "# Changelog\n\n"
+                "## [0.5.0] - 2026-04-21\n\n"
+                "- Taught the flagship `agentkit spec` flow to emit a `flagship-concrete-next-step` recommendation after shipped-truth sync.\n"
+                "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
+            )
         (project / "CHANGELOG.md").write_text(changelog, encoding="utf-8")
         (project / "BUILD-REPORT.md").write_text(
             "# BUILD-REPORT.md — demo-repo v0.3.0\n\nStatus: SHIPPED\n",
@@ -123,6 +132,15 @@ def _write_repo(
                 "Date: 2026-04-21\n\n"
                 "- Introduced a `shipped-truth-sync` recommendation after shipped adjacent grounding.\n"
                 "- Verified `agentkit spec . --json` no longer repeats shipped adjacent grounding work.\n",
+                encoding="utf-8",
+            )
+        if concrete_next_closed:
+            (project / "progress-log.md").write_text(
+                "# Progress Log — demo-repo v0.6.0 flagship concrete next step\n\n"
+                "Status: RELEASE-READY (LOCAL-ONLY)\n"
+                "Date: 2026-04-21\n\n"
+                "- Introduced a `flagship-concrete-next-step` recommendation after shipped-truth sync.\n"
+                "- Verified `agentkit spec . --json` no longer falls back to the generic subsystem recommendation.\n",
                 encoding="utf-8",
             )
 
@@ -237,20 +255,35 @@ def test_spec_moves_past_adjacent_grounding_once_that_increment_is_already_shipp
     assert any("Recent shipped/local-ready artifacts already record" in item for item in recommendation["evidence"])
 
 
-def test_spec_emits_concrete_flagship_next_step_after_shipped_truth_sync(tmp_path):
+def test_spec_advances_past_closed_flagship_concrete_next_step_lane(tmp_path):
     project = tmp_path / "demo-repo"
-    _write_repo(project, post_shipped_truth_objective=True, shipped_truth_sync=True)
+    _write_repo(project, post_shipped_truth_objective=True, concrete_next_closed=True)
 
     result = runner.invoke(app, ["spec", str(project), "--json"])
 
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     recommendation = payload["primary_recommendation"]
-    assert recommendation["kind"] == "flagship-concrete-next-step"
-    assert recommendation["title"] == "Emit a concrete next flagship lane after shipped-truth sync"
-    assert recommendation["contract_seed"]["title"].endswith("spec concrete next step")
-    assert "generic subsystem-next-step" in recommendation["objective"]
-    assert any("shipped-truth-sync increment as done" in item for item in recommendation["evidence"])
+    assert recommendation["kind"] == "flagship-post-closeout-advance"
+    assert recommendation["title"] == "Advance the flagship planner past the closed concrete-next-step lane"
+    assert recommendation["contract_seed"]["title"].endswith("flagship post-closeout advance")
+    assert "suppress replay of the already-completed `flagship-concrete-next-step` lane" in recommendation["objective"]
+    assert any("`flagship-concrete-next-step` increment as done" in item for item in recommendation["evidence"])
+
+
+def test_spec_advances_past_closed_flagship_concrete_next_lane(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, post_shipped_truth_objective=True, concrete_next_closed=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    recommendation = payload["primary_recommendation"]
+    assert recommendation["kind"] == "flagship-post-closeout-advance"
+    assert recommendation["title"] == "Advance the flagship planner past the closed concrete-next-step lane"
+    assert recommendation["contract_seed"]["title"].endswith("flagship post-closeout advance")
+    assert any("already record the `flagship-concrete-next-step` increment as done" in item for item in recommendation["evidence"])
 
 
 def test_spec_help():
