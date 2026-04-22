@@ -27,8 +27,9 @@ def test_hero_headline():
     assert "one canonical source" in html.lower()
     assert ".agentkit/source.md" in html
     assert f"v{stats['version']}" in html
-    assert "agentkit contract" in html
     assert "AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md" in html
+    assert "See what changes in a repo" in html
+    assert "agentkit contract" not in html
 
 
 def test_pipeline_stages():
@@ -60,9 +61,9 @@ def test_stat_values_present():
 def test_quickstart_code_block():
     html = _html()
     assert "pip install agentkit-cli" in html
+    assert "agentkit quickstart ." in html
     assert "agentkit source --init" in html
     assert "agentkit project --write" in html
-    assert "agentkit contract --init" in html
     assert "agentkit score" in html
 
 
@@ -86,14 +87,21 @@ def test_no_external_js_frameworks():
 def test_commands_table_present():
     html = _html()
     assert "cmd-table" in html
+    assert "agentkit quickstart ." in html
     assert "agentkit source --init" in html
-    assert "agentkit contract --init" in html
     assert "agentkit burn --path ./transcripts" in html
 
 
 def test_dark_theme_colors():
     html = _html()
     assert "#0d1117" in html or "0d1117" in html, "Dark background color missing"
+
+
+def test_real_repo_example_present():
+    html = _html()
+    assert "What changes in a real repo" in html
+    assert "After <code>source --init</code> + <code>project --write</code>" in html
+    assert "Reviewable in git" in html
 
 
 def test_stats_show_current_shipped_counts():

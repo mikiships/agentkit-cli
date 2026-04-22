@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>agentkit — Canonical source and guardrails for AI coding agents</title>
-<meta name="description" content="Write one canonical source for AI coding agents, project it into AGENTS.md and other agent files, add execution contracts, and score agent-readiness with agentkit-cli.">
+<meta name="description" content="Keep one repo-owned source for AI coding agents, project it into AGENTS.md and other agent files, then score and gate the repo with agentkit-cli.">
 <link rel="canonical" href="https://mikiships.github.io/agentkit-cli/">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Canonical source and guardrails for AI coding agents", "description": "Write one canonical source for AI coding agents, project it into AGENTS.md and other agent files, add execution contracts, and score agent-readiness with agentkit-cli.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "agentkit \u2014 Canonical source and guardrails for AI coding agents", "description": "Keep one repo-owned source for AI coding agents, project it into AGENTS.md and other agent files, then score and gate the repo with agentkit-cli.", "url": "https://mikiships.github.io/agentkit-cli/"}</script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -313,6 +313,49 @@ h2.section-title {
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 1rem;
 }
+.repo-delta-grid, .delta-points, .setup-paths {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+.repo-delta-grid {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+.delta-points {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.delta-shell, .delta-point, .setup-path {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+.delta-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.85rem;
+}
+.delta-note, .delta-point p, .setup-path p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.delta-note {
+  margin-top: 0.9rem;
+}
+.delta-point h3, .setup-path h3 {
+  font-size: 1rem;
+  margin-bottom: 0.55rem;
+}
+.setup-paths {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .code-block {
   background: #05080c;
   border: 1px solid var(--border);
@@ -505,7 +548,7 @@ tbody tr:hover { background: var(--surface2); }
 .topic-block p { font-size: 0.8rem; color: var(--muted); }
 
 @media (max-width: 900px) {
-  .hero-proof, .workflow-grid, .feature-grid, .trust-grid, .secondary-grid, .quickstart-shell {
+  .hero-proof, .workflow-grid, .feature-grid, .trust-grid, .secondary-grid, .quickstart-shell, .repo-delta-grid, .delta-points, .setup-paths {
     grid-template-columns: 1fr;
   }
   .stats-strip {
@@ -604,8 +647,8 @@ footer a:hover { color: var(--text); }
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="https://mikiships.github.io/agentkit-cli/">Home</a>
+    <a href="https://mikiships.github.io/agentkit-cli/#repo-diff">Repo example</a>
     <a href="https://mikiships.github.io/agentkit-cli/#quickstart">Try it</a>
-    <a href="https://mikiships.github.io/agentkit-cli/#use-cases">Use cases</a>
     <a href="https://mikiships.github.io/agentkit-cli/#trust">Trust</a>
     <a href="https://mikiships.github.io/agentkit-cli/#rankings">Rankings</a>
     <a href="https://mikiships.github.io/agentkit-cli/topic/python.html">Python</a> <a href="https://mikiships.github.io/agentkit-cli/topic/typescript.html">Typescript</a> <a href="https://mikiships.github.io/agentkit-cli/topic/rust.html">Rust</a> <a href="https://mikiships.github.io/agentkit-cli/topic/go.html">Go</a>
@@ -614,46 +657,130 @@ footer a:hover { color: var(--text); }
 </header>
 
         <div class="hero">
-          <div class="hero-badge">v1.2.0 &middot; 51.1k PyPI downloads &middot; canonical-source workflow</div>
+          <div class="hero-badge">v1.31.0 &middot; 51.1k PyPI downloads &middot; canonical-source workflow</div>
           <h1>Keep <em>one canonical source</em><br>for every AI coding agent</h1>
-          <p class="hero-sub">If you landed here from HN, the pitch is simple: agentkit-cli is not another prompt pack. It gives your repo one source of truth for agent instructions, projects that into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, adds an <code>agentkit contract</code> when work needs shared guardrails, then scores what actually ships.</p>
+          <p class="hero-sub">If you landed here from HN, the pitch is simple: keep one repo-owned source of truth at <code>.agentkit/source.md</code>, project it into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, then score whether the repo is actually ready for agent work.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="#quickstart" class="nav-cta">Try the 4-command setup ↓</a>
+            <a href="#repo-diff" class="nav-cta">See what changes in a repo ↓</a>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
           </div>
           <div class="hero-proof">
             <div class="proof-item">
               <span class="proof-kicker">Source</span>
-              <strong>Stop maintaining the same prompt file six times.</strong>
-              <p>Keep one source of truth, then project it into the filenames real agents already read.</p>
+              <strong>Author one file, not six drifting ones.</strong>
+              <p>Keep the canonical instructions in <code>.agentkit/source.md</code>, then project the filenames your tools already read.</p>
             </div>
             <div class="proof-item">
-              <span class="proof-kicker">Execution</span>
-              <strong>Make every agent see the same job contract.</strong>
-              <p>Use <code>agentkit contract</code> for scope, deliverables, checks, and validation before runs sprawl.</p>
+              <span class="proof-kicker">Repo diff</span>
+              <strong>The first output is a git diff you can review.</strong>
+              <p>Run <code>source --init</code> and <code>project --write</code> to add real files to the repo instead of hiding setup in another hosted UI.</p>
             </div>
             <div class="proof-item">
               <span class="proof-kicker">Guardrails</span>
-              <strong>Catch drift before agent runs go sideways.</strong>
-              <p>Lint context files, gate quality in CI, and review transcript waste instead of guessing.</p>
+              <strong>Get a fast score, then add gates when the repo is ready.</strong>
+              <p>Use <code>quickstart</code> for the first read, <code>score</code> for the repo-owned setup, and <code>gate</code> once you want CI enforcement.</p>
             </div>
             <div class="proof-item">
               <span class="proof-kicker">Proof</span>
-              <strong>51.1k PyPI downloads, 102 shipped versions, 20 public scored repos.</strong>
+              <strong>51.1k PyPI downloads, 131 shipped versions, 20 public scored repos.</strong>
               <p>Real installs, real scored examples, and a workflow that extends past the install command.</p>
             </div>
           </div>
         </div>
 
         <div class="stats-strip" id="proof">
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">4824</div><div class="stat-label">Tests</div></div>
-          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">102</div><div class="stat-label">Versions</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="tests">36</div><div class="stat-label">Tests</div></div>
+          <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">131</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">6</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">20</div><div class="stat-label">Repos Scored</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">5.1k</div><div class="stat-label">PyPI 30d Downloads</div></div>
         </div>
         <p class="section-note" style="text-align:center;margin-top:0.85rem;">PyPI stats source: pypistats.org, updated 2026-04-21.</p>
+
+        <section class="repo-diff-section" id="repo-diff">
+          <div class="container section-frame">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">What changes in a real repo</h2>
+                <p class="section-lead">The first visible output is a repo diff. agentkit does not ask you to trust a hosted dashboard before it changes anything useful in the repo itself.</p>
+              </div>
+            </div>
+            <div class="repo-delta-grid">
+              <div class="delta-shell">
+                <span class="delta-label">Before</span>
+                <pre class="code-block"><code>repo/
+  README.md
+  pyproject.toml
+  src/
+  tests/</code></pre>
+                <p class="delta-note">Normal codebase, but no shared agent instructions. Each tool starts from a different file or from no file at all.</p>
+              </div>
+              <div class="delta-shell">
+                <span class="delta-label">After <code>source --init</code> + <code>project --write</code></span>
+                <pre class="code-block"><code>repo/
+  .agentkit/source.md
+  AGENTS.md
+  CLAUDE.md
+  GEMINI.md
+  COPILOT.md
+  AGENT.md
+  llms.txt
+  README.md
+  pyproject.toml
+  src/
+  tests/</code></pre>
+                <p class="delta-note">One repo-owned source fans out into the filenames Claude Code, Codex, Gemini, Copilot, and other agent surfaces already look for.</p>
+              </div>
+            </div>
+            <div class="delta-points">
+              <div class="delta-point"><h3>Reviewable in git</h3><p>The setup becomes a normal repo change that maintainers can diff, review, and revert.</p></div>
+              <div class="delta-point"><h3>Shared across agents</h3><p>You edit the source once instead of hand-syncing separate agent files every time the repo rules change.</p></div>
+              <div class="delta-point"><h3>Measurable afterward</h3><p>Run <code>agentkit score</code> or <code>agentkit gate</code> after the files exist so the workflow stays inspectable.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="quickstart-section" id="quickstart">
+          <div class="container section-frame">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Install to first value</h2>
+                <p class="section-lead">There are two honest entry points: use <code>quickstart</code> if you want a score before editing files, or use the canonical-source flow if you already want repo-owned agent instructions in git.</p>
+              </div>
+            </div>
+            <div class="setup-paths">
+              <div class="setup-path">
+                <span class="proof-kicker">Path 1</span>
+                <h3>Get a score first</h3>
+                <p>Best for skeptical first runs. You learn where the repo stands before adopting any workflow changes.</p>
+                <pre class="code-block"><code>pip install agentkit-cli
+agentkit quickstart .</code></pre>
+                <ul class="quickstart-list">
+                  <li><strong><code>quickstart</code></strong> runs doctor plus a fast composite score on the current repo.</li>
+                  <li><strong>No file writes required.</strong> You get findings and a score before deciding whether to standardize anything.</li>
+                </ul>
+              </div>
+              <div class="setup-path">
+                <span class="proof-kicker">Path 2</span>
+                <h3>Write the repo-owned setup</h3>
+                <p>Best when you already know the repo needs one shared source of instructions across multiple agent surfaces.</p>
+                <pre class="code-block"><code>agentkit source --init
+agentkit project --write
+agentkit score</code></pre>
+                <ul class="quickstart-list">
+                  <li><strong><code>source --init</code></strong> creates <code>.agentkit/source.md</code> as the file you actually maintain.</li>
+                  <li><strong><code>project --write</code></strong> writes the projected agent files next to the code.</li>
+                  <li><strong><code>score</code></strong> tells you if the repo is ready for gates and repeatable agent work.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="inline-links">
+              <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="btn-gh">PyPI ↗</a>
+              <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">Docs and source ↗</a>
+            </div>
+          </div>
+        </section>
 
         <section class="workflow-section">
           <div class="container section-frame">
@@ -666,54 +793,31 @@ footer a:hover { color: var(--text); }
             <div class="workflow-grid">
               <div class="workflow-card"><span class="step">01</span><h3>Write the canonical source</h3><p>Initialize <code>.agentkit/source.md</code> so your team edits one file instead of manually keeping AGENTS.md, CLAUDE.md, and friends in sync.</p></div>
               <div class="workflow-card"><span class="step">02</span><h3>Project into real agent files</h3><p>Generate the filenames existing tools expect, so Claude Code, Codex, Gemini, Copilot, and MCP flows inherit the same context.</p></div>
-              <div class="workflow-card"><span class="step">03</span><h3>Score, gate, and learn</h3><p>Add contracts, lint for drift, benchmark execution quality, and inspect transcripts so the workflow gets better over time.</p></div>
+              <div class="workflow-card"><span class="step">03</span><h3>Score, gate, and learn</h3><p>Run <code>score</code>, fail CI with <code>gate</code>, benchmark execution quality, and inspect transcripts so the workflow gets better over time.</p></div>
             </div>
           </div>
         </section>
 
         <section class="secondary-section" id="use-cases">
-          <div class="container secondary-grid">
-            <div class="secondary-card">
-              <h3>For teams juggling multiple agent surfaces</h3>
-              <p>You already have Claude Code, Codex, Gemini, Copilot, or MCP tools touching the same repo and you do not want their instructions drifting apart.</p>
-            </div>
-            <div class="secondary-card">
-              <h3>For maintainers who want guardrails, not vibes</h3>
-              <p>You want contracts, linting, CI gates, and transcript review so agent work can be inspected instead of hand-waved.</p>
-            </div>
-            <div class="secondary-card">
-              <h3>For people evaluating agent-readiness in public</h3>
-              <p>You want to score real repos, compare examples, and share a concrete artifact instead of arguing from screenshots.</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="quickstart-section" id="quickstart">
-          <div class="container section-frame">
+          <div class="container">
             <div class="section-header">
               <div>
-                <h2 class="section-title">Quickstart</h2>
-                <p class="section-lead">This is the fastest path to a useful repo setup. You can get a canonical source, write the projected files, add an execution contract, and score the result in a few commands.</p>
+                <h2 class="section-title">Who should use this now</h2>
+                <p class="section-lead">This is most useful once agent work is a repo problem, not just a personal prompt problem. The value starts when the instructions need to live in git and stay consistent across tools or teammates.</p>
               </div>
             </div>
-            <div class="quickstart-shell">
-              <pre class="code-block"><code>pip install agentkit-cli
-agentkit source --init
-agentkit project --write
-agentkit contract --init
-agentkit score</code></pre>
-              <div class="quickstart-notes">
-                <h3>What those commands do</h3>
-                <ul class="quickstart-list">
-                  <li><strong><code>source --init</code></strong> creates the canonical source file at <code>.agentkit/source.md</code>.</li>
-                  <li><strong><code>project --write</code></strong> fans that source out into the filenames AI tools already read.</li>
-                  <li><strong><code>contract --init</code></strong> gives each agent run a shared execution brief with clear constraints.</li>
-                  <li><strong><code>score</code></strong> tells you whether the setup is actually ready for agent work.</li>
-                </ul>
-                <div class="inline-links">
-                  <a href="https://pypi.org/project/agentkit-cli/" target="_blank" class="btn-gh">PyPI ↗</a>
-                  <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">Docs and source ↗</a>
-                </div>
+            <div class="secondary-grid">
+              <div class="secondary-card">
+                <h3>More than one agent touches the repo</h3>
+                <p>You already have Claude Code, Codex, Gemini, Copilot, or MCP tools touching the same codebase and you do not want their instructions drifting apart.</p>
+              </div>
+              <div class="secondary-card">
+                <h3>You want repo-owned instructions</h3>
+                <p>You want the setup to be a normal change in git, with files maintainers can review, diff, and enforce in CI.</p>
+              </div>
+              <div class="secondary-card">
+                <h3>You want proof before policy</h3>
+                <p>You want to score real repos, inspect public examples, and measure readiness before telling a team to standardize on a workflow.</p>
               </div>
             </div>
           </div>
@@ -728,9 +832,9 @@ agentkit score</code></pre>
               </div>
             </div>
             <div class="trust-grid" style="margin-bottom:1rem">
-              <div class="trust-card"><h3>Shipped and installed</h3><p><strong>102 released versions</strong> and about <strong>51.1k PyPI downloads</strong> show this is a real shipped toolchain, not a one-weekend demo.</p></div>
+              <div class="trust-card"><h3>Shipped and installed</h3><p><strong>131 released versions</strong> and about <strong>51.1k PyPI downloads</strong> show this is a real shipped toolchain, not a one-weekend demo.</p></div>
               <div class="trust-card"><h3>Public examples, not mockups</h3><p><strong>20 public repositories</strong> are already scored on this site across <strong>4</strong> ecosystems, so visitors can inspect what the workflow measures.</p></div>
-              <div class="trust-card"><h3>More than one command</h3><p>The toolkit already spans source management, projection, scoring, linting, benchmarking, transcript review, and MCP access across <strong>6 packages</strong>, with <strong>5.1k</strong> downloads in the last 30 days alone.</p></div>
+              <div class="trust-card"><h3>Workflow surface, not a toy</h3><p>The toolkit already spans quickstart, source management, projection, scoring, linting, benchmarking, transcript review, and MCP access across <strong>6 packages</strong>, with <strong>5.1k</strong> downloads in the last 30 days alone.</p></div>
             </div>
             <div class="section-header">
               <div>
@@ -739,7 +843,7 @@ agentkit score</code></pre>
               </div>
             </div>
             <div class="feature-grid">
-              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point for source, project, contract, score, and guard flows.</p></div>
+              <div class="feature-card"><h3>agentkit-cli</h3><p>The orchestration entry point for quickstart, source, project, score, gate, and guard flows.</p></div>
               <div class="feature-card"><h3>agentmd</h3><p>Generate or tighten agent-facing context files from the canonical source before they drift.</p></div>
               <div class="feature-card"><h3>agentlint</h3><p>Catch stale paths, year-rot, missing references, and bloated instructions before they mislead agents.</p></div>
               <div class="feature-card"><h3>coderace</h3><p>Benchmark AI coding agents on your own tasks instead of trusting generic benchmark marketing.</p></div>
@@ -774,9 +878,9 @@ agentkit score</code></pre>
             <table class="cmd-table">
               <thead><tr><th>Command</th><th>Description</th></tr></thead>
               <tbody>
+                <tr><td>agentkit quickstart .</td><td>Run the fastest honest first pass: doctor plus a fast composite score on the current repo</td></tr>
                 <tr><td>agentkit source --init</td><td>Create the dedicated canonical source file at <code>.agentkit/source.md</code></td></tr>
                 <tr><td>agentkit project --write</td><td>Write AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code> from that source</td></tr>
-                <tr><td>agentkit contract --init</td><td>Create an <code>agentkit contract</code> so every agent sees the same scope, deliverables, and validation rules</td></tr>
                 <tr><td>agentkit score</td><td>Compute the repo's composite agent-readiness score</td></tr>
                 <tr><td>agentkit analyze github:owner/repo --share</td><td>Analyze a public repo and publish a shareable scorecard</td></tr>
                 <tr><td>agentkit burn --path ./transcripts</td><td>Inspect local coding-agent transcript spend and waste patterns</td></tr>

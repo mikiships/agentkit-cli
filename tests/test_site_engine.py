@@ -145,7 +145,9 @@ def test_generate_index_shows_current_frontdoor_story(engine):
     assert str(stats["tests"]) in page.html
     assert "one canonical source" in page.html.lower()
     assert ".agentkit/source.md" in page.html
-    assert "agentkit contract" in page.html
+    assert "What changes in a real repo" in page.html
+    assert "agentkit contract" not in page.html
+    assert "agentkit quickstart ." in page.html
     assert "agentkit score" in page.html
 
 
