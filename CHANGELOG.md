@@ -9,6 +9,8 @@
 
 ### Docs
 - Advanced `.agentkit/source.md`, BUILD-TASKS, BUILD-REPORT, FINAL-SUMMARY, and progress surfaces to truthful `v1.28.0` local-only status.
+- Completed strict release proof for `v1.28.0`: branch push, annotated tag push, and PyPI publish all verified directly.
+- Recorded chronology truth that shipped `v1.28.0` is the peeled tag commit `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`, while later branch-head commits are docs-only release-surface reconciliation.
 
 ## [1.27.0] - 2026-04-21
 

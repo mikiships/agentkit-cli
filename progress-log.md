@@ -1,6 +1,6 @@
 # Progress Log — agentkit-cli v1.28.0 flagship post-closeout advance
 
-Status: RELEASE-READY (LOCAL-ONLY)
+Status: SHIPPED
 Date: 2026-04-21
 
 ## Why this lane exists
@@ -90,3 +90,11 @@ This tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: the flagship command path 
 - Verified PyPI project JSON: `info.version == 1.28.0` and the release list now includes `1.28.0`.
 - Verified PyPI version JSON: `https://pypi.org/pypi/agentkit-cli/1.28.0/json` returns version `1.28.0` with artifacts `agentkit_cli-1.28.0-py3-none-any.whl` and `agentkit_cli-1.28.0.tar.gz`.
 - Next: reconcile shipped tag commit versus later docs-only branch-head commits across the release reports, rerun the conflict/hygiene checks against final prose, and leave the repo clean.
+
+## Release completion D4 update
+
+- Reconciled `BUILD-REPORT.md`, `BUILD-REPORT-v1.28.0.md`, `FINAL-SUMMARY.md`, `CHANGELOG.md`, and this progress log from local-only wording to shipped truth.
+- Locked the shipped release identity to annotated tag `v1.28.0` peeling to `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`.
+- Explicitly separated the shipped tag commit from later docs-only branch-head reconciliation commits so future sessions do not mistake branch tip chronology for the shipped payload.
+- Reran the final contradiction scan and hygiene scan after the shipped-state prose edits; both remained clean.
+- Final release surfaces now directly prove all four required checkpoints: tests green, branch pushed, annotated tag pushed, and PyPI live.
