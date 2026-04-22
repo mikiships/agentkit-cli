@@ -352,6 +352,9 @@ class SpecEngine:
         flagship_post_closeout = self._flagship_post_closeout_advance_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if flagship_post_closeout is not None:
             candidates.append(flagship_post_closeout)
+        flagship_adjacent_closeout_advance = self._flagship_adjacent_closeout_advance_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if flagship_adjacent_closeout_advance is not None:
+            candidates.append(flagship_adjacent_closeout_advance)
         flagship_adjacent_next = self._flagship_adjacent_next_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if flagship_adjacent_next is not None:
             candidates.append(flagship_adjacent_next)
@@ -995,6 +998,88 @@ class SpecEngine:
             ),
         )
 
+    def _flagship_adjacent_closeout_advance_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        has_adjacent_next_trigger = (
+            "flagship-adjacent-next-step" in objective_lower
+            and (
+                "fresh flagship recommendation" in objective_lower
+                or "keep the flagship planner advancing" in objective_lower
+                or "promote the next bounded flagship recommendation" in objective_lower
+            )
+        )
+        if not has_adjacent_next_trigger:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+        if not self._has_completed_flagship_adjacent_next_step(workflow_artifacts):
+            return None
+
+        completed_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if self._artifact_closes_flagship_adjacent_next_step(artifact)
+            ),
+            None,
+        )
+        objective = "Teach the flagship self-spec flow to suppress replay of the closed `flagship-adjacent-next-step` lane and advance to one fresh flagship recommendation with an updated contract seed."
+        evidence = [
+            f"Canonical source objective is already about the closed `flagship-adjacent-next-step` lane: {objective_summary}",
+            "Recent shipped/local-ready artifacts already record the `flagship-adjacent-next-step` increment as done.",
+            "The flagship repo-understanding workflow should keep advancing from current truth instead of stopping on the newly closed adjacent lane.",
+        ]
+        if completed_artifact is not None and completed_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact carrying the closed lane: {completed_artifact.version}.")
+        return SpecRecommendation(
+            slug="flagship-adjacent-closeout-advance",
+            kind="flagship-adjacent-closeout-advance",
+            score=96,
+            title="Advance the flagship planner past the closed adjacent-next-step lane",
+            objective=objective,
+            why_now=[
+                "The flagship repo already shipped or reached truthful local release-ready status for `flagship-adjacent-next-step`, so replaying that lane is stale.",
+                "The next honest increment is another planner self-advance that keeps the flagship repo-understanding workflow moving with one fresh bounded recommendation.",
+                "This preserves the flagship self-spec path as a deterministic progression instead of ending on a just-finished local lane.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to flagship replay detection, recommendation advancement, contract seeding, and the nearest truthful local planning surfaces.",
+                "Do not reopen the already-completed `flagship-adjacent-next-step` implementation lane.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Prove current repo truth already closes `flagship-adjacent-next-step` through shipped or truthful local-release-ready artifacts.",
+                "Add regression coverage showing the planner advances again instead of replaying the newly closed adjacent lane.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} flagship adjacent closeout advance",
+                deliverables=[
+                    "Detect when `flagship-adjacent-next-step` is already shipped or truthfully local release-ready in current flagship repo artifacts.",
+                    "Suppress replay of that closed lane and emit one fresh flagship recommendation with bounded why-now, scope, and validation fields.",
+                    "Keep `.agentkit/source.md` and nearby local planning surfaces aligned with the new post-adjacent-lane truth.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, spec workflow, and CLI entry regressions for the adjacent-next-step replay case.",
+                    *list(repo_hints.command_hints[:1]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
     def _coverage_candidate(self, root: Path, map_context: MapContext, repo_hints) -> Optional[SpecRecommendation]:
         risks = list(map_context.hints) + ([] if map_context.summary is None else [])
         risk = next((item for item in map_context.hints if item.kind == "risk"), None)
@@ -1158,6 +1243,11 @@ class SpecEngine:
         joined = "\n".join(haystacks).lower()
         return "flagship-post-closeout-advance" in joined or "flagship post-closeout advance" in joined or "post closeout advance" in joined
 
+    def _artifact_mentions_flagship_adjacent_next_step(self, artifact: SpecWorkflowArtifact) -> bool:
+        haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
+        joined = "\n".join(haystacks).lower()
+        return "flagship-adjacent-next-step" in joined or "flagship adjacent next step" in joined or "adjacent next step" in joined
+
     def _has_shipped_adjacent_grounding(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
             artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
@@ -1184,6 +1274,17 @@ class SpecEngine:
     def _has_completed_flagship_post_closeout_advance(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
             self._artifact_closes_flagship_post_closeout_advance(artifact)
+            for artifact in workflow_artifacts
+        )
+
+    def _artifact_closes_flagship_adjacent_next_step(self, artifact: SpecWorkflowArtifact) -> bool:
+        if not self._artifact_mentions_flagship_adjacent_next_step(artifact):
+            return False
+        return artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"} or artifact.kind == "changelog"
+
+    def _has_completed_flagship_adjacent_next_step(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
+        return any(
+            self._artifact_closes_flagship_adjacent_next_step(artifact)
             for artifact in workflow_artifacts
         )
 
