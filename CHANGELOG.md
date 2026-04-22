@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.31.0] - 2026-04-22
+
+### Fixed
+- Promoted the post-adjacent-closeout flagship fallback into one bounded `agentkit_cli` next-step recommendation, so the live self-spec flow no longer stalls on the generic `subsystem-next-step` handoff after `v1.30.0`.
+- Kept the bounded recommendation deterministic and grounded in current flagship repo truth, including contract seed, scope boundaries, why-now evidence, and validation hints.
+- Added focused regression coverage across spec engine, spec command, spec workflow, and CLI entry paths for the bounded post-adjacent-closeout case.
+
+### Docs
+- Advanced `.agentkit/source.md`, `BUILD-TASKS.md`, and `progress-log.md` to truthful `v1.31.0` local closeout status for the bounded-next-step lane.
+- Started strict release completion for `v1.31.0` by reconciling package version surfaces and repo-local release surfaces before push, tag, and publish.
+
 ## [1.30.0] - 2026-04-21
 
 ### Fixed

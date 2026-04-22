@@ -1,16 +1,13 @@
-# Final Summary — agentkit-cli v1.30.0 flagship adjacent next step
+# Final Summary — agentkit-cli v1.31.0 bounded agentkit next step
 
-Status: SHIPPED
+Status: RELEASE-READY (LOCAL-ONLY)
 Date: 2026-04-22
-Contract: all-day-build-contract-agentkit-cli-v1.30.0-release.md
+Contract: all-day-build-contract-agentkit-cli-v1.31.0-release.md
 
 ## Outcome
 
-SHIPPED
+RELEASE-READY (LOCAL-ONLY)
 
-- Shipped `agentkit-cli v1.30.0`: focused slice `32 passed in 2.13s`, full suite `5020 passed, 1 warning in 205.87s`, branch pushed, annotated tag pushed, and PyPI live.
-- The shipped functional outcome is the flagship planner self-advance: `agentkit spec . --json` now emits `flagship-adjacent-closeout-advance` instead of replaying the already-closed `flagship-adjacent-next-step` lane.
-- Release verification caught a real blocker before shipping, package/test version surfaces were still on `1.29.0`, and reconciled that mismatch before any git or registry mutation.
-- Shipped release commit is the peeled tag target `e0554e08d69a0ab332555dbe01e17b5a7967c730`; later branch-head commits are docs-only chronology reconciliation.
-- Final contradiction scan was clean.
-- Final hygiene scan was clean.
+- `agentkit-cli v1.31.0` now has reconciled local version surfaces and a truthful `v1.31.0` build report.
+- Focused validation is green, and the live planner still emits `agentkit-cli-bounded-next-step` with title `Emit one bounded `agentkit_cli` next step after adjacent closeout`.
+- Branch push, annotated tag push, and PyPI publish are still pending, so this line is not shipped yet.
