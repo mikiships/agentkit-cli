@@ -1,6 +1,6 @@
 # Progress Log — agentkit-cli v1.29.0 flagship self-advance
 
-Status: RELEASE IN PROGRESS
+Status: SHIPPED
 Date: 2026-04-21
 
 ## Why this lane exists
@@ -48,5 +48,7 @@ After `v1.28.0` shipped, the flagship repo still let `agentkit spec . --json` re
 ## Current release truth
 
 - The intended shipped behavior for `v1.29.0` is still correct in the current tree: `agentkit spec . --json` advances to `flagship-adjacent-next-step`
-- The local-ready claim was false at release start until the package version surfaces were reconciled from `1.28.0` to `1.29.0`
-- Branch push, tag creation, tag push, PyPI publish, remote verification, contradiction scan, hygiene scan, and final shipped chronology reconciliation are the remaining release-completion steps
+- Release verification started by catching a real blocker, package version surfaces still on `1.28.0`, and reconciled that mismatch before any git or registry mutation
+- Branch `feat/v1.29.0-flagship-self-advance` is live on origin and annotated tag `v1.29.0` now points at the shipped release commit
+- PyPI now serves `agentkit-cli==1.29.0` with `agentkit_cli-1.29.0-py3-none-any.whl` and `agentkit_cli-1.29.0.tar.gz`
+- Contradiction scan and hygiene scan both closed cleanly

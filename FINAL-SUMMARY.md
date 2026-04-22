@@ -1,13 +1,15 @@
 # Final Summary — agentkit-cli v1.29.0 flagship self-advance
 
-Status: IN PROGRESS
+Status: SHIPPED
 Date: 2026-04-21
 Contract: all-day-build-contract-agentkit-cli-v1.29.0-release.md
 
 ## Outcome
 
-IN PROGRESS
+SHIPPED
 
-- Current-tree release verification is complete: `source-audit` is ready, `spec` advances to `flagship-adjacent-next-step`, focused regressions passed, and the full suite passed.
-- The local-ready claim initially had one release blocker: package version surfaces still reported `1.28.0`. That mismatch is now reconciled in-tree so branch/tag/publish work can proceed truthfully.
-- Branch push, annotated tag `v1.29.0`, PyPI publish for `agentkit-cli==1.29.0`, and final chronology reconciliation are still pending.
+- Shipped `agentkit-cli v1.29.0`: focused slice `29 passed in 1.79s`, full suite `5017 passed, 1 warning in 190.05s`, branch pushed, annotated tag pushed, and PyPI live.
+- The shipped functional outcome is the flagship planner self-advance: `agentkit spec . --json` now emits `flagship-adjacent-next-step` instead of replaying the already-closed `flagship-post-closeout-advance` lane.
+- Release verification caught a real blocker before shipping, package version surfaces were still on `1.28.0`, and reconciled that mismatch before any git or registry mutation.
+- Final contradiction scan was clean.
+- Final hygiene scan was clean.
