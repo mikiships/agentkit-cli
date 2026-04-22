@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-22T15:02:12.976635+00:00",
+  "generated_at": "2026-04-22T15:03:19.485654+00:00",
   "frontdoor": {
-    "version": "1.31.0",
-    "tests": 36,
-    "versions": 131,
+    "version": "1.2.0",
+    "tests": 4824,
+    "versions": 102,
     "packages": 6,
     "pypi_total": 51075,
     "pypi_month": 5089,
