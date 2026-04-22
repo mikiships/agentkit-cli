@@ -61,3 +61,14 @@ This tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: the flagship command path 
 
 - Final contradiction scan was clean: `No contradictory success/blocker narratives found.`
 - Final hygiene scan was clean: `Total findings: 0`.
+
+
+## Release completion D1 update
+
+- Verified current repo truth directly from this tree: branch `feat/v1.28.0-flagship-post-closeout-advance`, HEAD `8ac518b92ad70a55604d67061edbe7287981ae16`.
+- Working tree was not clean on entry because the strict release contract file `all-day-build-contract-agentkit-cli-v1.28.0-release.md` was present but untracked.
+- Re-ran current-tree release-critical validation from source-of-truth commands: `python3 -m agentkit_cli.main source-audit . --json`, `python3 -m agentkit_cli.main spec . --json`, focused release slice, and full suite.
+- Validation for D1: focused slice `32 passed in 1.71s`; full suite `5014 passed, 1 warning in 188.89s (0:03:08)`.
+- Verified direct external release truth before mutation: remote branch `origin/feat/v1.28.0-flagship-post-closeout-advance` absent, tag `v1.28.0` absent locally and on origin, PyPI project latest `1.27.0`, and PyPI `agentkit-cli/1.28.0` version endpoint returned missing.
+- Ran mandated recall/conflict/hygiene checks using the workspace script copies because the repo-local `scripts/pre-action-recall.sh`, `scripts/check-status-conflicts.sh`, and `scripts/post-agent-hygiene-check.sh` paths referenced by the contract do not exist in this repo.
+- Next: push the release branch, create and push annotated tag `v1.28.0`, then build and publish fresh `1.28.0` artifacts.
