@@ -35,20 +35,26 @@ After `v1.28.0` shipped, the flagship repo still let `agentkit spec . --json` re
 
 ### D4. Release-completion verification and reconciliation
 - Ran `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.29.0-flagship-self-advance` before trusting the release narrative
-- Verified current branch and head directly: `feat/v1.29.0-flagship-self-advance` at `f96cd44941a0cbb96c7e212b0cebbc82009cd707`
-- Re-ran current-tree validation: `python -m agentkit_cli.main source-audit . --json` -> ready, `python -m agentkit_cli.main spec . --json` -> `flagship-adjacent-next-step`, focused tests `29 passed in 1.79s`, full suite `5017 passed, 1 warning in 190.05s (0:03:10)`
-- Found and reconciled the release-blocking source-of-truth mismatch: `pyproject.toml` and `agentkit_cli/__init__.py` still declared `1.28.0`, so `v1.29.0` was not yet publishable truthfully until those version surfaces were updated
-- Refreshed `CHANGELOG.md`, `BUILD-REPORT.md`, and `FINAL-SUMMARY.md` to truthful `v1.29.0` release-in-progress state before push/tag/publish
+- Verified current-tree release truth directly: `python -m agentkit_cli.main source-audit . --json` -> ready, `python -m agentkit_cli.main spec . --json` -> `flagship-adjacent-next-step`, focused tests `29 passed in 1.83s`, full suite `5017 passed, 1 warning in 190.83s (0:03:10)`
+- Found and reconciled the real release blocker before shipping: `pyproject.toml` and `agentkit_cli/__init__.py` still declared `1.28.0`, and `tests/test_main.py` still expected `1.28.0`
+- Deliverable-cluster commits: `2c71ab1` (`docs: start v1.29.0 release completion`) and `404ada0` (`test: update version assertion for v1.29.0`)
+- Verified remote branch head directly: `origin/feat/v1.29.0-flagship-self-advance` -> `f869a12f54501abe115a7369d75d51c0b1d19656`
+- Verified and reconciled annotated tag truth directly: `v1.29.0` had initially peeled to `c80e636d41d6a38437792fd35131889ca44d0831`, which predated the version-assertion test fix, so the annotated tag was corrected and force-pushed; it now peels to shipped commit `404ada0eb6cf8092659d567b10f3c28448aafc66`
+- Verified release artifacts and registry directly: `dist/agentkit_cli-1.29.0-py3-none-any.whl`, `dist/agentkit_cli-1.29.0.tar.gz`, PyPI project JSON `info.version=1.29.0`, and PyPI version JSON files `agentkit_cli-1.29.0-py3-none-any.whl` plus `agentkit_cli-1.29.0.tar.gz`
+- Final contradiction scan: `No contradictory success/blocker narratives found.`
+- Final hygiene scan: `Total findings: 0`
 
 ## Validation status
 
-- Focused regressions from the release tree: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `29 passed in 1.79s`
-- Full suite from the release tree: `uv run python -m pytest -q` -> `5017 passed, 1 warning in 190.05s (0:03:10)`
+- Focused regressions from the shipped release tree: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `29 passed in 1.83s`
+- Full suite from the shipped release tree: `uv run python -m pytest -q` -> `5017 passed, 1 warning in 190.83s (0:03:10)`
 
-## Current release truth
+## Final shipped truth
 
-- The intended shipped behavior for `v1.29.0` is still correct in the current tree: `agentkit spec . --json` advances to `flagship-adjacent-next-step`
-- Release verification started by catching a real blocker, package version surfaces still on `1.28.0`, and reconciled that mismatch before any git or registry mutation
-- Branch `feat/v1.29.0-flagship-self-advance` is live on origin and annotated tag `v1.29.0` now points at the shipped release commit
-- PyPI now serves `agentkit-cli==1.29.0` with `agentkit_cli-1.29.0-py3-none-any.whl` and `agentkit_cli-1.29.0.tar.gz`
-- Contradiction scan and hygiene scan both closed cleanly
+- Shipped release commit: `404ada0eb6cf8092659d567b10f3c28448aafc66`
+- Later docs-only chronology head: `f869a12f54501abe115a7369d75d51c0b1d19656`
+- Remote branch ref: `origin/feat/v1.29.0-flagship-self-advance` -> `f869a12f54501abe115a7369d75d51c0b1d19656`
+- Annotated tag object: `1eb19058143ef3f6629e6f25da6041f0213efbeb`
+- Tag peel: `404ada0eb6cf8092659d567b10f3c28448aafc66`
+- PyPI live: `agentkit-cli==1.29.0` with `agentkit_cli-1.29.0-py3-none-any.whl` and `agentkit_cli-1.29.0.tar.gz`
+- Shipped functional outcome: `agentkit spec . --json` advances to `flagship-adjacent-next-step`

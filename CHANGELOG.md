@@ -9,7 +9,7 @@
 ### Docs
 - Advanced `.agentkit/source.md`, `BUILD-TASKS.md`, and `progress-log.md` to truthful `v1.29.0` release-ready status before release completion.
 - Completed strict release proof for `v1.29.0`: current-tree validation, branch push, annotated tag push, and PyPI publish all verified directly.
-- Recorded chronology truth that shipped `v1.29.0` is the peeled tag commit for `v1.29.0`, while any later branch-head commits are docs-only release-surface reconciliation.
+- Recorded chronology truth that shipped `v1.29.0` is the peeled tag commit `404ada0eb6cf8092659d567b10f3c28448aafc66`, while later branch-head commit `f869a12f54501abe115a7369d75d51c0b1d19656` is docs-only release-surface reconciliation.
 
 ## [1.28.0] - 2026-04-21
 
