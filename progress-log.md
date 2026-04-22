@@ -1,6 +1,6 @@
 # Progress Log — agentkit-cli v1.29.0 flagship self-advance
 
-Status: LOCAL-ONLY COMPLETE
+Status: RELEASE IN PROGRESS
 Date: 2026-04-21
 
 ## Why this lane exists
@@ -31,15 +31,22 @@ After `v1.28.0` shipped, the flagship repo still let `agentkit spec . --json` re
 - Refreshed `.agentkit/source.md` so the active objective names `flagship-adjacent-next-step`
 - Refreshed `BUILD-TASKS.md` to capture the actual stale-fallback reproduction and the new flagship lane truth
 - Confirmed the live planner now returns `flagship-adjacent-next-step` with title `Emit the next flagship lane after post-closeout advance`
+- Deliverable-cluster commit: `f96cd44` (`docs: close out v1.29.0 flagship self-advance`)
+
+### D4. Release-completion verification and reconciliation
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/pre-action-recall.sh release agentkit-cli /Users/mordecai/repos/agentkit-cli-v1.29.0-flagship-self-advance` before trusting the release narrative
+- Verified current branch and head directly: `feat/v1.29.0-flagship-self-advance` at `f96cd44941a0cbb96c7e212b0cebbc82009cd707`
+- Re-ran current-tree validation: `python -m agentkit_cli.main source-audit . --json` -> ready, `python -m agentkit_cli.main spec . --json` -> `flagship-adjacent-next-step`, focused tests `29 passed in 1.79s`, full suite `5017 passed, 1 warning in 190.05s (0:03:10)`
+- Found and reconciled the release-blocking source-of-truth mismatch: `pyproject.toml` and `agentkit_cli/__init__.py` still declared `1.28.0`, so `v1.29.0` was not yet publishable truthfully until those version surfaces were updated
+- Refreshed `CHANGELOG.md`, `BUILD-REPORT.md`, and `FINAL-SUMMARY.md` to truthful `v1.29.0` release-in-progress state before push/tag/publish
 
 ## Validation status
 
-- Focused regressions: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `29 passed in 1.71s`
-- Full suite: `uv run python -m pytest -q` -> `5017 passed, 1 warning in 189.97s (0:03:09)`
+- Focused regressions from the release tree: `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `29 passed in 1.79s`
+- Full suite from the release tree: `uv run python -m pytest -q` -> `5017 passed, 1 warning in 190.05s (0:03:10)`
 
-## Final local-only closeout truth
+## Current release truth
 
-- Live planner result: `flagship-adjacent-next-step` / `Emit the next flagship lane after post-closeout advance`
-- HEAD before final planning-surface commit: `6529650`
-- Tree state before final commit: only `.agentkit/source.md`, `BUILD-TASKS.md`, and `progress-log.md` remained dirty for truthful local closeout refresh
-- This branch remains local-only. No push, tag, publish, or mutation outside this repo occurred
+- The intended shipped behavior for `v1.29.0` is still correct in the current tree: `agentkit spec . --json` advances to `flagship-adjacent-next-step`
+- The local-ready claim was false at release start until the package version surfaces were reconciled from `1.28.0` to `1.29.0`
+- Branch push, tag creation, tag push, PyPI publish, remote verification, contradiction scan, hygiene scan, and final shipped chronology reconciliation are the remaining release-completion steps

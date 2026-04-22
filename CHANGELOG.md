@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.29.0] - 2026-04-21
+
+### Fixed
+- Taught the flagship `agentkit spec` flow to recognize when `flagship-post-closeout-advance` is already closed out in current repo truth, suppress replay of that finished lane, and promote the fresh `flagship-adjacent-next-step` recommendation instead of the generic subsystem fallback.
+- Added focused regression coverage across spec engine, command, workflow, and CLI entry paths for the post-closeout flagship replay case.
+
+### Docs
+- Advanced `.agentkit/source.md`, `BUILD-TASKS.md`, and `progress-log.md` to truthful `v1.29.0` release-ready status before release completion.
+- Completed strict release proof for `v1.29.0`: current-tree validation, branch push, annotated tag push, and PyPI publish all verified directly.
+- Recorded chronology truth that shipped `v1.29.0` is the peeled tag commit for `v1.29.0`, while any later branch-head commits are docs-only release-surface reconciliation.
+
 ## [1.28.0] - 2026-04-21
 
 ### Fixed
