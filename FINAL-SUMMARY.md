@@ -1,13 +1,16 @@
 # Final Summary — agentkit-cli v1.30.0 flagship adjacent next step
 
-Status: IN PROGRESS
-Date: 2026-04-21
+Status: SHIPPED
+Date: 2026-04-22
 Contract: all-day-build-contract-agentkit-cli-v1.30.0-release.md
 
 ## Outcome
 
-IN PROGRESS
+SHIPPED
 
-- D1 is complete: release verification re-grounded the current tree, reran source-audit plus the focused release-critical slice, and reconciled stale `1.29.0` version surfaces to `1.30.0`.
-- The current flagship planner outcome remains the intended shipped behavior for this lane: `agentkit spec . --json` now emits `flagship-adjacent-closeout-advance` instead of replaying the already-closed `flagship-adjacent-next-step` lane.
-- Full release completion is still pending until branch push, annotated tag `v1.30.0`, and PyPI `agentkit-cli==1.30.0` are all directly proven.
+- Shipped `agentkit-cli v1.30.0`: focused slice `32 passed in 2.13s`, full suite `5020 passed, 1 warning in 205.87s`, branch pushed, annotated tag pushed, and PyPI live.
+- The shipped functional outcome is the flagship planner self-advance: `agentkit spec . --json` now emits `flagship-adjacent-closeout-advance` instead of replaying the already-closed `flagship-adjacent-next-step` lane.
+- Release verification caught a real blocker before shipping, package/test version surfaces were still on `1.29.0`, and reconciled that mismatch before any git or registry mutation.
+- Shipped release commit is the peeled tag target `e0554e08d69a0ab332555dbe01e17b5a7967c730`; later branch head `259ccebf76315141a302b6f348bf8db309f9d7cf` is docs-only chronology reconciliation.
+- Final contradiction scan was clean.
+- Final hygiene scan was clean.

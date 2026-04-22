@@ -1,7 +1,7 @@
 # Progress Log — agentkit-cli v1.30.0 flagship adjacent next step
 
-Status: RELEASE COMPLETION IN PROGRESS
-Date: 2026-04-21
+Status: SHIPPED
+Date: 2026-04-22
 
 ## Why this lane existed
 
@@ -12,7 +12,7 @@ After `v1.29.0` shipped, the flagship repo emitted `flagship-adjacent-next-step`
 - Starting HEAD for release completion was `341ea50504a8734756a7bf144a2507e67d82fef7` on `feat/v1.30.0-flagship-adjacent-next-step`
 - `v1.29.0` is already shipped, with annotated tag and PyPI live in the parent line
 - `python3 -m agentkit_cli.main spec . --json` initially recommended `flagship-adjacent-next-step`
-- The pre-release local planner closeout for this lane already proved focused tests `32 passed in 2.85s` and full suite `5020 passed, 1 warning in 202.30s`
+- The pre-release local planner closeout for this lane had already proved focused tests `32 passed in 2.85s` and full suite `5020 passed, 1 warning in 202.30s`
 
 ## Completed deliverables
 
@@ -34,8 +34,28 @@ After `v1.29.0` shipped, the flagship repo emitted `flagship-adjacent-next-step`
 - Reconciled those stale `1.29.0` version surfaces to `1.30.0` before any push, tag, or publish action
 - Re-ran the full suite after the version-surface reconciliation with `uv run python -m pytest -q` -> `5020 passed, 1 warning in 205.87s`
 
+### D2 — git release surfaces
+
+- Pushed `feat/v1.30.0-flagship-adjacent-next-step` to origin and verified the remote branch updated successfully
+- Created annotated tag `v1.30.0` and pushed it to origin
+- Verified remote tag truth: tag object `cef4b48a63630c131927ce05e219abd60e3840c1`, peeled shipped commit `e0554e08d69a0ab332555dbe01e17b5a7967c730`
+
+### D3 — registry live proof
+
+- Built fresh release artifacts in `.release-dist-v1.30.0/` to avoid contamination from the long-lived `dist/` directory
+- Produced exactly `agentkit_cli-1.30.0.tar.gz` and `agentkit_cli-1.30.0-py3-none-any.whl`
+- Published only those two artifacts with `uvx twine upload --repository pypi ...`
+- Verified both `https://pypi.org/pypi/agentkit-cli/json` and `https://pypi.org/pypi/agentkit-cli/1.30.0/json` report `1.30.0` live with the expected wheel and sdist
+
+### D4 — shipped chronology and closeout
+
+- Recorded shipped truth across `BUILD-REPORT.md`, `BUILD-REPORT-v1.30.0.md`, `FINAL-SUMMARY.md`, and `CHANGELOG.md`
+- Preserved chronology split explicitly: shipped release commit is `e0554e08d69a0ab332555dbe01e17b5a7967c730`, while branch head `259ccebf76315141a302b6f348bf8db309f9d7cf` is the later docs-only closeout commit
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.30.0-flagship-adjacent-next-step` -> clean
+- Ran `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.30.0-flagship-adjacent-next-step` -> clean
+
 ## Current recommendation truth
 
 - `python3 -m agentkit_cli.main spec . --json` now recommends `flagship-adjacent-closeout-advance`
 - The recommendation title is `Advance the flagship planner past the closed adjacent-next-step lane`
-- External release surfaces are still pending until branch push, tag push, and PyPI publish are directly proven
+- `agentkit-cli v1.30.0` is now shipped, with branch, tag, registry, and chronology surfaces all reconciled truthfully
