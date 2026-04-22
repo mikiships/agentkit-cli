@@ -50,7 +50,7 @@ After `v1.29.0` shipped, the flagship repo emitted `flagship-adjacent-next-step`
 ### D4 — shipped chronology and closeout
 
 - Recorded shipped truth across `BUILD-REPORT.md`, `BUILD-REPORT-v1.30.0.md`, `FINAL-SUMMARY.md`, and `CHANGELOG.md`
-- Preserved chronology split explicitly: shipped release commit is `e0554e08d69a0ab332555dbe01e17b5a7967c730`, while branch head `259ccebf76315141a302b6f348bf8db309f9d7cf` is the later docs-only closeout commit
+- Preserved chronology split explicitly: shipped release commit is `e0554e08d69a0ab332555dbe01e17b5a7967c730`, while later branch-head commits are docs-only closeout reconciliation
 - Ran `bash /Users/mordecai/.openclaw/workspace/scripts/check-status-conflicts.sh /Users/mordecai/repos/agentkit-cli-v1.30.0-flagship-adjacent-next-step` -> clean
 - Ran `bash /Users/mordecai/.openclaw/workspace/scripts/post-agent-hygiene-check.sh /Users/mordecai/repos/agentkit-cli-v1.30.0-flagship-adjacent-next-step` -> clean
 

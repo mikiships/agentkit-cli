@@ -24,7 +24,7 @@ Contract: all-day-build-contract-agentkit-cli-v1.30.0-release.md
 - Release verification caught a real mismatch first: `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py` still reported `1.29.0`. Reconciled those version surfaces to `1.30.0` before any branch, tag, or registry mutation.
 - `uv run python -m pytest -q` after the version-surface reconciliation -> `5020 passed, 1 warning in 205.87s (0:03:25)`.
 - `git push -u origin feat/v1.30.0-flagship-adjacent-next-step` -> remote branch created and later advanced cleanly.
-- `git ls-remote --heads origin feat/v1.30.0-flagship-adjacent-next-step` -> remote branch head matches the final docs-only closeout commit `259ccebf76315141a302b6f348bf8db309f9d7cf`.
+- `git ls-remote --heads origin feat/v1.30.0-flagship-adjacent-next-step` -> remote branch head matches the later docs-only closeout branch state, distinct from the shipped tag target.
 - `git tag -a v1.30.0 -m "v1.30.0"` plus `git push origin v1.30.0` -> annotated tag created and pushed.
 - `git ls-remote --tags origin refs/tags/v1.30.0 refs/tags/v1.30.0^{}` -> remote tag object is `cef4b48a63630c131927ce05e219abd60e3840c1`; peeled tag target is shipped release commit `e0554e08d69a0ab332555dbe01e17b5a7967c730`.
 - `uv build --out-dir .release-dist-v1.30.0` -> fresh artifacts `agentkit_cli-1.30.0.tar.gz` and `agentkit_cli-1.30.0-py3-none-any.whl`.
@@ -39,4 +39,4 @@ Contract: all-day-build-contract-agentkit-cli-v1.30.0-release.md
 
 - `agentkit-cli v1.30.0` is shipped: tests are green, branch push is proven, annotated tag `v1.30.0` is live on origin, and PyPI `agentkit-cli==1.30.0` is live with both artifacts.
 - The shipped functional outcome is the flagship planner self-advance: `agentkit spec . --json` now emits `flagship-adjacent-closeout-advance` instead of replaying the already-closed `flagship-adjacent-next-step` lane.
-- Chronology is intentionally split: shipped release commit is the peeled tag target `e0554e08d69a0ab332555dbe01e17b5a7967c730`, while branch head `259ccebf76315141a302b6f348bf8db309f9d7cf` is a later docs-only closeout commit that records the shipped proof.
+- Chronology is intentionally split: shipped release commit is the peeled tag target `e0554e08d69a0ab332555dbe01e17b5a7967c730`, while later branch-head commits on `feat/v1.30.0-flagship-adjacent-next-step` are docs-only closeout reconciliation that records the shipped proof.
