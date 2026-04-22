@@ -24,6 +24,7 @@ def _write_repo(
     concrete_next_closed: bool = False,
     post_closeout_closed: bool = False,
     adjacent_next_closed: bool = False,
+    adjacent_closeout_closed: bool = False,
 ) -> None:
     if canonical:
         (project / ".agentkit").mkdir(parents=True)
@@ -51,6 +52,8 @@ def _write_repo(
         objective = "Teach the flagship self-spec flow to recognize when `flagship-post-closeout-advance` is already closed out in current repo truth, stop replaying that lane, and promote the next honest flagship recommendation from current shipped or local-release-ready evidence."
     if adjacent_next_closed:
         objective = "Teach the flagship self-spec flow to recognize when `flagship-adjacent-next-step` is already closed out in current repo truth, stop replaying that lane, and keep the flagship planner advancing with one fresh flagship recommendation from shipped or local-release-ready evidence."
+    if adjacent_closeout_closed:
+        objective = "Teach the self-spec flow to advance past the generic `subsystem-next-step` fallback for `agentkit_cli`, so the flagship repo-understanding workflow emits one concrete bounded next recommendation inside the `agentkit_cli` subsystem instead of stopping at the generic scoped-surface handoff."
     source_path.write_text(
         "# Demo Repo\n\n"
         f"## Objective\n{objective}\n\n"
@@ -77,7 +80,7 @@ def _write_repo(
             "agentkit contract \"Ship the next increment\" --path . --map repo-map.json\n"
             "```\n"
         )
-        if stale_self_hosting or post_shipped_truth_objective or post_closeout_closed or adjacent_next_closed:
+        if stale_self_hosting or post_shipped_truth_objective or post_closeout_closed or adjacent_next_closed or adjacent_closeout_closed:
             readme = (
                 "# Demo Repo\n\n"
                 "Supported lane: `source -> audit -> map -> spec -> contract`\n\n"
@@ -118,6 +121,13 @@ def _write_repo(
                 "# Changelog\n\n"
                 "## [0.8.0] - 2026-04-21\n\n"
                 "- Taught the flagship `agentkit spec` flow to suppress replay of the closed `flagship-adjacent-next-step` lane.\n"
+                "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
+            )
+        if adjacent_closeout_closed:
+            changelog = (
+                "# Changelog\n\n"
+                "## [0.9.0] - 2026-04-22\n\n"
+                "- Taught the flagship `agentkit spec` flow to suppress replay of the closed `flagship-adjacent-closeout-advance` lane and emit one bounded `agentkit_cli` next step.\n"
                 "- Kept the supported repo-understanding lane at `source -> audit -> map -> spec -> contract`.\n"
             )
         if concrete_next_closed or shipped_flagship_concrete_next_step:
@@ -195,6 +205,23 @@ def _write_repo(
                 "Date: 2026-04-21\n\n"
                 "- The shipped flagship repo still lets `agentkit spec . --json` replay `flagship-adjacent-next-step`.\n"
                 "- This lane exists to keep the flagship planner advancing from current repo truth.\n",
+                encoding="utf-8",
+            )
+        if adjacent_closeout_closed:
+            (project / "BUILD-REPORT.md").write_text(
+                "# BUILD-REPORT.md — demo-repo v0.9.0 flagship adjacent closeout advance\n\nStatus: SHIPPED\n- Closed the `flagship-adjacent-closeout-advance` lane and verified the planner should emit one bounded `agentkit_cli` next step.\n",
+                encoding="utf-8",
+            )
+            (project / "FINAL-SUMMARY.md").write_text(
+                "# Final Summary — demo-repo v0.9.0 flagship adjacent closeout advance\n\nStatus: SHIPPED\n- The flagship planner already completed the `flagship-adjacent-closeout-advance` lane.\n",
+                encoding="utf-8",
+            )
+            (project / "progress-log.md").write_text(
+                "# Progress Log — demo-repo v0.10.0 bounded agentkit next step\n\n"
+                "Status: IN PROGRESS\n"
+                "Date: 2026-04-22\n\n"
+                "- The shipped flagship repo still lets `agentkit spec . --json` fall through to `subsystem-next-step` for `agentkit_cli`.\n"
+                "- This lane exists to replace that generic fallback with one bounded `agentkit_cli` recommendation from current repo truth.\n",
                 encoding="utf-8",
             )
 
@@ -368,6 +395,21 @@ def test_spec_advances_past_closed_flagship_adjacent_next_lane(tmp_path):
     assert recommendation["title"] == "Advance the flagship planner past the closed adjacent-next-step lane"
     assert recommendation["contract_seed"]["title"].endswith("flagship adjacent closeout advance")
     assert any("`flagship-adjacent-next-step` increment as done" in item for item in recommendation["evidence"])
+
+
+def test_spec_advances_past_closed_flagship_adjacent_closeout_lane(tmp_path):
+    project = tmp_path / "demo-repo"
+    _write_repo(project, adjacent_closeout_closed=True)
+
+    result = runner.invoke(app, ["spec", str(project), "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    recommendation = payload["primary_recommendation"]
+    assert recommendation["kind"] == "agentkit-cli-bounded-next-step"
+    assert recommendation["title"] == "Emit one bounded `agentkit_cli` next step after adjacent closeout"
+    assert recommendation["contract_seed"]["title"].endswith("bounded agentkit next step")
+    assert any("`flagship-adjacent-closeout-advance` increment as done" in item for item in recommendation["evidence"])
 
 
 def test_spec_help():

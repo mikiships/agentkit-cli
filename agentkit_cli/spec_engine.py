@@ -361,6 +361,9 @@ class SpecEngine:
         adjacent_grounding = self._adjacent_grounding_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
         if adjacent_grounding is not None:
             candidates.append(adjacent_grounding)
+        bounded_agentkit_next = self._bounded_agentkit_next_candidate(root, source_context, audit_result, workflow_artifacts, map_context, repo_hints)
+        if bounded_agentkit_next is not None:
+            candidates.append(bounded_agentkit_next)
         coverage = self._coverage_candidate(root, map_context, repo_hints)
         if coverage is not None:
             candidates.append(coverage)
@@ -1080,6 +1083,91 @@ class SpecEngine:
             ),
         )
 
+
+    def _bounded_agentkit_next_candidate(
+        self,
+        root: Path,
+        source_context: SourceContext,
+        audit_result: SourceAuditResult,
+        workflow_artifacts: list[SpecWorkflowArtifact],
+        map_context: MapContext,
+        repo_hints,
+    ) -> Optional[SpecRecommendation]:
+        objective_summary = self._first_section_text(source_context.content, "objective")
+        if not objective_summary:
+            return None
+        objective_lower = objective_summary.lower()
+        has_subsystem_fallback_trigger = (
+            "subsystem-next-step" in objective_lower
+            and "agentkit_cli" in objective_lower
+            and (
+                "one concrete bounded next recommendation" in objective_lower
+                or "concrete bounded next recommendation" in objective_lower
+                or "one bounded next recommendation" in objective_lower
+                or "bounded next recommendation" in objective_lower
+            )
+        )
+        if not has_subsystem_fallback_trigger:
+            return None
+        if audit_result.used_fallback or not audit_result.readiness.ready_for_contract:
+            return None
+
+        completed_artifact = next(
+            (
+                artifact
+                for artifact in workflow_artifacts
+                if self._artifact_closes_flagship_adjacent_closeout_advance(artifact)
+            ),
+            None,
+        )
+        primary_area = map_context.subsystems[0].path if map_context.subsystems else root.name
+        objective = "Teach the self-spec flow to replace the generic `subsystem-next-step` fallback for `agentkit_cli` with one bounded next recommendation grounded in current flagship repo truth."
+        evidence = [
+            f"Canonical source objective already targets the remaining fallback gap inside `{primary_area}`: {objective_summary}",
+            "The live planner still needs one bounded `agentkit_cli` recommendation with truthful why-now, scope, and validation fields instead of the generic subsystem handoff.",
+        ]
+        if completed_artifact is not None:
+            evidence.append("Recent shipped/local-ready artifacts already record the `flagship-adjacent-closeout-advance` increment as done.")
+        if completed_artifact is not None and completed_artifact.version:
+            evidence.append(f"Latest shipped/local-ready artifact carrying that closeout: {completed_artifact.version}.")
+        return SpecRecommendation(
+            slug="agentkit-cli-bounded-next-step",
+            kind="agentkit-cli-bounded-next-step",
+            score=91,
+            title="Emit one bounded `agentkit_cli` next step after adjacent closeout",
+            objective=objective,
+            why_now=[
+                "The flagship planner already advanced through `flagship-adjacent-closeout-advance`, so the remaining truth gap is the generic `agentkit_cli` fallback.",
+                "One bounded recommendation is enough to reopen the next local-only lane without another human interpretation step.",
+                "This keeps the flagship self-spec flow deterministic and actionable while staying inside the mapped `agentkit_cli` surface.",
+            ],
+            scope_boundaries=self._ordered_unique([
+                "Limit the change to `agentkit_cli` planner logic, nearest helpers, truthful local planning surfaces, and the focused regression tests that prove the fallback is gone.",
+                "Do not reopen the already-completed `flagship-adjacent-closeout-advance` lane except to read its evidence pattern.",
+                *list(repo_hints.boundaries[:3]),
+            ]),
+            validation_hints=self._ordered_unique([
+                "Reproduce the current `subsystem-next-step` fallback for `agentkit_cli` before changing planner logic.",
+                "Add regression coverage across spec engine, spec command, spec workflow, and CLI entry paths for the post-adjacent-closeout flagship case.",
+                *list(repo_hints.command_hints[:2]),
+            ]),
+            evidence=evidence,
+            contract_seed=SpecContractSeed(
+                objective=objective,
+                title=f"All-Day Build Contract: {root.name} bounded agentkit next step",
+                deliverables=[
+                    "Detect when current flagship repo truth has already completed `flagship-adjacent-closeout-advance` and should no longer fall back to the generic `agentkit_cli` subsystem recommendation.",
+                    "Emit one bounded `agentkit_cli` recommendation with truthful why-now, scope boundaries, validation hints, and contract-seeding fields.",
+                    "Keep `.agentkit/source.md` and the nearest local planning surfaces aligned with the new post-fallback truth while staying local-only.",
+                ],
+                test_requirements=[
+                    "Run focused spec-engine, spec command, spec workflow, and CLI entry regressions for the post-adjacent-closeout fallback case.",
+                    *list(repo_hints.command_hints[:1]),
+                ],
+                map_input=str(map_context.source or map_context.generated_from or root),
+            ),
+        )
+
     def _coverage_candidate(self, root: Path, map_context: MapContext, repo_hints) -> Optional[SpecRecommendation]:
         risks = list(map_context.hints) + ([] if map_context.summary is None else [])
         risk = next((item for item in map_context.hints if item.kind == "risk"), None)
@@ -1186,7 +1274,7 @@ class SpecEngine:
                     status=self._extract_status(text),
                     version=self._extract_version(text),
                     lanes=self._extract_lanes(text),
-                    evidence=lines[:12],
+                    evidence=lines[:24],
                 )
             )
         return artifacts
@@ -1248,6 +1336,15 @@ class SpecEngine:
         joined = "\n".join(haystacks).lower()
         return "flagship-adjacent-next-step" in joined or "flagship adjacent next step" in joined or "adjacent next step" in joined
 
+    def _artifact_mentions_flagship_adjacent_closeout_advance(self, artifact: SpecWorkflowArtifact) -> bool:
+        haystacks = [artifact.path, artifact.kind, artifact.status or "", artifact.version or "", *artifact.evidence, *artifact.lanes]
+        joined = "\n".join(haystacks).lower()
+        return (
+            "flagship-adjacent-closeout-advance" in joined
+            or "flagship adjacent closeout advance" in joined
+            or "adjacent closeout advance" in joined
+        )
+
     def _has_shipped_adjacent_grounding(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
             artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"}
@@ -1285,6 +1382,17 @@ class SpecEngine:
     def _has_completed_flagship_adjacent_next_step(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
         return any(
             self._artifact_closes_flagship_adjacent_next_step(artifact)
+            for artifact in workflow_artifacts
+        )
+
+    def _artifact_closes_flagship_adjacent_closeout_advance(self, artifact: SpecWorkflowArtifact) -> bool:
+        if not self._artifact_mentions_flagship_adjacent_closeout_advance(artifact):
+            return False
+        return artifact.status in {"SHIPPED", "RELEASE-READY (LOCAL-ONLY)"} or artifact.kind == "changelog"
+
+    def _has_completed_flagship_adjacent_closeout_advance(self, workflow_artifacts: list[SpecWorkflowArtifact]) -> bool:
+        return any(
+            self._artifact_closes_flagship_adjacent_closeout_advance(artifact)
             for artifact in workflow_artifacts
         )
 
