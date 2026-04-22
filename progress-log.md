@@ -38,7 +38,7 @@ After `v1.28.0` shipped, the flagship repo still let `agentkit spec . --json` re
 - Verified current-tree release truth directly: `python -m agentkit_cli.main source-audit . --json` -> ready, `python -m agentkit_cli.main spec . --json` -> `flagship-adjacent-next-step`, focused tests `29 passed in 1.83s`, full suite `5017 passed, 1 warning in 190.83s (0:03:10)`
 - Found and reconciled the real release blocker before shipping: `pyproject.toml` and `agentkit_cli/__init__.py` still declared `1.28.0`, and `tests/test_main.py` still expected `1.28.0`
 - Deliverable-cluster commits: `2c71ab1` (`docs: start v1.29.0 release completion`) and `404ada0` (`test: update version assertion for v1.29.0`)
-- Verified remote branch head directly: `origin/feat/v1.29.0-flagship-self-advance` -> `f869a12f54501abe115a7369d75d51c0b1d19656`
+- Verified remote branch head directly: `origin/feat/v1.29.0-flagship-self-advance` -> `af75cff236426eb8521204adbd446980ce49fc8f`
 - Verified and reconciled annotated tag truth directly: `v1.29.0` had initially peeled to `c80e636d41d6a38437792fd35131889ca44d0831`, which predated the version-assertion test fix, so the annotated tag was corrected and force-pushed; it now peels to shipped commit `404ada0eb6cf8092659d567b10f3c28448aafc66`
 - Verified release artifacts and registry directly: `dist/agentkit_cli-1.29.0-py3-none-any.whl`, `dist/agentkit_cli-1.29.0.tar.gz`, PyPI project JSON `info.version=1.29.0`, and PyPI version JSON files `agentkit_cli-1.29.0-py3-none-any.whl` plus `agentkit_cli-1.29.0.tar.gz`
 - Final contradiction scan: `No contradictory success/blocker narratives found.`
@@ -52,8 +52,8 @@ After `v1.28.0` shipped, the flagship repo still let `agentkit spec . --json` re
 ## Final shipped truth
 
 - Shipped release commit: `404ada0eb6cf8092659d567b10f3c28448aafc66`
-- Later docs-only chronology head: `f869a12f54501abe115a7369d75d51c0b1d19656`
-- Remote branch ref: `origin/feat/v1.29.0-flagship-self-advance` -> `f869a12f54501abe115a7369d75d51c0b1d19656`
+- Later docs-only chronology head: `af75cff236426eb8521204adbd446980ce49fc8f`
+- Remote branch ref: `origin/feat/v1.29.0-flagship-self-advance` -> `af75cff236426eb8521204adbd446980ce49fc8f`
 - Annotated tag object: `1eb19058143ef3f6629e6f25da6041f0213efbeb`
 - Tag peel: `404ada0eb6cf8092659d567b10f3c28448aafc66`
 - PyPI live: `agentkit-cli==1.29.0` with `agentkit_cli-1.29.0-py3-none-any.whl` and `agentkit_cli-1.29.0.tar.gz`
