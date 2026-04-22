@@ -1,7 +1,7 @@
 # agentkit-cli
 
 ## Objective
-Teach the flagship self-spec flow to recognize when `flagship-post-closeout-advance` is already closed out in current repo truth, stop replaying that lane, and promote the next honest flagship recommendation from current shipped or local-release-ready evidence.
+Teach the flagship self-spec flow to recognize when `flagship-post-closeout-advance` is already closed out in current repo truth, stop replaying that lane, and promote the next honest flagship recommendation, `flagship-adjacent-next-step`, instead of the generic subsystem fallback.
 
 ## Commands
 - `python3 -m agentkit_cli.main source-audit . --json`
@@ -26,7 +26,7 @@ Work only inside this repository. Keep changes narrowly focused on deterministic
 - Run `uv run python -m pytest -q`.
 
 ## Deliverables
-- Canonical `.agentkit/source.md` aligned with the new flagship objective.
-- Successful self-spec output that advances past the closed `flagship-post-closeout-advance` lane.
+- Canonical `.agentkit/source.md` aligned with the post-closeout flagship objective and the promoted `flagship-adjacent-next-step` lane.
+- Successful self-spec output that advances past the closed `flagship-post-closeout-advance` lane and avoids the generic subsystem fallback.
 - Truthful local planning surfaces in `BUILD-TASKS.md`, `progress-log.md`, and the new build contract.
-- One local completion commit after validation passes.
+- Local completion commits after focused validation and final closeout.
