@@ -72,3 +72,11 @@ This tree is truthfully `RELEASE-READY (LOCAL-ONLY)`: the flagship command path 
 - Verified direct external release truth before mutation: remote branch `origin/feat/v1.28.0-flagship-post-closeout-advance` absent, tag `v1.28.0` absent locally and on origin, PyPI project latest `1.27.0`, and PyPI `agentkit-cli/1.28.0` version endpoint returned missing.
 - Ran mandated recall/conflict/hygiene checks using the workspace script copies because the repo-local `scripts/pre-action-recall.sh`, `scripts/check-status-conflicts.sh`, and `scripts/post-agent-hygiene-check.sh` paths referenced by the contract do not exist in this repo.
 - Next: push the release branch, create and push annotated tag `v1.28.0`, then build and publish fresh `1.28.0` artifacts.
+
+## Release completion D2 update
+
+- Pushed branch `feat/v1.28.0-flagship-post-closeout-advance` to `origin`; remote head now resolves to `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`.
+- Created annotated tag `v1.28.0` with message `Release v1.28.0`; local annotated tag object is `c5832f0d153b60d376546408e0dbda90bfd39e40` and it peels to shipped commit `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`.
+- Pushed `v1.28.0` to origin and verified both remote refs directly: branch head `refs/heads/feat/v1.28.0-flagship-post-closeout-advance` and peeled tag `refs/tags/v1.28.0^{}` both resolve to `1a6a8a366e43c28d1c227fd7acac7d1806efb6f9`.
+- Chronology note: the shipped tag commit is now the documentation-backed verification commit `1a6a8a3`, not the earlier local-only closeout commit `8ac518b`.
+- Next: build fresh `1.28.0` wheel and sdist from a cleaned `dist/`, publish only those two artifacts, then verify PyPI project and version endpoints plus filenames.
