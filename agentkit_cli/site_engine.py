@@ -747,8 +747,9 @@ _NAV = """<header>
   <div class="nav-brand">agentkit<span>/cli</span></div>
   <nav>
     <a href="{base_url}">Home</a>
-    <a href="{base_url}#quickstart">Quickstart</a>
-    <a href="{base_url}#proof">Proof</a>
+    <a href="{base_url}#quickstart">Try it</a>
+    <a href="{base_url}#use-cases">Use cases</a>
+    <a href="{base_url}#trust">Trust</a>
     <a href="{base_url}#rankings">Rankings</a>
     {topic_links}
     <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="nav-cta">GitHub ↗</a>
@@ -924,6 +925,7 @@ class SiteEngine:
         """Generate index.html."""
         frontdoor = build_frontdoor_stats((site_data or {}).get("frontdoor"))
         if site_data and site_data.get("repos") is not None:
+            raw_repos = site_data.get("repos", [])
             all_repos = [
                 RepoEntry(
                     repo=repo.get("name", ""),
@@ -932,15 +934,20 @@ class SiteEngine:
                     last_run=repo.get("synced_at", ""),
                     details=repo,
                 )
-                for repo in site_data.get("repos", [])
+                for repo in raw_repos
                 if repo.get("name")
             ]
             total_repos = int((site_data.get("stats") or {}).get("total", len(all_repos)))
-            community_repos = sum(1 for repo in site_data.get("repos", []) if repo.get("source") == "community")
+            community_repos = sum(1 for repo in raw_repos if repo.get("source") == "community")
+            ecosystem_count = len({str(repo.get("ecosystem", "")).strip().lower() for repo in raw_repos if repo.get("ecosystem")})
         else:
+            raw_repos = []
             all_repos = self._get_all_repos(limit=self.config.limit)
             total_repos = self._count_unique_repos()
             community_repos = 0
+            ecosystem_count = len(self.config.topics)
+        trust_stat_value = community_repos if community_repos > 0 else ecosystem_count
+        trust_stat_label = "Community Scored" if community_repos > 0 else "Ecosystems"
         rows_html = "".join(
             f"<tr>"
             f'<td class="repo-name"><a href="{self.config.base_url}repo/{_safe_name(r.repo)}.html">{r.repo}</a></td>'
@@ -963,12 +970,12 @@ class SiteEngine:
 
         body = f"""
         <div class="hero">
-          <div class="hero-badge">v{frontdoor['version']} &middot; open source workflow kit for AI coding agents</div>
+          <div class="hero-badge">v{frontdoor['version']} &middot; {total_repos} public repos scored &middot; open source workflow kit</div>
           <h1>Keep <em>one canonical source</em><br>for every AI coding agent</h1>
-          <p class="hero-sub">agentkit-cli gives you a source-first workflow for agent context and execution rules. Write once in <code>.agentkit/source.md</code>, project that into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, add an <code>agentkit contract</code> when work needs shared guardrails, then score what ships.</p>
+          <p class="hero-sub">If you landed here from HN, the pitch is simple: agentkit-cli is not another prompt pack. It gives your repo one source of truth for agent instructions, projects that into AGENTS.md, CLAUDE.md, GEMINI.md, COPILOT.md, AGENT.md, and <code>llms.txt</code>, adds an <code>agentkit contract</code> when work needs shared guardrails, then scores what actually ships.</p>
           <div class="hero-actions">
             <div class="install-block"><span class="prompt">$</span> pip install agentkit-cli</div>
-            <a href="#quickstart" class="nav-cta">See quickstart ↓</a>
+            <a href="#quickstart" class="nav-cta">Try the 4-command setup ↓</a>
             <a href="https://github.com/mikiships/agentkit-cli" target="_blank" class="btn-gh">View on GitHub</a>
           </div>
           <div class="hero-proof">
@@ -980,7 +987,7 @@ class SiteEngine:
             <div class="proof-item">
               <span class="proof-kicker">Execution</span>
               <strong>Make every agent see the same job contract.</strong>
-              <p>Use <code>agentkit contract</code> for scope, deliverables, checks, and team-wide execution rules.</p>
+              <p>Use <code>agentkit contract</code> for scope, deliverables, checks, and validation before runs sprawl.</p>
             </div>
             <div class="proof-item">
               <span class="proof-kicker">Guardrails</span>
@@ -989,8 +996,8 @@ class SiteEngine:
             </div>
             <div class="proof-item">
               <span class="proof-kicker">Proof</span>
-              <strong>{frontdoor['tests']} tests, {frontdoor['versions']} shipped versions, {frontdoor['packages']} packages.</strong>
-              <p>Real release cadence and real surface area, not a one-command demo that stops at the headline.</p>
+              <strong>{frontdoor['tests']} tests, {frontdoor['versions']} shipped versions, {total_repos} public scored repos.</strong>
+              <p>Real release cadence, real scored examples, and a workflow that extends past the install command.</p>
             </div>
           </div>
         </div>
@@ -1000,7 +1007,7 @@ class SiteEngine:
           <div class="stat-item stat-card"><div class="stat-value" data-stat="versions">{frontdoor['versions']}</div><div class="stat-label">Versions</div></div>
           <div class="stat-item stat-card"><div class="stat-value" data-stat="packages">{frontdoor['packages']}</div><div class="stat-label">Packages</div></div>
           <div class="stat-item stat-card"><div class="stat-num" id="repos-scored-stat">{total_repos}</div><div class="stat-label">Repos Scored</div></div>
-          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">{community_repos}</div><div class="stat-label">Community Scored</div></div>
+          <div class="stat-item stat-card"><div class="stat-num" id="community-scored-stat">{trust_stat_value}</div><div class="stat-label">{trust_stat_label}</div></div>
         </div>
 
         <section class="workflow-section">
@@ -1015,6 +1022,23 @@ class SiteEngine:
               <div class="workflow-card"><span class="step">01</span><h3>Write the canonical source</h3><p>Initialize <code>.agentkit/source.md</code> so your team edits one file instead of manually keeping AGENTS.md, CLAUDE.md, and friends in sync.</p></div>
               <div class="workflow-card"><span class="step">02</span><h3>Project into real agent files</h3><p>Generate the filenames existing tools expect, so Claude Code, Codex, Gemini, Copilot, and MCP flows inherit the same context.</p></div>
               <div class="workflow-card"><span class="step">03</span><h3>Score, gate, and learn</h3><p>Add contracts, lint for drift, benchmark execution quality, and inspect transcripts so the workflow gets better over time.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="secondary-section" id="use-cases">
+          <div class="container secondary-grid">
+            <div class="secondary-card">
+              <h3>For teams juggling multiple agent surfaces</h3>
+              <p>You already have Claude Code, Codex, Gemini, Copilot, or MCP tools touching the same repo and you do not want their instructions drifting apart.</p>
+            </div>
+            <div class="secondary-card">
+              <h3>For maintainers who want guardrails, not vibes</h3>
+              <p>You want contracts, linting, CI gates, and transcript review so agent work can be inspected instead of hand-waved.</p>
+            </div>
+            <div class="secondary-card">
+              <h3>For people evaluating agent-readiness in public</h3>
+              <p>You want to score real repos, compare examples, and share a concrete artifact instead of arguing from screenshots.</p>
             </div>
           </div>
         </section>
@@ -1050,8 +1074,19 @@ agentkit score</code></pre>
           </div>
         </section>
 
-        <section class="features-section">
+        <section class="features-section" id="trust">
           <div class="container">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Why trust this</h2>
+                <p class="section-lead">The value here is not just the thesis. There is a shipped toolchain behind it, public scored examples, and enough surface area to show the workflow has been exercised.</p>
+              </div>
+            </div>
+            <div class="trust-grid" style="margin-bottom:1rem">
+              <div class="trust-card"><h3>Shipped repeatedly</h3><p><strong>{frontdoor['versions']} released versions</strong> and <strong>{frontdoor['tests']} tests</strong> signal ongoing iteration, not a landing page built ahead of the product.</p></div>
+              <div class="trust-card"><h3>Public examples, not mockups</h3><p><strong>{total_repos} public repositories</strong> are already scored on this site across <strong>{ecosystem_count}</strong> ecosystems, so visitors can inspect what the workflow measures.</p></div>
+              <div class="trust-card"><h3>More than one command</h3><p>The toolkit already spans source management, projection, scoring, linting, benchmarking, transcript review, and MCP access across <strong>{frontdoor['packages']} packages</strong>.</p></div>
+            </div>
             <div class="section-header">
               <div>
                 <h2 class="section-title">The workflow stack</h2>
@@ -1074,7 +1109,7 @@ agentkit score</code></pre>
             <div class="section-header">
               <div>
                 <h2 class="section-title">Public proof</h2>
-                <p class="section-lead">The public site still matters, but it belongs as evidence for the workflow. These scorecards show what the toolkit measures against real repositories.</p>
+                <p class="section-lead">Start here if you want evidence before install. These scorecards show what the toolkit measures against real repositories, not toy demos.</p>
               </div>
             </div>
             <div id="recently-scored-list" class="recently-scored-list">
@@ -1088,7 +1123,7 @@ agentkit score</code></pre>
             <div class="section-header">
               <div>
                 <h2 class="section-title">Core commands</h2>
-                <p class="section-lead">The high-leverage commands line up with the workflow: source, project, contract, score, analyze, and guard.</p>
+                <p class="section-lead">If you only try one path first, use the setup flow. The rest of the commands help once you want analysis, sharing, transcript review, or CI enforcement.</p>
               </div>
             </div>
             <table class="cmd-table">
@@ -1109,8 +1144,8 @@ agentkit score</code></pre>
         <section class="secondary-section">
           <div class="container secondary-grid">
             <div class="secondary-card">
-              <h3>Explore live rankings</h3>
-              <p>Browse ecosystem scoreboards and repo pages when you want examples, comparisons, or public proof points.</p>
+              <h3>Not ready to install yet?</h3>
+              <p>Browse ecosystem scoreboards and repo pages first. It is the fastest way to understand what agent-readiness means in practice.</p>
               <div class="inline-links" style="margin-top:1rem">{topics_pills}<a class="pill" href="leaderboard.html">Leaderboard</a><a class="pill" href="trending.html">Trending</a></div>
             </div>
             <div class="secondary-card" id="org-leaderboard">
