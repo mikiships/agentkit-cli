@@ -32,6 +32,7 @@ After `v1.29.0` shipped, the flagship repo emitted `flagship-adjacent-next-step`
 - Re-ran release-critical focused tests with `uv run python -m pytest -q tests/test_spec_engine.py tests/test_spec_cmd.py tests/test_spec_workflow.py tests/test_main.py` -> `32 passed in 2.13s`
 - Found the release blocker directly in repo truth: `pyproject.toml`, `agentkit_cli/__init__.py`, and `tests/test_main.py` still said `1.29.0` even though this is the `v1.30.0` branch
 - Reconciled those stale `1.29.0` version surfaces to `1.30.0` before any push, tag, or publish action
+- Re-ran the full suite after the version-surface reconciliation with `uv run python -m pytest -q` -> `5020 passed, 1 warning in 205.87s`
 
 ## Current recommendation truth
 
